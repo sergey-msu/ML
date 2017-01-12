@@ -2,8 +2,14 @@
 
 namespace ML.Core
 {
+  /// <summary>
+  /// Represents a classification class
+  /// </summary>
   public class Class
   {
+    /// <summary>
+    /// Default class singleton
+    /// </summary>
     public static readonly Class None = new Class("[NONE]");
 
     public readonly string m_Name;
@@ -18,7 +24,14 @@ namespace ML.Core
       m_Value = value ?? 0.0F;
     }
 
+    /// <summary>
+    /// Class Name
+    /// </summary>
     public string Name  { get { return m_Name; } }
+
+    /// <summary>
+    /// Some associated value (e.g. {-1, +1} for two-classes classification)
+    /// </summary>
     public float  Value { get { return m_Value; } }
 
     #region Overrides

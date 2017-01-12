@@ -5,8 +5,14 @@ using ML.Core.Contracts;
 
 namespace ML.Core.Stats
 {
+  /// <summary>
+  /// Margin calculator
+  /// </summary>
   public static class Margin
   {
+    /// <summary>
+    /// Calculates margin for given algorithm
+    /// </summary>
     public static Dictionary<int, float> Calculate(IAlgorithm algorithm)
     {
       var result = new SortedDictionary<int, float>();
@@ -18,10 +24,10 @@ namespace ML.Core.Stats
         float maxi = float.MinValue;
         float si = 0;
 
-        foreach (var cls in algorithm.Classes)
+        foreach (var cls in algorithm.Classes.Values)
         {
-          var closeness = algorithm.EstimateClose(pData.Key, cls.Value);
-          if (cls.Value == pData.Value) si = closeness;
+          var closeness = algorithm.EstimateClose(pData.Key, cls);
+          if (cls == pData.Value) si = closeness;
           else
           {
             if (maxi < closeness) maxi = closeness;

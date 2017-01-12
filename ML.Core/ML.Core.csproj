@@ -61,6 +61,9 @@
     <Compile Include="Kernels\QuardaticKernel.cs" />
     <Compile Include="Kernels\TriangularKernel.cs" />
     <Compile Include="Kernels\RectangularKernel.cs" />
+    <Compile Include="Metric\LInftyMetric.cs" />
+    <Compile Include="Metric\MetricBase.cs" />
+    <Compile Include="Metric\LpMetric.cs" />
     <Compile Include="Metric\EuclideanMetric.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

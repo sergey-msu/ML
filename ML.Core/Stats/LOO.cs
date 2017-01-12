@@ -7,8 +7,14 @@ using ML.Core.Contracts;
 
 namespace ML.Core.Stats
 {
+  /// <summary>
+  /// Leave-One-Out calculators
+  /// </summary>
   public static class LOO
   {
+    /// <summary>
+    /// LOO for NNK
+    /// </summary>
     public static NearestKNeighboursAlgorithm.Params For_NearestKNeighboursAlgorithm(ClassifiedSample trainingSample, IMetric metric)
     {
       var kMin = int.MaxValue;
@@ -40,6 +46,9 @@ namespace ML.Core.Stats
       return new NearestKNeighboursAlgorithm.Params(kMin);
     }
 
+    /// <summary>
+    /// LOO for PFW
+    /// </summary>
     public static ParzenFixedAlgorithm.Params For_ParzenFixedAlgorithm(ClassifiedSample trainingSample, IMetric metric, IKernel kernel, float hmin, float hmax)
     {
       var hMin = float.MaxValue;

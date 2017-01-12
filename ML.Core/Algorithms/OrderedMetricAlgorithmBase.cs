@@ -17,7 +17,7 @@ namespace ML.Core.Algorithms
       var closeness = 0.0F;
       var sLength = TrainingSample.Count;
 
-      var orderedSample = Metric.Order(x, TrainingSample.Points);
+      var orderedSample = Metric.Sort(x, TrainingSample.Points);
 
       for (int i=0; i<sLength; i++)
       {

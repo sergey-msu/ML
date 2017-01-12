@@ -5,37 +5,19 @@ using System.Runtime.CompilerServices;
 
 namespace ML.Core
 {
+  /// <summary>
+  /// Unitilitary functions
+  /// </summary>
   public static class Utils
   {
-    #region Inner
-
-    public struct Point2D
-    {
-      public Point2D(double x, double y)
-      {
-        X = x;
-        Y = y;
-      }
-
-      public readonly double X;
-      public readonly double Y;
-
-      public Point2D? ToBoxMuller()
-      {
-        var s = X * X + Y * Y;
-        if (s > 1 || s == 0) return null;
-
-        var L = Math.Sqrt(-2 * Math.Log(s) / s);
-
-        return new Point2D(X * L, this.Y * L);
-      }
-    }
-
-    #endregion
-
     [ThreadStatic]
     private static readonly Random s_UniformRandom = new Random();
 
+    /// <summary>
+    /// Returns uniformly distributed random value
+    /// </summary>
+    /// <param name="a">Min value</param>
+    /// <param name="b">Max value</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double GenerateUniform(double a, double b)
     {
@@ -43,12 +25,23 @@ namespace ML.Core
       return a + x * (b - a);
     }
 
+    /// <summary>
+    /// Returns uniformly distributed in [-1, 1]x[-1, 1] 2D point
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Point2D GenerateUniformPoint()
     {
       return new Point2D(Utils.GenerateUniform(-1, 1), Utils.GenerateUniform(-1, 1));
     }
 
+
+
+    /// <summary>
+    /// Returns Box-Muller normally distributed 2D point
+    /// </summary>
+    /// <param name="muX">Mean X</param>
+    /// <param name="muY">Mean Y</param>
+    /// <param name="sigma">Sigma</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Point2D GenerateNormalPoint(double muX, double muY, double sigma)
     {

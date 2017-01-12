@@ -2,6 +2,9 @@
 
 namespace ML.Core
 {
+  /// <summary>
+  /// Represents a Feature
+  /// </summary>
   public class Feature
   {
     public readonly string m_Name;
@@ -14,6 +17,9 @@ namespace ML.Core
       m_Name = name;
     }
 
+    /// <summary>
+    /// Feature name
+    /// </summary>
     public string Name  { get { return m_Name; } }
 
     #region Overrides
