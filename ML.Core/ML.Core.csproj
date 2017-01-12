@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4D82FFF2-3CA0-44ED-94EE-CED63DC7E106}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ML.Core</RootNamespace>
+    <AssemblyName>ML.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Algorithms\AlgorithmBase.cs" />
+    <Compile Include="Algorithms\NearestKNeighboursAlgorithm.cs" />
+    <Compile Include="Algorithms\OrderedMetricAlgorithmBase.cs" />
+    <Compile Include="Algorithms\PotentialFunctionAlgorithm.cs" />
+    <Compile Include="Algorithms\ParzenVariableAlgorithm.cs" />
+    <Compile Include="Algorithms\ParzenFixedAlgorithm.cs" />
+    <Compile Include="Algorithms\MetricAlgorithmBase.cs" />
+    <Compile Include="Algorithms\NearestKWeightedNeighboursAlgorithm.cs" />
+    <Compile Include="Algorithms\KernelAlgorithmBase.cs" />
+    <Compile Include="Algorithms\NearestNeighbourAlgorithm.cs" />
+    <Compile Include="ClassifiedSample.cs" />
+    <Compile Include="Feature.cs" />
+    <Compile Include="Class.cs" />
+    <Compile Include="Contracts\IAlgorithm.cs" />
+    <Compile Include="Contracts\IKernel.cs" />
+    <Compile Include="Contracts\IMetric.cs" />
+    <Compile Include="Kernels\GaussianKernel.cs" />
+    <Compile Include="Kernels\QuarticKernel.cs" />
+    <Compile Include="Kernels\QuardaticKernel.cs" />
+    <Compile Include="Kernels\TriangularKernel.cs" />
+    <Compile Include="Kernels\RectangularKernel.cs" />
+    <Compile Include="Metric\EuclideanMetric.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stats\General.cs" />
+    <Compile Include="Stats\LOO.cs" />
+    <Compile Include="Stats\Margin.cs" />
+    <Compile Include="Utils.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
