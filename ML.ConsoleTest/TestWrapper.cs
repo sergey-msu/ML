@@ -88,6 +88,9 @@ namespace ML.ConsoleTest
 
     private void doParzenFixedAlgorithmTest()
     {
+      var timer = new System.Diagnostics.Stopwatch();
+      timer.Start();
+
       var metric = new EuclideanMetric();
       var kernel = new GaussianKernel();
 
@@ -124,6 +127,9 @@ namespace ML.ConsoleTest
       Console.WriteLine();
 
       Visualizer.Run(algorithm);
+
+      timer.Stop();
+      Console.WriteLine(timer.ElapsedMilliseconds/1000.0F);
     }
 
     private void doPotentialFixedAlgorithmTest()
