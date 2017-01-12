@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using ML.Core.Contracts;
 
 namespace ML.Core.Algorithms
 {
+  /// <summary>
+  /// Base class for algorithm supplied with some spacial metric
+  /// </summary>
   public abstract class MetricAlgorithmBase<TParam> : AlgorithmBase<TParam>
   {
     public readonly IMetric m_Metric;
@@ -19,6 +21,9 @@ namespace ML.Core.Algorithms
       m_Metric = metric;
     }
 
+    /// <summary>
+    /// Space metric
+    /// </summary>
     public IMetric Metric { get { return m_Metric; } }
   }
 }

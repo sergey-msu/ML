@@ -5,6 +5,9 @@ using ML.Core.Contracts;
 
 namespace ML.Core.Algorithms
 {
+  /// <summary>
+  /// Base class for algorithm that accepts whole traing sample
+  /// </summary>
   public abstract class AlgorithmBase<TParam> : IAlgorithm
   {
     private readonly ClassifiedSample  m_TrainingSample;
@@ -21,12 +24,34 @@ namespace ML.Core.Algorithms
       m_Parameters = pars;
     }
 
+    /// <summary>
+    /// Algorithm mnemonic ID
+    /// </summary>
     public abstract string ID { get; }
+
+    /// <summary>
+    /// Algorithm name
+    /// </summary>
     public abstract string Name { get; }
+
+    /// <summary>
+    /// Training sample
+    /// </summary>
     public ClassifiedSample TrainingSample { get { return m_TrainingSample; } }
+
+    /// <summary>
+    /// Known classes
+    /// </summary>
     public Dictionary<string, Class> Classes { get { return m_Classes; } }
+
+    /// <summary>
+    /// Algorithm parameters
+    /// </summary>
     public TParam Parameters { get { return m_Parameters; } }
 
+    /// <summary>
+    /// Classify point
+    /// </summary>
     public Class Classify(Point x)
     {
       Class result = null;
@@ -45,6 +70,9 @@ namespace ML.Core.Algorithms
       return result;
     }
 
+    /// <summary>
+    /// Estimated closeness of given point to given classes
+    /// </summary>
     public abstract float EstimateClose(Point point, Class cls);
   }
 }

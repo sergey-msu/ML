@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using ML.Core.Contracts;
 
 namespace ML.Core.Algorithms

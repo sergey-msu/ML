@@ -5,6 +5,9 @@ using ML.Core.Contracts;
 
 namespace ML.Core.Algorithms
 {
+  /// <summary>
+  /// Parzen Variable Window Algorithm
+  /// </summary>
   public sealed class ParzenVariableAlgorithm : KernelAlgorithmBase<ParzenVariableAlgorithm.Params>
   {
     #region Inner
@@ -34,10 +37,23 @@ namespace ML.Core.Algorithms
         throw new ArgumentException("ParzenFixedAlgorithm.ctor(k<0|k+1>=classifiedSample.Count)");
     }
 
+    /// <summary>
+    /// Algorithm mnemonic ID
+    /// </summary>
     public override string ID { get { return "PVW"; } }
 
+    /// <summary>
+    /// Algorithm name
+    /// </summary>
     public override string Name { get { return "Parzen Variable Width Window"; } }
 
+    /// <summary>
+    /// Calculate 'weight' - a contribution of training point (i-th from ordered training sample)
+    /// to closeness of test point to its class
+    /// </summary>
+    /// <param name="i">Point number in ordered training sample</param>
+    /// <param name="x">Test point</param>
+    /// <param name="orderedSample">Ordered training sample</param>
     protected override float CalculateWeight(int i, Point x, Dictionary<Point, float> orderedSample)
     {
       var r = orderedSample.ElementAt(i).Value / orderedSample.ElementAt(Parameters.K+1).Value;

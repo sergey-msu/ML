@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using ML.Core.Contracts;
 
-
 namespace ML.Core.Algorithms
 {
   public sealed class PotentialFunctionAlgorithm : MetricAlgorithmBase<PotentialFunctionAlgorithm.Params>
