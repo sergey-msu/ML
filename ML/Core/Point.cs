@@ -51,7 +51,7 @@ namespace ML.Core
       m_SpacePoint = new float[dimension];
     }
 
-    public Point(float[] point)
+    public Point(params float[] point)
     {
       if (point==null || point.Length<=0)
         throw new ArgumentException("Point.ctor(point=null|empty)");
