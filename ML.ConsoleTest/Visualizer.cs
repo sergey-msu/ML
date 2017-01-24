@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ML.Core;
-using ML.Core.Contracts;
+using ML.Contracts;
 using System.IO;
 
 namespace ML.ConsoleTest

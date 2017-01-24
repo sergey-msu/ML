@@ -6,8 +6,8 @@ using ML.Core;
 using ML.Core.Algorithms;
 using ML.Core.Metric;
 using ML.Core.Kernels;
-using ML.Core.Contracts;
-using ML.Core.Stats;
+using ML.Contracts;
+using ML.MetricalMethods;
 
 namespace ML.ConsoleTest
 {
@@ -45,7 +45,7 @@ namespace ML.ConsoleTest
       calculateMargin(algorithm);
 
       Console.WriteLine("Errors:");
-      var errors = General.GetErrors(algorithm, Data.Data);
+      var errors = ErrorInfo.GetErrors(algorithm, Data.Data);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -75,7 +75,7 @@ namespace ML.ConsoleTest
       {
         var p = new NearestKNeighboursAlgorithm.Params(k);
         var alg = new NearestKNeighboursAlgorithm(Data.TrainingSample, metric, p);
-        var errors = General.GetErrors(alg, Data.Data);
+        var errors = ErrorInfo.GetErrors(alg, Data.Data);
         var ec = errors.Count();
         var dc = Data.Data.Count;
         var pct = Math.Round(100.0F * ec / dc, 2);
@@ -118,7 +118,7 @@ namespace ML.ConsoleTest
 
         var p = new ParzenFixedAlgorithm.Params(h);
         var alg = new ParzenFixedAlgorithm(Data.TrainingSample, metric, kernel, p);
-        var errors = General.GetErrors(alg, Data.Data);
+        var errors = ErrorInfo.GetErrors(alg, Data.Data);
         var ec = errors.Count();
         var dc = Data.Data.Count;
         var pct = Math.Round(100.0F * ec / dc, 2);
@@ -151,7 +151,7 @@ namespace ML.ConsoleTest
       calculateMargin(algorithm);
 
       Console.WriteLine("Errors:");
-      var errors = General.GetErrors(algorithm, Data.Data);
+      var errors = ErrorInfo.GetErrors(algorithm, Data.Data);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -163,7 +163,7 @@ namespace ML.ConsoleTest
     }
 
 
-    private void calculateMargin(IAlgorithm algorithm)
+    private void calculateMargin(IMetricAlgorithm algorithm)
     {
       var res = Margin.Calculate(algorithm);
 
