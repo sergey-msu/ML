@@ -13,6 +13,10 @@ namespace ML.Core
     {
     }
 
+    public ClassifiedSample(Dictionary<Point, Class> other) : base(other)
+    {
+    }
+
     public ClassifiedSample(ClassifiedSample other) : base(other)
     {
     }

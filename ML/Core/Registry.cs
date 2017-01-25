@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using ML.Core.Kernels;
 using ML.Core.Metric;
+using ML.Core.Logical;
 
 namespace ML.Core
 {
@@ -40,6 +41,17 @@ namespace ML.Core
 
         return result;
       }
+    }
+
+    public static class Informativities
+    {
+      private static readonly GiniInformativity m_GiniInformativity = new GiniInformativity();
+      private static readonly DonskoyInformativity m_DonskoyInformativity = new DonskoyInformativity();
+      private static readonly EntropyInformativity m_EntropyInformativity = new EntropyInformativity();
+
+      public static GiniInformativity GiniInfomativity { get { return m_GiniInformativity; } }
+      public static DonskoyInformativity DonskoyInformativity { get { return m_DonskoyInformativity; } }
+      public static EntropyInformativity EntropyInformativity { get { return m_EntropyInformativity; } }
     }
   }
 }

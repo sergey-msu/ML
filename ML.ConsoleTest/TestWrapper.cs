@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Collections;
+using System.Collections.Generic;
 using ML.Core;
-using ML.Core.Algorithms;
 using ML.Core.Metric;
 using ML.Core.Kernels;
 using ML.Contracts;
-using ML.MetricalMethods;
+using ML.LogicalMethods.Algorithms;
+using ML.MetricalMethods.Algorithms;
+using ML.Core.Logical;
 
 namespace ML.ConsoleTest
 {
@@ -30,8 +31,10 @@ namespace ML.ConsoleTest
     {
       //doNearestNeighbourAlgorithmTest();
       //doNearestKNeighboursAlgorithmTest();
-      doParzenFixedAlgorithmTest();
+      //doParzenFixedAlgorithmTest();
       //doPotentialFixedAlgorithmTest();
+
+      doDecisionTreeAlgorithmTest();
     }
 
     #region .pvt
@@ -39,51 +42,51 @@ namespace ML.ConsoleTest
     private void doNearestNeighbourAlgorithmTest()
     {
       var metric = new EuclideanMetric();
-      var algorithm = new NearestNeighbourAlgorithm(Data.TrainingSample, metric);
+      var alg = new NearestNeighbourAlgorithm(Data.TrainingSample, metric);
 
       Console.WriteLine("Margin:");
-      calculateMargin(algorithm);
+      calculateMargin(alg);
 
       Console.WriteLine("Errors:");
-      var errors = ErrorInfo.GetErrors(algorithm, Data.Data);
+      var errors = alg.GetErrors(Data.Data);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
 
-      Visualizer.Run(algorithm);
+      Visualizer.Run(alg);
     }
 
     private void doNearestKNeighboursAlgorithmTest()
     {
       var metric = new EuclideanMetric();
+      var alg = new NearestKNeighboursAlgorithm(Data.TrainingSample, metric, 1);
 
       // LOO
-      var res = LOO.For_NearestKNeighboursAlgorithm(Data.TrainingSample, metric);
-      Console.WriteLine("Nearest K Neigbour: optimal k is {0}", res.K);
+      alg.Train_LOO();
+      var optK = alg.K;
+      Console.WriteLine("Nearest K Neigbour: optimal k is {0}", optK);
       Console.WriteLine();
 
       // Margins
-      var pars = new NearestKNeighboursAlgorithm.Params(res.K);
-      var algorithm = new NearestKNeighboursAlgorithm(Data.TrainingSample, metric, pars);
-      calculateMargin(algorithm);
+      Console.WriteLine("Margins:");
+      calculateMargin(alg);
       Console.WriteLine();
 
       //Error distribution
       Console.WriteLine("Errors:");
       for (int k = 1; k < 5; k++)
       {
-        var p = new NearestKNeighboursAlgorithm.Params(k);
-        var alg = new NearestKNeighboursAlgorithm(Data.TrainingSample, metric, p);
-        var errors = ErrorInfo.GetErrors(alg, Data.Data);
+        alg.K = k;
+        var errors = alg.GetErrors(Data.Data);
         var ec = errors.Count();
         var dc = Data.Data.Count;
         var pct = Math.Round(100.0F * ec / dc, 2);
-        Console.WriteLine("{0}:\t{1} of {2}\t({3}%) {4}", k, ec, dc, pct, k == res.K ? "<-LOO optimal" : string.Empty);
+        Console.WriteLine("{0}:\t{1} of {2}\t({3}%) {4}", k, ec, dc, pct, k == optK ? "<-LOO optimal" : string.Empty);
       }
       Console.WriteLine();
 
-      Visualizer.Run(algorithm);
+      Visualizer.Run(alg);
     }
 
     private void doParzenFixedAlgorithmTest()
@@ -93,17 +96,17 @@ namespace ML.ConsoleTest
 
       var metric = new EuclideanMetric();
       var kernel = new GaussianKernel();
+      var alg = new ParzenFixedAlgorithm(Data.TrainingSample, metric, kernel, 1.0F);
 
       // LOO
-      var res = LOO.For_ParzenFixedAlgorithm(Data.TrainingSample, metric, kernel, 0.1F, 20.0F);
-      Console.WriteLine("Parzen Fixed: optimal h is {0}", res.H);
+      alg.Train_LOO(0.1F, 20.0F, 0.2F);
+      var optH = alg.H;
+      Console.WriteLine("Parzen Fixed: optimal h is {0}", optH);
       Console.WriteLine();
 
       // Margins
       Console.WriteLine("Margins:");
-      var pars = new ParzenFixedAlgorithm.Params(res.H);
-      var algorithm = new ParzenFixedAlgorithm(Data.TrainingSample, metric, kernel, pars);
-      calculateMargin(algorithm);
+      calculateMargin(alg);
       Console.WriteLine();
 
       //var x = algorithm.Classify(new Point(new float[] { -3, 0 }));
@@ -114,19 +117,18 @@ namespace ML.ConsoleTest
       for (float h1 = step; h1 < 5; h1 += step)
       {
         var h = h1;
-        if (h <= res.H && h + step > res.H) h = res.H;
+        if (h <= optH && h + step > optH) h = optH;
 
-        var p = new ParzenFixedAlgorithm.Params(h);
-        var alg = new ParzenFixedAlgorithm(Data.TrainingSample, metric, kernel, p);
-        var errors = ErrorInfo.GetErrors(alg, Data.Data);
+        alg.H = h;
+        var errors = alg.GetErrors(Data.Data);
         var ec = errors.Count();
         var dc = Data.Data.Count;
         var pct = Math.Round(100.0F * ec / dc, 2);
-        Console.WriteLine("{0}:\t{1} of {2}\t({3}%) {4}", Math.Round(h, 2), ec, dc, pct, h == res.H ? "<-LOO optimal" : string.Empty);
+        Console.WriteLine("{0}:\t{1} of {2}\t({3}%) {4}", Math.Round(h, 2), ec, dc, pct, h == optH ? "<-LOO optimal" : string.Empty);
       }
       Console.WriteLine();
 
-      Visualizer.Run(algorithm);
+      Visualizer.Run(alg);
 
       timer.Stop();
       Console.WriteLine(timer.ElapsedMilliseconds/1000.0F);
@@ -137,39 +139,65 @@ namespace ML.ConsoleTest
       var metric = new EuclideanMetric();
       var kernel = new GaussianKernel();
 
-      var gammas = new float[Data.TrainingSample.Count];
-      var hs = new float[Data.TrainingSample.Count];
+      var eqps = new PotentialFunctionAlgorithm.KernelEquipment[Data.TrainingSample.Count];
       for (int i=0; i<Data.TrainingSample.Count; i++)
-      {
-        gammas[i] = 1.0F;
-        hs[i] = 1.5F;
-      }
-      var pars = new PotentialFunctionAlgorithm.Params(gammas, hs);
-      var algorithm = new PotentialFunctionAlgorithm(Data.TrainingSample, metric, kernel, pars);
+        eqps[i] = new PotentialFunctionAlgorithm.KernelEquipment(1.0F, 1.5F);
+      var alg = new PotentialFunctionAlgorithm(Data.TrainingSample, metric, kernel, eqps);
 
       Console.WriteLine("Margin:");
-      calculateMargin(algorithm);
+      calculateMargin(alg);
 
       Console.WriteLine("Errors:");
-      var errors = ErrorInfo.GetErrors(algorithm, Data.Data);
+      var errors = alg.GetErrors(Data.Data);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
 
-      var x = errors.Any(e => Data.TrainingSample.Any(t => t.Key==e.Point));
-
-      Visualizer.Run(algorithm);
+      Visualizer.Run(alg);
     }
+
+    private void doDecisionTreeAlgorithmTest()
+    {
+      var dim = Data.TrainingSample.First().Key.Dimension;
+      var patterns = getSimpleLogicPatterns(dim);
+
+      var alg = new DecisionTreeAlgorithm(Data.TrainingSample);
+      var informativity = new GiniInformativity();
+      alg.Train_ID3(patterns, informativity);
+
+      Console.WriteLine("Errors:");
+      var errors = alg.GetErrors(Data.Data);
+      var ec = errors.Count();
+      var dc = Data.Data.Count;
+      var pct = Math.Round(100.0F * ec / dc, 2);
+      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+
+      Visualizer.Run(alg);
+    }
+
 
 
     private void calculateMargin(IMetricAlgorithm algorithm)
     {
-      var res = Margin.Calculate(algorithm);
-
+      var res = algorithm.CalculateMargins();
       foreach (var r in res)
       {
         Console.WriteLine("{0}\t{1}", r.Key, r.Value);
+      }
+    }
+
+    private IEnumerable<Predicate<Point>> getSimpleLogicPatterns(int dim)
+    {
+      float step = 0.5F;
+      float min = 0;
+      float max = 1;
+
+      for (int i=0; i<dim; i++)
+      {
+        var idx = i;
+        for (float l=min; l<=max; l += step)
+          yield return (p => p[idx]<l);
       }
     }
 

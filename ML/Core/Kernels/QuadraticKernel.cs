@@ -3,7 +3,7 @@
 namespace ML.Core.Kernels
 {
   /// <summary>
-  /// Quardatic kernel r -> r^2, [-1, 1]
+  /// Quardatic kernel r -> 1-r^2, [-1, 1]
   /// </summary>
   public sealed class QuadraticKernel : IKernel
   {
@@ -12,7 +12,7 @@ namespace ML.Core.Kernels
 
     public float Calculate(float r)
     {
-      return (r >= -1 && r <= 1) ? (1 - r*r) : 0;
+      return (r > -1 && r < 1) ? (1 - r*r) : 0;
     }
   }
 }

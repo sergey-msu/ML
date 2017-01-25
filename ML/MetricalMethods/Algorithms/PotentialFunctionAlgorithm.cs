@@ -2,48 +2,42 @@
 using System.Linq;
 using System.Collections.Generic;
 using ML.Contracts;
+using ML.Core;
 
-namespace ML.Core.Algorithms
+namespace ML.MetricalMethods.Algorithms
 {
-  public sealed class PotentialFunctionAlgorithm : MetricAlgorithmBase<PotentialFunctionAlgorithm.Params>
+  public sealed class PotentialFunctionAlgorithm : MetricAlgorithmBase
   {
     #region Inner
 
-    public class Params
+    public struct KernelEquipment
     {
-      public Params(float[] gammas, float[] hs)
+      public KernelEquipment(float gamma, float h)
       {
-        if (gammas == null || gammas.Length <= 0)
-          throw new ArgumentException("PotentialAlgorithm.Params.ctor(gammas=null|empty)");
-        if (hs == null || hs.Length <= 0)
-          throw new ArgumentException("PotentialAlgorithm.Params.ctor(hs=null|empty)");
-        if (gammas.Length != hs.Length)
-          throw new ArgumentException("PotentialAlgorithm.Params.ctor(gammas.length<>hs.length)");
-
-        Gammas = gammas;
-        Hs = hs;
+        Gamma = gamma;
+        H = h;
       }
 
-      public readonly float[] Gammas;
-      public readonly float[] Hs;
+      public float Gamma;
+      public float H;
     }
 
     #endregion
 
     private readonly IKernel m_Kernel;
+    private KernelEquipment[] m_Eqps;
 
     public PotentialFunctionAlgorithm(ClassifiedSample classifiedSample,
-                              IMetric metric,
-                              IKernel kernel,
-                              Params pars)
-      : base(classifiedSample, metric, pars)
+                                      IMetric metric,
+                                      IKernel kernel,
+                                      KernelEquipment[] eqps)
+      : base(classifiedSample, metric)
     {
       if (kernel == null)
-        throw new ArgumentException("PotentialAlgorithm.ctor(kernel=null)");
-      if (Parameters.Gammas.Length != classifiedSample.Count)
-        throw new ArgumentException("PotentialAlgorithm.ctor(gammas.length<>sample.length)");
+        throw new MLException("PotentialAlgorithm.ctor(kernel=null)");
 
       m_Kernel = kernel;
+      Eqps = eqps;
     }
 
     public override string ID { get { return "PF"; } }
@@ -51,6 +45,28 @@ namespace ML.Core.Algorithms
     public override string Name { get { return "Potential Functions"; } }
 
     public IKernel Kernel { get { return m_Kernel; } }
+
+    public KernelEquipment[] Eqps
+    {
+      get { return m_Eqps; }
+      set
+      {
+        KernelEquipment[] eqps;
+        if (value==null)
+        {
+          var cnt = TrainingSample.Count;
+          eqps = new KernelEquipment[cnt];
+          for (int i=0; i<cnt; i++)
+            eqps[i] = new KernelEquipment(1.0F, 1.0F);
+        }
+        else
+        {
+          eqps = value.ToArray();
+        }
+
+        m_Eqps = eqps;
+      }
+    }
 
     public override float EstimateClose(Point x, Class cls)
     {
@@ -62,17 +78,11 @@ namespace ML.Core.Algorithms
         idx++;
         if (sData.Value != cls) continue;
 
-        var r = Metric.Dist(x, sData.Key) / Parameters.Hs[idx];
-        closeness += Parameters.Gammas[idx] * m_Kernel.Calculate(r);
+        var r = Metric.Dist(x, sData.Key) / m_Eqps[idx].H;
+        closeness += m_Eqps[idx].Gamma * m_Kernel.Calculate(r);
       }
 
       return closeness;
-    }
-
-    private float calculateWeight(int i, Point x, Dictionary<Point, float> orderedSample)
-    {
-      var r = orderedSample.ElementAt(i).Value / Parameters.Hs[i];
-      return Parameters.Gammas[i] * m_Kernel.Calculate(r);
     }
   }
 }

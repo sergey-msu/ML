@@ -1,18 +1,19 @@
 ﻿using System;
+using ML.Contracts;
 
 namespace ML.Core
 {
   /// <summary>
   /// Represents a Feature
   /// </summary>
-  public class Feature
+  public class Feature : INamed
   {
     public readonly string m_Name;
 
     public Feature(string name)
     {
       if (string.IsNullOrWhiteSpace(name))
-        throw new ArgumentException("Feature.ctor(name=null|empty)");
+        throw new MLException("Feature.ctor(name=null|empty)");
 
       m_Name = name;
     }

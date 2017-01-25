@@ -13,7 +13,7 @@ namespace ML.Core.Kernels
 
     public float Calculate(float r)
     {
-      return (float)Math.Exp(-2*r*r);
+      return (float)Math.Exp(-r*r);
     }
   }
 }

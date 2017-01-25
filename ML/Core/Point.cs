@@ -54,7 +54,7 @@ namespace ML.Core
     public Point(params float[] point)
     {
       if (point==null || point.Length<=0)
-        throw new ArgumentException("Point.ctor(point=null|empty)");
+        throw new MLException("Point.ctor(point=null|empty)");
 
       m_SpacePoint = point.ToArray();
     }
@@ -136,7 +136,7 @@ namespace ML.Core
     public static void CheckDimensions(Point p1, Point p2)
     {
       if (p1.Dimension != p2.Dimension)
-        throw new InvalidOperationException("Can not add point with different dimension");
+        throw new MLException("Can not add point with different dimension");
     }
 
     #endregion

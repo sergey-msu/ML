@@ -2,39 +2,24 @@
 using System.Linq;
 using System.Collections.Generic;
 using ML.Contracts;
+using ML.Core;
 
-namespace ML.Core.Algorithms
+namespace ML.MetricalMethods.Algorithms
 {
   /// <summary>
   /// Parzen Variable Window Algorithm
   /// </summary>
-  public sealed class ParzenVariableAlgorithm : KernelAlgorithmBase<ParzenVariableAlgorithm.Params>
+  public sealed class ParzenVariableAlgorithm : KernelAlgorithmBase
   {
-    #region Inner
-
-    public class Params
-    {
-      public Params(int k)
-      {
-        if (k <= 0)
-          throw new ArgumentException("ParzenVariableAlgorithm.Params.ctor(k<=0)");
-
-        K = k;
-      }
-
-      public readonly int K;
-    }
-
-    #endregion
+    private int m_K;
 
     public ParzenVariableAlgorithm(ClassifiedSample classifiedSample,
                                    IMetric metric,
                                    IKernel kernel,
-                                   Params pars)
-      : base(classifiedSample, metric, kernel, pars)
+                                   int k)
+      : base(classifiedSample, metric, kernel)
     {
-      if (pars.K < 0 || pars.K+1 >= classifiedSample.Count)
-        throw new ArgumentException("ParzenFixedAlgorithm.ctor(k<0|k+1>=classifiedSample.Count)");
+      K = k;
     }
 
     /// <summary>
@@ -45,7 +30,22 @@ namespace ML.Core.Algorithms
     /// <summary>
     /// Algorithm name
     /// </summary>
-    public override string Name { get { return "Parzen Variable Width Window"; } }
+    public override string Name { get { return "Parzen Window of Variable Width"; } }
+
+    /// <summary>
+    /// Neighbour count
+    /// </summary>
+    public int K
+    {
+      get { return m_K; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("NearestKNeighboursAlgorithm.K(value<=0)");
+
+        m_K = value;
+      }
+    }
 
     /// <summary>
     /// Calculate 'weight' - a contribution of training point (i-th from ordered training sample)
@@ -56,7 +56,7 @@ namespace ML.Core.Algorithms
     /// <param name="orderedSample">Ordered training sample</param>
     protected override float CalculateWeight(int i, Point x, Dictionary<Point, float> orderedSample)
     {
-      var r = orderedSample.ElementAt(i).Value / orderedSample.ElementAt(Parameters.K+1).Value;
+      var r = orderedSample.ElementAt(i).Value / orderedSample.ElementAt(m_K+1).Value;
       return Kernel.Calculate(r);
     }
   }

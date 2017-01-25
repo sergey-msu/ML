@@ -13,7 +13,7 @@ namespace ML.Core.Kernels
 
     public float Calculate(float r)
     {
-      return (r >= -1 && r <= 1) ? 1 : 0;
+      return (r > -1 && r < 1) ? 1 : 0;
     }
   }
 }

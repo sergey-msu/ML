@@ -1,11 +1,12 @@
 ﻿using System;
+using ML.Contracts;
 
 namespace ML.Core
 {
   /// <summary>
   /// Represents a classification class
   /// </summary>
-  public class Class
+  public class Class : INamed
   {
     /// <summary>
     /// Default class singleton
@@ -18,7 +19,7 @@ namespace ML.Core
     public Class(string name, float? value = null)
     {
       if (string.IsNullOrWhiteSpace(name))
-        throw new ArgumentException("Class.ctor(name=null|empty)");
+        throw new MLException("Class.ctor(name=null|empty)");
 
       m_Name = name;
       m_Value = value ?? 0.0F;

@@ -1,36 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ML.Contracts;
+using ML.Core;
 
-namespace ML.Core.Algorithms
+namespace ML.MetricalMethods.Algorithms
 {
   /// <summary>
   /// Nearest K Neighbours Algorithm
   /// </summary>
-  public sealed class NearestKNeighboursAlgorithm : OrderedMetricAlgorithmBase<NearestKNeighboursAlgorithm.Params>
+  public sealed class NearestKNeighboursAlgorithm : OrderedMetricAlgorithmBase
   {
-    #region Inner
-
-    public class Params
-    {
-      public Params(int k)
-      {
-        if (k <= 0)
-          throw new ArgumentException("NearestKNeighboursAlgorithm.Params.ctor(k<=0)");
-
-        K = k;
-      }
-
-      public readonly int K;
-    }
-
-    #endregion
+    private int m_K;
 
     public NearestKNeighboursAlgorithm(ClassifiedSample classifiedSample,
                                        IMetric metric,
-                                       Params pars)
-      : base(classifiedSample, metric, pars)
+                                       int k)
+      : base(classifiedSample, metric)
     {
+      K = k;
     }
 
     /// <summary>
@@ -44,6 +32,22 @@ namespace ML.Core.Algorithms
     public override string Name { get { return "Nearest K Neighbour(s)"; } }
 
     /// <summary>
+    /// Neighbour count
+    /// </summary>
+    public int K
+    {
+      get { return m_K; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("NearestKNeighboursAlgorithm.K(value<=0)");
+
+        m_K = value;
+      }
+    }
+
+
+    /// <summary>
     /// Calculate 'weight' - a contribution of training point (i-th from ordered training sample)
     /// to closeness of test point to its class
     /// </summary>
@@ -52,7 +56,43 @@ namespace ML.Core.Algorithms
     /// <param name="orderedSample">Ordered training sample</param>
     protected override float CalculateWeight(int i, Point x, Dictionary<Point, float> orderedSample)
     {
-      return (i < Parameters.K) ? 1 : 0;
+      return (i < m_K) ? 1 : 0;
+    }
+
+    /// <summary>
+    /// Leave-one-out optimization
+    /// </summary>
+    public void Train_LOO(int? minK = null, int? maxK = null)
+    {
+      if (!minK.HasValue || minK.Value<1) minK = 1;
+      if (!maxK.HasValue || maxK.Value>TrainingSample.Count) maxK = TrainingSample.Count;
+
+      var kOpt = int.MaxValue;
+      var minErrCnt = int.MaxValue;
+
+      for (int k = minK.Value; k <= maxK.Value; k++)
+      {
+        var errCnt = 0;
+        m_K = k;
+
+        for (int i = 0; i < TrainingSample.Count; i++)
+        {
+          var pData = TrainingSample.ElementAt(i);
+          using (var mask = this.ApplySampleMask((p, c, idx) => idx != i))
+          {
+            var cls = this.Classify(pData.Key);
+            if (cls != pData.Value) errCnt++;
+          }
+        }
+
+        if (errCnt < minErrCnt)
+        {
+          minErrCnt = errCnt;
+          kOpt = k;
+        }
+      }
+
+      m_K = kOpt;
     }
   }
 }

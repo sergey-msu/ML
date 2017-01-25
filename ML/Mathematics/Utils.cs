@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
+using ML.Core;
 
-namespace ML.Core
+namespace ML.Mathematics
 {
   /// <summary>
   /// Unitilitary functions

@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using ML.Contracts;
+using ML.Core;
 
-
-namespace ML.Core.Algorithms
+namespace ML.MetricalMethods.Algorithms
 {
   /// <summary>
   /// Nearest Neighbour Algorithm
   /// </summary>
-  public sealed class NearestNeighbourAlgorithm : OrderedMetricAlgorithmBase<NearestNeighbourAlgorithm.Params>
+  public sealed class NearestNeighbourAlgorithm : OrderedMetricAlgorithmBase
   {
-    #region Inner
-
-    public class Params {}
-
-    #endregion
-
-    public NearestNeighbourAlgorithm(ClassifiedSample classifiedSample, IMetric metric, Params pars=null)
-      : base(classifiedSample, metric, pars)
+    public NearestNeighbourAlgorithm(ClassifiedSample classifiedSample, IMetric metric)
+      : base(classifiedSample, metric)
     {
     }
 
@@ -29,7 +23,7 @@ namespace ML.Core.Algorithms
     /// <summary>
     /// Algorithm name
     /// </summary>
-    public override string Name { get { return "Nearest K Neighbours"; } }
+    public override string Name { get { return "Nearest Neighbour"; } }
 
     /// <summary>
     /// Calculate 'weight' - a contribution of training point (i-th from ordered training sample)

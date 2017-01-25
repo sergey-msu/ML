@@ -13,7 +13,7 @@ namespace ML.Core.Metric
     public LpMetric(float p)
     {
       if (p<1)
-        throw new ArgumentException("p should be greaeter or equals that 1 to represent a valid metric");
+        throw new MLException("p should be greaeter or equals that 1 to represent a valid metric");
 
       P = p;
     }
