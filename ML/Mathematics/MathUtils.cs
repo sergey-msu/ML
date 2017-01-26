@@ -7,10 +7,20 @@ namespace ML.Mathematics
   /// <summary>
   /// Unitilitary functions
   /// </summary>
-  public static class Utils
+  public static class MathUtils
   {
     [ThreadStatic]
     private static readonly Random s_UniformRandom = new Random();
+
+    /// <summary>
+    /// Calculates h(z) = -z log2(z)
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double EntropyH(float z)
+    {
+      const double COEFF = 1.44269504089F; // 1/ln(2)
+      return (0.0D <= z && z < double.Epsilon) ? 0.0D : -z*Math.Log(z)*COEFF;
+    }
 
     /// <summary>
     /// Returns uniformly distributed random value
@@ -30,10 +40,8 @@ namespace ML.Mathematics
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Point2D GenerateUniformPoint()
     {
-      return new Point2D(Utils.GenerateUniform(-1, 1), Utils.GenerateUniform(-1, 1));
+      return new Point2D(MathUtils.GenerateUniform(-1, 1), MathUtils.GenerateUniform(-1, 1));
     }
-
-
 
     /// <summary>
     /// Returns Box-Muller normally distributed 2D point
@@ -47,7 +55,7 @@ namespace ML.Mathematics
       Point2D? sample = null;
       while (!sample.HasValue)
       {
-        var p = Utils.GenerateUniformPoint();
+        var p = MathUtils.GenerateUniformPoint();
         sample = p.ToBoxMuller();
       }
 

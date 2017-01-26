@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using ML.Core;
 using ML.Core.Metric;
@@ -159,11 +158,10 @@ namespace ML.ConsoleTest
 
     private void doDecisionTreeAlgorithmTest()
     {
-      var dim = Data.TrainingSample.First().Key.Dimension;
-      var patterns = getSimpleLogicPatterns(dim);
+      var patterns = getSimpleLogicPatterns();
 
       var alg = new DecisionTreeAlgorithm(Data.TrainingSample);
-      var informativity = new GiniInformativity();
+      var informativity = new EntropyIndex();
       alg.Train_ID3(patterns, informativity);
 
       Console.WriteLine("Errors:");
@@ -187,17 +185,23 @@ namespace ML.ConsoleTest
       }
     }
 
-    private IEnumerable<Predicate<Point>> getSimpleLogicPatterns(int dim)
+    private IEnumerable<Predicate<Point>> getSimpleLogicPatterns()
     {
-      float step = 0.5F;
-      float min = 0;
-      float max = 1;
+      var sample = Data.TrainingSample;
+      var dim = sample.First().Key.Dimension;
+      float step = 0.05F;
 
       for (int i=0; i<dim; i++)
       {
         var idx = i;
+        var min = sample.Min(p => p.Key[idx]);
+        var max = sample.Max(p => p.Key[idx]);
+
         for (float l=min; l<=max; l += step)
-          yield return (p => p[idx]<l);
+        {
+          var level = l;
+          yield return (p => idx>=p.Dimension ? true : p[idx]<level);
+        }
       }
     }
 

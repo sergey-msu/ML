@@ -45,13 +45,13 @@ namespace ML.Core
 
     public static class Informativities
     {
-      private static readonly GiniInformativity m_GiniInformativity = new GiniInformativity();
-      private static readonly DonskoyInformativity m_DonskoyInformativity = new DonskoyInformativity();
-      private static readonly EntropyInformativity m_EntropyInformativity = new EntropyInformativity();
+      private static readonly GiniIndex m_GiniInformativity = new GiniIndex();
+      private static readonly DonskoyIndex m_DonskoyInformativity = new DonskoyIndex();
+      private static readonly EntropyIndex m_EntropyInformativity = new EntropyIndex();
 
-      public static GiniInformativity GiniInfomativity { get { return m_GiniInformativity; } }
-      public static DonskoyInformativity DonskoyInformativity { get { return m_DonskoyInformativity; } }
-      public static EntropyInformativity EntropyInformativity { get { return m_EntropyInformativity; } }
+      public static GiniIndex GiniInfomativity { get { return m_GiniInformativity; } }
+      public static DonskoyIndex DonskoyInformativity { get { return m_DonskoyInformativity; } }
+      public static EntropyIndex EntropyInformativity { get { return m_EntropyInformativity; } }
     }
   }
 }

@@ -13,14 +13,22 @@ namespace ML.LogicalMethods.Algorithms
   {
     #region Inner
 
+      /// <summary>
+      /// Base class for decision tree nodes
+      /// </summary>
       public abstract class Node
       {
         public abstract Class Decide(Point x);
       }
 
+      /// <summary>
+      /// Represents inner (predicate) decision tree node
+      /// </summary>
       public class InnerNode : Node
       {
         private readonly Predicate<Point> m_Condition;
+        private Node m_NegativeNode;
+        private Node m_PositiveNode;
 
         public InnerNode(Predicate<Point> condition)
         {
@@ -30,8 +38,24 @@ namespace ML.LogicalMethods.Algorithms
            m_Condition = condition;
         }
 
-        public Node NegativeNode { get; set; }
-        public Node PositiveNode { get; set; }
+        public Node NegativeNode { get { return m_NegativeNode; } }
+        public Node PositiveNode { get { return m_PositiveNode; } }
+
+        public void SetNegativeNode(Node node)
+        {
+          if (node==null)
+            throw new MLException("Node can not be null");
+
+          m_NegativeNode = node;
+        }
+
+        public void SetPositiveNode(Node node)
+        {
+          if (node==null)
+            throw new MLException("Node can not be null");
+
+          m_PositiveNode = node;
+        }
 
         public override Class Decide(Point x)
         {
@@ -44,6 +68,9 @@ namespace ML.LogicalMethods.Algorithms
         }
       }
 
+      /// <summary>
+      /// Represents leaf (class) decision tree node
+      /// </summary>
       public class LeafNode : Node
       {
         private readonly Class m_Class;
@@ -104,7 +131,7 @@ namespace ML.LogicalMethods.Algorithms
     /// <summary>
     /// Train tree via ID3 algorithm
     /// </summary>
-    public void Train_ID3(IEnumerable<Predicate<Point>> patterns, IInformativity informativity)
+    public void Train_ID3(IEnumerable<Predicate<Point>> patterns, IInformIndex informativity)
     {
       if (patterns==null || !patterns.Any())
         throw new MLException("Patterns are empty or null");
@@ -116,7 +143,7 @@ namespace ML.LogicalMethods.Algorithms
 
     #region .pvt
 
-      private Node trainID3Core(IEnumerable<Predicate<Point>> patterns, ClassifiedSample sample, IInformativity informativity)
+      private Node trainID3Core(IEnumerable<Predicate<Point>> patterns, ClassifiedSample sample, IInformIndex informativity)
       {
         if (!sample.Any()) throw new MLException("Empty sample");
 
@@ -145,8 +172,10 @@ namespace ML.LogicalMethods.Algorithms
         }
 
         var node = new InnerNode(pattern);
-        node.NegativeNode = trainID3Core(patterns, negSample, informativity);
-        node.PositiveNode = trainID3Core(patterns, posSample, informativity);
+        var negNode = trainID3Core(patterns, negSample, informativity);
+        var posNode = trainID3Core(patterns, posSample, informativity);
+        node.SetNegativeNode(negNode);
+        node.SetPositiveNode(posNode);
 
         return node;
       }

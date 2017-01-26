@@ -11,7 +11,7 @@ namespace ML.Tests
     public const float EPS = 0.0000001F;
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
+    [ExpectedException(typeof(MLException))]
     public void EuclideanMetric_Dist_Validation()
     {
       var metric = new EuclideanMetric();
@@ -68,7 +68,7 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
+    [ExpectedException(typeof(MLException))]
     public void LInftyMetric_Dist_Validation()
     {
       var metric = new LInftyMetric();
@@ -102,7 +102,7 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
+    [ExpectedException(typeof(MLException))]
     public void LpMetric_Dist_Validation()
     {
       var metric = new LpMetric(1.2F);
@@ -113,7 +113,7 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof(MLException))]
     public void LpMetric_Dist_Ctor()
     {
       var metric = new LpMetric(0.8F);

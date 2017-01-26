@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contracts\IInformativity.cs" />
+    <Compile Include="Contracts\IInformIndex.cs" />
     <Compile Include="Core\AlgorithmBase.cs" />
     <Compile Include="Core\ClassifiedSample.cs" />
     <Compile Include="Contracts\IAuxiliary.cs" />
@@ -55,9 +55,10 @@
     <Compile Include="Core\Kernels\QuadraticKernel.cs" />
     <Compile Include="Core\Kernels\TriangularKernel.cs" />
     <Compile Include="Core\Kernels\RectangularKernel.cs" />
-    <Compile Include="Core\Logical\EntropyInformativity.cs" />
-    <Compile Include="Core\Logical\DonskoyInformativity.cs" />
-    <Compile Include="Core\Logical\GiniInformativity.cs" />
+    <Compile Include="Core\Logical\EntropyIndex.cs" />
+    <Compile Include="Core\Logical\DonskoyIndex.cs" />
+    <Compile Include="Core\Logical\IndexBase.cs" />
+    <Compile Include="Core\Logical\GiniIndex.cs" />
     <Compile Include="Core\Metric\LInftyMetric.cs" />
     <Compile Include="Core\Metric\MetricBase.cs" />
     <Compile Include="Core\Metric\LpMetric.cs" />
@@ -73,7 +74,7 @@
     <Compile Include="MetricalMethods\Algorithms\ParzenVariableAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Mathematics\Utils.cs" />
+    <Compile Include="Mathematics\MathUtils.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
