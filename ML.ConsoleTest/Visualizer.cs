@@ -13,10 +13,10 @@ namespace ML.ConsoleTest
   {
     private const string COMMA = ",";
 
-    private float m_XMin;
-    private float m_XMax;
-    private float m_YMin;
-    private float m_YMax;
+    private double m_XMin;
+    private double m_XMax;
+    private double m_YMin;
+    private double m_YMax;
     private int   m_XCnt;
     private int   m_YCnt;
 
@@ -58,7 +58,7 @@ namespace ML.ConsoleTest
         var pd = string.Empty;
         if (k<m_YCnt)
         {
-          var data = new float[m_XCnt];
+          var data = new double[m_XCnt];
           for (int i=0; i<m_XCnt; i++)
           {
             var point = getPoint(i, k);

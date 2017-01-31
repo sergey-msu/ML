@@ -12,12 +12,12 @@ namespace ML.MetricalMethods.Algorithms
   public sealed class NearestKWeighedNeighboursAlgorithm : OrderedMetricAlgorithmBase
   {
     private int m_K;
-    private float[] m_Weights;
+    private double[] m_Weights;
 
     public NearestKWeighedNeighboursAlgorithm(ClassifiedSample classifiedSample,
                                                IMetric metric,
                                                int k,
-                                               float[] weights)
+                                               double[] weights)
       : base(classifiedSample, metric)
     {
       K = k;
@@ -52,15 +52,15 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Neighbout weights
     /// </summary>
-    public float[] Weights
+    public double[] Weights
     {
       get { return m_Weights; }
       set
       {
-        float[] weights;
+        double[] weights;
         if (value==null)
         {
-          weights = new float[m_K];
+          weights = new double[m_K];
           for (int i=0; i<m_K; i++)
             weights[i] = 1;
         }
@@ -80,7 +80,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <param name="i">Point number in ordered training sample</param>
     /// <param name="x">Test point</param>
     /// <param name="orderedSample">Ordered training sample</param>
-    protected override float CalculateWeight(int i, Point x, Dictionary<Point, float> orderedSample)
+    protected override double CalculateWeight(int i, Point x, Dictionary<Point, double> orderedSample)
     {
       return (i < m_K && i < m_Weights.Length) ? m_Weights[i] : 0;
     }

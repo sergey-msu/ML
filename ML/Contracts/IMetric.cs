@@ -11,13 +11,13 @@ namespace ML.Contracts
     /// <summary>
     /// Distance between two points
     /// </summary>
-    float Dist(Point p1, Point p2);
+    double Dist(Point p1, Point p2);
 
     /// <summary>
     /// Sorts some point set with respect to the distance to some fixed point
     /// </summary>
     /// <param name="x">Origin point</param>
     /// <param name="sample">Sample point set</param>
-    Dictionary<Point, float> Sort(Point x, IEnumerable<Point> sample);
+    Dictionary<Point, double> Sort(Point x, IEnumerable<Point> sample);
   }
 }

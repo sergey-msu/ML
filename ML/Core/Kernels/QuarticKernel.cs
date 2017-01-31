@@ -10,7 +10,7 @@ namespace ML.Core.Kernels
     public string ID { get { return "QRT"; } }
     public string Name { get { return "Quartic"; } }
 
-    public float Calculate(float r)
+    public double Calculate(double r)
     {
       return (r > -1 && r < 1) ? (1 - r*r)*(1 - r*r) : 0;
     }

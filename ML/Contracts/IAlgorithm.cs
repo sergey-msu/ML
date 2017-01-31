@@ -37,11 +37,11 @@ namespace ML.Contracts
     /// <summary>
     /// Estimate point closeness to some class
     /// </summary>
-    float EstimateClose(Point point, Class cls);
+    double EstimateClose(Point point, Class cls);
 
     /// <summary>
     /// Calculates margins
     /// </summary>
-    Dictionary<int, float> CalculateMargins();
+    Dictionary<int, double> CalculateMargins();
   }
 }

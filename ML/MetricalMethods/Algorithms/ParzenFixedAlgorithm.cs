@@ -11,12 +11,12 @@ namespace ML.MetricalMethods.Algorithms
   /// </summary>
   public sealed class ParzenFixedAlgorithm : KernelAlgorithmBase
   {
-    private float m_H;
+    private double m_H;
 
     public ParzenFixedAlgorithm(ClassifiedSample classifiedSample,
                                 IMetric metric,
                                 IKernel kernel,
-                                float h)
+                                double h)
       : base(classifiedSample, metric, kernel)
     {
       H = h;
@@ -35,12 +35,12 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Window width
     /// </summary>
-    public float H
+    public double H
     {
       get { return m_H; }
       set
       {
-        if (value <= float.Epsilon)
+        if (value <= double.Epsilon)
           throw new MLException("ParzenFixedAlgorithm.H(value<=0)");
 
         m_H = value;
@@ -54,7 +54,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <param name="i">Point number in ordered training sample</param>
     /// <param name="x">Test point</param>
     /// <param name="orderedSample">Ordered training sample</param>
-    protected override float CalculateWeight(int i, Point x, Dictionary<Point, float> orderedSample)
+    protected override double CalculateWeight(int i, Point x, Dictionary<Point, double> orderedSample)
     {
       var r = orderedSample.ElementAt(i).Value / m_H;
       return Kernel.Calculate(r);
@@ -63,12 +63,12 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Leave-one-out optimization
     /// </summary>
-    public void Train_LOO(float hMin, float hMax, float step)
+    public void Train_LOO(double hMin, double hMax, double step)
     {
-      var hOpt = float.MaxValue;
+      var hOpt = double.MaxValue;
       var minErrCnt = int.MaxValue;
 
-      for (float h = hMin; h <= hMax; h += step)
+      for (double h = hMin; h <= hMax; h += step)
       {
         var errCnt = 0;
         m_H = h;

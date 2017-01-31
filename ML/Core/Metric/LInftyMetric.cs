@@ -13,7 +13,7 @@ namespace ML.Core.Metric
     /// <summary>
     /// Distance between two points
     /// </summary>
-    public override float Dist(Point p1, Point p2)
+    public override double Dist(Point p1, Point p2)
     {
       Point.CheckDimensions(p1, p2);
 
@@ -26,7 +26,7 @@ namespace ML.Core.Metric
         if (abs > max) max = abs;
       }
 
-      return (float)max;
+      return (double)max;
     }
   }
 }

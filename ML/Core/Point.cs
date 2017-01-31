@@ -44,14 +44,14 @@ namespace ML.Core
   /// </summary>
   public struct Point
   {
-    private readonly float[] m_SpacePoint;
+    private readonly double[] m_SpacePoint;
 
     public Point(int dimension)
     {
-      m_SpacePoint = new float[dimension];
+      m_SpacePoint = new double[dimension];
     }
 
-    public Point(params float[] point)
+    public Point(params double[] point)
     {
       if (point==null || point.Length<=0)
         throw new MLException("Point.ctor(point=null|empty)");
@@ -70,7 +70,7 @@ namespace ML.Core
     /// <summary>
     /// Returns i-th point coordinate value
     /// </summary>
-    public float this[int i]
+    public double this[int i]
     {
       get { return m_SpacePoint[i]; }
       set { m_SpacePoint[i] = value; }
@@ -94,7 +94,7 @@ namespace ML.Core
       Point.CheckDimensions(p1, p2);
 
       var dim = p1.Dimension;
-      var point = new float[dim];
+      var point = new double[dim];
       for (int i=0; i<dim; i++)
         point[i] = p1.m_SpacePoint[i] + p2.m_SpacePoint[i];
 
@@ -106,17 +106,17 @@ namespace ML.Core
       Point.CheckDimensions(p1, p2);
 
       var dim = p1.Dimension;
-      var point = new float[dim];
+      var point = new double[dim];
       for (int i=0; i<dim; i++)
         point[i] = p1.m_SpacePoint[i] - p2.m_SpacePoint[i];
 
       return new Point(point);
     }
 
-    public static Point operator *(float c, Point p1)
+    public static Point operator *(double c, Point p1)
     {
       var dim = p1.Dimension;
-      var point = new float[dim];
+      var point = new double[dim];
       for (int i=0; i<dim; i++)
         point[i] = c * p1.m_SpacePoint[i];
 

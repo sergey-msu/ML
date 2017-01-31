@@ -133,12 +133,12 @@ namespace ML.ConsoleTest
       calculateMargin(alg);
       Console.WriteLine();
 
-      //var x = algorithm.Classify(new Point(new float[] { -3, 0 }));
+      //var x = algorithm.Classify(new Point(new double[] { -3, 0 }));
 
       //Error distribution
       Console.WriteLine("Errors:");
       var step = 0.1F;
-      for (float h1 = step; h1 < 5; h1 += step)
+      for (double h1 = step; h1 < 5; h1 += step)
       {
         var h = h1;
         if (h <= optH && h + step > optH) h = optH;
@@ -214,7 +214,7 @@ namespace ML.ConsoleTest
     {
       var sample = Data.TrainingSample;
       var dim = sample.First().Key.Dimension;
-      float step = 0.05F;
+      double step = 0.05F;
 
       for (int i=0; i<dim; i++)
       {
@@ -222,7 +222,7 @@ namespace ML.ConsoleTest
         var min = sample.Min(p => p.Key[idx]);
         var max = sample.Max(p => p.Key[idx]);
 
-        for (float l=min; l<=max; l += step)
+        for (double l=min; l<=max; l += step)
         {
           var level = l;
           yield return (p => idx>=p.Dimension ? true : p[idx]<level);

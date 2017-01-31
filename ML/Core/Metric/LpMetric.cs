@@ -10,7 +10,7 @@ namespace ML.Core.Metric
     public override string ID { get { return "LP"; } }
     public override string Name { get { return "L p"; } }
 
-    public LpMetric(float p)
+    public LpMetric(double p)
     {
       if (p<1)
         throw new MLException("p should be greaeter or equals that 1 to represent a valid metric");
@@ -21,12 +21,12 @@ namespace ML.Core.Metric
     /// <summary>
     /// A value of P exponent
     /// </summary>
-    public readonly float P;
+    public readonly double P;
 
     /// <summary>
     /// Distance between two points
     /// </summary>
-    public override float Dist(Point p1, Point p2)
+    public override double Dist(Point p1, Point p2)
     {
       Point.CheckDimensions(p1, p2);
 
@@ -36,7 +36,7 @@ namespace ML.Core.Metric
       for (int i=0; i<dim; i++)
         sum += Math.Pow(Math.Abs(p1[i]-p2[i]), P);
 
-      return (float)Math.Pow(sum, 1.0F / P);
+      return (double)Math.Pow(sum, 1.0F / P);
     }
   }
 }

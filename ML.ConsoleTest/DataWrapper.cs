@@ -90,9 +90,9 @@ namespace ML.ConsoleTest
         var point = new Point(dim);
         for (var i = 0; i < dim; i++)
         {
-          float result;
+          double result;
           var ftIdx = featureIndxs[i];
-          if(!float.TryParse(data[ftIdx], out result))
+          if(!double.TryParse(data[ftIdx], out result))
           {
             success = false;
             break;
@@ -106,8 +106,8 @@ namespace ML.ConsoleTest
         var clsName = data[classesIndx];
         if (!Classes.TryGetValue(clsName, out cls))
         {
-          float val;
-          var value = (clsValIdx<0 || !float.TryParse(data[clsValIdx], out val)) ? (float?)null : val;
+          double val;
+          var value = (clsValIdx<0 || !double.TryParse(data[clsValIdx], out val)) ? (double?)null : val;
           cls = new Class(clsName, value);
           Classes[clsName] = cls;
         }

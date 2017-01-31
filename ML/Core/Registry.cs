@@ -26,11 +26,11 @@ namespace ML.Core
     {
       private static readonly EuclideanMetric m_EuclideanMetric = new EuclideanMetric();
       private static readonly LInftyMetric    m_LInftyMetric    = new LInftyMetric();
-      private static readonly Dictionary<float, LpMetric> m_LpMetrics= new Dictionary<float, LpMetric>();
+      private static readonly Dictionary<double, LpMetric> m_LpMetrics= new Dictionary<double, LpMetric>();
 
       public static EuclideanMetric EuclideanMetric { get { return m_EuclideanMetric; } }
       public static LInftyMetric LInftyMetric { get { return m_LInftyMetric; } }
-      public static LpMetric LpMetric(float p)
+      public static LpMetric LpMetric(double p)
       {
         LpMetric result;
         if (!m_LpMetrics.TryGetValue(p, out result))

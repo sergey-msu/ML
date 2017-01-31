@@ -32,7 +32,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <param name="i">Point number in ordered training sample</param>
     /// <param name="x">Test point</param>
     /// <param name="orderedSample">Ordered training sample</param>
-    protected override float CalculateWeight(int i, Point x, Dictionary<Point, float> orderedSample)
+    protected override double CalculateWeight(int i, Point x, Dictionary<Point, double> orderedSample)
     {
       return i==0 ? 1 : 0;
     }

@@ -34,7 +34,7 @@ namespace ML.MetricalMethods.Algorithms
     public override Class Classify(Point x)
     {
       Class result = null;
-      var maxEst = float.MinValue;
+      var maxEst = double.MinValue;
 
       foreach (var cls in Classes.Values)
       {
@@ -52,21 +52,21 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public abstract float EstimateClose(Point point, Class cls);
+    public abstract double EstimateClose(Point point, Class cls);
 
     /// <summary>
     /// Calculates margins
     /// </summary>
-    public Dictionary<int, float> CalculateMargins()
+    public Dictionary<int, double> CalculateMargins()
     {
-      var result = new SortedDictionary<int, float>();
+      var result = new SortedDictionary<int, double>();
       int idx = -1;
 
       foreach (var pData in TrainingSample)
       {
         idx++;
-        float maxi = float.MinValue;
-        float si = 0;
+        double maxi = double.MinValue;
+        double si = 0;
 
         foreach (var cls in Classes.Values)
         {
@@ -98,9 +98,9 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public override float EstimateClose(Point x, Class cls)
+    public override double EstimateClose(Point x, Class cls)
     {
-      var closeness = 0.0F;
+      var closeness = 0.0D;
       var sLength = TrainingSample.Count;
 
       var orderedSample = Metric.Sort(x, TrainingSample.Points);
@@ -124,7 +124,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <param name="i">Point number in ordered training sample</param>
     /// <param name="x">Test point</param>
     /// <param name="orderedSample">Ordered training sample</param>
-    protected abstract float CalculateWeight(int i, Point x, Dictionary<Point, float> orderedSample);
+    protected abstract double CalculateWeight(int i, Point x, Dictionary<Point, double> orderedSample);
   }
 
   /// <summary>

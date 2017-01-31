@@ -17,6 +17,6 @@ namespace ML.Contracts
     /// <summary>
     /// Calculates informativity function with respect to given pattern
     /// </summary>
-    float Calculate(Predicate<Point> pattern, ClassifiedSample sample);
+    double Calculate(Predicate<Point> pattern, ClassifiedSample sample);
   }
 }

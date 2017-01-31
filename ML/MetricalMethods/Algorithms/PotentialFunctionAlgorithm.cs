@@ -12,14 +12,14 @@ namespace ML.MetricalMethods.Algorithms
 
     public struct KernelEquipment
     {
-      public KernelEquipment(float gamma, float h)
+      public KernelEquipment(double gamma, double h)
       {
         Gamma = gamma;
         H = h;
       }
 
-      public float Gamma;
-      public float H;
+      public double Gamma;
+      public double H;
     }
 
     #endregion
@@ -68,9 +68,9 @@ namespace ML.MetricalMethods.Algorithms
       }
     }
 
-    public override float EstimateClose(Point x, Class cls)
+    public override double EstimateClose(Point x, Class cls)
     {
-      var closeness = 0.0F;
+      var closeness = 0.0D;
       int idx = -1;
 
       foreach (var sData in TrainingSample)

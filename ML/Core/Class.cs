@@ -14,9 +14,9 @@ namespace ML.Core
     public static readonly Class None = new Class("[NONE]");
 
     public readonly string m_Name;
-    public readonly float  m_Value;
+    public readonly double  m_Value;
 
-    public Class(string name, float? value = null)
+    public Class(string name, double? value = null)
     {
       if (string.IsNullOrWhiteSpace(name))
         throw new MLException("Class.ctor(name=null|empty)");
@@ -33,7 +33,7 @@ namespace ML.Core
     /// <summary>
     /// Some associated value (e.g. {-1, +1} for two-classes classification)
     /// </summary>
-    public float  Value { get { return m_Value; } }
+    public double  Value { get { return m_Value; } }
 
     #region Overrides
 

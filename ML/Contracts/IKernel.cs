@@ -8,6 +8,6 @@
     /// <summary>
     /// Do calculate kernel value
     /// </summary>
-    float Calculate(float r);
+    double Calculate(double r);
   }
 }
