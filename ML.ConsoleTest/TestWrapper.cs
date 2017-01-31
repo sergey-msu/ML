@@ -178,7 +178,7 @@ namespace ML.ConsoleTest
       var pct = Math.Round(100.0F * ec / dc, 2);
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
 
-      //Visualizer.Run(alg);
+      Visualizer.Run(alg);
     }
 
     private void doDecisionTreeAlgorithmTest()

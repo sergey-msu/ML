@@ -9,6 +9,16 @@ namespace ML.ConsoleTest
 {
   public class DataWrapper
   {
+    #region Inner
+
+      public class DataError
+      {
+        public int LineNum { get; set; }
+        public string Line { get; set; }
+      }
+
+    #endregion
+
     private const string CLASS_HEADER    = "_class";
     private const string CLASS_VALUE     = "_value";
     private const string TRAINING_HEADER = "_training";
@@ -21,7 +31,8 @@ namespace ML.ConsoleTest
     public readonly Dictionary<string, Class> Classes = new Dictionary<string, Class>();
     public readonly Dictionary<string, Feature> Features = new Dictionary<string, Feature>();
     public readonly ClassifiedSample Data = new ClassifiedSample();
-    public ClassifiedSample TrainingSample = new ClassifiedSample();
+    public readonly ClassifiedSample TrainingSample = new ClassifiedSample();
+    public readonly List<DataError> Errors = new List<DataError>();
 
 
     private void readData(string file)
@@ -79,9 +90,11 @@ namespace ML.ConsoleTest
     private void readBody(StreamReader reader, int[] featureIndxs, int trainingIndx, int classesIndx, int clsValIdx)
     {
       var dim = featureIndxs.Length;
+      var lineNum = 0;
 
       while (true)
       {
+        lineNum++;
         var line = reader.ReadLine();
         if (string.IsNullOrWhiteSpace(line)) break;
         var data = line.Split(',');
@@ -100,8 +113,11 @@ namespace ML.ConsoleTest
           point[i] = result;
         }
 
-        if (!success) continue;
-
+        if (!success)
+        {
+          Errors.Add(new DataError { LineNum = lineNum, Line = line });
+          continue;
+        }
         Class cls;
         var clsName = data[classesIndx];
         if (!Classes.TryGetValue(clsName, out cls))
