@@ -59,6 +59,9 @@
     <EmbeddedResource Include="Data\primitive2.csv" />
     <EmbeddedResource Include="Data\primitive3.csv" />
     <EmbeddedResource Include="Data\iris.trunk.2d.csv" />
+    <EmbeddedResource Include="Data\ionosphere.csv" />
+    <EmbeddedResource Include="Data\sonar.csv" />
+    <EmbeddedResource Include="Data\breast-cancer.csv" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ML\ML.csproj">

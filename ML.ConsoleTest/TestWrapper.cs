@@ -13,6 +13,28 @@ namespace ML.ConsoleTest
 {
   public class TestWrapper
   {
+    #region Inner
+
+    public class Runner : IDisposable
+    {
+      private readonly System.Diagnostics.Stopwatch m_Stopwatch;
+
+      public Runner()
+      {
+        m_Stopwatch = new System.Diagnostics.Stopwatch();
+        Console.WriteLine("RUNNER STARTED");
+        m_Stopwatch.Start();
+      }
+
+      public void Dispose()
+      {
+        m_Stopwatch.Stop();
+        Console.WriteLine("RUNNER STOPPED at [{0}] s", m_Stopwatch.Elapsed.TotalSeconds);
+      }
+    }
+
+    #endregion
+
     public TestWrapper(DataWrapper data)
     {
       if (data == null)
@@ -28,12 +50,15 @@ namespace ML.ConsoleTest
 
     public void Run()
     {
-      //doNearestNeighbourAlgorithmTest();
-      //doNearestKNeighboursAlgorithmTest();
-      //doParzenFixedAlgorithmTest();
-      //doPotentialFixedAlgorithmTest();
+      using (var runner = new Runner())
+      {
+        //doNearestNeighbourAlgorithmTest();
+        //doNearestKNeighboursAlgorithmTest();
+        //doParzenFixedAlgorithmTest();
+        doPotentialFixedAlgorithmTest();
 
-      doDecisionTreeAlgorithmTest();
+        //doDecisionTreeAlgorithmTest();
+      }
     }
 
     #region .pvt
@@ -153,7 +178,7 @@ namespace ML.ConsoleTest
       var pct = Math.Round(100.0F * ec / dc, 2);
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
 
-      Visualizer.Run(alg);
+      //Visualizer.Run(alg);
     }
 
     private void doDecisionTreeAlgorithmTest()
@@ -161,7 +186,7 @@ namespace ML.ConsoleTest
       var patterns = getSimpleLogicPatterns();
 
       var alg = new DecisionTreeAlgorithm(Data.TrainingSample);
-      var informativity = new EntropyIndex();
+      var informativity = new DonskoyIndex();
       alg.Train_ID3(patterns, informativity);
 
       Console.WriteLine("Errors:");

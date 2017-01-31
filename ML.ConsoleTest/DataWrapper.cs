@@ -86,12 +86,21 @@ namespace ML.ConsoleTest
         if (string.IsNullOrWhiteSpace(line)) break;
         var data = line.Split(',');
 
+        var success = true;
         var point = new Point(dim);
         for (var i = 0; i < dim; i++)
         {
+          float result;
           var ftIdx = featureIndxs[i];
-          point[i] = float.Parse(data[ftIdx]);
+          if(!float.TryParse(data[ftIdx], out result))
+          {
+            success = false;
+            break;
+          }
+          point[i] = result;
         }
+
+        if (!success) continue;
 
         Class cls;
         var clsName = data[classesIndx];
