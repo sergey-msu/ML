@@ -75,7 +75,9 @@
     <Compile Include="MetricalMethods\Algorithms\ParzenFixedAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\ParzenVariableAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
-    <Compile Include="NeuralMethods\Algorithms\NeuralNetwork.cs" />
+    <Compile Include="NeuralMethods\NeuralNetwork.Neuron.cs" />
+    <Compile Include="NeuralMethods\NeuralNetwork.Layer.cs" />
+    <Compile Include="NeuralMethods\NeuralNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Mathematics\MathUtils.cs" />
   </ItemGroup>
