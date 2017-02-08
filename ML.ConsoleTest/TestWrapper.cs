@@ -55,9 +55,9 @@ namespace ML.ConsoleTest
         //doNearestNeighbourAlgorithmTest();
         //doNearestKNeighboursAlgorithmTest();
         //doParzenFixedAlgorithmTest();
-        doPotentialFixedAlgorithmTest();
+        //doPotentialFixedAlgorithmTest();
 
-        //doDecisionTreeAlgorithmTest();
+        doDecisionTreeAlgorithmTest();
       }
     }
 

@@ -24,12 +24,12 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Algorithm mnemonic ID
     /// </summary>
-    public override string ID { get { return "NNK"; } }
+    public override string ID { get { return "KNN"; } }
 
     /// <summary>
     /// Algorithm name
     /// </summary>
-    public override string Name { get { return "Nearest K Neighbour(s)"; } }
+    public override string Name { get { return "K-Nearest Neighbor(s)"; } }
 
     /// <summary>
     /// Neighbour count

@@ -66,6 +66,7 @@
     <Compile Include="Core\Point.cs" />
     <Compile Include="Core\Registry.cs" />
     <Compile Include="LogicalMethods\Algorithms\DecisionTreeAlgorithm.cs" />
+    <Compile Include="Mathematics\RandomGenerator.cs" />
     <Compile Include="MetricalMethods\Algorithms\AlgorithmBases.cs" />
     <Compile Include="MetricalMethods\Algorithms\NearestKNeighboursAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\NearestKWeighedNeighboursAlgorithm.cs" />
