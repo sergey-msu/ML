@@ -15,7 +15,7 @@ namespace ML.MetricalMethods.Algorithms
 
     public ParzenVariableAlgorithm(ClassifiedSample classifiedSample,
                                    IMetric metric,
-                                   IKernel kernel,
+                                   IFunction kernel,
                                    int k)
       : base(classifiedSample, metric, kernel)
     {

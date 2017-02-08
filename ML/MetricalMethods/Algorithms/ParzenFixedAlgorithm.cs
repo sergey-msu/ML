@@ -15,7 +15,7 @@ namespace ML.MetricalMethods.Algorithms
 
     public ParzenFixedAlgorithm(ClassifiedSample classifiedSample,
                                 IMetric metric,
-                                IKernel kernel,
+                                IFunction kernel,
                                 double h)
       : base(classifiedSample, metric, kernel)
     {

@@ -4,7 +4,7 @@ using ML.Contracts;
 namespace ML.Core
 {
   /// <summary>
-  /// Represents a Feature
+  /// Represents a Feature of some physical object
   /// </summary>
   public class Feature : INamed
   {

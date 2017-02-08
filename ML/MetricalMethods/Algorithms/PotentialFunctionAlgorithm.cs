@@ -24,12 +24,12 @@ namespace ML.MetricalMethods.Algorithms
 
     #endregion
 
-    private readonly IKernel m_Kernel;
+    private readonly IFunction m_Kernel;
     private KernelEquipment[] m_Eqps;
 
     public PotentialFunctionAlgorithm(ClassifiedSample classifiedSample,
                                       IMetric metric,
-                                      IKernel kernel,
+                                      IFunction kernel,
                                       KernelEquipment[] eqps)
       : base(classifiedSample, metric)
     {
@@ -44,7 +44,7 @@ namespace ML.MetricalMethods.Algorithms
 
     public override string Name { get { return "Potential Functions"; } }
 
-    public IKernel Kernel { get { return m_Kernel; } }
+    public IFunction Kernel { get { return m_Kernel; } }
 
     public KernelEquipment[] Eqps
     {

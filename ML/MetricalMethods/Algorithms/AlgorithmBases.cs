@@ -132,11 +132,11 @@ namespace ML.MetricalMethods.Algorithms
   /// </summary>
   public abstract class KernelAlgorithmBase : OrderedMetricAlgorithmBase
   {
-    private readonly IKernel m_Kernel;
+    private readonly IFunction m_Kernel;
 
     public KernelAlgorithmBase(ClassifiedSample classifiedSample,
                                IMetric metric,
-                               IKernel kernel)
+                               IFunction kernel)
       : base(classifiedSample, metric)
     {
       if (kernel == null)
@@ -145,6 +145,6 @@ namespace ML.MetricalMethods.Algorithms
       m_Kernel = kernel;
     }
 
-    public IKernel Kernel { get { return m_Kernel; } }
+    public IFunction Kernel { get { return m_Kernel; } }
   }
 }

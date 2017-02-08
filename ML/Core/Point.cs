@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using ML.Contracts;
 
 namespace ML.Core
 {
@@ -42,7 +43,7 @@ namespace ML.Core
   /// <summary>
   /// Represents a multidimentional point
   /// </summary>
-  public struct Point
+  public struct Point : IFeatureContainer<double>
   {
     private readonly double[] m_SpacePoint;
 
@@ -59,22 +60,34 @@ namespace ML.Core
       m_SpacePoint = point.ToArray();
     }
 
-    /// <summary>
-    /// Dimension
-    /// </summary>
-    public int Dimension
-    {
-      get { return m_SpacePoint.Length; }
-    }
+    #region IFeatureContainer
 
-    /// <summary>
-    /// Returns i-th point coordinate value
-    /// </summary>
-    public double this[int i]
-    {
-      get { return m_SpacePoint[i]; }
-      set { m_SpacePoint[i] = value; }
-    }
+      /// <summary>
+      /// Dimension
+      /// </summary>
+      public int Dimension
+      {
+        get { return m_SpacePoint.Length; }
+      }
+
+      /// <summary>
+      /// Returns i-th point coordinate value
+      /// </summary>
+      public double this[int i]
+      {
+        get { return m_SpacePoint[i]; }
+        set { m_SpacePoint[i] = value; }
+      }
+
+      /// <summary>
+      /// Returns raw data array of feature values
+      /// </summary>
+      public double[] RawData
+      {
+        get { return m_SpacePoint; }
+      }
+
+    #endregion
 
     #region Overrides
 

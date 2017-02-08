@@ -6,7 +6,7 @@ namespace ML.Core.Kernels
   /// <summary>
   /// Triangular kernel r -> 1-|r|, [-1, 1]
   /// </summary>
-  public sealed class TriangularKernel : IKernel
+  public sealed class TriangularKernel : IFunction
   {
     public string ID { get { return "TRN"; } }
     public string Name { get { return "Triangular"; } }

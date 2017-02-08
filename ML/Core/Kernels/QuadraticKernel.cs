@@ -5,7 +5,7 @@ namespace ML.Core.Kernels
   /// <summary>
   /// Quardatic kernel r -> 1-r^2, [-1, 1]
   /// </summary>
-  public sealed class QuadraticKernel : IKernel
+  public sealed class QuadraticKernel : IFunction
   {
     public string ID { get { return "QDR"; } }
     public string Name { get { return "Quadratic"; } }
