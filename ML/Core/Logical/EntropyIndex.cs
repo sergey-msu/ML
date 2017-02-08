@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ML.Mathematics;
+using ML.Core.Mathematics;
 
 namespace ML.Core.Logical
 {

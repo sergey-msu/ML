@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
-using ML.Core;
 
-namespace ML.Mathematics
+namespace ML.Core.Mathematics
 {
   /// <summary>
   /// Random unitilitary container
