@@ -57,7 +57,7 @@ namespace ML.MetricalMethods.Algorithms
     protected override double CalculateWeight(int i, Point x, Dictionary<Point, double> orderedSample)
     {
       var r = orderedSample.ElementAt(i).Value / orderedSample.ElementAt(m_K+1).Value;
-      return Kernel.Calculate(r);
+      return Kernel.Value(r);
     }
   }
 }

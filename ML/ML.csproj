@@ -42,6 +42,12 @@
   <ItemGroup>
     <Compile Include="Contracts\IFeatureContainer.cs" />
     <Compile Include="Contracts\IInformIndex.cs" />
+    <Compile Include="Core\ActivationFunctions\ArctanActivation.cs" />
+    <Compile Include="Core\ActivationFunctions\BinaryStepActivation.cs" />
+    <Compile Include="Core\ActivationFunctions\IdentityActivation.cs" />
+    <Compile Include="Core\ActivationFunctions\LogisticActivation.cs" />
+    <Compile Include="Core\ActivationFunctions\ReLUActivation.cs" />
+    <Compile Include="Core\ActivationFunctions\TanhActivation.cs" />
     <Compile Include="Core\AlgorithmBase.cs" />
     <Compile Include="Core\ClassifiedSample.cs" />
     <Compile Include="Contracts\IAuxiliary.cs" />
@@ -75,6 +81,7 @@
     <Compile Include="MetricalMethods\Algorithms\ParzenFixedAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\ParzenVariableAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
+    <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithm.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.Neuron.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.Layer.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.cs" />

@@ -8,9 +8,9 @@ namespace ML.NeuralMethods
 {
   public partial class NeuralNetwork<TInput> where TInput : IFeatureContainer<double>
   {
-    public class NeuronLayer
+    public class NeuralLayer
     {
-      internal NeuronLayer(NeuralNetwork<TInput> network)
+      internal NeuralLayer(NeuralNetwork<TInput> network)
       {
         if (network == null)
           throw new MLException("NeuronLayer.ctor(network=null)");
@@ -61,7 +61,7 @@ namespace ML.NeuralMethods
 
         neuron = new Neuron(this);
         var neurons = new Neuron[m_Neurons.Length + 1];
-        if (idx < 0) idx = neurons.Length;
+        if (idx < 0) idx = m_Neurons.Length;
 
         for (int i = 0; i < neurons.Length; i++)
         {
@@ -103,6 +103,32 @@ namespace ML.NeuralMethods
         }
 
         return true;
+      }
+
+      public NeuralLayer PrevLayer()
+      {
+        var idx = Array.IndexOf(m_Network.Layers, this);
+        if (idx <= 0) return null;
+        return m_Network.Layers[idx-1];
+      }
+
+      public NeuralLayer NextLayer()
+      {
+        var idx = Array.IndexOf(m_Network.Layers, this);
+        if (idx >= m_Network.Layers.Length-1) return null;
+        return m_Network.Layers[idx+1];
+      }
+
+      public void UpdateWeights(double[] weights, ref int cursor)
+      {
+        var neuronCount = m_Neurons.Length;
+        for (int i=0; i<neuronCount; i++)
+        {
+          if (cursor >= weights.Length) break;
+
+          var neuron = m_Neurons[i];
+          neuron.UpdateWeights(weights, ref cursor);
+        }
       }
 
       public double[] Calculate(double[] input)

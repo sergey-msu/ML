@@ -36,7 +36,7 @@ namespace ML.Core.Metric
       for (int i=0; i<dim; i++)
         sum += Math.Pow(Math.Abs(p1[i]-p2[i]), P);
 
-      return (double)Math.Pow(sum, 1.0F / P);
+      return Math.Pow(sum, 1.0F / P);
     }
   }
 }

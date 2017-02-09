@@ -56,7 +56,7 @@ namespace ML.Core.Logical
         result += (p == l) ? 0 : -(double)(l - p) / l * MathUtils.EntropyH((bag.Pc-bag.pc) / (l - p));
       }
 
-      return (double)result;
+      return result;
     }
   }
 }

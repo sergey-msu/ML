@@ -12,37 +12,37 @@ namespace ML.NeuralMethods
     {
     }
 
-    private NeuronLayer[] m_Layers;
+    private NeuralLayer[] m_Layers;
 
     public IFunction ActivationFunction { get; set; }
-    public NeuronLayer[] Layers { get { return m_Layers; } }
-    public NeuronLayer this[int i]
+    public NeuralLayer[] Layers { get { return m_Layers; } }
+    public NeuralLayer this[int i]
     {
       get { return m_Layers[i]; }
       set { m_Layers[i] = value; }
     }
 
 
-    public NeuronLayer AddLayer(int idx = -1)
+    public NeuralLayer AddLayer(int idx = -1)
     {
-      NeuronLayer layer;
+      NeuralLayer layer;
 
       if (m_Layers == null)
       {
         if (idx>0)
           throw new MLException(string.Format("Unable to insert first layer at position '{0}'", idx));
 
-        layer = new NeuronLayer(this);
-        m_Layers = new NeuronLayer[1] { layer };
+        layer = new NeuralLayer(this);
+        m_Layers = new NeuralLayer[1] { layer };
         return layer;
       }
 
       if (idx > m_Layers.Length)
           throw new MLException(string.Format("Unable to insert layer at position '{0}'", idx));
 
-      layer = new NeuronLayer(this);
-      var layers = new NeuronLayer[m_Layers.Length+1];
-      if (idx < 0) idx = layers.Length;
+      layer = new NeuralLayer(this);
+      var layers = new NeuralLayer[m_Layers.Length+1];
+      if (idx < 0) idx = m_Layers.Length;
 
       for (int i=0; i<layers.Length; i++)
       {
@@ -56,7 +56,7 @@ namespace ML.NeuralMethods
       return layer;
     }
 
-    public bool RemoveLayer(NeuronLayer layer)
+    public bool RemoveLayer(NeuralLayer layer)
     {
       if (m_Layers == null || m_Layers.Length <= 0)
         return false;
@@ -74,7 +74,7 @@ namespace ML.NeuralMethods
       if (idx < 0 || idx >= m_Layers.Length)
         return false;
 
-      var layers = new NeuronLayer[m_Layers.Length-1];
+      var layers = new NeuralLayer[m_Layers.Length-1];
       for (int i=0; i<m_Layers.Length; i++)
       {
         if (i<idx)
@@ -86,10 +86,27 @@ namespace ML.NeuralMethods
       return true;
     }
 
+    public void UpdateWeights(double[] weights)
+    {
+      if (weights==null)
+        throw new MLException("Weights are null");
+
+      var layerCount = m_Layers.Length;
+      var cursor = 0;
+
+      for (int i=0; i<layerCount; i++)
+      {
+        if (cursor >= weights.Length) break;
+
+        var layer = m_Layers[i];
+        layer.UpdateWeights(weights, ref cursor);
+      }
+    }
+
     public double[] Calculate(TInput input)
     {
       if (m_Layers==null || m_Layers.Length <= 0)
-        throw new MLException("Neural Netwok contains no layers");
+        throw new MLException("Network contains no layers");
 
       var data = input.RawData;
       var layerCount = m_Layers.Length;

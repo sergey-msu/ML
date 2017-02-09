@@ -11,9 +11,15 @@ namespace ML.Core.Kernels
     public string ID { get { return "RECT"; } }
     public string Name { get { return "Rectangular"; } }
 
-    public double Calculate(double r)
+    public double Value(double r)
     {
       return (r > -1 && r < 1) ? 1 : 0;
     }
+
+    public double Derivative(double r)
+    {
+      return 0;
+    }
+
   }
 }

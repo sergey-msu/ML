@@ -16,7 +16,7 @@ namespace ML.Core.Metric
     public override double Dist(Point p1, Point p2)
     {
       Point.CheckDimensions(p1, p2);
-      return (double)Math.Sqrt(Dist2(p1, p2));
+      return Math.Sqrt(Dist2(p1, p2));
     }
     /// <summary>
     /// Squared distance between two points

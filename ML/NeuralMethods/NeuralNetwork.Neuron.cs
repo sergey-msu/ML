@@ -10,18 +10,20 @@ namespace ML.NeuralMethods
   {
     public class Neuron
     {
-      internal Neuron(NeuronLayer layer)
+      internal Neuron(NeuralLayer layer)
       {
         if (layer == null)
           throw new MLException("Neuron.ctor(layer=null)");
 
         m_Layer = layer;
+        m_Weights = new Dictionary<int, double>();
       }
 
-      private readonly NeuronLayer m_Layer;
+      private readonly NeuralLayer m_Layer;
+      private Dictionary<int, double> m_Weights;
       private IFunction m_ActivationFunction;
 
-      public NeuronLayer Layer { get { return m_Layer; } }
+      public NeuralLayer Layer { get { return m_Layer; } }
       public IFunction ActivationFunction
       {
         get
@@ -34,17 +36,39 @@ namespace ML.NeuralMethods
         set { m_ActivationFunction = value; }
       }
 
+      public double this[int idx]
+      {
+        get { return m_Weights[idx]; }
+        set { m_Weights[idx] = value; }
+      }
+
+      public void UpdateWeights(double[] weights, ref int cursor)
+      {
+        var idx = cursor;
+        var newWeights = new Dictionary<int, double>(m_Weights);
+
+        foreach (var wdata in m_Weights)
+        {
+          if (idx >= weights.Length) break;
+
+          var value = weights[idx];
+          newWeights[wdata.Key] = value;
+          idx++;
+        }
+
+        cursor = idx;
+        m_Weights = newWeights;
+      }
 
       public double Calculate(double[] input)
       {
         var value = 0.0D;
-        //for (int k=0; k<input.Length; k++)
-        //{
-        //  // if w.Length <= k then break;
-        //  value += w[k]*data[k];
-        //}
+        var count = m_Weights.Count;
 
-        return ActivationFunction.Calculate(value);
+        foreach (var wdata in m_Weights)
+          value += wdata.Value * input[wdata.Key];
+
+        return ActivationFunction.Value(value);
       }
     }
   }

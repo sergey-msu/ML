@@ -11,9 +11,15 @@ namespace ML.Core.Kernels
     public string ID { get { return "GAUSS"; } }
     public string Name { get { return "Gaussian"; } }
 
-    public double Calculate(double r)
+    public double Value(double r)
     {
-      return (double)Math.Exp(-r*r);
+      return Math.Exp(-r*r);
     }
+
+    public double Derivative(double r)
+    {
+      return -2.0D * r * Math.Exp(-r*r);
+    }
+
   }
 }

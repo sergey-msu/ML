@@ -10,9 +10,15 @@ namespace ML.Core.Kernels
     public string ID { get { return "QRT"; } }
     public string Name { get { return "Quartic"; } }
 
-    public double Calculate(double r)
+    public double Value(double r)
     {
       return (r > -1 && r < 1) ? (1 - r*r)*(1 - r*r) : 0;
     }
+
+    public double Derivative(double r)
+    {
+      return (r > -1 && r < 1) ? (r*r-1)*r*4 : 0;
+    }
+
   }
 }

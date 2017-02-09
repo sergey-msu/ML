@@ -2,6 +2,7 @@
 using ML.Core.Kernels;
 using ML.Core.Metric;
 using ML.Core.Logical;
+using ML.Core.ActivationFunctions;
 
 namespace ML.Core
 {
@@ -52,6 +53,24 @@ namespace ML.Core
       public static GiniIndex GiniInfomativity { get { return m_GiniInformativity; } }
       public static DonskoyIndex DonskoyInformativity { get { return m_DonskoyInformativity; } }
       public static EntropyIndex EntropyInformativity { get { return m_EntropyInformativity; } }
+    }
+
+    public static class ActivationFunctions
+    {
+      private static readonly ArctanActivation m_Atan = new ArctanActivation();
+      private static readonly BinaryStepActivation m_BinaryStep = new BinaryStepActivation();
+      private static readonly IdentityActivation m_Identity = new IdentityActivation();
+      private static readonly LogisticActivation m_Logistic = new LogisticActivation();
+      private static readonly ReLUActivation m_ReLU = new ReLUActivation();
+      private static readonly TanhActivation m_TanhActivation = new TanhActivation();
+
+
+      public static ArctanActivation Atan { get { return m_Atan; } }
+      public static BinaryStepActivation BinaryStep { get { return m_BinaryStep; } }
+      public static IdentityActivation Identity { get { return m_Identity; } }
+      public static LogisticActivation Logistic { get { return m_Logistic; } }
+      public static ReLUActivation ReLU { get { return m_ReLU; } }
+      public static TanhActivation TanhActivation { get { return m_TanhActivation; } }
     }
   }
 }

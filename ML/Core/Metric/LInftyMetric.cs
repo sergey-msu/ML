@@ -26,7 +26,7 @@ namespace ML.Core.Metric
         if (abs > max) max = abs;
       }
 
-      return (double)max;
+      return max;
     }
   }
 }

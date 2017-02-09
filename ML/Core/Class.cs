@@ -11,29 +11,36 @@ namespace ML.Core
     /// <summary>
     /// Default class singleton
     /// </summary>
-    public static readonly Class None = new Class("[NONE]");
+    public static readonly Class None = new Class("[NONE]", -1);
 
-    public readonly string m_Name;
-    public readonly double  m_Value;
+    private readonly string m_Name;
+    private readonly double  m_Value;
+    private readonly int m_Order;
 
-    public Class(string name, double? value = null)
+    public Class(string name, int order, double? value = null)
     {
       if (string.IsNullOrWhiteSpace(name))
         throw new MLException("Class.ctor(name=null|empty)");
 
       m_Name = name;
+      m_Order = order;
       m_Value = value ?? 0.0F;
     }
 
     /// <summary>
     /// Class Name
     /// </summary>
-    public string Name  { get { return m_Name; } }
+    public string Name { get { return m_Name; } }
+
+    /// <summary>
+    /// Class Order
+    /// </summary>
+    public int Order { get { return m_Order; } }
 
     /// <summary>
     /// Some associated value (e.g. {-1, +1} for two-classes classification)
     /// </summary>
-    public double  Value { get { return m_Value; } }
+    public double Value { get { return m_Value; } }
 
     #region Overrides
 

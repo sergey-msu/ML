@@ -1,4 +1,6 @@
-﻿using ML.Core.Mathematics;
+﻿using ML.Core;
+using ML.Core.Mathematics;
+using ML.NeuralMethods;
 using System;
 using System.IO;
 
@@ -10,6 +12,8 @@ namespace ML.ConsoleTest
 
     static void Main(string[] args)
     {
+      neuralNetworkTest();
+
       //generateNormal2Classes(200, 200);
       //generateNormal3Classes(100, 100, 100);
 
@@ -84,6 +88,50 @@ namespace ML.ConsoleTest
           writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p3.X, 4), Math.Round(p3.Y, 4), "Blue", 3, i % s3 == 0 ? 1 : 0);
         }
       }
+    }
+
+    private static void neuralNetworkTest()
+    {
+      var network = new NeuralNetwork<Point>();
+      network.ActivationFunction = Registry.ActivationFunctions.Identity;
+
+      var l1 = network.AddLayer();
+      var n11 = l1.AddNeuron();
+      n11[0] = 0.5D;
+      var n12 = l1.AddNeuron();
+      n12[0] = 0.1D;
+      n12[1] = 0.3D;
+      var n13 = l1.AddNeuron();
+      n13[0] = 0.2D;
+      n13[1] = 0.4D;
+      var n14 = l1.AddNeuron();
+      n14[1] = 0.5D;
+      n14[2] = 0.7D;
+
+      var l2 = network.AddLayer();
+      var n21 = l2.AddNeuron();
+      n21[0] = 0.1D;
+      n21[1] = 0.2D;
+      n21[2] = 0.3D;
+      var n22 = l2.AddNeuron();
+      n22[2] = 0.1D;
+      n22[3] = 0.2D;
+
+      var l3 = network.AddLayer();
+      var n31 = l3.AddNeuron();
+      n31[0] = 0.5D;
+      n31[1] = 0.1D;
+
+      var input = new Point(1.0D, 1.0D, 1.0D);
+      var result = network.Calculate(input);
+
+      var correct = 0.185D; // correct value for testing
+
+      var newWeights = new double[] { 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D };
+      network.UpdateWeights(newWeights);
+      result = network.Calculate(input);
+
+      correct = 9.0D;
     }
 
   }

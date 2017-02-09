@@ -8,6 +8,11 @@
     /// <summary>
     /// Do calculate function value
     /// </summary>
-    double Calculate(double r);
+    double Value(double r);
+
+    /// <summary>
+    /// Do calculate function's derivative value
+    /// </summary>
+    double Derivative(double r);
   }
 }

@@ -79,7 +79,7 @@ namespace ML.MetricalMethods.Algorithms
         if (sData.Value != cls) continue;
 
         var r = Metric.Dist(x, sData.Key) / m_Eqps[idx].H;
-        closeness += m_Eqps[idx].Gamma * m_Kernel.Calculate(r);
+        closeness += m_Eqps[idx].Gamma * m_Kernel.Value(r);
       }
 
       return closeness;
