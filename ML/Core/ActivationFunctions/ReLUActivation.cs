@@ -9,8 +9,7 @@ namespace ML.Core.ActivationFunctions
   public class ReLUActivation : IFunction
   {
     public string ID { get { return "RELU"; } }
-
-    public string Name { get { return "Rectified Linear Unit Activation Function"; } }
+    public string Name { get { return "Rectified Linear Unit"; } }
 
     public double Value(double r)
     {

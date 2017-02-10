@@ -4,21 +4,21 @@ using ML.Contracts;
 namespace ML.Core.ActivationFunctions
 {
   /// <summary>
-  /// Identity Activation Function
+  /// Exponent Activation Function
   /// </summary>
-  public sealed class IdentityActivation : IFunction
+  public class ExpActivation : IFunction
   {
-    public string ID { get { return "IDT"; } }
-    public string Name { get { return "Identity"; } }
+    public string ID { get { return "EXP"; } }
+    public string Name { get { return "Exponent"; } }
 
     public double Value(double r)
     {
-      return r;
+      return Math.Exp(r);
     }
 
     public double Derivative(double r)
     {
-      return 1.0D;
+      return Math.Exp(r);
     }
   }
 }

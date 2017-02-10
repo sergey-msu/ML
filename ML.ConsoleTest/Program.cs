@@ -1,8 +1,11 @@
-﻿using ML.Core;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+using System.Collections.Generic;
+using ML.Core;
 using ML.Core.Mathematics;
 using ML.NeuralMethods;
-using System;
-using System.IO;
 
 namespace ML.ConsoleTest
 {
@@ -12,7 +15,8 @@ namespace ML.ConsoleTest
 
     static void Main(string[] args)
     {
-      neuralNetworkTest();
+      //neuralNetworkTest();
+      neuralNetworkAlgorithmTest();
 
       //generateNormal2Classes(200, 200);
       //generateNormal3Classes(100, 100, 100);
@@ -128,11 +132,60 @@ namespace ML.ConsoleTest
       var correct = 0.185D; // correct value for testing
 
       var newWeights = new double[] { 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D, 1.0D };
-      network.UpdateWeights(newWeights);
+      network.UpdateWeights(newWeights, false);
       result = network.Calculate(input);
 
       correct = 9.0D;
     }
 
+    private static void neuralNetworkAlgorithmTest()
+    {
+      //var schema = new NetSchema
+      //{
+      //  ActivationFuction = Registry.ActivationFunctions.Exp,
+      //  Layers = new List<LayerSchema>
+      //  {
+      //    new LayerSchema
+      //    {
+      //      ProbabalisticOutput = true,
+      //      Neurons = new List<NeuronSchema>
+      //      {
+      //        new NeuronSchema { WeightIndices = new List<int> { 0, 1 } },
+      //        new NeuronSchema { WeightIndices = new List<int> { 0, 1 } },
+      //        new NeuronSchema { WeightIndices = new List<int> { 0, 1 } }
+      //      }
+      //    },
+      //    new LayerSchema
+      //    {
+      //      Neurons = new List<NeuronSchema>
+      //      {
+      //        new NeuronSchema { WeightIndices = new List<int> { 0, 1 } } // output
+      //      }
+      //    }
+      //  }
+      //};
+
+      var schema =
+      @"<net ActivationFuction='EXP'>
+          <layers>
+            <layer ProbabalisticOutput='1'>
+              <neurons>
+                <neuron WeightIndices='0,1'/>
+                <neuron WeightIndices='0,1'/>
+                <neuron WeightIndices='0,1'/>
+              </neurons>
+            </layer>
+            <layer>
+              <neurons>
+                <neuron WeightIndices='0,1,2'/>
+              </neurons>
+            </layer>
+          </layers>
+        </net>";
+
+        var doc = XDocument.Parse(schema);
+        var net = doc.Root;
+        var layers = net.Descendants("layer");
+    }
   }
 }

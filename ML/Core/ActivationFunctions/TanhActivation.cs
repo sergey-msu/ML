@@ -9,8 +9,7 @@ namespace ML.Core.ActivationFunctions
   public class TanhActivation : IFunction
   {
     public string ID { get { return "TANH"; } }
-
-    public string Name { get { return "Hyperbolic Tangent Activation Function"; } }
+    public string Name { get { return "Hyperbolic Tangent"; } }
 
     public double Value(double r)
     {

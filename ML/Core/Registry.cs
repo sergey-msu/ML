@@ -30,8 +30,8 @@ namespace ML.Core
       private static readonly Dictionary<double, LpMetric> m_LpMetrics= new Dictionary<double, LpMetric>();
 
       public static EuclideanMetric EuclideanMetric { get { return m_EuclideanMetric; } }
-      public static LInftyMetric LInftyMetric { get { return m_LInftyMetric; } }
-      public static LpMetric LpMetric(double p)
+      public static LInftyMetric    LInftyMetric { get { return m_LInftyMetric; } }
+      public static LpMetric        LpMetric(double p)
       {
         LpMetric result;
         if (!m_LpMetrics.TryGetValue(p, out result))
@@ -46,31 +46,35 @@ namespace ML.Core
 
     public static class Informativities
     {
-      private static readonly GiniIndex m_GiniInformativity = new GiniIndex();
+      private static readonly GiniIndex    m_GiniInformativity    = new GiniIndex();
       private static readonly DonskoyIndex m_DonskoyInformativity = new DonskoyIndex();
       private static readonly EntropyIndex m_EntropyInformativity = new EntropyIndex();
 
-      public static GiniIndex GiniInfomativity { get { return m_GiniInformativity; } }
+      public static GiniIndex    GiniInfomativity     { get { return m_GiniInformativity; } }
       public static DonskoyIndex DonskoyInformativity { get { return m_DonskoyInformativity; } }
       public static EntropyIndex EntropyInformativity { get { return m_EntropyInformativity; } }
     }
 
     public static class ActivationFunctions
     {
-      private static readonly ArctanActivation m_Atan = new ArctanActivation();
+      private static readonly ArctanActivation     m_Atan       = new ArctanActivation();
       private static readonly BinaryStepActivation m_BinaryStep = new BinaryStepActivation();
-      private static readonly IdentityActivation m_Identity = new IdentityActivation();
-      private static readonly LogisticActivation m_Logistic = new LogisticActivation();
-      private static readonly ReLUActivation m_ReLU = new ReLUActivation();
-      private static readonly TanhActivation m_TanhActivation = new TanhActivation();
+      private static readonly IdentityActivation   m_Identity   = new IdentityActivation();
+      private static readonly LogisticActivation   m_Logistic   = new LogisticActivation();
+      private static readonly ReLUActivation       m_ReLU       = new ReLUActivation();
+      private static readonly TanhActivation       m_Tanh       = new TanhActivation();
+      private static readonly ExpActivation        m_Exp        = new ExpActivation();
+      private static readonly SignActivation       m_Sign       = new SignActivation();
 
 
-      public static ArctanActivation Atan { get { return m_Atan; } }
+      public static ArctanActivation     Atan       { get { return m_Atan; } }
       public static BinaryStepActivation BinaryStep { get { return m_BinaryStep; } }
-      public static IdentityActivation Identity { get { return m_Identity; } }
-      public static LogisticActivation Logistic { get { return m_Logistic; } }
-      public static ReLUActivation ReLU { get { return m_ReLU; } }
-      public static TanhActivation TanhActivation { get { return m_TanhActivation; } }
+      public static IdentityActivation   Identity   { get { return m_Identity; } }
+      public static LogisticActivation   Logistic   { get { return m_Logistic; } }
+      public static ReLUActivation       ReLU       { get { return m_ReLU; } }
+      public static TanhActivation       Tanh       { get { return m_Tanh; } }
+      public static ExpActivation        Exp        { get { return m_Exp; } }
+      public static SignActivation       Sign       { get { return m_Sign; } }
     }
   }
 }

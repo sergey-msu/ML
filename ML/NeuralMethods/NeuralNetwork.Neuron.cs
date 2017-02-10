@@ -24,6 +24,7 @@ namespace ML.NeuralMethods
       private IFunction m_ActivationFunction;
 
       public NeuralLayer Layer { get { return m_Layer; } }
+      public int WeightCount { get { return m_Weights.Count; } }
       public IFunction ActivationFunction
       {
         get
@@ -42,22 +43,24 @@ namespace ML.NeuralMethods
         set { m_Weights[idx] = value; }
       }
 
-      public void UpdateWeights(double[] weights, ref int cursor)
+      public void UpdateWeights(double[] weights, bool isDelta, ref int cursor)
       {
         var idx = cursor;
-        var newWeights = new Dictionary<int, double>(m_Weights);
 
         foreach (var wdata in m_Weights)
         {
           if (idx >= weights.Length) break;
 
           var value = weights[idx];
-          newWeights[wdata.Key] = value;
+          if (isDelta)
+            m_Weights[wdata.Key] += value;
+          else
+            m_Weights[wdata.Key] = value;
+
           idx++;
         }
 
         cursor = idx;
-        m_Weights = newWeights;
       }
 
       public double Calculate(double[] input)

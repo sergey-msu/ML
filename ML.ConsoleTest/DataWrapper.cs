@@ -120,11 +120,12 @@ namespace ML.ConsoleTest
         }
         Class cls;
         var clsName = data[classesIndx];
+        var clsOrder = 1;
         if (!Classes.TryGetValue(clsName, out cls))
         {
           double val;
           var value = (clsValIdx<0 || !double.TryParse(data[clsValIdx], out val)) ? (double?)null : val;
-          cls = new Class(clsName, value);
+          cls = new Class(clsName, clsOrder++, value);
           Classes[clsName] = cls;
         }
 

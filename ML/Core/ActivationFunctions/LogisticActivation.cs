@@ -9,8 +9,7 @@ namespace ML.Core.ActivationFunctions
   public sealed class LogisticActivation : IFunction
   {
     public string ID { get { return "LGS"; } }
-
-    public string Name { get { return "Logistic Activation Function"; } }
+    public string Name { get { return "Logistic"; } }
 
     public double Value(double r)
     {

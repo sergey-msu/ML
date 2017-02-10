@@ -18,5 +18,27 @@ namespace ML.Core.Mathematics
       return (0.0D <= z && z < double.Epsilon) ? 0.0D : -z*Math.Log(z)*COEFF;
     }
 
+    /// <summary>
+    /// Calculates maximum value within array alog with its index
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void CalcMax(double[] array, out int idx, out double max)
+    {
+      idx = -1;
+      max = double.MinValue;
+
+      if (array==null) return;
+
+      for (int i=0; i<array.Length; i++)
+      {
+        var val = array[i];
+        if (idx<0 || val > max)
+        {
+          idx = i;
+          max = val;
+        }
+      }
+    }
+
   }
 }

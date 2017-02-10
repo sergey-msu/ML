@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Contracts;
+using System.Xml.Linq;
 
 namespace ML.NeuralMethods
 {
@@ -14,7 +15,9 @@ namespace ML.NeuralMethods
 
     private NeuralLayer[] m_Layers;
 
+    public bool AddConstantFeature { get; set; }
     public IFunction ActivationFunction { get; set; }
+    public int Epoch { get; set; }
     public NeuralLayer[] Layers { get { return m_Layers; } }
     public NeuralLayer this[int i]
     {
@@ -86,7 +89,7 @@ namespace ML.NeuralMethods
       return true;
     }
 
-    public void UpdateWeights(double[] weights)
+    public void UpdateWeights(double[] weights, bool isDelta)
     {
       if (weights==null)
         throw new MLException("Weights are null");
@@ -99,7 +102,7 @@ namespace ML.NeuralMethods
         if (cursor >= weights.Length) break;
 
         var layer = m_Layers[i];
-        layer.UpdateWeights(weights, ref cursor);
+        layer.UpdateWeights(weights, isDelta, ref cursor);
       }
     }
 
@@ -109,6 +112,13 @@ namespace ML.NeuralMethods
         throw new MLException("Network contains no layers");
 
       var data = input.RawData;
+      if (AddConstantFeature)
+      {
+        data = new double[input.RawData.Length+1];
+        Array.Copy(input.RawData, data, input.RawData.Length);
+        data[input.RawData.Length] = 1.0D;
+      }
+
       var layerCount = m_Layers.Length;
 
       for (int i=0; i<layerCount; i++)
@@ -120,4 +130,29 @@ namespace ML.NeuralMethods
       return data;
     }
   }
+
+  //#region Schema
+
+  //public class NeuronSchema
+  //{
+  //  public List<int> WeightIndices { get; set; }
+  //  public IFunction ActivationFuction { get; set; }
+  //}
+
+  //public class LayerSchema
+  //{
+  //  public List<NeuronSchema> Neurons { get; set; }
+  //  public bool               AddConstantFeature { get; set; }
+  //  public bool               ProbabalisticOutput { get; set; }
+  //  public IFunction          ActivationFuction { get; set; }
+  //}
+
+  //public class NetSchema
+  //{
+  //  public List<LayerSchema> Layers { get; set; }
+  //  public bool              AddConstantFeature { get; set; }
+  //  public IFunction         ActivationFuction { get; set; }
+  //}
+
+  //#endregion
 }

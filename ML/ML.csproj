@@ -44,9 +44,11 @@
     <Compile Include="Contracts\IInformIndex.cs" />
     <Compile Include="Core\ActivationFunctions\ArctanActivation.cs" />
     <Compile Include="Core\ActivationFunctions\BinaryStepActivation.cs" />
+    <Compile Include="Core\ActivationFunctions\ExpActivation.cs" />
     <Compile Include="Core\ActivationFunctions\IdentityActivation.cs" />
     <Compile Include="Core\ActivationFunctions\LogisticActivation.cs" />
     <Compile Include="Core\ActivationFunctions\ReLUActivation.cs" />
+    <Compile Include="Core\ActivationFunctions\SignActivation.cs" />
     <Compile Include="Core\ActivationFunctions\TanhActivation.cs" />
     <Compile Include="Core\AlgorithmBase.cs" />
     <Compile Include="Core\ClassifiedSample.cs" />
@@ -81,14 +83,16 @@
     <Compile Include="MetricalMethods\Algorithms\ParzenFixedAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\ParzenVariableAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
-    <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithm.cs" />
+    <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.Neuron.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.Layer.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Mathematics\MathUtils.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="NeuralMethods\Algorithms\NeuralNetworkSimpleAlgorithm.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

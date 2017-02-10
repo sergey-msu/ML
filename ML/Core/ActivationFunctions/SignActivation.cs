@@ -4,16 +4,17 @@ using ML.Contracts;
 namespace ML.Core.ActivationFunctions
 {
   /// <summary>
-  /// Binary Step Activation Function
+  /// Signum Activation Function
   /// </summary>
-  public sealed class BinaryStepActivation : IFunction
+  public class SignActivation : IFunction
   {
-    public string ID { get { return "STEP"; } }
-    public string Name { get { return "Binary Step"; } }
+    public string ID { get { return "SIGN"; } }
+    public string Name { get { return "Signum"; } }
 
     public double Value(double r)
     {
-      return r < 0 ? 0 : 1;
+      if (r==0) return 0;
+      return (r<0) ? -1 : 1;
     }
 
     public double Derivative(double r)

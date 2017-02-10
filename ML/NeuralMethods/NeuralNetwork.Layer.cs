@@ -22,6 +22,8 @@ namespace ML.NeuralMethods
       private Neuron[] m_Neurons;
       private IFunction m_ActivationFunction;
 
+      public bool AddConstantFeature { get; set; }
+      public bool ProbabalisticOutput { get; set; }
       public NeuralNetwork<TInput> Network { get { return m_Network; } }
       public Neuron[] Neurons { get { return m_Neurons; } }
       public Neuron this[int i]
@@ -119,7 +121,7 @@ namespace ML.NeuralMethods
         return m_Network.Layers[idx+1];
       }
 
-      public void UpdateWeights(double[] weights, ref int cursor)
+      public void UpdateWeights(double[] weights, bool isDelta, ref int cursor)
       {
         var neuronCount = m_Neurons.Length;
         for (int i=0; i<neuronCount; i++)
@@ -127,7 +129,7 @@ namespace ML.NeuralMethods
           if (cursor >= weights.Length) break;
 
           var neuron = m_Neurons[i];
-          neuron.UpdateWeights(weights, ref cursor);
+          neuron.UpdateWeights(weights, isDelta, ref cursor);
         }
       }
 
@@ -139,10 +141,28 @@ namespace ML.NeuralMethods
         var neuronCount = m_Neurons.Length;
         var output = new double[neuronCount];
 
+        var data = input;
+        if (AddConstantFeature)
+        {
+          data = new double[input.Length+1];
+          Array.Copy(input, data, input.Length);
+          data[input.Length] = 1.0D;
+        }
+
+        var sum = 0.0D;
+
         for (int i = 0; i < neuronCount; i++)
         {
           var neuron = m_Neurons[i];
-          output[i] = neuron.Calculate(input);
+          var calc = neuron.Calculate(input);
+          sum += calc;
+          output[i] = calc;
+        }
+
+        if (ProbabalisticOutput)
+        {
+          for (int i=0; i<neuronCount; i++)
+            output[i] /= sum;
         }
 
         return output;
