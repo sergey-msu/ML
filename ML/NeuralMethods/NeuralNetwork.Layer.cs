@@ -6,10 +6,17 @@ using ML.Contracts;
 
 namespace ML.NeuralMethods
 {
-  public partial class NeuralNetwork<TInput> where TInput : IFeatureContainer<double>
+  public partial class NeuralNetwork<TInput> where TInput : IFeaturable<double>
   {
+    /// <summary>
+    /// Represents artificial neural layer as a list of neurons
+    /// </summary>
     public class NeuralLayer
     {
+      private readonly NeuralNetwork<TInput> m_Network;
+      private Neuron[] m_Neurons;
+      private IFunction m_ActivationFunction;
+
       internal NeuralLayer(NeuralNetwork<TInput> network)
       {
         if (network == null)
@@ -18,19 +25,41 @@ namespace ML.NeuralMethods
         m_Network = network;
       }
 
-      private readonly NeuralNetwork<TInput> m_Network;
-      private Neuron[] m_Neurons;
-      private IFunction m_ActivationFunction;
+      /// <summary>
+      /// If true, adds artificial +1 input value in the and of input data array
+      /// </summary>
+      public bool UseBias { get; set; }
 
-      public bool AddConstantFeature { get; set; }
-      public bool ProbabalisticOutput { get; set; }
+      /// <summary>
+      /// In true, norms output vector to the summ value of it's components (give more 'probabalistic' meaning to the result)
+      /// </summary>
+      public bool NormOutput { get; set; }
+
+      /// <summary>
+      /// Neural network that the layer belongs to
+      /// </summary>
       public NeuralNetwork<TInput> Network { get { return m_Network; } }
+
+      /// <summary>
+      /// A list of the layer neurons
+      /// </summary>
       public Neuron[] Neurons { get { return m_Neurons; } }
+
+      /// <summary>
+      /// Indexer for layer neurons
+      /// </summary>
       public Neuron this[int i]
       {
-        get { return m_Neurons[i]; }
-        set { m_Neurons[i] = value; }
+        get
+        {
+          var count = m_Neurons.Length;
+          return (i>=0 && i<count) ? m_Neurons[i] : null;
+        }
       }
+
+      /// <summary>
+      /// Layer activation function. If null, the network's activation function will be used
+      /// </summary>
       public IFunction ActivationFunction
       {
         get
@@ -44,14 +73,17 @@ namespace ML.NeuralMethods
       }
 
 
-      public Neuron AddNeuron(int idx = -1)
+      /// <summary>
+      /// Creates new neuron at the given position. Adds the result in the end if the position is not selected
+      /// </summary>
+      public Neuron CreateNeuron(int idx = -1)
       {
         Neuron neuron;
 
         if (m_Neurons == null)
         {
           if (idx > 0)
-            throw new MLException(string.Format("Unable to insert first nauron at position '{0}'", idx));
+            throw new MLException(string.Format("Unable to insert first neuron at position '{0}'", idx));
 
           neuron = new Neuron(this);
           m_Neurons = new Neuron[1] { neuron };
@@ -77,6 +109,9 @@ namespace ML.NeuralMethods
         return neuron;
       }
 
+      /// <summary>
+      /// Removes neuron from the layer
+      /// </summary>
       public bool RemoveNeuron(Neuron neuron)
       {
         if (m_Neurons == null || m_Neurons.Length <= 0)
@@ -88,6 +123,9 @@ namespace ML.NeuralMethods
         return RemoveNeuron(idx);
       }
 
+      /// <summary>
+      /// Removes neuron at the given position from the layer
+      /// </summary>
       public bool RemoveNeuron(int idx)
       {
         if (m_Neurons == null || m_Neurons.Length <= 0)
@@ -104,23 +142,16 @@ namespace ML.NeuralMethods
             neurons[i - 1] = m_Neurons[i];
         }
 
+        m_Neurons = neurons;
         return true;
       }
 
-      public NeuralLayer PrevLayer()
-      {
-        var idx = Array.IndexOf(m_Network.Layers, this);
-        if (idx <= 0) return null;
-        return m_Network.Layers[idx-1];
-      }
-
-      public NeuralLayer NextLayer()
-      {
-        var idx = Array.IndexOf(m_Network.Layers, this);
-        if (idx >= m_Network.Layers.Length-1) return null;
-        return m_Network.Layers[idx+1];
-      }
-
+      /// <summary>
+      /// Updates all layer neurons weights with the given array of values
+      /// </summary>
+      /// <param name="weights">Array of values</param>
+      /// <param name="isDelta">Are the values in array is absolute or just deltas</param>
+      /// <param name="cursor">'From' index in the array</param>
       public void UpdateWeights(double[] weights, bool isDelta, ref int cursor)
       {
         var neuronCount = m_Neurons.Length;
@@ -133,6 +164,10 @@ namespace ML.NeuralMethods
         }
       }
 
+      /// <summary>
+      /// Calculates result array produced by layer
+      /// </summary>
+      /// <param name="input">Input data array</param>
       public double[] Calculate(double[] input)
       {
         if (m_Neurons == null || m_Neurons.Length <= 0)
@@ -142,7 +177,7 @@ namespace ML.NeuralMethods
         var output = new double[neuronCount];
 
         var data = input;
-        if (AddConstantFeature)
+        if (UseBias)
         {
           data = new double[input.Length+1];
           Array.Copy(input, data, input.Length);
@@ -154,12 +189,12 @@ namespace ML.NeuralMethods
         for (int i = 0; i < neuronCount; i++)
         {
           var neuron = m_Neurons[i];
-          var calc = neuron.Calculate(input);
-          sum += calc;
+          var calc = neuron.Calculate(data);
+          sum += Math.Abs(calc);
           output[i] = calc;
         }
 
-        if (ProbabalisticOutput)
+        if (NormOutput)
         {
           for (int i=0; i<neuronCount; i++)
             output[i] /= sum;

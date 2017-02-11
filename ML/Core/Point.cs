@@ -43,7 +43,7 @@ namespace ML.Core
   /// <summary>
   /// Represents a multidimentional point
   /// </summary>
-  public struct Point : IFeatureContainer<double>
+  public struct Point : IFeaturable<double>
   {
     private readonly double[] m_SpacePoint;
 

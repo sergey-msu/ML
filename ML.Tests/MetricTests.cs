@@ -8,7 +8,7 @@ namespace ML.Tests
   [TestClass]
   public class MetricTests
   {
-    public const double EPS = 0.0000001F;
+    public const double EPS = 0.0000001D;
 
     [TestMethod]
     [ExpectedException(typeof(MLException))]

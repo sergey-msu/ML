@@ -7,7 +7,7 @@ namespace ML.Tests
   [TestClass]
   public class KernelTests
   {
-    public const double EPS = 0.0000001F;
+    public const double EPS = 0.0000001D;
 
     [TestMethod]
     public void GaussianKernel_Value()

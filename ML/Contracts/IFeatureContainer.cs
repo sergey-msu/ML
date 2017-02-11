@@ -3,7 +3,7 @@
   /// <summary>
   /// Contract for physical object that contains some features
   /// </summary>
-  public interface IFeatureContainer<TVal>
+  public interface IFeaturable<TVal>
   {
     /// <summary>
     /// Gets/sets feature value by its index

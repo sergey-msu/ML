@@ -40,7 +40,7 @@ namespace ML.Tests
 
     #endregion
 
-    public const double EPS = 0.0000001F;
+    public const double EPS = 0.0000001D;
 
     [TestMethod]
     public void GiniIndex_Calculate_2C()

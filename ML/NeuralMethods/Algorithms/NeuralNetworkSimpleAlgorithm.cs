@@ -8,6 +8,8 @@ namespace ML.NeuralMethods.Algorithms
 {
   public class NeuralNetworkSimpleAlgorithm : NeuralNetworkAlgorithmBase
   {
+    private int m_CurrentEpoch;
+
     public NeuralNetworkSimpleAlgorithm(ClassifiedSample classifiedSample)
       : base(classifiedSample)
     {
@@ -23,14 +25,14 @@ namespace ML.NeuralMethods.Algorithms
 
     public void Train()
     {
-      Network.Epoch = 0;
+      m_CurrentEpoch = 0;
 
       var weightCount = Network.Layers.Sum(l => l.Neurons.Sum(n => n.WeightCount));
       var weights = new double[weightCount];
 
       for (int i=0; i<EpochCount; i++) // epoch
       {
-        Network.Epoch++;
+        m_CurrentEpoch++;
 
         foreach (var pdata in TrainingSample) // iteration
         {
@@ -51,6 +53,7 @@ namespace ML.NeuralMethods.Algorithms
       deltas[idx] = -Margin;
       Network.UpdateWeights(deltas, true);
       var minError = calculateError(data, cls);
+      if (minError < float.Epsilon) return;
       var minDx = -Margin;
 
       deltas[idx] = Step;
@@ -63,12 +66,17 @@ namespace ML.NeuralMethods.Algorithms
         {
           minError = error;
           minDx = dx;
+          if (minError < float.Epsilon) break;
         }
         dx += Step;
       }
 
-      deltas[idx] = minDx-dx;
-      Network.UpdateWeights(deltas, true);
+      var d = minDx-dx;
+      if (d < 0)
+      {
+        deltas[idx] = d;
+        Network.UpdateWeights(deltas, true);
+      }
     }
 
     private double calculateError(Point data, Class cls)

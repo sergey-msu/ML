@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using ML.Core;
 using ML.Core.Mathematics;
 using ML.NeuralMethods;
+using ML.NeuralMethods.Algorithms;
 
 namespace ML.ConsoleTest
 {
@@ -99,30 +100,30 @@ namespace ML.ConsoleTest
       var network = new NeuralNetwork<Point>();
       network.ActivationFunction = Registry.ActivationFunctions.Identity;
 
-      var l1 = network.AddLayer();
-      var n11 = l1.AddNeuron();
+      var l1 = network.CreateLayer();
+      var n11 = l1.CreateNeuron();
       n11[0] = 0.5D;
-      var n12 = l1.AddNeuron();
+      var n12 = l1.CreateNeuron();
       n12[0] = 0.1D;
       n12[1] = 0.3D;
-      var n13 = l1.AddNeuron();
+      var n13 = l1.CreateNeuron();
       n13[0] = 0.2D;
       n13[1] = 0.4D;
-      var n14 = l1.AddNeuron();
+      var n14 = l1.CreateNeuron();
       n14[1] = 0.5D;
       n14[2] = 0.7D;
 
-      var l2 = network.AddLayer();
-      var n21 = l2.AddNeuron();
+      var l2 = network.CreateLayer();
+      var n21 = l2.CreateNeuron();
       n21[0] = 0.1D;
       n21[1] = 0.2D;
       n21[2] = 0.3D;
-      var n22 = l2.AddNeuron();
+      var n22 = l2.CreateNeuron();
       n22[2] = 0.1D;
       n22[3] = 0.2D;
 
-      var l3 = network.AddLayer();
-      var n31 = l3.AddNeuron();
+      var l3 = network.CreateLayer();
+      var n31 = l3.CreateNeuron();
       n31[0] = 0.5D;
       n31[1] = 0.1D;
 
@@ -140,52 +141,43 @@ namespace ML.ConsoleTest
 
     private static void neuralNetworkAlgorithmTest()
     {
-      //var schema = new NetSchema
-      //{
-      //  ActivationFuction = Registry.ActivationFunctions.Exp,
-      //  Layers = new List<LayerSchema>
-      //  {
-      //    new LayerSchema
-      //    {
-      //      ProbabalisticOutput = true,
-      //      Neurons = new List<NeuronSchema>
-      //      {
-      //        new NeuronSchema { WeightIndices = new List<int> { 0, 1 } },
-      //        new NeuronSchema { WeightIndices = new List<int> { 0, 1 } },
-      //        new NeuronSchema { WeightIndices = new List<int> { 0, 1 } }
-      //      }
-      //    },
-      //    new LayerSchema
-      //    {
-      //      Neurons = new List<NeuronSchema>
-      //      {
-      //        new NeuronSchema { WeightIndices = new List<int> { 0, 1 } } // output
-      //      }
-      //    }
-      //  }
-      //};
+      var class1 = new Class("green", 0, 1);
+      var class2 = new Class("red", 1, 2);
+      var sample = new ClassifiedSample
+      {
+        { new Point(1, 0), class1 },
+        { new Point(0, 1), class1 },
+        { new Point(0, 0), class2 },
+        { new Point(1, 1), class2 }
+      };
 
-      var schema =
-      @"<net ActivationFuction='EXP'>
-          <layers>
-            <layer ProbabalisticOutput='1'>
-              <neurons>
-                <neuron WeightIndices='0,1'/>
-                <neuron WeightIndices='0,1'/>
-                <neuron WeightIndices='0,1'/>
-              </neurons>
-            </layer>
-            <layer>
-              <neurons>
-                <neuron WeightIndices='0,1,2'/>
-              </neurons>
-            </layer>
-          </layers>
-        </net>";
+      var algorithm = new NeuralNetworkSimpleAlgorithm(sample)
+      {
+        EpochCount = 1,
+        Margin = 5.0D,
+        Step = 0.1D
+      };
+      var net = algorithm.Network;
+      net.ActivationFunction = Registry.ActivationFunctions.Exp;
 
-        var doc = XDocument.Parse(schema);
-        var net = doc.Root;
-        var layers = net.Descendants("layer");
+      var layer1 = net.CreateLayer();
+      layer1.NormOutput = true;
+      var n11 = layer1.CreateNeuron();
+      n11[0] = 0.01D;
+      n11[1] = 0.01D;
+      var n12 = layer1.CreateNeuron();
+      n12[0] = 0.01D;
+      n12[1] = 0.01D;
+
+      var output = net.CreateLayer();
+      var n21 = output.CreateNeuron();
+      n21[0] = 0.01D;
+      n21[1] = 0.01D;
+      var n22 = output.CreateNeuron();
+      n22[0] = 0.01D;
+      n22[1] = 0.01D;
+
+      algorithm.Train();
     }
   }
 }
