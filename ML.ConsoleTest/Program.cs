@@ -97,7 +97,7 @@ namespace ML.ConsoleTest
 
     private static void neuralNetworkTest()
     {
-      var network = new NeuralNetwork<Point>();
+      var network = new NeuralNetwork();
       network.ActivationFunction = Registry.ActivationFunctions.Identity;
 
       var l1 = network.CreateLayer();

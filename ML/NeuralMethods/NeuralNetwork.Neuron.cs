@@ -6,7 +6,7 @@ using ML.Core;
 
 namespace ML.NeuralMethods
 {
-  public partial class NeuralNetwork<TInput> where TInput : IFeaturable<double>
+  public partial class NeuralNetwork
   {
     /// <summary>
     /// Represents artificial neuron: a node with activation function and a list of pairs (index, weight)

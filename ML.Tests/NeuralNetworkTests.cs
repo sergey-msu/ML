@@ -16,7 +16,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralNetwork_CreateLayer()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
 
       var layer1 = net.CreateLayer();
       var layer2 = net.CreateLayer();
@@ -33,7 +33,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralNetwork_CreateLayerAtIndex()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
 
       var layer1 = net.CreateLayer();
       var layer2 = net.CreateLayer(0);
@@ -58,7 +58,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralNetwork_RemoveLayer()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer1 = net.CreateLayer();
       var layer2 = net.CreateLayer();
 
@@ -75,7 +75,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralNetwork_RemoveLayerAtIndex()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer1 = net.CreateLayer();
       var layer2 = net.CreateLayer();
       var layer3 = net.CreateLayer();
@@ -103,7 +103,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_CreateNeuron()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
 
       var neuron1 = layer.CreateNeuron();
@@ -121,7 +121,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_CreateNeuronAtIndex()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
 
       var neuron1 = layer.CreateNeuron();
@@ -147,7 +147,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_RemoveNeuron()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
 
       var neuron1 = layer.CreateNeuron();
@@ -166,7 +166,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_RemoveNeuronAtIndex()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
 
       var neuron1 = layer.CreateNeuron();
@@ -192,7 +192,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_Calculate()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       var neuron1 = layer.CreateNeuron();
       neuron1[0] = 0.1D;
@@ -204,14 +204,14 @@ namespace ML.Tests
 
       layer.ActivationFunction = Registry.ActivationFunctions.Identity;
 
-      var result = layer.Calculate(point.RawData);
+      var result = layer.Calculate(point);
       Assert.AreEqual(2, result.Length);
       Assert.IsTrue(Math.Abs(result[0] - 0.5) < EPS);
       Assert.IsTrue(Math.Abs(result[1] - 0.7) < EPS);
 
       layer.ActivationFunction = Registry.ActivationFunctions.Exp;
 
-      result = layer.Calculate(point.RawData);
+      result = layer.Calculate(point);
       Assert.AreEqual(2, result.Length);
       Assert.IsTrue(Math.Abs(result[0] - Math.Exp(0.5)) < EPS);
       Assert.IsTrue(Math.Abs(result[1] - Math.Exp(0.7)) < EPS);
@@ -220,7 +220,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_Calculate_NormOutput()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       layer.NormOutput = true;
       var neuron1 = layer.CreateNeuron();
@@ -233,14 +233,14 @@ namespace ML.Tests
 
       layer.ActivationFunction = Registry.ActivationFunctions.Identity;
 
-      var result = layer.Calculate(point.RawData);
+      var result = layer.Calculate(point);
       Assert.AreEqual(2, result.Length);
       Assert.IsTrue(Math.Abs(result[0] - 0.5/1.2) < EPS);
       Assert.IsTrue(Math.Abs(result[1] - 0.7/1.2) < EPS);
 
       layer.ActivationFunction = Registry.ActivationFunctions.Exp;
 
-      result = layer.Calculate(point.RawData);
+      result = layer.Calculate(point);
       Assert.AreEqual(2, result.Length);
       Assert.IsTrue(Math.Abs(result[0] - Math.Exp(0.5)/(Math.Exp(0.5)+Math.Exp(0.7))) < EPS);
       Assert.IsTrue(Math.Abs(result[1] - Math.Exp(0.7)/(Math.Exp(0.5)+Math.Exp(0.7))) < EPS);
@@ -249,7 +249,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_Calculate_UseBias()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       layer.UseBias = true;
       var neuron1 = layer.CreateNeuron();
@@ -264,14 +264,14 @@ namespace ML.Tests
 
       layer.ActivationFunction = Registry.ActivationFunctions.Identity;
 
-      var result = layer.Calculate(point.RawData);
+      var result = layer.Calculate(point);
       Assert.AreEqual(2, result.Length);
       Assert.IsTrue(Math.Abs(result[0] - 0.4) < EPS);
       Assert.IsTrue(Math.Abs(result[1] - 0.9) < EPS);
 
       layer.ActivationFunction = Registry.ActivationFunctions.Exp;
 
-      result = layer.Calculate(point.RawData);
+      result = layer.Calculate(point);
       Assert.AreEqual(2, result.Length);
       Assert.IsTrue(Math.Abs(result[0] - Math.Exp(0.4)) < EPS);
       Assert.IsTrue(Math.Abs(result[1] - Math.Exp(0.9)) < EPS);
@@ -280,7 +280,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_UpdateWeights_Bulk()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       var neuron1 = layer.CreateNeuron();
       neuron1[0] = 0.2D;
@@ -323,7 +323,7 @@ namespace ML.Tests
     [TestMethod]
     public void NeuralLayer_UpdateWeights_Delta()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       var neuron1 = layer.CreateNeuron();
       neuron1[0] = 2D;
@@ -370,7 +370,7 @@ namespace ML.Tests
     [TestMethod]
     public void Neuron_SetWeights()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       var neuron = layer.CreateNeuron();
 
@@ -389,7 +389,7 @@ namespace ML.Tests
     [TestMethod]
     public void Neuron_Calculate()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       var neuron = layer.CreateNeuron();
       var point = new Point(1, 2, 3, 4);
@@ -399,18 +399,18 @@ namespace ML.Tests
       neuron[3] = -0.1D;
 
       neuron.ActivationFunction = Registry.ActivationFunctions.Identity;
-      var result = neuron.Calculate(point.RawData);
+      var result = neuron.Calculate(point);
       Assert.IsTrue(Math.Abs(result - 0.3) < EPS);
 
       neuron.ActivationFunction = Registry.ActivationFunctions.Exp;
-      result = neuron.Calculate(point.RawData);
+      result = neuron.Calculate(point);
       Assert.IsTrue(Math.Abs(result - Math.Exp(0.3)) < EPS);
     }
 
     [TestMethod]
     public void Neuron_UpdateWeights_Bulk()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       var neuron = layer.CreateNeuron();
       var weights = new double[] { 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -445,7 +445,7 @@ namespace ML.Tests
     [TestMethod]
     public void Neuron_UpdateWeights_Delta()
     {
-      var net = new NeuralNetwork<Point>();
+      var net = new NeuralNetwork();
       var layer = net.CreateLayer();
       var neuron = layer.CreateNeuron();
       var weights = new double[] { 1, 2, 0, 1, -1, 2, 1, 0 };

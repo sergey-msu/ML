@@ -15,12 +15,12 @@ namespace ML.NeuralMethods.Algorithms
     protected NeuralNetworkAlgorithmBase(ClassifiedSample classifiedSample)
       : base(classifiedSample)
     {
-      m_Network = new NeuralNetwork<Point>();
+      m_Network = new NeuralNetwork();
     }
 
-    private readonly NeuralNetwork<Point> m_Network;
+    private readonly NeuralNetwork m_Network;
 
-    public NeuralNetwork<Point> Network { get { return m_Network; } }
+    public NeuralNetwork Network { get { return m_Network; } }
 
 
     public override Class Classify(Point x)

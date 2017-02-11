@@ -10,13 +10,15 @@ namespace ML.NeuralMethods
   /// Represents artificial neural network: set of layers with neuron nodes and weighted connections
   /// </summary>
   /// <typeparam name="TInput">Input data type</typeparam>
-  public partial class NeuralNetwork<TInput> where TInput : IFeaturable<double>
+  public partial class NeuralNetwork
   {
     private NeuralLayer[] m_Layers;
 
     public NeuralNetwork()
     {
     }
+
+    #region Properties
 
     /// <summary>
     /// If true, adds artificial +1 input value in the and of input data array
@@ -45,11 +47,14 @@ namespace ML.NeuralMethods
       }
     }
 
+    #endregion
+
+    #region Public
+
     /// <summary>
-    /// Creates new neural layer at the given position. Adds the result in the end if the position is not selected
+    /// Creates new neural layer at the given position.
+    /// Adds the result in the end if the position is not selected
     /// </summary>
-    /// <param name="idx"></param>
-    /// <returns></returns>
     public NeuralLayer CreateLayer(int idx = -1)
     {
       NeuralLayer layer;
@@ -117,6 +122,7 @@ namespace ML.NeuralMethods
       }
 
       m_Layers = layers;
+
       return true;
     }
 
@@ -192,17 +198,17 @@ namespace ML.NeuralMethods
     /// Calculates result array produced by network
     /// </summary>
     /// <param name="input">Input data array</param>
-    public double[] Calculate(TInput input)
+    public double[] Calculate(Point input)
     {
       if (m_Layers==null || m_Layers.Length <= 0)
         throw new MLException("Network contains no layers");
 
-      var data = input.RawData;
+      double[] data = input;
       if (UseBias)
       {
-        data = new double[input.RawData.Length+1];
-        Array.Copy(input.RawData, data, input.RawData.Length);
-        data[input.RawData.Length] = 1.0D;
+        data = new double[input.Dimension+1];
+        Array.Copy(input, data, input.Dimension);
+        data[input.Dimension] = 1.0D;
       }
 
       var layerCount = m_Layers.Length;
@@ -215,5 +221,7 @@ namespace ML.NeuralMethods
 
       return data;
     }
+
+    #endregion
   }
 }

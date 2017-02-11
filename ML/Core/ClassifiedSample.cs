@@ -24,7 +24,7 @@ namespace ML.Core
     /// <summary>
     /// All points
     /// </summary>
-    public IEnumerable<Point> Points  { get { return this.Keys; } }
+    public IEnumerable<Point> Points { get { return this.Keys; } }
 
     /// <summary>
     /// All classes

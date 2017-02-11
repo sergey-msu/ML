@@ -43,13 +43,14 @@ namespace ML.Core
   /// <summary>
   /// Represents a multidimentional point
   /// </summary>
-  public struct Point : IFeaturable<double>
+  public struct Point
   {
     private readonly double[] m_SpacePoint;
 
-    public Point(int dimension)
+    public Point(int dim)
     {
-      m_SpacePoint = new double[dimension];
+      m_SpacePoint = new double[dim];
+      Dimension = dim;
     }
 
     public Point(params double[] point)
@@ -58,36 +59,22 @@ namespace ML.Core
         throw new MLException("Point.ctor(point=null|empty)");
 
       m_SpacePoint = point.ToArray();
+      Dimension = m_SpacePoint.Length;
     }
 
-    #region IFeatureContainer
+    /// <summary>
+    /// Dimension
+    /// </summary>
+    public readonly int Dimension;
 
-      /// <summary>
-      /// Dimension
-      /// </summary>
-      public int Dimension
-      {
-        get { return m_SpacePoint.Length; }
-      }
-
-      /// <summary>
-      /// Returns i-th point coordinate value
-      /// </summary>
-      public double this[int i]
-      {
-        get { return m_SpacePoint[i]; }
-        set { m_SpacePoint[i] = value; }
-      }
-
-      /// <summary>
-      /// Returns raw data array of feature values
-      /// </summary>
-      public double[] RawData
-      {
-        get { return m_SpacePoint; }
-      }
-
-    #endregion
+    /// <summary>
+    /// Returns i-th point coordinate value
+    /// </summary>
+    public double this[int i]
+    {
+      get { return m_SpacePoint[i]; }
+      set { m_SpacePoint[i] = value; }
+    }
 
     #region Overrides
 
@@ -150,6 +137,11 @@ namespace ML.Core
     {
       if (p1.Dimension != p2.Dimension)
         throw new MLException("Can not add point with different dimension");
+    }
+
+    public static implicit operator double[](Point x)
+    {
+       return x.m_SpacePoint;
     }
 
     #endregion

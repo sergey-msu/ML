@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contracts\IFeatureContainer.cs" />
     <Compile Include="Contracts\IInformIndex.cs" />
     <Compile Include="Core\ActivationFunctions\ArctanActivation.cs" />
     <Compile Include="Core\ActivationFunctions\BinaryStepActivation.cs" />
@@ -85,6 +84,7 @@
     <Compile Include="MetricalMethods\Algorithms\ParzenVariableAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
+    <Compile Include="NeuralMethods\Algorithms\PerceptronAlgorithm.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.Neuron.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.Layer.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.cs" />

@@ -6,18 +6,18 @@ using ML.Contracts;
 
 namespace ML.NeuralMethods
 {
-  public partial class NeuralNetwork<TInput> where TInput : IFeaturable<double>
+  public partial class NeuralNetwork
   {
     /// <summary>
     /// Represents artificial neural layer as a list of neurons
     /// </summary>
     public class NeuralLayer
     {
-      private readonly NeuralNetwork<TInput> m_Network;
+      private readonly NeuralNetwork m_Network;
       private Neuron[] m_Neurons;
       private IFunction m_ActivationFunction;
 
-      internal NeuralLayer(NeuralNetwork<TInput> network)
+      internal NeuralLayer(NeuralNetwork network)
       {
         if (network == null)
           throw new MLException("NeuronLayer.ctor(network=null)");
@@ -38,7 +38,7 @@ namespace ML.NeuralMethods
       /// <summary>
       /// Neural network that the layer belongs to
       /// </summary>
-      public NeuralNetwork<TInput> Network { get { return m_Network; } }
+      public NeuralNetwork Network { get { return m_Network; } }
 
       /// <summary>
       /// A list of the layer neurons

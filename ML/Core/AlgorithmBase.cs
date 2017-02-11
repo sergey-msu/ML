@@ -66,15 +66,15 @@ namespace ML.Core
       {
         public Error(Point point, Class realClass, Class calcClass)
         {
-          Point = point;
+          Opject = point;
           RealClass = realClass;
           CalcClass = calcClass;
         }
 
         /// <summary>
-        /// Classified point
+        /// Classified object
         /// </summary>
-        public readonly Point Point;
+        public readonly Point Opject;
 
         /// <summary>
         /// Real point class
@@ -82,14 +82,14 @@ namespace ML.Core
         public readonly Class RealClass;
 
         /// <summary>
-        /// Calculated point class
+        /// Calculated oblect class
         /// </summary>
         public readonly Class CalcClass;
       }
 
     #endregion
 
-    private readonly ClassifiedSample  m_TrainingSample;
+    private readonly ClassifiedSample m_TrainingSample;
     private readonly Dictionary<string, Class> m_Classes;
     private MaskHandle m_MaskHandle;
 
@@ -129,7 +129,7 @@ namespace ML.Core
     public Dictionary<string, Class> Classes { get { return m_Classes; } }
 
     /// <summary>
-    /// Classify point
+    /// Classify object
     /// </summary>
     public abstract Class Classify(Point x);
 
