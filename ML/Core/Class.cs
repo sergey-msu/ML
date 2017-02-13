@@ -15,15 +15,13 @@ namespace ML.Core
 
     private readonly string m_Name;
     private readonly double  m_Value;
-    private readonly int m_Order;
 
-    public Class(string name, int order, double? value = null)
+    public Class(string name, double? value = null)
     {
       if (string.IsNullOrWhiteSpace(name))
         throw new MLException("Class.ctor(name=null|empty)");
 
       m_Name = name;
-      m_Order = order;
       m_Value = value ?? 0.0F;
     }
 
@@ -31,11 +29,6 @@ namespace ML.Core
     /// Class Name
     /// </summary>
     public string Name { get { return m_Name; } }
-
-    /// <summary>
-    /// Class Order
-    /// </summary>
-    public int Order { get { return m_Order; } }
 
     /// <summary>
     /// Some associated value (e.g. {-1, +1} for two-classes classification)

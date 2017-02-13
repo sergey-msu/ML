@@ -6,94 +6,95 @@ using ML.Core;
 
 namespace ML.NeuralMethods.Algorithms
 {
-  public class NeuralNetworkSimpleAlgorithm : NeuralNetworkAlgorithmBase
-  {
-    private int m_CurrentEpoch;
+  // TODO
+  //public class NeuralNetworkSimpleAlgorithm : NeuralNetworkAlgorithmBase
+  //{
+  //  private int m_CurrentEpoch;
 
-    public NeuralNetworkSimpleAlgorithm(ClassifiedSample classifiedSample)
-      : base(classifiedSample)
-    {
-    }
+  //  public NeuralNetworkSimpleAlgorithm(ClassifiedSample classifiedSample)
+  //    : base(classifiedSample)
+  //  {
+  //  }
 
-    public override string ID   { get { return "NNET-SIMP"; } }
-    public override string Name { get { return "Simple Neural Network"; } }
+    //public override string ID   { get { return "NNET-SIMP"; } }
+    //public override string Name { get { return "Simple Neural Network"; } }
 
-    public int    EpochCount { get; set; }
-    public double Margin     { get; set; }
-    public double Step       { get; set; }
+    //public int    EpochCount { get; set; }
+    //public double Margin     { get; set; }
+    //public double Step       { get; set; }
 
 
-    public void Train()
-    {
-      m_CurrentEpoch = 0;
+    //public void Train()
+    //{
+    //  m_CurrentEpoch = 0;
 
-      var weightCount = Network.Layers.Sum(l => l.Neurons.Sum(n => n.WeightCount));
-      var weights = new double[weightCount];
+    //  var weightCount = Network.Layers.Sum(l => l.Neurons.Sum(n => n.WeightCount));
+    //  var weights = new double[weightCount];
 
-      for (int i=0; i<EpochCount; i++) // epoch
-      {
-        m_CurrentEpoch++;
+    //  for (int i=0; i<EpochCount; i++) // epoch
+    //  {
+    //    m_CurrentEpoch++;
 
-        foreach (var pdata in TrainingSample) // iteration
-        {
-          var point = pdata.Key;
-          var cls = pdata.Value;
+    //    foreach (var pdata in TrainingSample) // iteration
+    //    {
+    //      var point = pdata.Key;
+    //      var cls = pdata.Value;
 
-          for (int k=0; k<weightCount; k++)
-            minimizeError(point, cls, weightCount, k);
-        }
-      }
-    }
+    //      for (int k=0; k<weightCount; k++)
+    //        minimizeError(point, cls, weightCount, k);
+    //    }
+    //  }
+    //}
 
-    #region .pvt
+    //#region .pvt
 
-    private void minimizeError(Point data, Class cls, int count, int idx)
-    {
-      var deltas = new double[count];
-      deltas[idx] = -Margin;
-      Network.UpdateWeights(deltas, true);
-      var minError = calculateError(data, cls);
-      if (minError < float.Epsilon) return;
-      var minDx = -Margin;
+    //private void minimizeError(Point data, Class cls, int count, int idx)
+    //{
+    //  var deltas = new double[count];
+    //  deltas[idx] = -Margin;
+    //  Network.UpdateWeights(deltas, true);
+    //  var minError = calculateError(data, cls);
+    //  if (minError < float.Epsilon) return;
+    //  var minDx = -Margin;
 
-      deltas[idx] = Step;
-      var dx = -Margin;
-      while (dx < Margin)
-      {
-        Network.UpdateWeights(deltas, true);
-        var error = calculateError(data, cls);
-        if (error < minError)
-        {
-          minError = error;
-          minDx = dx;
-          if (minError < float.Epsilon) break;
-        }
-        dx += Step;
-      }
+    //  deltas[idx] = Step;
+    //  var dx = -Margin;
+    //  while (dx < Margin)
+    //  {
+    //    Network.UpdateWeights(deltas, true);
+    //    var error = calculateError(data, cls);
+    //    if (error < minError)
+    //    {
+    //      minError = error;
+    //      minDx = dx;
+    //      if (minError < float.Epsilon) break;
+    //    }
+    //    dx += Step;
+    //  }
 
-      var d = minDx-dx;
-      if (d < 0)
-      {
-        deltas[idx] = d;
-        Network.UpdateWeights(deltas, true);
-      }
-    }
+    //  var d = minDx-dx;
+    //  if (d < 0)
+    //  {
+    //    deltas[idx] = d;
+    //    Network.UpdateWeights(deltas, true);
+    //  }
+    //}
 
-    private double calculateError(Point data, Class cls)
-    {
-      var result = Network.Calculate(data);
+    //private double calculateError(Point data, Class cls)
+    //{
+    //  var result = Network.Calculate(data);
 
-      int idx;
-      double max;
-      MathUtils.CalcMax(result, out idx, out max);
-      var calcClsVal = result[idx];
-      var expClsVal = result[cls.Order];
+    //  int idx;
+    //  double max;
+    //  MathUtils.CalcMax(result, out idx, out max);
+    //  var calcClsVal = result[idx];
+    //  var expClsVal = result[cls.Order];
 
-      var error = Math.Abs(calcClsVal - expClsVal);
+    //  var error = Math.Abs(calcClsVal - expClsVal);
 
-      return error;
-    }
+    //  return error;
+    //}
 
-    #endregion
-  }
+    //#endregion
+  //}
 }

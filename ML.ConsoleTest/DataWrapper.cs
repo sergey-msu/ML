@@ -34,6 +34,7 @@ namespace ML.ConsoleTest
     public readonly ClassifiedSample TrainingSample = new ClassifiedSample();
     public readonly List<DataError> Errors = new List<DataError>();
 
+    public int Dimension { get; private set; }
 
     private void readData(string file)
     {
@@ -52,12 +53,14 @@ namespace ML.ConsoleTest
         {
           readHeaders(reader, out featureIndxs, out trainingIndx, out classesIndx, out clsValIdx);
           readBody(reader, featureIndxs, trainingIndx, classesIndx, clsValIdx);
+          Dimension = featureIndxs.Length;
         }
         catch (Exception ex)
         {
           Console.WriteLine("CRITICAL ERROR: {0}", ex.Message);
         }
       }
+
     }
 
     private void readHeaders(StreamReader reader, out int[] featureIndxs, out int trainingIndx, out int classesIndx, out int clsValIdx)
@@ -120,12 +123,11 @@ namespace ML.ConsoleTest
         }
         Class cls;
         var clsName = data[classesIndx];
-        var clsOrder = 1;
         if (!Classes.TryGetValue(clsName, out cls))
         {
           double val;
           var value = (clsValIdx<0 || !double.TryParse(data[clsValIdx], out val)) ? (double?)null : val;
-          cls = new Class(clsName, clsOrder++, value);
+          cls = new Class(clsName, value);
           Classes[clsName] = cls;
         }
 

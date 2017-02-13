@@ -8,6 +8,7 @@ using ML.Contracts;
 using ML.LogicalMethods.Algorithms;
 using ML.MetricalMethods.Algorithms;
 using ML.Core.Logical;
+using ML.NeuralMethods.Algorithms;
 
 namespace ML.ConsoleTest
 {
@@ -57,7 +58,9 @@ namespace ML.ConsoleTest
         //doParzenFixedAlgorithmTest();
         //doPotentialFixedAlgorithmTest();
 
-        doDecisionTreeAlgorithmTest();
+        //doDecisionTreeAlgorithmTest();
+
+        doPerceptronAlgorithmTest();
       }
     }
 
@@ -199,6 +202,14 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
+    private void doPerceptronAlgorithmTest()
+    {
+      var epoch = 1;
+      var alg = new PerceptronAlgorithm(Data.TrainingSample, Data.Dimension, 3, -0.5, 0.5);
+      alg.Train_ErrorCorrection(epoch);
+
+      Visualizer.Run(alg);
+    }
 
 
     private void calculateMargin(IMetricAlgorithm algorithm)

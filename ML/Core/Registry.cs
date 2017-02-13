@@ -80,19 +80,20 @@ namespace ML.Core
 
     public static class ActivationFunctions
     {
-      private static readonly ArctanActivation     m_Atan       = new ArctanActivation();
-      private static readonly BinaryStepActivation m_BinaryStep = new BinaryStepActivation();
-      private static readonly IdentityActivation   m_Identity   = new IdentityActivation();
-      private static readonly LogisticActivation   m_Logistic   = new LogisticActivation();
-      private static readonly ReLUActivation       m_ReLU       = new ReLUActivation();
-      private static readonly TanhActivation       m_Tanh       = new TanhActivation();
-      private static readonly ExpActivation        m_Exp        = new ExpActivation();
-      private static readonly SignActivation       m_Sign       = new SignActivation();
+      private static readonly ArctanActivation   m_Atan       = new ArctanActivation();
+      private static readonly StepActivation     m_Step = new StepActivation();
+      private static readonly IdentityActivation m_Identity   = new IdentityActivation();
+      private static readonly LogisticActivation m_Logistic   = new LogisticActivation();
+      private static readonly ReLUActivation     m_ReLU       = new ReLUActivation();
+      private static readonly TanhActivation     m_Tanh       = new TanhActivation();
+      private static readonly ExpActivation      m_Exp        = new ExpActivation();
+      private static readonly SignActivation     m_Sign       = new SignActivation();
+      private static readonly Dictionary<double, ShiftedStepActivation> m_ShiftedSteps= new Dictionary<double, ShiftedStepActivation>();
 
       public static readonly Dictionary<string, IFunction> ByID = new Dictionary<string, IFunction>
       {
         { m_Atan.ID,       m_Atan },
-        { m_BinaryStep.ID, m_BinaryStep },
+        { m_Step.ID, m_Step },
         { m_Identity.ID,   m_Identity },
         { m_Logistic.ID,   m_Logistic },
         { m_ReLU.ID,       m_ReLU },
@@ -101,14 +102,25 @@ namespace ML.Core
         { m_Sign.ID,       m_Sign }
       };
 
-      public static ArctanActivation     Atan       { get { return m_Atan; } }
-      public static BinaryStepActivation BinaryStep { get { return m_BinaryStep; } }
-      public static IdentityActivation   Identity   { get { return m_Identity; } }
-      public static LogisticActivation   Logistic   { get { return m_Logistic; } }
-      public static ReLUActivation       ReLU       { get { return m_ReLU; } }
-      public static TanhActivation       Tanh       { get { return m_Tanh; } }
-      public static ExpActivation        Exp        { get { return m_Exp; } }
-      public static SignActivation       Sign       { get { return m_Sign; } }
+      public static ArctanActivation      Atan     { get { return m_Atan; } }
+      public static StepActivation        Step     { get { return m_Step; } }
+      public static IdentityActivation    Identity { get { return m_Identity; } }
+      public static LogisticActivation    Logistic { get { return m_Logistic; } }
+      public static ReLUActivation        ReLU     { get { return m_ReLU; } }
+      public static TanhActivation        Tanh     { get { return m_Tanh; } }
+      public static ExpActivation         Exp      { get { return m_Exp; } }
+      public static SignActivation        Sign     { get { return m_Sign; } }
+      public static ShiftedStepActivation ShiftedStep(double p)
+      {
+        ShiftedStepActivation result;
+        if (!m_ShiftedSteps.TryGetValue(p, out result))
+        {
+          result = new ShiftedStepActivation(p);
+          m_ShiftedSteps[p] = result;
+        }
+
+        return result;
+      }
     }
   }
 }

@@ -8,12 +8,18 @@ namespace ML.Core.ActivationFunctions
   /// </summary>
   public class SignActivation : IFunction
   {
+    public SignActivation(double zeroValue = 1)
+    {
+      ZeroValue = zeroValue;
+    }
+
+    public readonly double ZeroValue;
     public string ID { get { return "SIGN"; } }
     public string Name { get { return "Signum"; } }
 
     public double Value(double r)
     {
-      if (r==0) return 0;
+      if (r==0) return ZeroValue;
       return (r<0) ? -1 : 1;
     }
 

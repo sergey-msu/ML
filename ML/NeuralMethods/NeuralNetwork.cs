@@ -153,16 +153,19 @@ namespace ML.NeuralMethods
     /// <param name="fromNeuronIndx">Index of the 'from' neuron from the previous layer</param>
     /// <param name="neuronIndx">Index of the 'to' neuron in the given layer</param>
     /// <returns>Returns false if layer or neuron does not exist</returns>
-    public bool TrySetWeight(int layerIdx, int fromNeuronIndx, int neuronIndx, double? weight)
+    public bool TrySetWeight(int layerIdx, int fromNeuronIndx, int neuronIndx, double? weight, bool isDelta)
     {
-      weight = null;
       var layer = this[layerIdx];
       if (layer==null) return false;
 
       var neuron = layer[neuronIndx];
       if (neuron == null) return false;
 
-      neuron[fromNeuronIndx] = weight;
+      if (isDelta)
+        neuron[fromNeuronIndx] += weight;
+      else
+        neuron[fromNeuronIndx] = weight;
+
       return true;
     }
 

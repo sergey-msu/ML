@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
-using ML.Contracts;
 using ML.Core.Mathematics;
 
 namespace ML.NeuralMethods.Algorithms
@@ -31,7 +30,7 @@ namespace ML.NeuralMethods.Algorithms
       double max;
       MathUtils.CalcMax(result, out idx, out max);
 
-      var cls = Classes.FirstOrDefault(c => c.Value.Order == idx);
+      var cls = Classes.FirstOrDefault(c => (int)c.Value.Value == idx);
 
       return cls.Value ?? Class.None;
     }
