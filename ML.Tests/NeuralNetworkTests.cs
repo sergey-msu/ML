@@ -31,68 +31,19 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void NeuralNetwork_CreateLayerAtIndex()
-    {
-      var net = new NeuralNetwork();
-
-      var layer1 = net.CreateLayer();
-      var layer2 = net.CreateLayer(0);
-      var layer3 = net.CreateLayer(1);
-      var layer4 = net.CreateLayer(2);
-
-      Assert.IsNotNull(layer1);
-      Assert.IsNotNull(layer2);
-      Assert.IsNotNull(layer3);
-      Assert.IsNotNull(layer4);
-      Assert.AreEqual(net, layer1.Network);
-      Assert.AreEqual(net, layer2.Network);
-      Assert.AreEqual(net, layer3.Network);
-      Assert.AreEqual(net, layer4.Network);
-      Assert.AreEqual(4, net.Layers.Length);
-      Assert.AreEqual(layer1, net[3]);
-      Assert.AreEqual(layer2, net[0]);
-      Assert.AreEqual(layer3, net[1]);
-      Assert.AreEqual(layer4, net[2]);
-    }
-
-    [TestMethod]
     public void NeuralNetwork_RemoveLayer()
     {
       var net = new NeuralNetwork();
       var layer1 = net.CreateLayer();
       var layer2 = net.CreateLayer();
 
-      var result = net.RemoveLayer(layer1);
-      Assert.IsTrue(result);
+      var result = net.RemoveLayer();
+      Assert.AreEqual(layer2, result);
       Assert.AreEqual(1, net.Layers.Length);
-      Assert.AreEqual(layer2, net[0]);
-
-      result = net.RemoveLayer(layer2);
-      Assert.IsTrue(result);
-      Assert.AreEqual(0, net.Layers.Length);
-    }
-
-    [TestMethod]
-    public void NeuralNetwork_RemoveLayerAtIndex()
-    {
-      var net = new NeuralNetwork();
-      var layer1 = net.CreateLayer();
-      var layer2 = net.CreateLayer();
-      var layer3 = net.CreateLayer();
-
-      var result = net.RemoveLayer(1);
-      Assert.IsTrue(result);
-      Assert.AreEqual(2, net.Layers.Length);
       Assert.AreEqual(layer1, net[0]);
-      Assert.AreEqual(layer3, net[1]);
 
-      result = net.RemoveLayer(0);
-      Assert.IsTrue(result);
-      Assert.AreEqual(1, net.Layers.Length);
-      Assert.AreEqual(layer3, net[0]);
-
-      result = net.RemoveLayer(0);
-      Assert.IsTrue(result);
+      result = net.RemoveLayer();
+      Assert.AreEqual(layer1, result);
       Assert.AreEqual(0, net.Layers.Length);
     }
 
@@ -119,32 +70,6 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void NeuralLayer_CreateNeuronAtIndex()
-    {
-      var net = new NeuralNetwork();
-      var layer = net.CreateLayer();
-
-      var neuron1 = layer.CreateNeuron();
-      var neuron2 = layer.CreateNeuron(0);
-      var neuron3 = layer.CreateNeuron(1);
-      var neuron4 = layer.CreateNeuron(2);
-
-      Assert.IsNotNull(neuron1);
-      Assert.IsNotNull(neuron2);
-      Assert.IsNotNull(neuron3);
-      Assert.IsNotNull(neuron4);
-      Assert.AreEqual(layer, neuron1.Layer);
-      Assert.AreEqual(layer, neuron2.Layer);
-      Assert.AreEqual(layer, neuron3.Layer);
-      Assert.AreEqual(layer, neuron4.Layer);
-      Assert.AreEqual(4, layer.Neurons.Length);
-      Assert.AreEqual(neuron1, layer[3]);
-      Assert.AreEqual(neuron2, layer[0]);
-      Assert.AreEqual(neuron3, layer[1]);
-      Assert.AreEqual(neuron4, layer[2]);
-    }
-
-    [TestMethod]
     public void NeuralLayer_RemoveNeuron()
     {
       var net = new NeuralNetwork();
@@ -153,39 +78,13 @@ namespace ML.Tests
       var neuron1 = layer.CreateNeuron();
       var neuron2 = layer.CreateNeuron();
 
-      var result = layer.RemoveNeuron(neuron1);
-      Assert.IsTrue(result);
+      var result = layer.RemoveNeuron();
+      Assert.AreEqual(neuron2, result);
       Assert.AreEqual(1, layer.Neurons.Length);
-      Assert.AreEqual(neuron2, layer[0]);
-
-      result = layer.RemoveNeuron(neuron2);
-      Assert.IsTrue(result);
-      Assert.AreEqual(0, layer.Neurons.Length);
-    }
-
-    [TestMethod]
-    public void NeuralLayer_RemoveNeuronAtIndex()
-    {
-      var net = new NeuralNetwork();
-      var layer = net.CreateLayer();
-
-      var neuron1 = layer.CreateNeuron();
-      var neuron2 = layer.CreateNeuron();
-      var neuron3 = layer.CreateNeuron();
-
-      var result = layer.RemoveNeuron(1);
-      Assert.IsTrue(result);
-      Assert.AreEqual(2, layer.Neurons.Length);
       Assert.AreEqual(neuron1, layer[0]);
-      Assert.AreEqual(neuron3, layer[1]);
 
-      result = layer.RemoveNeuron(0);
-      Assert.IsTrue(result);
-      Assert.AreEqual(1, layer.Neurons.Length);
-      Assert.AreEqual(neuron3, layer[0]);
-
-      result = layer.RemoveNeuron(0);
-      Assert.IsTrue(result);
+      result = layer.RemoveNeuron();
+      Assert.AreEqual(neuron1, result);
       Assert.AreEqual(0, layer.Neurons.Length);
     }
 

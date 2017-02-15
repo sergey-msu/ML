@@ -53,6 +53,7 @@
     <Compile Include="Core\AlgorithmBase.cs" />
     <Compile Include="Core\ClassifiedSample.cs" />
     <Compile Include="Contracts\IAuxiliary.cs" />
+    <Compile Include="Core\ComputingNetworks\ComputingLayer.Base.cs" />
     <Compile Include="Core\Exceptions.cs" />
     <Compile Include="Core\Feature.cs" />
     <Compile Include="Core\Class.cs" />
@@ -85,8 +86,10 @@
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
     <Compile Include="NeuralMethods\Algorithms\PerceptronAlgorithm.cs" />
-    <Compile Include="NeuralMethods\NeuralNetwork.Neuron.cs" />
-    <Compile Include="NeuralMethods\NeuralNetwork.Layer.cs" />
+    <Compile Include="Core\ComputingNetworks\ComputingLayer.Contracts.cs" />
+    <Compile Include="Core\ComputingNetworks\ComputingNetwork.cs" />
+    <Compile Include="NeuralMethods\Neuron.cs" />
+    <Compile Include="NeuralMethods\NeuralLayer.cs" />
     <Compile Include="NeuralMethods\NeuralNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Mathematics\MathUtils.cs" />

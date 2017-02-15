@@ -25,7 +25,6 @@ namespace ML.NeuralMethods.Algorithms
 
     #endregion
 
-
     private readonly int m_HiddenNeuronCount;
     private readonly int m_InputDimension;
     private readonly double m_MinShift;

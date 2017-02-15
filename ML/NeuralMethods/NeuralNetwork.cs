@@ -10,7 +10,7 @@ namespace ML.NeuralMethods
   /// Represents artificial neural network: set of layers with neuron nodes and weighted connections
   /// </summary>
   /// <typeparam name="TInput">Input data type</typeparam>
-  public partial class NeuralNetwork
+  public class NeuralNetwork
   {
     private NeuralLayer[] m_Layers;
 
@@ -52,36 +52,23 @@ namespace ML.NeuralMethods
     #region Public
 
     /// <summary>
-    /// Creates new neural layer at the given position.
-    /// Adds the result in the end if the position is not selected
+    /// Creates new neural layer. Adds the result in the end
     /// </summary>
-    public NeuralLayer CreateLayer(int idx = -1)
+    public NeuralLayer CreateLayer()
     {
-      NeuralLayer layer;
+      var layer = new NeuralLayer(this);
 
       if (m_Layers == null)
       {
-        if (idx>0)
-          throw new MLException(string.Format("Unable to insert first layer at position '{0}'", idx));
-
-        layer = new NeuralLayer(this);
         m_Layers = new NeuralLayer[1] { layer };
         return layer;
       }
 
-      if (idx > m_Layers.Length)
-          throw new MLException(string.Format("Unable to insert layer at position '{0}'", idx));
-
-      layer = new NeuralLayer(this);
       var layers = new NeuralLayer[m_Layers.Length+1];
-      if (idx < 0) idx = m_Layers.Length;
 
-      for (int i=0; i<layers.Length; i++)
-      {
-        if (i<idx) layers[i] = m_Layers[i];
-        else if (i==idx) layers[i] = layer;
-        else layers[i] = m_Layers[i-1];
-      }
+      for (int i=0; i<m_Layers.Length; i++)
+        layers[i] = m_Layers[i];
+      layers[m_Layers.Length] = layer;
 
       m_Layers = layers;
 
@@ -89,41 +76,28 @@ namespace ML.NeuralMethods
     }
 
     /// <summary>
-    /// Removes layer from the network
+    /// Removes last layer from the network
     /// </summary>
-    public bool RemoveLayer(NeuralLayer layer)
+    public NeuralLayer RemoveLayer()
     {
       if (m_Layers == null || m_Layers.Length <= 0)
-        return false;
+        return null;
 
-      var idx = Array.IndexOf(m_Layers, layer);
-      if (idx < 0) return false;
+      var idx = m_Layers.Length-1;
+      var layer = m_Layers[idx];
 
-      return RemoveLayer(idx);
-    }
-
-    /// <summary>
-    /// Removes layer at the given position from the network
-    /// </summary>
-    public bool RemoveLayer(int idx)
-    {
-      if (m_Layers == null || m_Layers.Length <= 0)
-        return false;
-      if (idx < 0 || idx >= m_Layers.Length)
-        return false;
-
-      var layers = new NeuralLayer[m_Layers.Length-1];
-      for (int i=0; i<m_Layers.Length; i++)
-      {
-        if (i<idx)
-          layers[i] = m_Layers[i];
-        else if (i>idx)
-          layers[i-1] = m_Layers[i];
-      }
+      var layers = new NeuralLayer[idx];
+      for (int i = 0; i < idx; i++)
+        layers[i] = m_Layers[i];
 
       m_Layers = layers;
 
-      return true;
+      return layer;
+    }
+
+    public void CheckConsistency()
+    {
+      // TODO, returns consistency errors i.e. missing layers/neurons, broken connections etc.
     }
 
     /// <summary>
@@ -169,11 +143,6 @@ namespace ML.NeuralMethods
       return true;
     }
 
-    public void CheckConsistency()
-    {
-      // TODO, returns consistency errors i.e. missing layers/neurons, broken connections etc.
-    }
-
     /// <summary>
     /// Updates all layer neurons weights with the given array of values
     /// </summary>
@@ -201,7 +170,7 @@ namespace ML.NeuralMethods
     /// Calculates result array produced by network
     /// </summary>
     /// <param name="input">Input data array</param>
-    public double[] Calculate(Point input)
+    public virtual double[] Calculate(double[] input)
     {
       if (m_Layers==null || m_Layers.Length <= 0)
         throw new MLException("Network contains no layers");
@@ -209,9 +178,9 @@ namespace ML.NeuralMethods
       double[] data = input;
       if (UseBias)
       {
-        data = new double[input.Dimension+1];
-        Array.Copy(input, data, input.Dimension);
-        data[input.Dimension] = 1.0D;
+        data = new double[input.Length+1];
+        Array.Copy(input, data, input.Length);
+        data[input.Length] = 1.0D;
       }
 
       var layerCount = m_Layers.Length;

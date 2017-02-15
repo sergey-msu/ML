@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using System.Collections.Generic;
 using ML.Core;
 using ML.Core.Mathematics;
-using ML.NeuralMethods;
-using ML.NeuralMethods.Algorithms;
+using ML.Core.ComputingNetworks;
 
 namespace ML.ConsoleTest
 {
@@ -16,6 +14,8 @@ namespace ML.ConsoleTest
 
     static void Main(string[] args)
     {
+      testNewNetworkArchitecture();
+
       //generateNormal2Classes(200, 200);
       //generateNormal3Classes(100, 100, 100);
 
@@ -37,6 +37,23 @@ namespace ML.ConsoleTest
 
       Console.WriteLine("DONE");
       Console.ReadLine();
+    }
+
+    static void testNewNetworkArchitecture()
+    {
+      var network = new MultNetwork();
+
+      var layer1 = new SummLayer();
+      network.AddFirstLayer(layer1);
+
+      var layer2 = new DoubleLayer();
+      layer1.AddNext(layer2);
+
+      var output = new ThresholdLayer(2);
+      layer2.AddNext(output);
+
+      var x = new Point2D(0.7, 0.4);
+      var y = network.Calculate(x);
     }
 
     private static void generateNormal2Classes(int n1, int n2)
@@ -92,4 +109,119 @@ namespace ML.ConsoleTest
       }
     }
   }
+
+  #region Test Canvas
+
+  public class MultNetwork : ComputingNetwork<Point2D, int> {}
+
+  public class SummLayer : HiddenLayer<Point2D, double>
+  {
+    protected override bool DoUpdateParams(double[] pars, bool isDelta, ref int cursor)
+    {
+      return true;
+    }
+
+    protected override double DoCalculate(Point2D input)
+    {
+      return input.X + input.Y;
+    }
+
+    public override void Compile()
+    {
+      throw new NotImplementedException();
+    }
+
+    public override bool TrySetParam(int idx, double value, bool isDelta)
+    {
+      throw new NotImplementedException();
+    }
+
+    protected override bool DoTryGetParam(int idx, out double value)
+    {
+      throw new NotImplementedException();
+    }
+  }
+
+  public class DoubleLayer : HiddenLayer<double, double>
+  {
+    protected override bool DoUpdateParams(double[] pars, bool isDelta, ref int cursor)
+    {
+      return true;
+    }
+
+    protected override double DoCalculate(double input)
+    {
+      return input * 2;
+    }
+
+    public override void Compile()
+    {
+      throw new NotImplementedException();
+    }
+
+    public override bool TrySetParam(int idx, double value, bool isDelta)
+    {
+      throw new NotImplementedException();
+    }
+
+    protected override bool DoTryGetParam(int idx, out double value)
+    {
+      throw new NotImplementedException();
+    }
+  }
+
+  public class ThresholdLayer : OutputLayer<double, int>
+  {
+    private double m_Threshold;
+
+    public ThresholdLayer(double threshold)
+    {
+      m_Threshold = threshold;
+    }
+
+    public override int Calculate(double input)
+    {
+      return (input > m_Threshold) ? 1 : 0;
+    }
+
+    public override void Compile()
+    {
+      throw new NotImplementedException();
+    }
+
+    public override bool TryUpdateParams(double[] pars, bool isDelta, ref int cursor)
+    {
+      if (pars==null || pars.Length <= cursor) return false;
+      var value = pars[cursor];
+      if (isDelta)
+        m_Threshold += value;
+      else
+        m_Threshold = value;
+
+      cursor++;
+
+      return true;
+    }
+
+    public override bool TrySetParam(int idx, double value, bool isDelta)
+    {
+      if (idx != 0) return false;
+      if (isDelta)
+        m_Threshold += value;
+      else
+        m_Threshold = value;
+
+      return true;
+    }
+
+    public override bool TryGetParam(int idx, out double value)
+    {
+      value = 0;
+      if (idx != 0) return false;
+      value = m_Threshold;
+      return true;
+    }
+  }
+
+  #endregion
 }

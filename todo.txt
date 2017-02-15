@@ -1,0 +1,12 @@
+Neural Networks:
+- debug implement Perceptron algorithm
+- implement Gradient Descent algorithm for Perceptron
+  - with back propagation
+  - with stochastic
+  - all above for general NN
+- read more about Convolution NN
+- develop unified approach to multi-typed layers NN: layer<TIn, TOut>
+  (may be I should change array of layers to connected list of layers with .addNext<TNewOut>(newlayer<TOut, TNewOut>) method in each)
+- rewrite all NN code to new architecture
+
+DONE:
