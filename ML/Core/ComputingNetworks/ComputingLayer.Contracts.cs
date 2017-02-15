@@ -44,7 +44,7 @@ namespace ML.Core.ComputingNetworks
     /// <param name="value">Parameter value</param>
     /// <param name="isDelta">Is the values are exact or just delta to existing one</param>
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    bool TrySetParam(int idx, double value, bool isDelta);
+    bool TrySetParam(ref int idx, double value, bool isDelta);
 
     /// <summary>
     /// Tries to return parameter value at some position
@@ -52,11 +52,6 @@ namespace ML.Core.ComputingNetworks
     /// <param name="idx">Linear index of the parameter</param>
     /// <param name="value">Parameter value</param>
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    bool TryGetParam(int idx, out double value);
-
-    /// <summary>
-    /// Compiles Layer (build parameter index etc.)
-    /// </summary>
-    void Compile();
+    bool TryGetParam(ref int idx, out double value);
   }
 }

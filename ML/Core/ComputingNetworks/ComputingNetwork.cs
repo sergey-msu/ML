@@ -64,9 +64,9 @@ namespace ML.Core.ComputingNetworks
     /// <param name="value">Parameter value</param>
     /// <param name="isDelta">Is the values are exact or just delta to existing one</param>
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    public bool TrySetParam(int idx, double value, bool isDelta)
+    public bool TrySetParam(ref int idx, double value, bool isDelta)
     {
-      return m_FirstLayer.TrySetParam(idx, value, isDelta);
+      return m_FirstLayer.TrySetParam(ref idx, value, isDelta);
     }
 
     /// <summary>
@@ -75,17 +75,9 @@ namespace ML.Core.ComputingNetworks
     /// <param name="idx">Linear index of the parameter</param>
     /// <param name="value">Parameter value</param>
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    public bool TryGetParam(int idx, out double value)
+    public bool TryGetParam(ref int idx, out double value)
     {
-      return m_FirstLayer.TryGetParam(idx, out value);
-    }
-
-    /// <summary>
-    /// Compiles Network (build parameter index etc.)
-    /// </summary>
-    public void Compile()
-    {
-      m_FirstLayer.Compile();
+      return m_FirstLayer.TryGetParam(ref idx, out value);
     }
   }
 

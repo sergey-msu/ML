@@ -43,7 +43,7 @@ namespace ML.Core.ComputingNetworks
     /// <param name="value">Parameter value</param>
     /// <param name="isDelta">Is the values are exact or just delta to existing one</param>
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    public abstract bool TrySetParam(int idx, double value, bool isDelta);
+    public abstract bool TrySetParam(ref int idx, double value, bool isDelta);
 
     /// <summary>
     /// Tries to return parameter value at some position
@@ -51,12 +51,7 @@ namespace ML.Core.ComputingNetworks
     /// <param name="idx">Linear index of the parameter</param>
     /// <param name="value">Parameter value</param>
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    public abstract bool TryGetParam(int idx, out double value);
-
-    /// <summary>
-    /// Compiles Layer (build parameter index etc.)
-    /// </summary>
-    public abstract void Compile();
+    public abstract bool TryGetParam(ref int idx, out double value);
   }
 
   /// <summary>
@@ -120,9 +115,19 @@ namespace ML.Core.ComputingNetworks
     }
 
     /// <summary>
-    /// Compiles Network (build parameter index etc.)
+    /// Tries to return parameter value at some position
     /// </summary>
-    public abstract void Compile();
+    /// <param name="idx">Linear index of the parameter</param>
+    /// <param name="value">Parameter value</param>
+    /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
+    public bool TryGetParam(ref int idx, out double value)
+    {
+      var success = DoGetParam(ref idx, out value);
+      if (success) return true;
+
+      value = 0;
+      return m_NextLayer.TryGetParam(ref idx, out value);
+    }
 
     /// <summary>
     /// Tries to set parameter value at some position
@@ -131,38 +136,19 @@ namespace ML.Core.ComputingNetworks
     /// <param name="value">Parameter value</param>
     /// <param name="isDelta">Is the values are exact or just delta to existing one</param>
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    public abstract bool TrySetParam(int idx, double value, bool isDelta);
-
-    /// <summary>
-    /// Tries to return parameter value at some position
-    /// </summary>
-    /// <param name="idx">Linear index of the parameter</param>
-    /// <param name="value">Parameter value</param>
-    /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    public bool TryGetParam(int idx, out double value)
+    public bool TrySetParam(ref int idx, double value, bool isDelta)
     {
-      value = 0;
+      var success = DoSetParam(ref idx, value, isDelta);
+      if (success) return true;
 
-      //if (m_Indx.Begin > idx || m_Indx.End < idx)
-      //  return false;
-      //if (m_Indx.SubIndxs == null || m_Indx.SubIndxs.Length <= 0 || idx < m_Indx.SubIndxs[0].Begin)
-      //  return DoTryGetParam(idx, out value);
-
-      //var length = m_Indx.SubIndxs.Length;
-      //for (int i=0; i<length; i++)
-      //{
-      //  var indx = m_Indx.SubIndxs[i];
-      //}
-
-
-      return true;
+      return m_NextLayer.TrySetParam(ref idx, value, isDelta);
     }
 
+
     protected abstract bool DoUpdateParams(double[] pars, bool isDelta, ref int cursor);
-
+    protected abstract bool DoGetParam(ref int idx, out double value);
+    protected abstract bool DoSetParam(ref int idx, double value, bool isDelta);
     protected abstract TOut DoCalculate(TIn input);
-
-    protected abstract bool DoTryGetParam(int idx, out double value);
   }
 
   /// <summary>

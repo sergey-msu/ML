@@ -41,18 +41,28 @@ namespace ML.ConsoleTest
 
     static void testNewNetworkArchitecture()
     {
-      var network = new MultNetwork();
+      var network = new MultiNetwork();
 
       var layer1 = new SummLayer();
       network.AddFirstLayer(layer1);
 
-      var layer2 = new DoubleLayer();
-      layer1.AddNext(layer2);
+      var layer11 = new SimpleCompositeLayer(3, -1);
+      layer11.AddSubLayer(new TripleLayer());
+      layer11.AddSubLayer(new IncrementLayer());
+      layer1.AddNext(layer11);
 
-      var output = new ThresholdLayer(2);
+      var layer2 = new DoubleLayer();
+      layer11.AddNext(layer2);
+
+      var output = new ThresholdLayer(1);
       layer2.AddNext(output);
 
-      var x = new Point2D(0.7, 0.4);
+      var x = new Point2D(0.1, 0.2);
+
+      double val;
+      int idx = 3;
+      network.TryGetParam(ref idx, out val);
+
       var y = network.Calculate(x);
     }
 
@@ -112,61 +122,204 @@ namespace ML.ConsoleTest
 
   #region Test Canvas
 
-  public class MultNetwork : ComputingNetwork<Point2D, int> {}
+  public class MultiNetwork : ComputingNetwork<Point2D, double> {}
 
   public class SummLayer : HiddenLayer<Point2D, double>
   {
-    protected override bool DoUpdateParams(double[] pars, bool isDelta, ref int cursor)
-    {
-      return true;
-    }
-
     protected override double DoCalculate(Point2D input)
     {
       return input.X + input.Y;
     }
 
-    public override void Compile()
-    {
-      throw new NotImplementedException();
-    }
-
-    public override bool TrySetParam(int idx, double value, bool isDelta)
-    {
-      throw new NotImplementedException();
-    }
-
-    protected override bool DoTryGetParam(int idx, out double value)
-    {
-      throw new NotImplementedException();
-    }
-  }
-
-  public class DoubleLayer : HiddenLayer<double, double>
-  {
     protected override bool DoUpdateParams(double[] pars, bool isDelta, ref int cursor)
     {
       return true;
     }
 
+    protected override bool DoSetParam(ref int idx, double value, bool isDelta)
+    {
+      return false;
+    }
+
+    protected override bool DoGetParam(ref int idx, out double value)
+    {
+      value = 0;
+      return false;
+    }
+  }
+
+  public class SimpleCompositeLayer : CompositeLayer<double, double>
+  {
+    private double m_W1;
+    private double m_W2;
+
+    public SimpleCompositeLayer(double w1, double w2)
+    {
+      m_W1 = w1;
+      m_W2 = w2;
+    }
+
+    protected override bool DoGetParam(ref int idx, out double value)
+    {
+      if (idx==0)
+      {
+        value = m_W1;
+        return true;
+      }
+
+      if (idx==1)
+      {
+        value = m_W2;
+        return true;
+      }
+
+      value = 0;
+      idx -= 2;
+      return false;
+    }
+
+    protected override bool DoSetParam(ref int idx, double value, bool isDelta)
+    {
+      if (idx==0)
+      {
+        if (isDelta) m_W1 += value;
+        else m_W1 = value;
+        return true;
+      }
+
+      if (idx==1)
+      {
+        if (isDelta) m_W2 += value;
+        else m_W2 = value;
+        return true;
+      }
+
+      idx -= 2;
+      return false;
+    }
+
+    protected override bool DoUpdateParams(double[] pars, bool isDelta, ref int cursor)
+    {
+      if (cursor+2 >= pars.Length) return false;
+
+      var val1 = pars[0];
+      var val2 = pars[1];
+      if (isDelta)
+      {
+        m_W1 += val1;
+        m_W2 += val2;
+      }
+      else
+      {
+        m_W1 = val1;
+        m_W2 = val2;
+      }
+
+      cursor += 2;
+      return true;
+    }
+
+    protected override double MergeResults(double[] results)
+    {
+      if (results==null || results.Length != 2)
+        throw new MLException("Incorrect composite output");
+
+      return m_W1*results[0] + m_W2*results[1];
+    }
+  }
+
+  public class DoubleLayer : HiddenLayer<double, double>
+  {
     protected override double DoCalculate(double input)
     {
       return input * 2;
     }
-
-    public override void Compile()
+    protected override bool DoUpdateParams(double[] pars, bool isDelta, ref int cursor)
     {
-      throw new NotImplementedException();
+      return true;
     }
 
-    public override bool TrySetParam(int idx, double value, bool isDelta)
+    protected override bool DoSetParam(ref int idx, double value, bool isDelta)
     {
-      throw new NotImplementedException();
+      return false;
     }
 
-    protected override bool DoTryGetParam(int idx, out double value)
+    protected override bool DoGetParam(ref int idx, out double value)
     {
-      throw new NotImplementedException();
+      value = 0;
+      return false;
+    }
+  }
+
+  public class TripleLayer : OutputLayer<double, double>
+  {
+    public override double Calculate(double input)
+    {
+      return input*3;
+    }
+
+    public override bool TryUpdateParams(double[] pars, bool isDelta, ref int cursor)
+    {
+      return true;
+    }
+
+    public override bool TrySetParam(ref int idx, double value, bool isDelta)
+    {
+      return false;
+    }
+
+    public override bool TryGetParam(ref int idx, out double value)
+    {
+      value = 0;
+      return false;
+    }
+  }
+
+  public class IncrementLayer : OutputLayer<double, double>
+  {
+    public override double Calculate(double input)
+    {
+      return input + 1;
+    }
+
+    public override bool TryUpdateParams(double[] pars, bool isDelta, ref int cursor)
+    {
+      return true;
+    }
+
+    public override bool TrySetParam(ref int idx, double value, bool isDelta)
+    {
+      return false;
+    }
+
+    public override bool TryGetParam(ref int idx, out double value)
+    {
+      value = 0;
+      return false;
+    }
+  }
+
+  public class IdentityOutputLayer : OutputLayer<double, double>
+  {
+    public override double Calculate(double input)
+    {
+      return input;
+    }
+
+    public override bool TryUpdateParams(double[] pars, bool isDelta, ref int cursor)
+    {
+      return true;
+    }
+
+    public override bool TrySetParam(ref int idx, double value, bool isDelta)
+    {
+      return false;
+    }
+
+    public override bool TryGetParam(ref int idx, out double value)
+    {
+      value = 0;
+      return false;
     }
   }
 
@@ -184,11 +337,6 @@ namespace ML.ConsoleTest
       return (input > m_Threshold) ? 1 : 0;
     }
 
-    public override void Compile()
-    {
-      throw new NotImplementedException();
-    }
-
     public override bool TryUpdateParams(double[] pars, bool isDelta, ref int cursor)
     {
       if (pars==null || pars.Length <= cursor) return false;
@@ -203,9 +351,14 @@ namespace ML.ConsoleTest
       return true;
     }
 
-    public override bool TrySetParam(int idx, double value, bool isDelta)
+    public override bool TrySetParam(ref int idx, double value, bool isDelta)
     {
-      if (idx != 0) return false;
+      if (idx != 0)
+      {
+        idx--;
+        return false;
+      }
+
       if (isDelta)
         m_Threshold += value;
       else
@@ -214,10 +367,15 @@ namespace ML.ConsoleTest
       return true;
     }
 
-    public override bool TryGetParam(int idx, out double value)
+    public override bool TryGetParam(ref int idx, out double value)
     {
       value = 0;
-      if (idx != 0) return false;
+      if (idx != 0)
+      {
+        idx--;
+        return false;
+      }
+
       value = m_Threshold;
       return true;
     }
