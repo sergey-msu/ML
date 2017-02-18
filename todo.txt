@@ -1,13 +1,40 @@
-Neural Networks:
-- debug implement Perceptron algorithm
-- implement Gradient Descent algorithm for Perceptron
+CURRENT:
+
+- Computing Networks/Layers
+  - ??? refactor: extract abstract base Layer class
+    (may be just mix Hidden and Output logic with 'if' statement? - so there will be only 2 classes: ComputingNetwork and CompositeNetwork)
+  - ??? do we REALLY need linked-list architecture? Should we use more evident layered array architecture (with reflection type checks on AddLayer())?
+  - add network-wide global context
+
+- rewrite all NN code according to new CN architecture
+  - rewrite
+  - cover with tests
+
+- implement Perceptron algorithm according to new CN architecture
+  - implement
+  - cover with tests
+
+- implement Gradient Descent algorithm for CN Perceptron
   - with back propagation
   - with stochastic
   - all above for general NN
-- read more about Convolution NN
-- develop unified approach to multi-typed layers NN: layer<TIn, TOut>
-  (may be I should change array of layers to connected list of layers with .addNext<TNewOut>(newlayer<TOut, TNewOut>) method in each)
-- rewrite all NN code to new architecture
+  - cover with tests
+
+- implement Convolution NN based on CN architecture
+  - read more about Convolution NN
+  - implement base CNN layer types
+  - implement CNN
+  - implement learning algorithm for NN
+  - testing with real images
+  - cover with tests
+
 
 DONE:
+
+- Computing Networks/Layers: develop unified approach to multi-typed layers NN: Layer<TIn, TOut>
+  - develop architecture
+  - refactor: index
+  - cover with unit tests
+  - develop benchmark tests on parameters get/set/bulk
+
 

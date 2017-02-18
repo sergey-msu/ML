@@ -36,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -51,6 +52,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ComputingNetworkTests.cs" />
     <Compile Include="InformativityIndexTests.cs" />
     <Compile Include="KernelTests.cs" />
     <Compile Include="MathUtilsTests.cs" />

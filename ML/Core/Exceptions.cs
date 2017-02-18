@@ -28,4 +28,30 @@ namespace ML.Core
     {
     }
   }
+
+  /// <summary>
+  /// Exception thrown when computing network/layer index was not properly set up
+  /// </summary>
+  [Serializable]
+  public class MLCorruptedIndexException : Exception
+  {
+    public MLCorruptedIndexException()
+    {
+    }
+
+    public MLCorruptedIndexException(string message)
+      : base(message)
+    {
+    }
+
+    public MLCorruptedIndexException(string message, Exception inner)
+      : base(message, inner)
+    {
+    }
+
+    protected MLCorruptedIndexException(SerializationInfo info, StreamingContext context)
+      : base(info, context)
+    {
+    }
+  }
 }
