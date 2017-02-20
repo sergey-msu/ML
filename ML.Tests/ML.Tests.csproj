@@ -52,7 +52,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ComputingNetworkTests.cs" />
+    <Compile Include="ComputingNodeTests.cs" />
     <Compile Include="InformativityIndexTests.cs" />
     <Compile Include="KernelTests.cs" />
     <Compile Include="MathUtilsTests.cs" />

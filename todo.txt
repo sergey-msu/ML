@@ -1,14 +1,13 @@
 CURRENT:
 
-- Computing Networks/Layers
-  - ??? refactor: extract abstract base Layer class
-    (may be just mix Hidden and Output logic with 'if' statement? - so there will be only 2 classes: ComputingNetwork and CompositeNetwork)
-  - ??? do we REALLY need linked-list architecture? Should we use more evident layered array architecture (with reflection type checks on AddLayer())?
-  - add network-wide global context
-
-- rewrite all NN code according to new CN architecture
-  - rewrite
+- [INPROG] rewrite all NN code according to new CN architecture
+  - [INPROG] rewrite
   - cover with tests
+
+Computing Networks/Layers
+  - develop way to create simple base networks (factory methods)
+  - add network-wide global context
+  - review architecture: public/internal members - try to use assembly from ouside
 
 - implement Perceptron algorithm according to new CN architecture
   - implement
@@ -31,10 +30,12 @@ CURRENT:
 
 DONE:
 
-- Computing Networks/Layers: develop unified approach to multi-typed layers NN: Layer<TIn, TOut>
+-[ALL:TO_COMMIT] Computing Networks/Layers: develop unified approach to multi-typed layers NN: Layer<TIn, TOut>
   - develop architecture
   - refactor: index
   - cover with unit tests
   - develop benchmark tests on parameters get/set/bulk
-
+  - refactor: extract abstract base Layer class
+    (may be just mix Hidden and Output logic with 'if' statement? - so there will be only 2 classes: ComputingNetwork and CompositeNetwork)
+  - do we REALLY need linked-list architecture? Should we use more evident layered array architecture (with reflection type checks on AddLayer())?
 

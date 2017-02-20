@@ -3,75 +3,29 @@
 namespace ML.Core.ComputingNetworks
 {
   /// <summary>
-  /// Index for fast search parameter within layer
-  /// </summary>
-  internal struct ParamIdx
-  {
-    public ParamIdx(int start, int self, int end)
-    {
-      if (start > self || self > end)
-        throw new MLCorruptedIndexException();
-
-      IsNotEmpty = true;
-      Start = start;
-      Self = self;
-      End = end;
-    }
-
-    public bool IsNotEmpty;
-    public int Start;
-    public int Self;
-    public int End;
-
-    public bool CheckSelf(int idx)
-    {
-      return IsNotEmpty && (Start <= idx) && (idx < Self);
-    }
-
-    public bool CheckEnd(int idx)
-    {
-      return IsNotEmpty && (Self <= idx) && (idx < End);
-    }
-
-    public void MoveCursor(ref int cursor)
-    {
-      cursor += (Self-Start); // = layer.ParamsCount
-    }
-  }
-
-  /// <summary>
-  /// Contract for a Computing Layer as a linked list of other values that can accomplish some calculations
+  /// Contract for a computing node as a black box that can accomplish some calculations
   /// </summary>
   /// <typeparam name="TIn">Input object type</typeparam>
-  public interface IComputingLayer<TIn>
+  /// <typeparam name="TOut">Output object type</typeparam>
+  public interface IComputingNode<TIn, TOut>
   {
     /// <summary>
-    /// Returns number of layer parameters
+    /// Returns number of node parameters
     /// </summary>
-    int ParamsCount { get; }
+    int ParamCount { get; }
 
     /// <summary>
-    /// Calculates final calculation result.
-    /// It may differ (for non-terminating layers) from direct layer rcalculation result:
-    /// L = [L1 -> [L2 -> L3]]
-    /// L(x) = L3(L2(L1(x))) - the final result, not L1(x)
+    /// Calculates node result
     /// </summary>
-    object Calculate(TIn input);
+    TOut Calculate(TIn input);
 
     /// <summary>
-    /// Builds layer before use (build search index etc)
+    /// Builds node before use (build search index etc)
     /// </summary>
-    void Build(bool buildIndex=true);
+    void Build();
 
     /// <summary>
-    /// Builds fast search index
-    /// </summary>
-    /// <param name="startIdx">Index start value</param>
-    /// <returns>End index</returns>
-    int BuildIndex(int startIdx);
-
-    /// <summary>
-    /// Tries to update parameters of the network and passes it down to all sublayers
+    /// Tries to update node parameters
     /// </summary>
     /// <param name="pars">Parameter values to update</param>
     /// <param name="isDelta">Is the values are exact or just deltas to existing ones</param>
@@ -97,31 +51,4 @@ namespace ML.Core.ComputingNetworks
     bool TryGetParam(int idx, out double value);
   }
 
-  /// <summary>
-  /// Contract for a terminating layer that has no next layers
-  /// </summary>
-  /// <typeparam name="TIn"></typeparam>
-  /// <typeparam name="TOut"></typeparam>
-  public interface IOutputLayer<TIn, TOut> : IComputingLayer<TIn>
-  {
-  }
-
-  /// <summary>
-  /// Contract for a hidden computing layer -
-  /// non-terminating layer that calculates some result and passes it further in the layer chain
-  /// </summary>
-  /// <typeparam name="TIn">Input object type</typeparam>
-  /// <typeparam name="TOut">Direct output object type</typeparam>
-  public interface IHiddenLayer<TIn, TOut> : IComputingLayer<TIn>
-  {
-    /// <summary>
-    /// Next layer in layer chain
-    /// </summary>
-    IComputingLayer<TOut> NextLayer { get; }
-
-    /// <summary>
-    /// Adds next (it terms of linked list paradigm) layer
-    /// </summary>
-    void AddNextLayer(IComputingLayer<TOut> layer);
-  }
 }

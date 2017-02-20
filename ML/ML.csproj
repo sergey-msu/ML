@@ -53,9 +53,10 @@
     <Compile Include="Core\AlgorithmBase.cs" />
     <Compile Include="Core\ClassifiedSample.cs" />
     <Compile Include="Contracts\IAuxiliary.cs" />
-    <Compile Include="Core\ComputingNetworks\CompositeLayer.cs" />
-    <Compile Include="Core\ComputingNetworks\HiddenLayer.cs" />
-    <Compile Include="Core\ComputingNetworks\OutputLayer.cs" />
+    <Compile Include="Core\ComputingNetworks\CompositeNode.cs" />
+    <Compile Include="Core\ComputingNetworks\ComputingNetwork.cs" />
+    <Compile Include="Core\ComputingNetworks\ComputingNode.cs" />
+    <Compile Include="Core\ComputingNetworks\Index.cs" />
     <Compile Include="Core\Exceptions.cs" />
     <Compile Include="Core\Feature.cs" />
     <Compile Include="Core\Class.cs" />
@@ -77,6 +78,8 @@
     <Compile Include="Core\Metric\EuclideanMetric.cs" />
     <Compile Include="Core\Point.cs" />
     <Compile Include="Core\Registry.cs" />
+    <Compile Include="Core\ComputingNetworks\Contracts.cs" />
+    <Compile Include="Core\ComputingNetworks\SequenceNode.cs" />
     <Compile Include="LogicalMethods\Algorithms\DecisionTreeAlgorithm.cs" />
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />
     <Compile Include="MetricalMethods\Algorithms\AlgorithmBases.cs" />
@@ -88,8 +91,6 @@
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
     <Compile Include="NeuralMethods\Algorithms\PerceptronAlgorithm.cs" />
-    <Compile Include="Core\ComputingNetworks\Contracts.cs" />
-    <Compile Include="Core\ComputingNetworks\ComputingNetwork.cs" />
     <Compile Include="NeuralMethods\Networks\Neuron.cs" />
     <Compile Include="NeuralMethods\___OLD\Neuron.cs" />
     <Compile Include="NeuralMethods\___OLD\NeuralLayer.cs" />
