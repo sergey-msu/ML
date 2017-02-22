@@ -6,7 +6,7 @@ using ML.Core;
 namespace ML.Tests
 {
   [TestClass]
-  public class InformativityIndexTests
+  public class InformativityIndexTests : TestBase
   {
     #region Setup
 
@@ -41,6 +41,12 @@ namespace ML.Tests
     #endregion
 
     public const double EPS = 0.0000001D;
+
+    [ClassInitialize]
+    public static void ClassInit(TestContext context)
+    {
+      BaseClassInit(context);
+    }
 
     [TestMethod]
     public void GiniIndex_Calculate_2C()

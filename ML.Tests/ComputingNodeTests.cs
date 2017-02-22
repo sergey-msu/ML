@@ -7,7 +7,7 @@ using ML.Core;
 namespace ML.Tests
 {
   [TestClass]
-  public class ComputingNodeTests
+  public class ComputingNodeTests : TestBase
   {
     #region Inner
 
@@ -176,6 +176,7 @@ namespace ML.Tests
 
       public PolynomialNode(int degree, double[] coeffs)
       {
+        m_Degree = degree;
         m_Coeffs = coeffs;
       }
 
@@ -187,7 +188,7 @@ namespace ML.Tests
       public override double Calculate(double input)
       {
         var result = m_Coeffs[m_Degree];
-        for (int i=m_Degree; i>0; i++)
+        for (int i=m_Degree; i>0; i--)
           result = result*input + m_Coeffs[i-1];
 
         return result;
@@ -195,7 +196,10 @@ namespace ML.Tests
 
       protected override void DoUpdateParams(double[] pars, bool isDelta, int cursor)
       {
-        m_Degree = (int)pars[cursor];
+        if (isDelta)
+          m_Degree += (int)pars[cursor];
+        else
+          m_Degree = (int)pars[cursor];
 
         for (int i=0; i<m_Coeffs.Length; i++)
         {
@@ -419,38 +423,37 @@ namespace ML.Tests
     ///                      /                                                 \
     ///  (x,y) -> max(x,y) ->                                                   Sc.pr.(w1, w2) -> Shift(x -> x+w5)
     ///                      \                                                 /
-    ///                                         Pow(x -> x^w4)
+    ///                                       Pow(x -> x^w4)
     ///  params: [w1, w2, w3, w4, w5]
     /// </summary>
-    public class SmallNetwork : ComputingNetwork<Point2D, double>
+    public class SmallNetwork : JoinNode<Point2D, double, double>
     {
       public SmallNetwork()
       {
-        var root = new SequenceNode<Point2D, double, double>();
+        this.SetInputNode(new MaxNode());
 
-        root.SetInputNode(new MaxNode());
+        var seq = new SequenceNode<double>();
 
-        var hidden = new CompositeNode<double, double>();
-        var upper = new SequenceNode<double, double, double>();
-        upper.SetInputNode(new DoubleStepNode());
-        upper.SetOutputNode(new ShiftingNode(-1));
+        var hidden = new AggregateNode<double, double>();
+        var upper = new SequenceNode<double>();
+        upper.AddHiddenNode(new DoubleStepNode());
+        upper.AddHiddenNode(new ShiftingNode(-1));
         hidden.AddSubNode(upper);
         hidden.AddSubNode(new PowerNode(2));
         hidden.SetMergeNode(new MergeNode(2, -1));
-        root.AddHidden(hidden);
+        seq.AddHiddenNode(hidden);
+        seq.AddHiddenNode(new ShiftingNode(3));
 
-        root.SetOutputNode(new ShiftingNode(3));
-
-        SetRoot(root);
+        this.SetOutputNode(seq);
       }
     }
 
     /// <summary>
     /// (x1,...,x10) -> 10 of 10x10 matrix transform -> scalar product
     ///
-    /// params: [w[1,1,1], ..., w[10,10,1], ..., w[10,10,10], w1, w2, ..., w10] - 1010
+    /// params: [w[1,1,1], ..., w[10,10,1], ..., w[10,10,10], w1, w2, ..., w10] = #1010
     /// </summary>
-    public class LargeNetwork : ComputingNetwork<double[], double>
+    public class LargeNetwork : JoinNode<double[], double[], double>
     {
       public LargeNetwork(int dim, int lcount)
       {
@@ -459,30 +462,31 @@ namespace ML.Tests
         for (int j=0; j<dim; j++)
           M[i,j] = (double)(i+j)/dim;
 
-        var root = new SequenceNode<double[], double[], double>();
-
-        var node = new NMatrixNode(M);
-        root.SetInputNode(node);
-
-        for (int l=1; l<lcount; l++)
+        var seq = new SequenceNode<double[]>();
+        for (int l=0; l<lcount; l++)
         {
-          node = new NMatrixNode(M);
-          root.AddHidden(node);
+          var node = new NMatrixNode(M);
+          seq.AddHiddenNode(node);
         }
 
         var coeffs = new double[dim];
         for (int i=1; i<dim; i++)
           coeffs[i] = 1;
 
-        root.SetOutputNode(new ScalarProductNode(coeffs));
-
-        SetRoot(root);
+        this.SetInputNode(seq);
+        this.SetOutputNode(new ScalarProductNode(coeffs));
       }
     }
 
     #endregion
 
     #endregion
+
+    [ClassInitialize]
+    public static void ClassInit(TestContext context)
+    {
+      BaseClassInit(context);
+    }
 
     #region ComputingNode
 
@@ -572,22 +576,22 @@ namespace ML.Tests
 
     #endregion
 
-    #region CompositeNode
+    #region AggregateNode
 
     [TestMethod]
     [ExpectedException(typeof(MLException))]
-    public void CompositeNode_Build_NoSubNodes()
+    public void AggregateNode_Build_NoSubNodes()
     {
-      var node = new CompositeNode<double, double>();
+      var node = new AggregateNode<double, double>();
       node.SetMergeNode(new MergeNode(2, -1));
 
       node.Build();
     }
 
     [TestMethod]
-    public void CompositeNode_Build()
+    public void AggregateNode_Build()
     {
-      var node = new CompositeNode<double, double>();
+      var node = new AggregateNode<double, double>();
       var merge = new MergeNode(2, -1);
       var sub1 = new DoublingNode();
       var sub2 = new ShiftingNode(3);
@@ -604,9 +608,9 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void CompositeNode_Calculate()
+    public void AggregateNode_Calculate()
     {
-      var node = new CompositeNode<double, double>();
+      var node = new AggregateNode<double, double>();
       var merge = new MergeNode(2, -1);
       var sub1 = new DoublingNode();
       var sub2 = new ShiftingNode(3);
@@ -622,9 +626,9 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void CompositeNode_TryGetParam()
+    public void AggregateNode_TryGetParam()
     {
-      var node = new CompositeNode<double, double>();
+      var node = new AggregateNode<double, double>();
       var sub1 = new DoublingNode();
       var sub2 = new ShiftingNode(3);
       var merge = new MergeNode(2, -1);
@@ -654,9 +658,9 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void CompositeNode_TrySetParam()
+    public void AggregateNode_TrySetParam()
     {
-      var node = new CompositeNode<double, double>();
+      var node = new AggregateNode<double, double>();
       var sub1 = new DoublingNode();
       var sub2 = new ShiftingNode(3);
       var merge = new MergeNode(2, -1);
@@ -681,9 +685,9 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void CompositeNode_TryUpdateParams()
+    public void AggregateNode_TryUpdateParams()
     {
-      var node = new CompositeNode<double, double>();
+      var node = new AggregateNode<double, double>();
       var sub1 = new DoublingNode();
       var sub2 = new ShiftingNode(3);
       var merge = new MergeNode(2, -1);
@@ -704,41 +708,193 @@ namespace ML.Tests
 
       res = node.TryUpdateParams(pars, true, ref cursor);
       Assert.IsTrue(res);
+      Assert.AreEqual(7,  cursor);
+      Assert.AreEqual(1,  sub2.Shift);
+      Assert.AreEqual(6,  merge.Coeffs[0]);
+      Assert.AreEqual(-3, merge.Coeffs[1]);
+
+      res = node.TryUpdateParams(pars, true, ref cursor);
+      Assert.IsFalse(res);
     }
 
     #endregion
 
-    #region SequenceNode
+    #region CompositeNode
+
+    [TestMethod]
+    public void CompositeNode_Build()
+    {
+      var node = new CompositeNode<double, double>();
+      var sub1 = new DoublingNode();
+      var sub2 = new ShiftingNode(3);
+      var sub3 = new PolynomialNode(1, new double[] { 2, -3 });
+      node.AddSubNode(sub1);
+      node.AddSubNode(sub2);
+      node.AddSubNode(sub3);
+
+      node.Build();
+
+      Assert.AreEqual(0, node.ParamCount);
+      Assert.AreEqual(0, node.SubNodes[0].ParamCount);
+      Assert.AreEqual(1, node.SubNodes[1].ParamCount);
+      Assert.AreEqual(3, node.SubNodes[2].ParamCount);
+    }
+
+    [TestMethod]
+    public void CompositeNode_Calculate()
+    {
+      var node = new CompositeNode<double, double>();
+      var sub1 = new DoublingNode();
+      var sub2 = new ShiftingNode(3);
+      var sub3 = new PolynomialNode(1, new double[] { 2, -3 });
+      node.AddSubNode(sub1);
+      node.AddSubNode(sub2);
+      node.AddSubNode(sub3);
+
+      node.Build();
+
+      var res = node.Calculate(2);
+
+      Assert.AreEqual(3,  res.Length);
+      Assert.AreEqual(4,  res[0]);
+      Assert.AreEqual(5,  res[1]);
+      Assert.AreEqual(-4, res[2]);
+    }
+
+    [TestMethod]
+    public void CompositeNode_TryGetParam()
+    {
+      var node = new CompositeNode<double, double>();
+      var sub1 = new DoublingNode();
+      var sub2 = new ShiftingNode(3);
+      var sub3 = new PolynomialNode(1, new double[] { 2, -3 });
+      node.AddSubNode(sub1);
+      node.AddSubNode(sub2);
+      node.AddSubNode(sub3);
+
+      node.Build();
+
+      double par1;
+      double par2;
+      double par3;
+      double par4;
+      double par5;
+      var res1 = node.TryGetParam(0, out par1);
+      var res2 = node.TryGetParam(1, out par2);
+      var res3 = node.TryGetParam(2, out par3);
+      var res4 = node.TryGetParam(3, out par4);
+      var res5 = node.TryGetParam(4, out par5);
+
+      Assert.IsTrue(res1);
+      Assert.AreEqual(3, par1);
+      Assert.IsTrue(res2);
+      Assert.AreEqual(1, par2);
+      Assert.IsTrue(res3);
+      Assert.AreEqual(2, par3);
+      Assert.IsTrue(res4);
+      Assert.AreEqual(-3, par4);
+      Assert.IsFalse(res5);
+      Assert.AreEqual(0, par5);
+    }
+
+    [TestMethod]
+    public void CompositeNode_TrySetParam()
+    {
+      var node = new CompositeNode<double, double>();
+      var sub1 = new DoublingNode();
+      var sub2 = new ShiftingNode(3);
+      var sub3 = new PolynomialNode(1, new double[] { 2, -3});
+      node.AddSubNode(sub1);
+      node.AddSubNode(sub2);
+      node.AddSubNode(sub3);
+
+      node.Build();
+
+      var res1 = node.TrySetParam(0,  1, false);
+      var res2 = node.TrySetParam(1,  1, true);
+      var res3 = node.TrySetParam(2, -2, false);
+      var res4 = node.TrySetParam(3, -3, true);
+      var res5 = node.TrySetParam(4, 4,  false);
+
+      Assert.IsTrue(res1);
+      Assert.AreEqual(1, sub2.Shift);
+      Assert.IsTrue(res2);
+      Assert.AreEqual(2, sub3.Degree);
+      Assert.IsTrue(res3);
+      Assert.AreEqual(-2, sub3.Coeffs[0]);
+      Assert.IsTrue(res4);
+      Assert.AreEqual(-6, sub3.Coeffs[1]);
+      Assert.IsFalse(res5);
+    }
+
+    [TestMethod]
+    public void CompositeNode_TryUpdateParams()
+    {
+      var node = new CompositeNode<double, double>();
+      var sub1 = new DoublingNode();
+      var sub2 = new ShiftingNode(3);
+      var sub3 = new PolynomialNode(1, new double[] { 2, -3 });
+      node.AddSubNode(sub1);
+      node.AddSubNode(sub2);
+      node.AddSubNode(sub3);
+
+      node.Build();
+      var pars = new double[] { 1, 2, 3, -4, -1, 3, 1, -1, 2, 5 };
+      var cursor = 1;
+
+      var res = node.TryUpdateParams(pars, false, ref cursor);
+      Assert.IsTrue(res);
+      Assert.AreEqual(5,  cursor);
+      Assert.AreEqual(2,  sub2.Shift);
+      Assert.AreEqual(3,  sub3.Degree);
+      Assert.AreEqual(-4, sub3.Coeffs[0]);
+      Assert.AreEqual(-1, sub3.Coeffs[1]);
+
+      res = node.TryUpdateParams(pars, true, ref cursor);
+      Assert.IsTrue(res);
+      Assert.AreEqual(9,  cursor);
+      Assert.AreEqual(5,  sub2.Shift);
+      Assert.AreEqual(4,  sub3.Degree);
+      Assert.AreEqual(-5, sub3.Coeffs[0]);
+      Assert.AreEqual(1,  sub3.Coeffs[1]);
+
+      res = node.TryUpdateParams(pars, true, ref cursor);
+      Assert.IsFalse(res);
+    }
+
+    #endregion
+
+    #region JoinNode
 
     [TestMethod]
     [ExpectedException(typeof(MLException))]
-    public void SequenceNode_Build_NoFirstNode()
+    public void JoinNode_Build_NoInputNode()
     {
-      var second = new ShiftingNode(4);
-      var node = new SequenceNode<double, double, double>();
-      node.SetOutputNode(second);
+      var node = new JoinNode<double, double, double>();
+      var output = new DoublingNode();
+      node.SetOutputNode(output);
 
       node.Build();
     }
 
     [TestMethod]
     [ExpectedException(typeof(MLException))]
-    public void SequenceNode_Build_NoSecondNode()
+    public void JoinNode_Build_NoOutputNode()
     {
-      var first = new DoublingNode();
-      var node = new SequenceNode<double, double, double>();
-      node.SetInputNode(first);
+      var node = new JoinNode<double, double, double>();
+      var input = new DoublingNode();
+      node.SetInputNode(input);
 
       node.Build();
     }
 
     [TestMethod]
-    public void SequenceNode_Build()
+    public void JoinNode_Build()
     {
       var node1 = new DoublingNode();
       var node2 = new ShiftingNode(4);
       var node3 = new PowerNode(2);
-      var node = new SequenceNode<double, double, double>();
+      var node = new JoinNode<double, double, double>();
       node.SetInputNode(node1);
       node.SetOutputNode(node2);
 
@@ -748,7 +904,7 @@ namespace ML.Tests
       Assert.AreEqual(0, node.InputNode.ParamCount);
       Assert.AreEqual(1, node.OutputNode.ParamCount);
 
-      node = new SequenceNode<double, double, double>();
+      node = new JoinNode<double, double, double>();
       node.SetInputNode(node3);
       node.SetOutputNode(node1);
 
@@ -758,7 +914,7 @@ namespace ML.Tests
       Assert.AreEqual(1, node.InputNode.ParamCount);
       Assert.AreEqual(0, node.OutputNode.ParamCount);
 
-      node = new SequenceNode<double, double, double>();
+      node = new JoinNode<double, double, double>();
       node.SetInputNode(node2);
       node.SetOutputNode(node3);
 
@@ -770,11 +926,11 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void SequenceNode_Calculate()
+    public void JoinNode_Calculate()
     {
       var node1 = new DoublingNode();
       var node2 = new ShiftingNode(4);
-      var node = new SequenceNode<double, double, double>();
+      var node = new JoinNode<double, double, double>();
       node.SetInputNode(node1);
       node.SetOutputNode(node2);
 
@@ -786,11 +942,11 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void SequenceNode_TryGetParam()
+    public void JoinNode_TryGetParam()
     {
       var node1 = new DoublingNode();
       var node2 = new ShiftingNode(4);
-      var node = new SequenceNode<double, double, double>();
+      var node = new JoinNode<double, double, double>();
       node.SetInputNode(node1);
       node.SetOutputNode(node2);
 
@@ -807,11 +963,11 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void SequenceNode_TrySetParam()
+    public void JoinNode_TrySetParam()
     {
       var node1 = new PolynomialNode(2, new[] { 1.0D, -1.0D, 2.0D });
       var node2 = new ShiftingNode(4);
-      var node = new SequenceNode<double, double, double>();
+      var node = new JoinNode<double, double, double>();
       node.SetInputNode(node1);
       node.SetOutputNode(node2);
 
@@ -838,11 +994,11 @@ namespace ML.Tests
     }
 
     [TestMethod]
-    public void SequenceNode_TryUpdateParams()
+    public void JoinNode_TryUpdateParams()
     {
       var node1 = new PolynomialNode(2, new[] { 1.0D, -1.0D, 2.0D });
       var node2 = new ShiftingNode(4);
-      var node = new SequenceNode<double, double, double>();
+      var node = new JoinNode<double, double, double>();
       node.SetInputNode(node1);
       node.SetOutputNode(node2);
 
@@ -863,7 +1019,310 @@ namespace ML.Tests
       res = node.TryUpdateParams(pars, true, ref cursor);
       Assert.IsTrue(res);
       Assert.AreEqual(11, cursor);
+      Assert.AreEqual(3,  node1.Degree);
+      Assert.AreEqual(2,  node1.Coeffs[0]);
+      Assert.AreEqual(-2, node1.Coeffs[1]);
+      Assert.AreEqual(-3, node1.Coeffs[2]);
+      Assert.AreEqual(4,  node2.Shift);
+
+      res = node.TryUpdateParams(pars, false, ref cursor);
+      Assert.IsFalse(res);
+    }
+
+    #endregion
+
+    #region SequenceNode
+
+    [TestMethod]
+    public void SequenceNode_Build()
+    {
+      var node1 = new DoublingNode();
+      var node2 = new ShiftingNode(4);
+      var node3 = new PowerNode(2);
+      var node = new SequenceNode<double>();
+      node.AddHiddenNode(node1);
+      node.AddHiddenNode(node2);
+      node.AddHiddenNode(node3);
+
+      node.Build();
+
+      Assert.AreEqual(0, node.ParamCount);
+      Assert.AreEqual(3, node.HiddenNodes.Length);
+      Assert.AreEqual(0, node.HiddenNodes[0].ParamCount);
+      Assert.AreEqual(1, node.HiddenNodes[1].ParamCount);
+      Assert.AreEqual(1, node.HiddenNodes[2].ParamCount);
+    }
+
+    [TestMethod]
+    public void SequenceNode_Calculate()
+    {
+      var node1 = new DoublingNode();
+      var node2 = new ShiftingNode(4);
+      var node3 = new PowerNode(2);
+      var node = new SequenceNode<double>();
+      node.AddHiddenNode(node1);
+      node.AddHiddenNode(node2);
+      node.AddHiddenNode(node3);
+
+      node.Build();
+
+      var res = node.Calculate(3);
+
+      Assert.AreEqual(100, res);
+    }
+
+    [TestMethod]
+    public void SequenceNode_TryGetParam()
+    {
+      var node1 = new DoublingNode();
+      var node2 = new ShiftingNode(4);
+      var node3 = new PowerNode(2);
+      var node = new SequenceNode<double>();
+      node.AddHiddenNode(node1);
+      node.AddHiddenNode(node2);
+      node.AddHiddenNode(node3);
+
+      node.Build();
+
+      double par1;
+      double par2;
+      double par3;
+      var res1 = node.TryGetParam(0, out par1);
+      var res2 = node.TryGetParam(1, out par2);
+      var res3 = node.TryGetParam(2, out par3);
+
+      Assert.IsTrue(res1);
+      Assert.AreEqual(4, par1);
+      Assert.IsTrue(res2);
+      Assert.AreEqual(2, par2);
+      Assert.IsFalse(res3);
+    }
+
+    [TestMethod]
+    public void SequenceNode_TrySetParam()
+    {
+      var node1 = new PolynomialNode(2, new[] { 1.0D, -1.0D, 2.0D });
+      var node2 = new ShiftingNode(4);
+      var node3 = new PowerNode(2);
+      var node = new SequenceNode<double>();
+      node.AddHiddenNode(node1);
+      node.AddHiddenNode(node2);
+      node.AddHiddenNode(node3);
+
+      node.Build();
+
+      var res1 = node.TrySetParam(0,  1, false);
+      var res2 = node.TrySetParam(1,  1, true);
+      var res3 = node.TrySetParam(2, -2, false);
+      var res4 = node.TrySetParam(3, -1, true);
+      var res5 = node.TrySetParam(4,  3, false);
+      var res6 = node.TrySetParam(5,  4, true);
+      var res7 = node.TrySetParam(6,  -4, true);
+
+      Assert.IsTrue(res1);
+      Assert.AreEqual(1, node1.Degree);
+      Assert.IsTrue(res2);
+      Assert.AreEqual(2, node1.Coeffs[0]);
+      Assert.IsTrue(res4);
+      Assert.AreEqual(-2, node1.Coeffs[1]);
+      Assert.IsTrue(res4);
+      Assert.AreEqual(1, node1.Coeffs[2]);
+      Assert.IsTrue(res5);
+      Assert.AreEqual(3, node2.Shift);
+      Assert.IsTrue(res6);
+      Assert.AreEqual(6, node3.Power);
+      Assert.IsFalse(res7);
+    }
+
+    [TestMethod]
+    public void SequenceNode_TryUpdateParams()
+    {
+      var node1 = new PolynomialNode(2, new[] { 1.0D, -1.0D, 2.0D });
+      var node2 = new ShiftingNode(4);
+      var node3 = new PowerNode(2);
+      var node = new SequenceNode<double>();
+      node.AddHiddenNode(node1);
+      node.AddHiddenNode(node2);
+      node.AddHiddenNode(node3);
+
+      node.Build();
+
+      var pars = new double[] { 1, 2, 3, -4, -1, 3, 1, -1, 2, -2, 1, 2, 2, 4 };
+      var cursor = 1;
+
+      var res = node.TryUpdateParams(pars, false, ref cursor);
+      Assert.IsTrue(res);
+      Assert.AreEqual(7,  cursor);
+      Assert.AreEqual(2,  node1.Degree);
+      Assert.AreEqual(3,  node1.Coeffs[0]);
+      Assert.AreEqual(-4, node1.Coeffs[1]);
+      Assert.AreEqual(-1, node1.Coeffs[2]);
+      Assert.AreEqual(3,  node2.Shift);
+      Assert.AreEqual(1,  node3.Power);
+
+      res = node.TryUpdateParams(pars, true, ref cursor);
+      Assert.IsTrue(res);
+      Assert.AreEqual(13, cursor);
       Assert.AreEqual(1,  node1.Degree);
+      Assert.AreEqual(5,  node1.Coeffs[0]);
+      Assert.AreEqual(-6, node1.Coeffs[1]);
+      Assert.AreEqual(0, node1.Coeffs[2]);
+      Assert.AreEqual(5,  node2.Shift);
+      Assert.AreEqual(3,  node3.Power);
+
+      res = node.TryUpdateParams(pars, false, ref cursor);
+      Assert.IsFalse(res);
+    }
+
+    #endregion
+
+    #region SequenceNode
+
+    [TestMethod]
+    [ExpectedException(typeof(MLException))]
+    public void SequenceOutputNode_Build_NoOutputNode()
+    {
+      var first = new DoublingNode();
+      var node = new SequenceOutputNode<double, double>();
+
+      node.Build();
+    }
+
+    [TestMethod]
+    public void SequenceOutputNode_Build()
+    {
+      var node1 = new DoublingNode();
+      var node2 = new ShiftingNode(4);
+      var node3 = new PowerNode(2);
+      var node = new SequenceOutputNode<double, double>();
+      node.AddHiddenNode(node1);
+      node.SetOutputNode(node2);
+
+      node.Build();
+
+      Assert.AreEqual(0, node.ParamCount);
+      Assert.AreEqual(1, node.HiddenNodes.Length);
+      Assert.AreEqual(0, node.HiddenNodes[0].ParamCount);
+      Assert.AreEqual(1, node.OutputNode.ParamCount);
+
+      node = new SequenceOutputNode<double, double>();
+      node.AddHiddenNode(node3);
+      node.SetOutputNode(node1);
+
+      node.Build();
+
+      Assert.AreEqual(0, node.ParamCount);
+      Assert.AreEqual(1, node.HiddenNodes.Length);
+      Assert.AreEqual(1, node.HiddenNodes[0].ParamCount);
+      Assert.AreEqual(0, node.OutputNode.ParamCount);
+
+      node = new SequenceOutputNode<double, double>();
+      node.AddHiddenNode(node2);
+      node.SetOutputNode(node3);
+
+      node.Build();
+
+      Assert.AreEqual(0, node.ParamCount);
+      Assert.AreEqual(1, node.HiddenNodes.Length);
+      Assert.AreEqual(1, node.HiddenNodes[0].ParamCount);
+      Assert.AreEqual(1, node.OutputNode.ParamCount);
+    }
+
+    [TestMethod]
+    public void SequenceOutputNode_Calculate()
+    {
+      var node1 = new DoublingNode();
+      var node2 = new ShiftingNode(4);
+      var node = new SequenceOutputNode<double, double>();
+      node.AddHiddenNode(node1);
+      node.SetOutputNode(node2);
+
+      node.Build();
+
+      var res = node.Calculate(3);
+
+      Assert.AreEqual(10, res);
+    }
+
+    [TestMethod]
+    public void SequenceOutputNode_TryGetParam()
+    {
+      var node1 = new DoublingNode();
+      var node2 = new ShiftingNode(4);
+      var node = new SequenceOutputNode<double, double>();
+      node.AddHiddenNode(node1);
+      node.SetOutputNode(node2);
+
+      node.Build();
+
+      double par1;
+      double par2;
+      var res1 = node.TryGetParam(0, out par1);
+      var res2 = node.TryGetParam(1, out par2);
+
+      Assert.IsTrue(res1);
+      Assert.AreEqual(4, par1);
+      Assert.IsFalse(res2);
+    }
+
+    [TestMethod]
+    public void SequenceOutputNode_TrySetParam()
+    {
+      var node1 = new PolynomialNode(2, new[] { 1.0D, -1.0D, 2.0D });
+      var node2 = new ShiftingNode(4);
+      var node = new SequenceOutputNode<double, double>();
+      node.AddHiddenNode(node1);
+      node.SetOutputNode(node2);
+
+      node.Build();
+
+      var res1 = node.TrySetParam(0,  1, false);
+      var res2 = node.TrySetParam(1,  1, true);
+      var res3 = node.TrySetParam(2, -2, false);
+      var res4 = node.TrySetParam(3, -1, true);
+      var res5 = node.TrySetParam(4,  3, false);
+      var res6 = node.TrySetParam(5,  4, true);
+
+      Assert.IsTrue(res1);
+      Assert.AreEqual(1, node1.Degree);
+      Assert.IsTrue(res2);
+      Assert.AreEqual(2, node1.Coeffs[0]);
+      Assert.IsTrue(res4);
+      Assert.AreEqual(-2, node1.Coeffs[1]);
+      Assert.IsTrue(res4);
+      Assert.AreEqual(1, node1.Coeffs[2]);
+      Assert.IsTrue(res5);
+      Assert.AreEqual(3, node2.Shift);
+      Assert.IsFalse(res6);
+    }
+
+    [TestMethod]
+    public void SequenceOutputNode_TryUpdateParams()
+    {
+      var node1 = new PolynomialNode(2, new[] { 1.0D, -1.0D, 2.0D });
+      var node2 = new ShiftingNode(4);
+      var node = new SequenceOutputNode<double, double>();
+      node.AddHiddenNode(node1);
+      node.SetOutputNode(node2);
+
+      node.Build();
+
+      var pars = new double[] { 1, 2, 3, -4, -1, 3, 1, -1, 2, -2, 1, 2, 2, 4 };
+      var cursor = 1;
+
+      var res = node.TryUpdateParams(pars, false, ref cursor);
+      Assert.IsTrue(res);
+      Assert.AreEqual(6,  cursor);
+      Assert.AreEqual(2,  node1.Degree);
+      Assert.AreEqual(3,  node1.Coeffs[0]);
+      Assert.AreEqual(-4, node1.Coeffs[1]);
+      Assert.AreEqual(-1, node1.Coeffs[2]);
+      Assert.AreEqual(3,  node2.Shift);
+
+      res = node.TryUpdateParams(pars, true, ref cursor);
+      Assert.IsTrue(res);
+      Assert.AreEqual(11, cursor);
+      Assert.AreEqual(3,  node1.Degree);
       Assert.AreEqual(2,  node1.Coeffs[0]);
       Assert.AreEqual(-2, node1.Coeffs[1]);
       Assert.AreEqual(-3, node1.Coeffs[2]);
@@ -884,14 +1343,14 @@ namespace ML.Tests
       net.Build();
 
       Assert.AreEqual(0, net.ParamCount);
-      Assert.AreEqual(0, net.Root.ParamCount);
-      Assert.AreEqual(0, ((dynamic)net).Root.InputNode.ParamCount);
-      Assert.AreEqual(0, ((dynamic)net).Root.HiddenNodes[0].SubNodes[0].ParamCount);
-      Assert.AreEqual(0, ((dynamic)net).Root.HiddenNodes[0].SubNodes[0].InputNode.ParamCount);
-      Assert.AreEqual(1, ((dynamic)net).Root.HiddenNodes[0].SubNodes[0].OutputNode.ParamCount);
-      Assert.AreEqual(1, ((dynamic)net).Root.HiddenNodes[0].SubNodes[1].ParamCount);
-      Assert.AreEqual(2, ((dynamic)net).Root.HiddenNodes[0].MergeNode.ParamCount);
-      Assert.AreEqual(1, ((dynamic)net).Root.OutputNode.ParamCount);
+      Assert.AreEqual(0, ((dynamic)net).InputNode.ParamCount);
+      Assert.AreEqual(0, ((dynamic)net).OutputNode.ParamCount);
+      Assert.AreEqual(0, ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[0].ParamCount);
+      Assert.AreEqual(0, ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[0].HiddenNodes[0].ParamCount);
+      Assert.AreEqual(1, ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[0].HiddenNodes[1].ParamCount);
+      Assert.AreEqual(1, ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[1].ParamCount);
+      Assert.AreEqual(2, ((dynamic)net).OutputNode.HiddenNodes[0].MergeNode.ParamCount);
+      Assert.AreEqual(1, ((dynamic)net).OutputNode.HiddenNodes[1].ParamCount);
     }
 
     [TestMethod]
@@ -956,15 +1415,15 @@ namespace ML.Tests
       var res6 = net.TrySetParam(5, 6, true);
 
       Assert.IsTrue(res1);
-      Assert.AreEqual(1, ((dynamic)net).Root.HiddenNodes[0].SubNodes[0].OutputNode.Shift);
+      Assert.AreEqual(1, ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[0].HiddenNodes[1].Shift);
       Assert.IsTrue(res2);
-      Assert.AreEqual(4, ((dynamic)net).Root.HiddenNodes[0].SubNodes[1].Power);
+      Assert.AreEqual(4, ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[1].Power);
       Assert.IsTrue(res3);
-      Assert.AreEqual(3, ((dynamic)net).Root.HiddenNodes[0].MergeNode.Coeffs[0]);
+      Assert.AreEqual(3, ((dynamic)net).OutputNode.HiddenNodes[0].MergeNode.Coeffs[0]);
       Assert.IsTrue(res4);
-      Assert.AreEqual(3, ((dynamic)net).Root.HiddenNodes[0].MergeNode.Coeffs[1]);
+      Assert.AreEqual(3, ((dynamic)net).OutputNode.HiddenNodes[0].MergeNode.Coeffs[1]);
       Assert.IsTrue(res5);
-      Assert.AreEqual(5, ((dynamic)net).Root.OutputNode.Shift);
+      Assert.AreEqual(5, ((dynamic)net).OutputNode.HiddenNodes[1].Shift);
       Assert.IsFalse(res6);
     }
 
@@ -979,20 +1438,20 @@ namespace ML.Tests
       var res = net.TryUpdateParams(pars, false, ref cursor);
       Assert.IsTrue(res);
       Assert.AreEqual(6,  cursor);
-      Assert.AreEqual(2,  ((dynamic)net).Root.HiddenNodes[0].SubNodes[0].OutputNode.Shift);
-      Assert.AreEqual(3,  ((dynamic)net).Root.HiddenNodes[0].SubNodes[1].Power);
-      Assert.AreEqual(-4, ((dynamic)net).Root.HiddenNodes[0].MergeNode.Coeffs[0]);
-      Assert.AreEqual(-1, ((dynamic)net).Root.HiddenNodes[0].MergeNode.Coeffs[1]);
-      Assert.AreEqual(3,  ((dynamic)net).Root.OutputNode.Shift);
+      Assert.AreEqual(2,  ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[0].HiddenNodes[1].Shift);
+      Assert.AreEqual(3,  ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[1].Power);
+      Assert.AreEqual(-4, ((dynamic)net).OutputNode.HiddenNodes[0].MergeNode.Coeffs[0]);
+      Assert.AreEqual(-1, ((dynamic)net).OutputNode.HiddenNodes[0].MergeNode.Coeffs[1]);
+      Assert.AreEqual(3,  ((dynamic)net).OutputNode.HiddenNodes[1].Shift);
 
       res = net.TryUpdateParams(pars, true, ref cursor);
       Assert.IsTrue(res);
       Assert.AreEqual(11, cursor);
-      Assert.AreEqual(3,  ((dynamic)net).Root.HiddenNodes[0].SubNodes[0].OutputNode.Shift);
-      Assert.AreEqual(2,  ((dynamic)net).Root.HiddenNodes[0].SubNodes[1].Power);
-      Assert.AreEqual(-2, ((dynamic)net).Root.HiddenNodes[0].MergeNode.Coeffs[0]);
-      Assert.AreEqual(-3, ((dynamic)net).Root.HiddenNodes[0].MergeNode.Coeffs[1]);
-      Assert.AreEqual(4,  ((dynamic)net).Root.OutputNode.Shift);
+      Assert.AreEqual(3,  ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[0].HiddenNodes[1].Shift);
+      Assert.AreEqual(2,  ((dynamic)net).OutputNode.HiddenNodes[0].SubNodes[1].Power);
+      Assert.AreEqual(-2, ((dynamic)net).OutputNode.HiddenNodes[0].MergeNode.Coeffs[0]);
+      Assert.AreEqual(-3, ((dynamic)net).OutputNode.HiddenNodes[0].MergeNode.Coeffs[1]);
+      Assert.AreEqual(4,  ((dynamic)net).OutputNode.HiddenNodes[1].Shift);
 
       res = net.TryUpdateParams(pars, false, ref cursor);
       Assert.IsFalse(res);
@@ -1012,15 +1471,12 @@ namespace ML.Tests
 
       Assert.AreEqual(0, net.ParamCount);
 
-      var root = (SequenceNode<double[], double[], double>)net.Root;
-
-      Assert.AreEqual(10000, root.InputNode.ParamCount);
       for (int i=0; i<lcount-1; i++)
       {
-        var node = root.HiddenNodes[i];
+        var node = ((dynamic)net).InputNode.HiddenNodes[i];
         Assert.AreEqual(10000, node.ParamCount);
       }
-      Assert.AreEqual(100, root.OutputNode.ParamCount);
+      Assert.AreEqual(100, net.OutputNode.ParamCount);
     }
 
     [TestMethod]
@@ -1124,8 +1580,8 @@ namespace ML.Tests
     [TestMethod]
     public void Large_Bench_ComputingNetwork_Calculate()
     {
-      var dim = 100;
-      var lcount = 10;
+      var dim = 512;   // dim x dim matrices
+      var lcount = 10; // lcount layers
       var net = new LargeNetwork(dim, lcount);
       net.Build();
 
@@ -1144,14 +1600,14 @@ namespace ML.Tests
       Console.WriteLine("Calculation BM: (dim={0} nodes={1}): {2}ms",
                         dim,
                         lcount,
-                        (float)timer.ElapsedMilliseconds/times);
+                        (int)((float)timer.ElapsedMilliseconds/times));
     }
 
     [TestMethod]
     public void Large_Bench_ComputingNetwork_BulkSetVSIndexSet()
     {
-      var dim = 100;
-      var lcount = 10;
+      var dim = 512;   // dim x dim matrices
+      var lcount = 10; // lcount layers
       var pcount = dim*dim*lcount+dim;
       var net = new LargeNetwork(dim, lcount);
       net.Build();
@@ -1162,7 +1618,7 @@ namespace ML.Tests
       pars[73450] = 3.5D;
 
       var timer = new Stopwatch();
-      var times = 1000;
+      var times = 100;
       timer.Start();
 
       for (int i=0; i<times; i++)
@@ -1175,7 +1631,7 @@ namespace ML.Tests
       Console.WriteLine("Bulk Set BM: (dim={0} nodes={1}): {2} ticks",
                         dim,
                         lcount,
-                        (float)timer.ElapsedTicks/times);
+                        (int)((float)timer.ElapsedTicks/times));
 
       timer.Reset();
       timer.Start();
@@ -1190,7 +1646,7 @@ namespace ML.Tests
       Console.WriteLine("Index Set BM: (dim={0} nodes={1}): {2} ticks",
                         dim,
                         lcount,
-                        (float)timer.ElapsedTicks/times);
+                        (int)((float)timer.ElapsedTicks/times));
     }
 
     #endregion

@@ -16,13 +16,17 @@ namespace ML.NeuralMethods.Networks
     private Dictionary<int, double> m_Weights;
     private IFunction m_ActivationFunction;
 
-    internal Neuron(NeuralLayer layer)
+    public Neuron()
     {
-      if (layer == null)
+      m_Weights = new Dictionary<int, double>();
+    }
+
+    public Neuron(NeuralLayer layer) : this()
+    {
+      if (layer==null)
         throw new MLException("Neuron.ctor(layer=null)");
 
       m_Layer = layer;
-      m_Weights = new Dictionary<int, double>();
     }
 
 
@@ -46,9 +50,29 @@ namespace ML.NeuralMethods.Networks
         if (m_ActivationFunction != null)
           return m_ActivationFunction;
 
-        return m_Layer.ActivationFunction;
+        return m_Layer != null ?
+               m_Layer.ActivationFunction ?? Registry.ActivationFunctions.Identity :
+               Registry.ActivationFunctions.Identity;
       }
       set { m_ActivationFunction = value; }
+    }
+
+    /// <summary>
+    /// Indexer for connection weights. Set 'null' to remove connection at the given index
+    /// </summary>
+    public double? this[int idx]
+    {
+      get
+      {
+        double value;
+        if (!m_Weights.TryGetValue(idx, out value)) return null;
+        return value;
+      }
+      set
+      {
+        if (!value.HasValue) m_Weights.Remove(idx);
+        else m_Weights[idx] = value.Value;
+      }
     }
 
     /// <summary>
@@ -69,71 +93,32 @@ namespace ML.NeuralMethods.Networks
 
     protected override double DoGetParam(int idx)
     {
-      throw new NotImplementedException();
+      return m_Weights.ElementAt(idx).Value;
     }
 
     protected override void DoSetParam(int idx, double value, bool isDelta)
     {
-      throw new NotImplementedException();
+      var wdata = m_Weights.ElementAt(idx);
+      if (isDelta)
+        m_Weights[wdata.Key] += value;
+      else
+        m_Weights[wdata.Key] = value;
     }
 
     protected override void DoUpdateParams(double[] pars, bool isDelta, int cursor)
     {
-      throw new NotImplementedException();
-    }
-
-
-
-
-
-
-
-
-
-
-    /// <summary>
-    /// Indexer for connection weights. Set 'null' to remove connection at the given index
-    /// </summary>
-    public double? this[int i]
-    {
-      get
-      {
-        double value;
-        if (!m_Weights.TryGetValue(i, out value)) return null;
-        return value;
-      }
-      set
-      {
-        if (!value.HasValue) m_Weights.Remove(i);
-        else m_Weights[i] = value.Value;
-      }
-    }
-
-    /// <summary>
-    /// Updates neuron weights with the given array of values
-    /// </summary>
-    /// <param name="weights">Array of values</param>
-    /// <param name="isDelta">Are the values in array is absolute or just deltas</param>
-    /// <param name="cursor">'From' index in the array</param>
-    public void UpdateWeights(double[] weights, bool isDelta, ref int cursor)
-    {
-      var idx = cursor;
       var keys = new List<int>(m_Weights.Keys);
-
-      foreach (var key in keys)
+      if (isDelta)
       {
-        if (idx >= weights.Length) break;
-
-        var value = weights[idx];
-        if (isDelta)
-          m_Weights[key] += value;
-        else
-          m_Weights[key] = value;
-
-        idx++;
+        foreach (var key in keys)
+          m_Weights[key] += pars[cursor++];
       }
-
-      cursor = idx;
+      else
+      {
+        foreach (var key in keys)
+          m_Weights[key] = pars[cursor++];
+      }
     }
+
   }
 }

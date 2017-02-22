@@ -4,62 +4,47 @@ using System.Collections.Generic;
 namespace ML.Core.ComputingNetworks
 {
   /// <summary>
-  /// Less-generic shortcut version of SequenceNode<TPar, THidNode>
+  /// Represents 'stapling' node joined from two others
   ///
-  ///  TPar -> TPar -> ... -> TPar
-  ///
+  /// TIn -> THidOut -> TOut
   /// </summary>
-  /// <typeparam name="TPar">Input/output object type</typeparam>
-  public class SequenceNode<TPar> : SequenceNode<TPar, ComputingNode<TPar, TPar>>
-  {
-  }
-
-  /// <summary>
-  /// Represents computing node joined from set of others -
-  /// a node that sequentially tunells input through set of layers
-  ///
-  ///  TPar -> TPar -> ... -> TPar
-  ///
-  /// </summary>
-  /// <typeparam name="TPar">Input/output object type</typeparam>
-  /// <typeparam name="THidNode">Type of hidden nodes</typeparam>
-  public class SequenceNode<TPar, THidNode> : ComputingNode<TPar, TPar>
-    where THidNode : ComputingNode<TPar, TPar>
+  /// <typeparam name="TIn">Input object type</typeparam>
+  /// <typeparam name="THidOut">Hidden (inner) input object type</typeparam>
+  /// <typeparam name="TOut">Output object type</typeparam>
+  public class JoinNode<TIn, THidOut, TOut> : ComputingNode<TIn, TOut>
   {
     private ParamMultiIdx m_ParIdx;
-    private THidNode[] m_HiddenNodes;
+    private ComputingNode<TIn, THidOut> m_InputNode;
+    private ComputingNode<THidOut, TOut> m_OutputNode;
 
-
-    public SequenceNode()
+    public JoinNode()
     {
-      m_HiddenNodes = new THidNode[0];
     }
 
     public override int ParamCount { get { return 0; } }
-    public THidNode[] HiddenNodes { get { return m_HiddenNodes; } }
+    public IComputingNode<TIn, THidOut> InputNode { get { return m_InputNode; } }
+    public IComputingNode<THidOut, TOut> OutputNode { get { return m_OutputNode; } }
 
-    public void AddHiddenNode(THidNode hiddenNode)
+    public void SetInputNode(ComputingNode<TIn, THidOut> inputNode)
     {
-      if (hiddenNode==null)
+      if (inputNode==null)
         throw new MLException("Node can not be null");
 
-      var len = m_HiddenNodes.Length;
-      var hiddenNodes = new THidNode[len+1];
-      for (int i=0; i<len; i++)
-        hiddenNodes[i] = m_HiddenNodes[i];
-      hiddenNodes[len] = hiddenNode;
-
-      m_HiddenNodes = hiddenNodes;
+      m_InputNode = inputNode;
     }
 
-    public override TPar Calculate(TPar input)
+    public void SetOutputNode(ComputingNode<THidOut, TOut> outputNode)
     {
-      var result = input;
-      var len = m_HiddenNodes.Length;
-      for (int i=0; i<len; i++)
-        result = m_HiddenNodes[i].Calculate(result);
+      if (outputNode==null)
+        throw new MLException("Node can not be null");
 
-      return result;
+      m_OutputNode = outputNode;
+    }
+
+    public override TOut Calculate(TIn input)
+    {
+      var innerResult = m_InputNode.Calculate(input);
+      return m_OutputNode.Calculate(innerResult);
     }
 
     /// <summary>
@@ -67,11 +52,14 @@ namespace ML.Core.ComputingNetworks
     /// </summary>
     internal override void DoBuild(bool buildIndex)
     {
-      if (buildIndex) BuildIndex(0);
+      if (m_InputNode==null)
+        throw new MLException("Input node has not been set");
+      if (m_OutputNode==null)
+        throw new MLException("Output node has not been set");
 
-      var len = m_HiddenNodes.Length;
-      for (int i=0; i<len; i++)
-        m_HiddenNodes[i].DoBuild(false);
+      if (buildIndex) BuildIndex(0);
+      m_InputNode.DoBuild(false);
+      m_OutputNode.DoBuild(false);
     }
 
     /// <summary>
@@ -81,16 +69,19 @@ namespace ML.Core.ComputingNetworks
     /// <returns>Index end value</returns>
     internal override int BuildIndex(int startIdx)
     {
-      var len = m_HiddenNodes.Length;
-      var idxs = new int[len+1];
+      if (m_InputNode==null)
+        throw new MLException("Input node has not been set");
+      if (m_OutputNode==null)
+        throw new MLException("Output node has not been set");
+
+      var idxs = new int[3];
       idxs[0] = startIdx;
 
-      var endIdx = startIdx;
-      for (int i=0; i<len; i++)
-      {
-        endIdx = m_HiddenNodes[i].BuildIndex(endIdx);
-        idxs[i+1]=endIdx;
-      }
+      var endIdx = m_InputNode.BuildIndex(startIdx);
+      idxs[1] = endIdx;
+
+      endIdx = m_OutputNode.BuildIndex(endIdx);
+      idxs[2] = endIdx;
 
       m_ParIdx = new ParamMultiIdx(idxs);
 
@@ -108,18 +99,16 @@ namespace ML.Core.ComputingNetworks
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
     public override bool TryGetParam(int idx, out double value)
     {
-      if (m_ParIdx.CheckEnd(idx))
+      if (!m_ParIdx.CheckEnd(idx))
       {
-        var len = m_HiddenNodes.Length;
-        for (int i=0; i<len; i++)
-        {
-          if (m_ParIdx.CheckIdx(idx, i+1))
-            return m_HiddenNodes[i].TryGetParam(idx, out value);
-        }
+        value = 0;
+        return false;
       }
 
-      value = 0;
-      return false;
+      if (m_ParIdx.CheckIdx(idx, 1))
+        return m_InputNode.TryGetParam(idx, out value);
+
+      return m_OutputNode.TryGetParam(idx, out value);
     }
 
     /// <summary>
@@ -134,17 +123,13 @@ namespace ML.Core.ComputingNetworks
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
     public override bool TrySetParam(int idx, double value, bool isDelta)
     {
-      if (m_ParIdx.CheckEnd(idx))
-      {
-        var len = m_HiddenNodes.Length;
-        for (int i=0; i<len; i++)
-        {
-          if (m_ParIdx.CheckIdx(idx, i+1))
-            return m_HiddenNodes[i].TrySetParam(idx, value, isDelta);
-        }
-      }
+      if (!m_ParIdx.CheckEnd(idx))
+        return false;
 
-      return false;
+      if (m_ParIdx.CheckIdx(idx, 1))
+        return m_InputNode.TrySetParam(idx, value, isDelta);
+
+      return m_OutputNode.TrySetParam(idx, value, isDelta);
     }
 
     /// <summary>
@@ -162,14 +147,10 @@ namespace ML.Core.ComputingNetworks
       if (pars == null || pars.Length < cursor)
         return false;
 
-      var len = m_HiddenNodes.Length;
-      for (int i=0; i<len; i++)
-      {
-        var success = m_HiddenNodes[i].TryUpdateParams(pars, isDelta, ref cursor);
-        if (!success) return false;
-      }
+      var success = m_InputNode.TryUpdateParams(pars, isDelta, ref cursor);
+      if (!success) return false;
 
-      return true;
+      return m_OutputNode.TryUpdateParams(pars, isDelta, ref cursor);
     }
 
     protected override double DoGetParam(int idx)

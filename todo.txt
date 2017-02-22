@@ -1,13 +1,15 @@
 CURRENT:
 
-- [INPROG] rewrite all NN code according to new CN architecture
-  - [INPROG] rewrite
-  - cover with tests
+- [DONE] rewrite all NN code according to new CN architecture
+  - [DONE] rewrite NN
+  - [DONE] cover with tests
 
-Computing Networks/Layers
+- Computing Networks/Layers
   - develop way to create simple base networks (factory methods)
   - add network-wide global context
   - review architecture: public/internal members - try to use assembly from ouside
+  - add CheckConsistency() method to node/NN/...
+  - do we need special two-keyed dictionary for store neuron weights?
 
 - implement Perceptron algorithm according to new CN architecture
   - implement
@@ -18,6 +20,7 @@ Computing Networks/Layers
   - with stochastic
   - all above for general NN
   - cover with tests
+  - implement for NN/Perceptron
 
 - implement Convolution NN based on CN architecture
   - read more about Convolution NN
@@ -30,7 +33,7 @@ Computing Networks/Layers
 
 DONE:
 
--[ALL:TO_COMMIT] Computing Networks/Layers: develop unified approach to multi-typed layers NN: Layer<TIn, TOut>
+- Computing Networks/Layers: develop unified approach to multi-typed layers NN: Layer<TIn, TOut>
   - develop architecture
   - refactor: index
   - cover with unit tests

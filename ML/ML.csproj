@@ -54,9 +54,11 @@
     <Compile Include="Core\ClassifiedSample.cs" />
     <Compile Include="Contracts\IAuxiliary.cs" />
     <Compile Include="Core\ComputingNetworks\CompositeNode.cs" />
-    <Compile Include="Core\ComputingNetworks\ComputingNetwork.cs" />
+    <Compile Include="Core\ComputingNetworks\AggregateNode.cs" />
     <Compile Include="Core\ComputingNetworks\ComputingNode.cs" />
     <Compile Include="Core\ComputingNetworks\Index.cs" />
+    <Compile Include="Core\ComputingNetworks\JoinNode.cs" />
+    <Compile Include="Core\ComputingNetworks\SequenceOutputNode.cs" />
     <Compile Include="Core\Exceptions.cs" />
     <Compile Include="Core\Feature.cs" />
     <Compile Include="Core\Class.cs" />
@@ -91,10 +93,10 @@
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
     <Compile Include="NeuralMethods\Algorithms\PerceptronAlgorithm.cs" />
+    <Compile Include="NeuralMethods\Contracts\INeuralNetwork.cs" />
+    <Compile Include="NeuralMethods\Networks\NeuralLayer.cs" />
+    <Compile Include="NeuralMethods\Networks\NeuralNetwork.cs" />
     <Compile Include="NeuralMethods\Networks\Neuron.cs" />
-    <Compile Include="NeuralMethods\___OLD\Neuron.cs" />
-    <Compile Include="NeuralMethods\___OLD\NeuralLayer.cs" />
-    <Compile Include="NeuralMethods\___OLD\NeuralNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Mathematics\MathUtils.cs" />
   </ItemGroup>

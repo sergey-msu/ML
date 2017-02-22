@@ -204,11 +204,11 @@ namespace ML.ConsoleTest
 
     private void doPerceptronAlgorithmTest()
     {
-      var epoch = 1;
-      var alg = new PerceptronAlgorithm(Data.TrainingSample, Data.Dimension, 3, -0.5, 0.5);
-      alg.Train_ErrorCorrection(epoch);
+      //var epoch = 1;
+      //var alg = new PerceptronAlgorithm(Data.TrainingSample, Data.Dimension, 3, -0.5, 0.5);
+      //alg.Train_ErrorCorrection(epoch);
 
-      Visualizer.Run(alg);
+      //Visualizer.Run(alg);
     }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Core.Mathematics;
+using ML.NeuralMethods.Networks;
 
 namespace ML.NeuralMethods.Algorithms
 {
@@ -14,25 +15,25 @@ namespace ML.NeuralMethods.Algorithms
     protected NeuralNetworkAlgorithmBase(ClassifiedSample classifiedSample)
       : base(classifiedSample)
     {
-      m_Network = new NeuralNetwork();
+      //m_Network = new NeuralNetwork();
     }
 
-    private readonly NeuralNetwork m_Network;
+    //private readonly NeuralNetwork m_Network;
 
-    public NeuralNetwork Network { get { return m_Network; } }
+    //public NeuralNetwork Network { get { return m_Network; } }
 
 
-    public override Class Classify(Point x)
-    {
-      var result = m_Network.Calculate(x);
+    //public override Class Classify(Point x)
+    //{
+    //  var result = m_Network.Calculate(x);
 
-      int idx;
-      double max;
-      MathUtils.CalcMax(result, out idx, out max);
+    //  int idx;
+    //  double max;
+    //  MathUtils.CalcMax(result, out idx, out max);
 
-      var cls = Classes.FirstOrDefault(c => (int)c.Value.Value == idx);
+    //  var cls = Classes.FirstOrDefault(c => (int)c.Value.Value == idx);
 
-      return cls.Value ?? Class.None;
-    }
+    //  return cls.Value ?? Class.None;
+    //}
   }
 }

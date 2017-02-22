@@ -5,26 +5,32 @@ using ML.Core.Kernels;
 namespace ML.Tests
 {
   [TestClass]
-  public class KernelTests
+  public class KernelTests : TestBase
   {
     public const double EPS = 0.0000001D;
+
+    [ClassInitialize]
+    public static void ClassInit(TestContext context)
+    {
+      BaseClassInit(context);
+    }
 
     [TestMethod]
     public void GaussianKernel_Value()
     {
       var kernel = new GaussianKernel();
 
-      Assert.IsTrue(Math.Abs(kernel.Value(-2.5F) - 0.00193045413F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-2.0F) - 0.01831563888F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.5F) - 0.10539922456F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.0F) - 0.36787944117F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.5F) - 0.77880078307F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.0F) - 1.0F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.5F) - 0.77880078307F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.0F) - 0.36787944117F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.5F) - 0.10539922456F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 2.0F) - 0.01831563888F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 2.5F) - 0.00193045413F) < EPS);
+      MLAssert.AreEpsEqual(0.00193045413F, kernel.Value(-2.5F), EPS);
+      MLAssert.AreEpsEqual(0.01831563888F, kernel.Value(-2.0F), EPS);
+      MLAssert.AreEpsEqual(0.10539922456F, kernel.Value(-1.5F), EPS);
+      MLAssert.AreEpsEqual(0.36787944117F, kernel.Value(-1.0F), EPS);
+      MLAssert.AreEpsEqual(0.77880078307F, kernel.Value(-0.5F), EPS);
+      MLAssert.AreEpsEqual(1.0F,           kernel.Value( 0.0F), EPS);
+      MLAssert.AreEpsEqual(0.77880078307F, kernel.Value( 0.5F), EPS);
+      MLAssert.AreEpsEqual(0.36787944117F, kernel.Value( 1.0F), EPS);
+      MLAssert.AreEpsEqual(0.10539922456F, kernel.Value( 1.5F), EPS);
+      MLAssert.AreEpsEqual(0.01831563888F, kernel.Value( 2.0F), EPS);
+      MLAssert.AreEpsEqual(0.00193045413F, kernel.Value( 2.5F), EPS);
     }
 
     [TestMethod]
@@ -32,19 +38,19 @@ namespace ML.Tests
     {
       var kernel = new QuadraticKernel();
 
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.5F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.01F)) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.0F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.99F) - 0.0199F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.5F)  - 0.75F)   < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.2F)  - 0.96F)   < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.0F)  - 1.0F)    < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.2F)  - 0.96F)   < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.5F)  - 0.75F)   < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.99F) - 0.0199F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.0F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.01F)) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.5F))  < EPS);
+      MLAssert.AreEpsEqual(0,       kernel.Value(-1.5F),  EPS);
+      MLAssert.AreEpsEqual(0,       kernel.Value(-1.01F), EPS);
+      MLAssert.AreEpsEqual(0,       kernel.Value(-1.0F),  EPS);
+      MLAssert.AreEpsEqual(0.0199F, kernel.Value(-0.99F), EPS);
+      MLAssert.AreEpsEqual(0.75F,   kernel.Value(-0.5F),  EPS);
+      MLAssert.AreEpsEqual(0.96F,   kernel.Value(-0.2F),  EPS);
+      MLAssert.AreEpsEqual(1.0F,    kernel.Value( 0.0F),  EPS);
+      MLAssert.AreEpsEqual(0.96F,   kernel.Value( 0.2F),  EPS);
+      MLAssert.AreEpsEqual(0.75F,   kernel.Value( 0.5F),  EPS);
+      MLAssert.AreEpsEqual(0.0199F, kernel.Value( 0.99F), EPS);
+      MLAssert.AreEpsEqual(0,       kernel.Value( 1.0F),  EPS);
+      MLAssert.AreEpsEqual(0,       kernel.Value( 1.01F), EPS);
+      MLAssert.AreEpsEqual(0,       kernel.Value( 1.5F),  EPS);
     }
 
     [TestMethod]
@@ -52,19 +58,19 @@ namespace ML.Tests
     {
       var kernel = new QuarticKernel();
 
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.5F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.01F)) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.0F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.99F) - 0.00039601F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.5F)  - 0.5625F)   < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.2F)  - 0.9216F)   < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.0F)  - 1.0F)    < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.2F)  - 0.9216F)   < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.5F)  - 0.5625F)   < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.99F) - 0.00039601F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.0F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.01F)) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.5F))  < EPS);
+      MLAssert.AreEpsEqual(0,           kernel.Value(-1.5F),  EPS);
+      MLAssert.AreEpsEqual(0,           kernel.Value(-1.01F), EPS);
+      MLAssert.AreEpsEqual(0,           kernel.Value(-1.0F),  EPS);
+      MLAssert.AreEpsEqual(0.00039601F, kernel.Value(-0.99F), EPS);
+      MLAssert.AreEpsEqual(0.5625F,     kernel.Value(-0.5F),  EPS);
+      MLAssert.AreEpsEqual(0.9216F,     kernel.Value(-0.2F),  EPS);
+      MLAssert.AreEpsEqual(1.0F,        kernel.Value( 0.0F),  EPS);
+      MLAssert.AreEpsEqual(0.9216F,     kernel.Value( 0.2F),  EPS);
+      MLAssert.AreEpsEqual(0.5625F,     kernel.Value( 0.5F),  EPS);
+      MLAssert.AreEpsEqual(0.00039601F, kernel.Value( 0.99F), EPS);
+      MLAssert.AreEpsEqual(0,           kernel.Value( 1.0F),  EPS);
+      MLAssert.AreEpsEqual(0,           kernel.Value( 1.01F), EPS);
+      MLAssert.AreEpsEqual(0,           kernel.Value( 1.5F),  EPS);
     }
 
     [TestMethod]
@@ -72,19 +78,19 @@ namespace ML.Tests
     {
       var kernel = new TriangularKernel();
 
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.5F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.01F)) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.0F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.99F) - 0.01F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.5F)  - 0.5F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.2F)  - 0.8F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.0F)  - 1.0F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.2F)  - 0.8F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.5F)  - 0.5F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.99F) - 0.01F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.0F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.01F)) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.5F))  < EPS);
+      MLAssert.AreEpsEqual(0,     kernel.Value(-1.5F),  EPS);
+      MLAssert.AreEpsEqual(0,     kernel.Value(-1.01F), EPS);
+      MLAssert.AreEpsEqual(0,     kernel.Value(-1.0F),  EPS);
+      MLAssert.AreEpsEqual(0.01F, kernel.Value(-0.99F), EPS);
+      MLAssert.AreEpsEqual(0.5F,  kernel.Value(-0.5F),  EPS);
+      MLAssert.AreEpsEqual(0.8F,  kernel.Value(-0.2F),  EPS);
+      MLAssert.AreEpsEqual(1.0F,  kernel.Value( 0.0F),  EPS);
+      MLAssert.AreEpsEqual(0.8F,  kernel.Value( 0.2F),  EPS);
+      MLAssert.AreEpsEqual(0.5F,  kernel.Value( 0.5F),  EPS);
+      MLAssert.AreEpsEqual(0.01F, kernel.Value( 0.99F), EPS);
+      MLAssert.AreEpsEqual(0,     kernel.Value( 1.0F),  EPS);
+      MLAssert.AreEpsEqual(0,     kernel.Value( 1.01F), EPS);
+      MLAssert.AreEpsEqual(0,     kernel.Value( 1.5F),  EPS);
     }
 
     [TestMethod]
@@ -92,19 +98,19 @@ namespace ML.Tests
     {
       var kernel = new RectangularKernel();
 
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.5F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.01F)) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-1.0F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.99F) - 1.0F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.5F)  - 1.0F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value(-0.2F)  - 1.0F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.0F)  - 1.0F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.2F)  - 1.0F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.5F)  - 1.0F)  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 0.99F) - 1.0F) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.0F))  < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.01F)) < EPS);
-      Assert.IsTrue(Math.Abs(kernel.Value( 1.5F))  < EPS);
+      MLAssert.AreEpsEqual(0,    kernel.Value(-1.5F),  EPS);
+      MLAssert.AreEpsEqual(0,    kernel.Value(-1.01F), EPS);
+      MLAssert.AreEpsEqual(0,    kernel.Value(-1.0F),  EPS);
+      MLAssert.AreEpsEqual(1.0F, kernel.Value(-0.99F), EPS);
+      MLAssert.AreEpsEqual(1.0F, kernel.Value(-0.5F),  EPS);
+      MLAssert.AreEpsEqual(1.0F, kernel.Value(-0.2F),  EPS);
+      MLAssert.AreEpsEqual(1.0F, kernel.Value( 0.0F),  EPS);
+      MLAssert.AreEpsEqual(1.0F, kernel.Value( 0.2F),  EPS);
+      MLAssert.AreEpsEqual(1.0F, kernel.Value( 0.5F),  EPS);
+      MLAssert.AreEpsEqual(1.0F, kernel.Value( 0.99F), EPS);
+      MLAssert.AreEpsEqual(0,    kernel.Value( 1.0F),  EPS);
+      MLAssert.AreEpsEqual(0,    kernel.Value( 1.01F), EPS);
+      MLAssert.AreEpsEqual(0,    kernel.Value( 1.5F),  EPS);
     }
   }
 }

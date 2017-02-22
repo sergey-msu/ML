@@ -6,9 +6,15 @@ using ML.Core;
 namespace ML.Tests
 {
   [TestClass]
-  public class MetricTests
+  public class MetricTests : TestBase
   {
     public const double EPS = 0.0000001D;
+
+    [ClassInitialize]
+    public static void ClassInit(TestContext context)
+    {
+      BaseClassInit(context);
+    }
 
     [TestMethod]
     [ExpectedException(typeof(MLException))]
@@ -36,12 +42,12 @@ namespace ML.Tests
       var d23 = metric.Dist(p2, p3);
       var d32 = metric.Dist(p3, p2);
 
-      Assert.IsTrue(Math.Abs(d12 - Math.Sqrt(2)) < EPS);
-      Assert.IsTrue(Math.Abs(d21 - Math.Sqrt(2)) < EPS);
-      Assert.IsTrue(Math.Abs(d13 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d31 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d32 - Math.Sqrt(5)) < EPS);
-      Assert.IsTrue(Math.Abs(d23 - Math.Sqrt(5)) < EPS);
+      MLAssert.AreEpsEqual(Math.Sqrt(2), d12, EPS);
+      MLAssert.AreEpsEqual(Math.Sqrt(2), d21, EPS);
+      MLAssert.AreEpsEqual(3.0F,         d13, EPS);
+      MLAssert.AreEpsEqual(3.0F,         d31, EPS);
+      MLAssert.AreEpsEqual(Math.Sqrt(5), d32, EPS);
+      MLAssert.AreEpsEqual(Math.Sqrt(5), d23, EPS);
     }
 
     [TestMethod]
@@ -59,12 +65,12 @@ namespace ML.Tests
       var d23 = metric.Dist2(p2, p3);
       var d32 = metric.Dist2(p3, p2);
 
-      Assert.IsTrue(Math.Abs(d12 - 2.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d21 - 2.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d13 - 9.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d31 - 9.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d32 - 5.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d23 - 5.0F) < EPS);
+      MLAssert.AreEpsEqual(2.0F, d12, EPS);
+      MLAssert.AreEpsEqual(2.0F, d21, EPS);
+      MLAssert.AreEpsEqual(9.0F, d13, EPS);
+      MLAssert.AreEpsEqual(9.0F, d31, EPS);
+      MLAssert.AreEpsEqual(5.0F, d32, EPS);
+      MLAssert.AreEpsEqual(5.0F, d23, EPS);
     }
 
     [TestMethod]
@@ -93,12 +99,12 @@ namespace ML.Tests
       var d23 = metric.Dist(p2, p3);
       var d32 = metric.Dist(p3, p2);
 
-      Assert.IsTrue(Math.Abs(d12 - 1.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d21 - 1.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d13 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d31 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d32 - 2.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d23 - 2.0F) < EPS);
+       MLAssert.AreEpsEqual(1.0F, d12, EPS);
+       MLAssert.AreEpsEqual(1.0F, d21, EPS);
+       MLAssert.AreEpsEqual(3.0F, d13, EPS);
+       MLAssert.AreEpsEqual(3.0F, d31, EPS);
+       MLAssert.AreEpsEqual(2.0F, d32, EPS);
+       MLAssert.AreEpsEqual(2.0F, d23, EPS);
     }
 
     [TestMethod]
@@ -140,12 +146,12 @@ namespace ML.Tests
       var d23 = metric1.Dist(p2, p3);
       var d32 = metric1.Dist(p3, p2);
 
-      Assert.IsTrue(Math.Abs(d12 - 2.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d21 - 2.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d13 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d31 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d32 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d23 - 3.0F) < EPS);
+      MLAssert.AreEpsEqual(2.0F, d12, EPS);
+      MLAssert.AreEpsEqual(2.0F, d21, EPS);
+      MLAssert.AreEpsEqual(3.0F, d13, EPS);
+      MLAssert.AreEpsEqual(3.0F, d31, EPS);
+      MLAssert.AreEpsEqual(3.0F, d32, EPS);
+      MLAssert.AreEpsEqual(3.0F, d23, EPS);
 
       d12 = metric2.Dist(p1, p2);
       d21 = metric2.Dist(p2, p1);
@@ -154,12 +160,12 @@ namespace ML.Tests
       d23 = metric2.Dist(p2, p3);
       d32 = metric2.Dist(p3, p2);
 
-      Assert.IsTrue(Math.Abs(d12 - Math.Pow(2.0D, 1.0D/p)) < EPS);
-      Assert.IsTrue(Math.Abs(d21 - Math.Pow(2.0D, 1.0D/p)) < EPS);
-      Assert.IsTrue(Math.Abs(d13 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d31 - 3.0F) < EPS);
-      Assert.IsTrue(Math.Abs(d23 - Math.Pow(1 + Math.Pow(2.0D, p), 1.0D/p)) < EPS);
-      Assert.IsTrue(Math.Abs(d32 - Math.Pow(1 + Math.Pow(2.0D, p), 1.0D/p)) < EPS);
+      MLAssert.AreEpsEqual(Math.Pow(2.0D, 1.0D/p),                  d12, EPS);
+      MLAssert.AreEpsEqual(Math.Pow(2.0D, 1.0D/p),                  d21, EPS);
+      MLAssert.AreEpsEqual(3.0F,                                    d13, EPS);
+      MLAssert.AreEpsEqual(3.0F,                                    d31, EPS);
+      MLAssert.AreEpsEqual(Math.Pow(1 + Math.Pow(2.0D, p), 1.0D/p), d23, EPS);
+      MLAssert.AreEpsEqual(Math.Pow(1 + Math.Pow(2.0D, p), 1.0D/p), d32, EPS);
     }
   }
 }
