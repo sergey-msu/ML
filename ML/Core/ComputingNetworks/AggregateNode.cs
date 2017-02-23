@@ -23,7 +23,7 @@ namespace ML.Core.ComputingNetworks
   ///     \             /
   ///       TIn -> TOut
   /// </summary>
-  /// <typeparam name="TIn">Input object type</typeparam>
+  /// <typeparam name="TIn">Input object type </typeparam>
   /// <typeparam name="TOut">Output object type</typeparam>
   /// <typeparam name="TSubNode">Type of subnodes</typeparam>
   public class AggregateNode<TIn, TOut, TSubNode> : ComputingNode<TIn, TOut>
