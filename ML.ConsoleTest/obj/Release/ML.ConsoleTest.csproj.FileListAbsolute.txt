@@ -1,8 +1,0 @@
-F:\Work\git\ML\solution\ML.ConsoleTest\bin\Release\ML.ConsoleTest.exe.config
-F:\Work\git\ML\solution\ML.ConsoleTest\bin\Release\ML.ConsoleTest.exe
-F:\Work\git\ML\solution\ML.ConsoleTest\bin\Release\ML.ConsoleTest.pdb
-F:\Work\git\ML\solution\ML.ConsoleTest\bin\Release\ML.dll
-F:\Work\git\ML\solution\ML.ConsoleTest\bin\Release\ML.pdb
-F:\Work\git\ML\solution\ML.ConsoleTest\obj\Release\ML.ConsoleTest.csprojResolveAssemblyReference.cache
-F:\Work\git\ML\solution\ML.ConsoleTest\obj\Release\ML.ConsoleTest.exe
-F:\Work\git\ML\solution\ML.ConsoleTest\obj\Release\ML.ConsoleTest.pdb
