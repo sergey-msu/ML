@@ -13,7 +13,7 @@ namespace ML.ConsoleTest
 
       public class DataError
       {
-        public int LineNum { get; set; }
+        public int    LineNum { get; set; }
         public string Line { get; set; }
       }
 
