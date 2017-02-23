@@ -1,0 +1,8 @@
+F:\Work\git\ML\solution\ML.ConsoleTest\bin\Debug\ML.ConsoleTest.exe.config
+F:\Work\git\ML\solution\ML.ConsoleTest\bin\Debug\ML.ConsoleTest.exe
+F:\Work\git\ML\solution\ML.ConsoleTest\bin\Debug\ML.ConsoleTest.pdb
+F:\Work\git\ML\solution\ML.ConsoleTest\bin\Debug\ML.dll
+F:\Work\git\ML\solution\ML.ConsoleTest\bin\Debug\ML.pdb
+F:\Work\git\ML\solution\ML.ConsoleTest\obj\Debug\ML.ConsoleTest.csprojResolveAssemblyReference.cache
+F:\Work\git\ML\solution\ML.ConsoleTest\obj\Debug\ML.ConsoleTest.exe
+F:\Work\git\ML\solution\ML.ConsoleTest\obj\Debug\ML.ConsoleTest.pdb

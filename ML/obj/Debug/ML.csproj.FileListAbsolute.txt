@@ -1,0 +1,4 @@
+F:\Work\git\ML\solution\ML\bin\Debug\ML.dll
+F:\Work\git\ML\solution\ML\bin\Debug\ML.pdb
+F:\Work\git\ML\solution\ML\obj\Debug\ML.dll
+F:\Work\git\ML\solution\ML\obj\Debug\ML.pdb
