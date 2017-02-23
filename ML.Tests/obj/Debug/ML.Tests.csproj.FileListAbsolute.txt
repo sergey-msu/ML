@@ -1,7 +1,0 @@
-F:\Work\git\ML\solution\ML.Tests\bin\Debug\ML.Tests.dll
-F:\Work\git\ML\solution\ML.Tests\bin\Debug\ML.Tests.pdb
-F:\Work\git\ML\solution\ML.Tests\bin\Debug\ML.dll
-F:\Work\git\ML\solution\ML.Tests\bin\Debug\ML.pdb
-F:\Work\git\ML\solution\ML.Tests\obj\Debug\ML.Tests.csprojResolveAssemblyReference.cache
-F:\Work\git\ML\solution\ML.Tests\obj\Debug\ML.Tests.dll
-F:\Work\git\ML\solution\ML.Tests\obj\Debug\ML.Tests.pdb
