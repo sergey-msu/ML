@@ -2,3 +2,4 @@ F:\Work\git\ML\solution\ML\bin\Release\ML.dll
 F:\Work\git\ML\solution\ML\bin\Release\ML.pdb
 F:\Work\git\ML\solution\ML\obj\Release\ML.dll
 F:\Work\git\ML\solution\ML\obj\Release\ML.pdb
+F:\Work\git\ML\solution\ML\obj\Release\ML.csprojResolveAssemblyReference.cache
