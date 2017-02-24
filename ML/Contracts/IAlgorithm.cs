@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace ML.Contracts
 {
   /// <summary>
-  /// Classification algorithm contract
+  /// Contract of classification algorithm with training sample
   /// </summary>
-  public interface IAlgorithm : IMnemonicNamed
+  public interface ISupervisedAlgorithm : IMnemonicNamed
   {
     /// <summary>
     /// Initial classified training sample
@@ -27,7 +27,7 @@ namespace ML.Contracts
   /// <summary>
   /// Contract for general metric classification algorithm
   /// </summary>
-  public interface IMetricAlgorithm : IAlgorithm
+  public interface IMetricAlgorithm : ISupervisedAlgorithm
   {
     /// <summary>
     /// Space metric

@@ -8,7 +8,7 @@ namespace ML.Core
   /// <summary>
   /// Base class for algorithm that accepts whole traing sample
   /// </summary>
-  public abstract class AlgorithmBase : IAlgorithm
+  public abstract class AlgorithmBase : ISupervisedAlgorithm
   {
     #region Inner
 
@@ -93,12 +93,12 @@ namespace ML.Core
     private readonly Dictionary<string, Class> m_Classes;
     private MaskHandle m_MaskHandle;
 
-    protected AlgorithmBase(ClassifiedSample classifiedSample)
+    protected AlgorithmBase(ClassifiedSample trainingSample)
     {
-      if (classifiedSample == null || !classifiedSample.Any())
-        throw new MLException("AlrogithmBase.ctor(classifiedSample=null|empty)");
+      if (trainingSample == null || !trainingSample.Any())
+        throw new MLException("AlrogithmBase.ctor(trainingSample=null|empty)");
 
-      m_TrainingSample = new ClassifiedSample(classifiedSample);
+      m_TrainingSample = new ClassifiedSample(trainingSample);
       m_Classes = m_TrainingSample.Classes.ToDictionary(c => c.Name);
     }
 

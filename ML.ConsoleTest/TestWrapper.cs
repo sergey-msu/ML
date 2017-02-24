@@ -188,9 +188,9 @@ namespace ML.ConsoleTest
     {
       var patterns = getSimpleLogicPatterns();
 
-      var alg = new DecisionTreeAlgorithm(Data.TrainingSample);
+      var alg = new DecisionTreeID3Algorithm(Data.TrainingSample);
       var informativity = new DonskoyIndex();
-      alg.Train_ID3(patterns, informativity);
+      alg.Train(patterns, informativity);
 
       Console.WriteLine("Errors:");
       var errors = alg.GetErrors(Data.Data);

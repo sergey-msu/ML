@@ -27,7 +27,7 @@ namespace ML.ConsoleTest
 
     public readonly DataWrapper Data;
 
-    public void Run(IAlgorithm algorithm)
+    public void Run(ISupervisedAlgorithm algorithm)
     {
       var fn = string.Format("data/{0}-{1:yyyyMMdd-hhmmss}.csv", algorithm.ID, DateTime.Now);
       using (var file = File.Create(fn))
@@ -49,7 +49,7 @@ namespace ML.ConsoleTest
       m_YCnt = 200;
     }
 
-    private void doCalc(IAlgorithm algorithm, StreamWriter writer)
+    private void doCalc(ISupervisedAlgorithm algorithm, StreamWriter writer)
     {
       for (var k=0; k<Math.Max(m_XCnt, m_YCnt); k++)
       {

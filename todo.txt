@@ -30,6 +30,13 @@ CURRENT:
   - testing with real images
   - cover with tests
 
+ - General ML architcture review
+   - review/rewrite Algorithm architecture
+
+ - Cover all algorithm logic with unit tests
+
+ - Implement more algorithms
+   - implement C4.5 algorithm for decision trees
 
 DONE:
 

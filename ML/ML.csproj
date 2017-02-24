@@ -81,8 +81,10 @@
     <Compile Include="Core\Registry.cs" />
     <Compile Include="Core\ComputingNetworks\Contracts.cs" />
     <Compile Include="Core\ComputingNetworks\SequenceNode.cs" />
-    <Compile Include="LogicalMethods\Algorithms\DecisionTreeAlgorithm.cs" />
+    <Compile Include="LogicalMethods\Algorithms\DecisionTreeID3Algorithm.cs" />
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />
+    <Compile Include="LogicalMethods\Model\DecisionNode.cs" />
+    <Compile Include="LogicalMethods\Model\DecisionTree.cs" />
     <Compile Include="MetricalMethods\Algorithms\AlgorithmBases.cs" />
     <Compile Include="MetricalMethods\Algorithms\NearestKNeighboursAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\NearestKWeighedNeighboursAlgorithm.cs" />
