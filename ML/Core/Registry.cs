@@ -88,6 +88,7 @@ namespace ML.Core
       private static readonly TanhActivation     m_Tanh       = new TanhActivation();
       private static readonly ExpActivation      m_Exp        = new ExpActivation();
       private static readonly SignActivation     m_Sign       = new SignActivation();
+      private static readonly Dictionary<double, RationalActivation>    m_Rationals = new Dictionary<double, RationalActivation>();
       private static readonly Dictionary<double, ShiftedStepActivation> m_ShiftedSteps= new Dictionary<double, ShiftedStepActivation>();
 
       public static readonly Dictionary<string, IFunction> ByID = new Dictionary<string, IFunction>
@@ -117,6 +118,17 @@ namespace ML.Core
         {
           result = new ShiftedStepActivation(p);
           m_ShiftedSteps[p] = result;
+        }
+
+        return result;
+      }
+      public static RationalActivation Rational(double p)
+      {
+        RationalActivation result;
+        if (!m_Rationals.TryGetValue(p, out result))
+        {
+          result = new RationalActivation(p);
+          m_Rationals[p] = result;
         }
 
         return result;

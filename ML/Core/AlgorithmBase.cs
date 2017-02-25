@@ -128,8 +128,9 @@ namespace ML.Core
     /// </summary>
     public Dictionary<string, Class> Classes { get { return m_Classes; } }
 
+
     /// <summary>
-    /// Classify object
+    /// Maps object to corresponding class
     /// </summary>
     public abstract Class Classify(Point x);
 

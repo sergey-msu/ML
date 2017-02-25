@@ -3,7 +3,7 @@ using ML.Contracts;
 using ML.Core;
 using ML.Core.ComputingNetworks;
 
-namespace ML.NeuralMethods.Networks
+namespace ML.NeuralMethods.Model
 {
   /// <summary>
   /// Represents artificial neural layer as a list of neurons
@@ -29,6 +29,7 @@ namespace ML.NeuralMethods.Networks
         throw new MLException("NeuronLayer.ctor(network=null)");
 
       m_Network = network;
+      UseBias = m_Network.UseBias;
     }
 
 
@@ -38,7 +39,8 @@ namespace ML.NeuralMethods.Networks
     public int InputDim { get { return m_InputDim; } }
 
     /// <summary>
-    /// If true, adds artificial +1 input value in the and of input data array
+    /// If true, adds artificial +1 input value in the very end of input data array.
+    /// All layers inherit this value by default
     /// </summary>
     public bool UseBias { get; set; }
 
@@ -88,16 +90,7 @@ namespace ML.NeuralMethods.Networks
       if (InputDim != input.Length)
         throw new MLException("Incorret input vector dimension");
 
-      var data = input;
-
-      if (UseBias)
-      {
-        data = new double[input.Length + 1];
-        Array.Copy(input, 0, data, 0, input.Length);
-        data[input.Length] = 1.0D;
-      }
-
-      var result = base.Calculate(data);
+      var result = base.Calculate(input);
 
       if (NormOutput)
       {

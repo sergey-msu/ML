@@ -4,10 +4,10 @@ using ML.Contracts;
 using ML.Core.ComputingNetworks;
 using ML.Core;
 
-namespace ML.NeuralMethods.Networks
+namespace ML.NeuralMethods.Model
 {
   /// <summary>
-  /// Represents artificial neural network: set of layers with neuron nodes and weighted connections
+  /// Represents feedforward artificial neural network: set of layers with neuron nodes and weighted connections
   /// </summary>
   public class NeuralNetwork : SequenceNode<double[], NeuralLayer>
   {
@@ -23,7 +23,8 @@ namespace ML.NeuralMethods.Networks
     public int InputDim { get; set; }
 
     /// <summary>
-    /// If true, adds artificial +1 input value in the and of input data array
+    /// If true, adds artificial +1 input value in the very end of input data array.
+    /// All layers inherit this value by default but may override it after creation
     /// </summary>
     public bool UseBias { get; set; }
 
@@ -44,7 +45,7 @@ namespace ML.NeuralMethods.Networks
     /// <summary>
     /// Creates new neural layer and adds the result in the end of layer list
     /// </summary>
-    public NeuralLayer CreateLayer()
+    public virtual NeuralLayer CreateLayer()
     {
       var len = SubNodes.Length;
       var inputDim = (len <= 0) ? InputDim : SubNodes[len-1].SubNodes.Length;
@@ -63,16 +64,7 @@ namespace ML.NeuralMethods.Networks
       if (InputDim != input.Length)
         throw new MLException("Incorret input vector dimension");
 
-      double[] data = input;
-
-      if (UseBias)
-      {
-        data = new double[input.Length + 1];
-        Buffer.BlockCopy(input, 0, data, 0, input.Length);
-        data[input.Length] = 1.0D;
-      }
-
-      return base.Calculate(data);
+      return base.Calculate(input);
     }
 
     public override void DoBuild()

@@ -5,7 +5,7 @@ using ML.Contracts;
 using ML.Core;
 using ML.Core.ComputingNetworks;
 
-namespace ML.NeuralMethods.Networks
+namespace ML.NeuralMethods.Model
 {
   /// <summary>
   /// Represents McCulloch–Pitts artificial neuron: a node with activation function and a list of pairs (index, weight)
@@ -14,18 +14,20 @@ namespace ML.NeuralMethods.Networks
   {
     private readonly NeuralLayer m_Layer;
     private IFunction m_ActivationFunction;
-    protected readonly int m_InputDim;
+    protected int m_InputDim;
+    protected bool m_UseBias;
 
-    public Neuron(int inputDim)
+    public Neuron(int inputDim, bool useBias)
     {
       if (inputDim <= 0)
         throw new MLException("Neuron.ctor(inputDim<=0)");
 
       m_InputDim = inputDim;
+      m_UseBias = useBias;
     }
 
     public Neuron(NeuralLayer layer, int inputDim)
-      : this(inputDim)
+      : this(inputDim, layer.UseBias)
     {
       if (layer==null)
         throw new MLException("Neuron.ctor(layer=null)");
@@ -51,6 +53,14 @@ namespace ML.NeuralMethods.Networks
     {
       get { return m_ActivationFunction; }
       set { m_ActivationFunction = value; }
+    }
+
+    /// <summary>
+    /// Whether or not use bias connection - net value shift
+    /// </summary>
+    public bool UseBias
+    {
+      get { return m_UseBias; }
     }
 
     /// <summary>
@@ -90,22 +100,24 @@ namespace ML.NeuralMethods.Networks
 
   /// <summary>
   /// Represents McCulloch–Pitts artificial neuron: a node with activation function and a list of pairs (index, weight).
-  /// FlatNeuron stores whole array of weights even if there are always-zero weights (connetion is not exist).
+  /// FullNeuron stores whole array of weights even if there are always-zero weights (connetion is not exist).
   /// For a sparse-weighted neurons, please see SparseNeuron class
   /// </summary>
-  public class FlatNeuron : Neuron
+  public class FullNeuron : Neuron
   {
     private double[] m_Weights;
 
-    public FlatNeuron(int inputDim)
-      : base(inputDim)
+    public FullNeuron(int inputDim, bool useBias)
+      : base(inputDim, useBias)
     {
-      m_Weights = new double[inputDim];
+      var dim = m_UseBias ? inputDim+1 : inputDim;
+      m_Weights = new double[dim];
     }
 
-    public FlatNeuron(NeuralLayer layer, int inputDim) : base(layer, inputDim)
+    public FullNeuron(NeuralLayer layer, int inputDim) : base(layer, inputDim)
     {
-      m_Weights = new double[inputDim];
+      var dim = m_UseBias ? inputDim+1 : inputDim;
+      m_Weights = new double[dim];
     }
 
 
@@ -118,14 +130,14 @@ namespace ML.NeuralMethods.Networks
     {
       get
       {
-        if (idx < 0 || idx > m_InputDim)
+        if (idx < 0 || (idx > m_InputDim) || (!m_UseBias && idx == m_InputDim))
           throw new IndexOutOfRangeException();
 
         return m_Weights[idx];
       }
       set
       {
-        if (idx < 0 || idx > m_InputDim)
+        if (idx < 0 || (idx > m_InputDim) || (!m_UseBias && idx == m_InputDim))
           throw new IndexOutOfRangeException();
 
         m_Weights[idx] = value;
@@ -140,6 +152,8 @@ namespace ML.NeuralMethods.Networks
 
       for (int i=0; i<len; i++)
         value += m_Weights[i] * input[i];
+
+      if (m_UseBias) value += m_Weights[len]; // bias weight is the last element of weight array (by definition)
 
       return value;
     }
@@ -176,14 +190,14 @@ namespace ML.NeuralMethods.Networks
   /// Represents McCulloch–Pitts artificial neuron: a node with activation function and a list of pairs (index, weight).
   /// Optimized for sparse data, i.e. when only some weights are non-zero.
   /// Empirical threshold value of non-zero weights is 15-20%
-  /// (i.e. use SparseNeuron if only l.t. 15-20% of neuron weights are non-zero; othervise use FlatNeuron)
+  /// (i.e. use SparseNeuron if only l.t. 15-20% of neuron weights are non-zero; othervise use FullNeuron)
   /// </summary>
   public class SparseNeuron : Neuron
   {
     private Dictionary<int, double> m_Weights;
 
-    public SparseNeuron(int inputDim)
-      : base(inputDim)
+    public SparseNeuron(int inputDim, bool useBias)
+      : base(inputDim, useBias)
     {
       m_Weights = new Dictionary<int, double>();
     }
@@ -203,7 +217,7 @@ namespace ML.NeuralMethods.Networks
     {
       get
       {
-        if (idx < 0 || idx > m_InputDim)
+        if (idx < 0 || (idx > m_InputDim) || (!m_UseBias && idx == m_InputDim))
           throw new IndexOutOfRangeException();
 
         double result;
@@ -214,7 +228,7 @@ namespace ML.NeuralMethods.Networks
       }
       set
       {
-        if (idx < 0 || idx > m_InputDim)
+        if (idx < 0 || (idx > m_InputDim) || (!m_UseBias && idx == m_InputDim))
           throw new IndexOutOfRangeException();
 
         m_Weights[idx] = value;;
@@ -237,7 +251,12 @@ namespace ML.NeuralMethods.Networks
       var count = m_Weights.Count;
 
       foreach (var wdata in m_Weights)
-        value += wdata.Value * input[wdata.Key];
+      {
+        if (wdata.Key == input.Length) // bias weight is the last element of weight array (by definition)
+          value += wdata.Value;
+        else
+          value += wdata.Value * input[wdata.Key];
+      }
 
       return value;
     }

@@ -1,8 +1,15 @@
 CURRENT:
 
+- [INPROG] implement Perceptron algorithm according to new CN architecture
+  - [DONE] refactor UseBias ( -> neurons threshold as additional parameter?) + cover with tests
+  - [INPROG] Perceptron class
+  - simple learning
+  - backpropagation learning
+  - Accord learning
+  - cover with tests
+
 - [INPROG] Play with ACCORD Framework
   - [INPROG] compare with ML (write benchmarks in .Tests assembly)
-  - [DONE] FlatNeuron and SparseNeuron added to support full-conencted NN along with the sparse ones
 
 - General CN architecture
   - Read https://tproger.ru/translations/neural-network-zoo-1/ - NN zoo
@@ -10,10 +17,6 @@ CURRENT:
   - develop way to create simple base networks (factory methods)
   - add network-wide global context
   - review architecture: public/internal members - try to use assembly from ouside
-
-- implement Perceptron algorithm according to new CN architecture
-  - implement
-  - cover with tests
 
 - implement Gradient Descent algorithm for CN Perceptron
   - with back propagation
@@ -32,6 +35,8 @@ CURRENT:
 
  - General ML architcture review
    - review/rewrite Algorithm architecture
+     (may be extract Result:TModel property in AlgorithmBase,
+      general Train() method that fills the Result in protected abstract DoTrain() method)
 
  - Cover all algorithm logic with unit tests
 
@@ -52,4 +57,5 @@ DONE:
 - rewrite all NN code according to new CN architecture
   - rewrite NN
   - cover with tests
+  - FlatNeuron and SparseNeuron added to support full-conencted NN along with the sparse ones
 
