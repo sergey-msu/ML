@@ -72,23 +72,9 @@ namespace ML.NeuralMethods.Model
       if (InputDim <= 0)
         throw new MLException("Input dimension has not been set");
 
-      base.DoBuild();
-
-      var inputDim = InputDim;
       ActivationFunction = ActivationFunction ?? Registry.ActivationFunctions.Identity;
 
-      for (int i=0; i<SubNodes.Length; i++)
-      {
-        var layer = SubNodes[i];
-        if (layer.ActivationFunction==null)
-          layer.ActivationFunction = ActivationFunction;
-        for (int j=0; j<layer.SubNodes.Length; j++)
-        {
-          var node = layer.SubNodes[j];
-          if (node.ActivationFunction==null)
-            node.ActivationFunction = layer.ActivationFunction;
-        }
-      }
+      base.DoBuild();
     }
   }
 }

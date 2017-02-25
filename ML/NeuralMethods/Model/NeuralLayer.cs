@@ -98,8 +98,12 @@ namespace ML.NeuralMethods.Model
         var len = result.Length;
         for (int i = 0; i < len; i++)
           sum += Math.Abs(result[i]);
-        for (int i = 0; i < len; i++)
-          result[i] /= sum;
+
+        if (sum > 0)
+        {
+          for (int i = 0; i < len; i++)
+            result[i] /= sum;
+        }
       }
 
       return result;
@@ -110,9 +114,10 @@ namespace ML.NeuralMethods.Model
       if (InputDim <= 0)
         throw new MLException("Input dimension has not been set");
 
-      base.DoBuild();
+      if (ActivationFunction==null)
+        ActivationFunction = (Network != null ? Network.ActivationFunction : null) ?? Registry.ActivationFunctions.Identity;
 
-      ActivationFunction = ActivationFunction ?? Registry.ActivationFunctions.Identity;
+      base.DoBuild();
     }
   }
 }

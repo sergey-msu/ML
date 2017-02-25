@@ -91,17 +91,19 @@ namespace ML.NeuralMethods.Model
       return m_ActivationFunction.Value(m_Value);
     }
 
+    protected abstract double DoCalculate(double[] input);
+
+
     public override void DoBuild()
     {
       if (InputDim <= 0)
         throw new MLException("Input dimension has not been set");
 
+      if (ActivationFunction==null)
+        ActivationFunction = (Layer != null ? Layer.ActivationFunction : null) ?? Registry.ActivationFunctions.Identity;
+
       base.DoBuild();
-
-      ActivationFunction = ActivationFunction ?? Registry.ActivationFunctions.Identity;
     }
-
-    protected abstract double DoCalculate(double[] input);
   }
 
   /// <summary>

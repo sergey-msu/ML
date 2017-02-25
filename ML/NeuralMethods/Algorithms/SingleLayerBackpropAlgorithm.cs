@@ -12,39 +12,50 @@ namespace ML.NeuralMethods.Algorithms
   /// </summary>
   public class SingleLayerBackpropAlgorithm : NeuralNetworkAlgorithmBase
   {
-    #region CONST
-
-    public const bool DFT_USE_BIAS = true;
-    public const int DFT_EPOCH_COUNT = 1;
-    public const TrainingMode DTF_TRAINING_MODE = TrainingMode.Sequential;
-    public const double DFT_LEARNING_RATE = 0.1D;
-    public const double DFT_ERROR_LEVEL = 0.0D;
-    public static readonly IFunction DFT_ACTIVATION_FUNCTION = Registry.ActivationFunctions.Identity;
-
-    #endregion
-
     #region Inner
 
     public enum TrainingMode
     {
-      Sequential = 0,
+      Online = 0,
       Batch = 1
     }
+
+    public enum StopCriteria
+    {
+      ErrorMin = 0,
+      StepMin = 1
+    }
+
+    #endregion
+
+    #region CONST
+
+    public const bool DFT_USE_BIAS = true;
+    public const int DFT_EPOCH_COUNT = 1;
+    public const TrainingMode DTF_TRAINING_MODE = TrainingMode.Online;
+    public const StopCriteria DTF_STOP_CRITERIA = StopCriteria.ErrorMin;
+    public const double DFT_LEARNING_RATE = 0.1D;
+    public const double DFT_ERROR_LEVEL = 0.0D;
+    public const double DFT_STOP_STEP_LEVEL = 0.0D;
+    public static readonly IFunction DFT_ACTIVATION_FUNCTION = Registry.ActivationFunctions.Identity;
 
     #endregion
 
     private Dictionary<Class, double[]> m_ExpectedOutputs;
     private double m_Error;
+    private double m_Step;
 
-    protected SingleLayerBackpropAlgorithm(ClassifiedSample classifiedSample)
+    public SingleLayerBackpropAlgorithm(ClassifiedSample classifiedSample)
       : base(classifiedSample)
     {
-      UseBias = DFT_USE_BIAS;
       ActivationFunction = DFT_ACTIVATION_FUNCTION;
-      EpochCount = DFT_EPOCH_COUNT;
-      Mode = DTF_TRAINING_MODE;
-      LearningRate = DFT_LEARNING_RATE;
-      ErrorLevel = DFT_ERROR_LEVEL;
+      UseBias            = DFT_USE_BIAS;
+      EpochCount         = DFT_EPOCH_COUNT;
+      Mode               = DTF_TRAINING_MODE;
+      Stop               = DTF_STOP_CRITERIA;
+      StopStepLevel      = DFT_STOP_STEP_LEVEL;
+      LearningRate       = DFT_LEARNING_RATE;
+      ErrorLevel         = DFT_ERROR_LEVEL;
     }
 
     public override string ID { get { return "SL_BP"; } }
@@ -57,10 +68,13 @@ namespace ML.NeuralMethods.Algorithms
     public int EpochCount { get; set; }
     public double LearningRate { get ;set; }
     public TrainingMode Mode { get; set; }
+    public StopCriteria Stop { get; set; }
     public double ErrorLevel { get; set; }
+    public double StopStepLevel { get; set; }
     public double[] InitialWeights { get; set; }
 
     public double Error { get { return m_Error; } }
+    public double Step { get { return m_Step; } }
 
 
     protected override NeuralNetwork DoTrain()
@@ -98,7 +112,7 @@ namespace ML.NeuralMethods.Algorithms
 
       for (int i=0; i<count; i++)
       {
-        var cls = Classes.FirstOrDefault(p => (int)p.Value.Value == i).Value;
+        var cls = Classes.FirstOrDefault(p => (int)p.Value.Value == i+1).Value;
         if (cls==null)
           throw new MLException(string.Format("There is no class with value {0}. It is neccessary to have full set of classes with values from 0 to {1}", i, count));
 
@@ -133,38 +147,42 @@ namespace ML.NeuralMethods.Algorithms
     private void doTrain(NeuralNetwork net)
     {
       int epochCount = EpochCount;
-      var terr2 = 0.0D;
 
       for (int epoch=0; epoch<epochCount; epoch++)
       {
-        terr2 = runEpoch(net);
-        if (terr2 < ErrorLevel) break;
+        runEpoch(net);
+        if (checkStopCriteria()) break;
       }
-
-      m_Error = terr2;
     }
 
-    private double runEpoch(NeuralNetwork net)
+    private void runEpoch(NeuralNetwork net)
     {
       int epochLen = TrainingSample.Count;
       var terr2 = 0.0D;
+      var tstep2 = 0.0D;
 
       foreach (var data in TrainingSample)
       {
-        terr2 += runIter(net, data);
+        double ierr2;
+        double istep2;
+        runIter(net, data, out ierr2, out istep2);
+
+        terr2 += ierr2;
+        tstep2 = Math.Max(tstep2, istep2);
       }
 
-      return terr2/epochLen;
+      m_Error = terr2/epochLen;
+      m_Step = tstep2;
     }
 
-    private double runIter(NeuralNetwork net, KeyValuePair<Point, Class> data)
+    private void runIter(NeuralNetwork net, KeyValuePair<Point, Class> data, out double ierr2, out double istep2)
     {
       var n = InputDim;
       var m = OutputDim;
       var rate = LearningRate;
-      var activation = ActivationFunction;
       var layer = net[0];
       var serr2 = 0.0D;
+      var sstep2 = 0.0D;
 
       // forward calculation
       var result = net.Calculate(data.Key);
@@ -176,17 +194,37 @@ namespace ML.NeuralMethods.Algorithms
         var neuron = layer[j];
         var oj = neuron.Value;
         var ej = expect[j] - result[j];
-        var dj = rate * ej * activation.Derivative(oj);
+        var dj = rate * ej * neuron.ActivationFunction.Derivative(oj);
 
         for (int i=0; i<n; i++)
-          neuron[i] += dj * data.Key[i];
+        {
+          var dwj = dj * data.Key[i];
+          neuron[i] += dwj;
+          sstep2 += dwj*dwj;
+        }
 
-        if (UseBias) neuron[n] += dj;
+        if (UseBias)
+        {
+          neuron[n] += dj;
+          sstep2 += dj*dj;
+        }
 
         serr2 += ej*ej;
       }
 
-      return serr2/2;
+      ierr2 = serr2/2;
+      istep2 = sstep2;
+    }
+
+    private bool checkStopCriteria()
+    {
+      if (Stop == StopCriteria.ErrorMin)
+        return m_Error < ErrorLevel;
+
+      if (Stop == StopCriteria.StepMin)
+        return m_Step < StopStepLevel;
+
+      return false;
     }
 
     #endregion

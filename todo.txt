@@ -2,9 +2,15 @@ CURRENT:
 
 - [INPROG] implement Perceptron algorithm according to new CN architecture
   - [DONE] refactor UseBias ( -> neurons threshold as additional parameter?) + cover with tests
-  - [INPROG] Perceptron class
+  - [DONE] Perceptron algorithm
   - [INPROG] backpropagation learning (+ play with public/private props/fields)
-  - batch learning
+  - [INPROG] batch learning
+  - all above for 1 Hidden Layet NN
+  - cover with tests
+
+- implement Gradient Descent algorithm for general NN
+  - with back propagation
+  - with stochastic
   - cover with tests
 
 - [INPROG] Play with ACCORD Framework
@@ -16,13 +22,6 @@ CURRENT:
   - develop way to create simple base networks (factory methods)
   - add network-wide global context
   - review architecture: public/internal members - try to use assembly from ouside
-
-- implement Gradient Descent algorithm for CN Perceptron
-  - with back propagation
-  - with stochastic
-  - all above for general NN
-  - cover with tests
-  - implement for NN/Perceptron
 
 - implement Convolution NN based on CN architecture
   - read more about Convolution NN

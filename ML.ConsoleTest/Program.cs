@@ -16,17 +16,15 @@ namespace ML.ConsoleTest
 
     static void Main(string[] args)
     {
-      testNewNetworkArchitecture();
-
       //generateNormal2Classes(200, 200);
       //generateNormal3Classes(100, 100, 100);
 
       //var file = "primitive.csv";
       //var file = "iris.csv";
       //var file = "iris.trunk.2d.csv";
-      //var file = "normal.3classes.100.csv";
+      var file = "normal.3classes.100.csv";
       //var file = "normal.2classes.1000.csv";
-      var file = "normal.2classes.200.csv";
+      //var file = "normal.2classes.200.csv";
       //var file = "normal.3classes.1000.csv";
       //var file = "primitive3.csv";
       //var file = "ionosphere.csv";
@@ -39,11 +37,6 @@ namespace ML.ConsoleTest
 
       Console.WriteLine("DONE");
       Console.ReadLine();
-    }
-
-    static void testNewNetworkArchitecture()
-    {
-
     }
 
     private static void generateNormal2Classes(int n1, int n2)

@@ -204,11 +204,20 @@ namespace ML.ConsoleTest
 
     private void doPerceptronAlgorithmTest()
     {
-      //var epoch = 1;
-      //var alg = new PerceptronAlgorithm(Data.TrainingSample, Data.Dimension, 3, -0.5, 0.5);
-      //alg.Train_ErrorCorrection(epoch);
+      var alg = new SingleLayerBackpropAlgorithm(Data.TrainingSample)
+      {
+        EpochCount = 10000,
+        InputDim = 2,
+        OutputDim = 3,
+        UseBias = true,
+        LearningRate = 0.1D,
+        ActivationFunction = Registry.ActivationFunctions.Rational(1)
+      };
+      alg.Train();
 
-      //Visualizer.Run(alg);
+      Console.WriteLine(alg.Error);
+
+      Visualizer.Run(alg);
     }
 
 

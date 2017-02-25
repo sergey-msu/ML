@@ -1561,45 +1561,45 @@ namespace ML.Tests.UnitTests
 
     #endregion
 
-    [TestMethod]
-    public void ___Test()
-    {
-      var len = 40000;
-      var n1 = new FullNeuron(len, false);
-      var n2 = new SparseNeuron(len, false);
-      for (int i=0; i<len; i++)
-      {
-        n1[i] = i;
-        n2[i] = i;
-      }
-      n1.Build();
-      n2.Build();
+    //[TestMethod]
+    //public void ___Test()
+    //{
+    //  var len = 40000;
+    //  var n1 = new FullNeuron(len, false);
+    //  var n2 = new SparseNeuron(len, false);
+    //  for (int i=0; i<len; i++)
+    //  {
+    //    n1[i] = i;
+    //    n2[i] = i;
+    //  }
+    //  n1.Build();
+    //  n2.Build();
 
-      var times = 1;
-      var timer = new Stopwatch();
+    //  var times = 1;
+    //  var timer = new Stopwatch();
 
-      timer.Restart();
-      for (int t=0; t<times; t++)
-      for (int i=0; i<len; i++)
-      {
-        double value;
-        n2.TryGetParam(i, out value);
-        n2.TrySetParam(i, 234, false);
-      }
-      timer.Stop();
-      Console.WriteLine("sparse neuron: {0}", timer.Elapsed.TotalMilliseconds/times);
+    //  timer.Restart();
+    //  for (int t=0; t<times; t++)
+    //  for (int i=0; i<len; i++)
+    //  {
+    //    double value;
+    //    n2.TryGetParam(i, out value);
+    //    n2.TrySetParam(i, 234, false);
+    //  }
+    //  timer.Stop();
+    //  Console.WriteLine("sparse neuron: {0}", timer.Elapsed.TotalMilliseconds/times);
 
-      timer.Restart();
-      for (int t=0; t<times; t++)
-      for (int i=0; i<len; i++)
-      {
-        double value;
-        n1.TryGetParam(i, out value);
-        n1.TrySetParam(i, 234, false);
-      }
-      timer.Stop();
-      Console.WriteLine("full neuron: {0}", timer.Elapsed.TotalMilliseconds/times);
+    //  timer.Restart();
+    //  for (int t=0; t<times; t++)
+    //  for (int i=0; i<len; i++)
+    //  {
+    //    double value;
+    //    n1.TryGetParam(i, out value);
+    //    n1.TrySetParam(i, 234, false);
+    //  }
+    //  timer.Stop();
+    //  Console.WriteLine("full neuron: {0}", timer.Elapsed.TotalMilliseconds/times);
 
-    }
+    //}
   }
 }

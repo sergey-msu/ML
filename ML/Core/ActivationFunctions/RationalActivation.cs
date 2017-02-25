@@ -25,13 +25,13 @@ namespace ML.Core.ActivationFunctions
 
     public double Value(double r)
     {
-      return r / (Math.Abs(r) + m_Shift);
+      return r / (2*(Math.Abs(r) + m_Shift)) + 0.5D;
     }
 
     public double Derivative(double r)
     {
       var d = Math.Abs(r) + m_Shift;
-      return m_Shift / (d*d);
+      return m_Shift / (2*d*d);
     }
   }
 }
