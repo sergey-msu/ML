@@ -3,14 +3,31 @@
 namespace ML.Core.ComputingNetworks
 {
   /// <summary>
-  /// Index for fast search parameter within computing node
+  /// Represents abstract computing node
   ///
   /// TIn -> TOut
   ///
   /// </summary>
   /// <typeparam name="TIn">Input object type</typeparam>
   /// <typeparam name="TOut">Output object type</typeparam>
-  public abstract class ComputingNode<TIn, TOut> : IComputingNode<TIn, TOut>
+  public abstract class ComputingNode<TIn, TOut> : ComputingNode, IComputingNode<TIn, TOut>
+  {
+    public override object Calculate(object input)
+    {
+      return Calculate((TIn)input);
+    }
+
+    public abstract TOut Calculate(TIn input);
+  }
+
+
+  /// <summary>
+  /// Represents abstract computing node
+  ///
+  /// TIn -> TOut
+  ///
+  /// </summary>
+  public abstract class ComputingNode : IComputingNode
   {
     private ParamIdx m_ParIdx;
 
@@ -26,7 +43,7 @@ namespace ML.Core.ComputingNetworks
     /// <summary>
     /// Performs calculations and returns strong typed result
     /// </summary>
-    public abstract TOut Calculate(TIn input);
+    public abstract object Calculate(object input);
 
     /// <summary>
     /// Builds layer before use
@@ -54,6 +71,31 @@ namespace ML.Core.ComputingNetworks
       return endIdx;
     }
 
+    ///// <summary>
+    ///// Tries to return subnode which owns parameter with specified index
+    ///// WARNING: override this method carefully!
+    ///// Do not use base. as base methods operate with base class index which may differ from exact class index
+    ///// and so it will return wrong results. Override this method COMPLETELY or not override at all
+    ///// </summary>
+    ///// <param name="idx">Linear index of the parameter</param>
+    ///// <param name="TNode">Subnode</param>
+    ///// <param name="subidx">Internal index part within the subnode</param>
+    ///// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
+    //public virtual bool TryGetSubnodeByParamIndex<TNode>(int idx, out TNode result, out int subidx)
+    //  where TNode : class, IComputingNode
+    //{
+    //  if (!m_ParIdx.CheckEnd(idx))
+    //  {
+    //    result = null;
+    //    subidx = -1;
+    //    return false;
+    //  }
+    //
+    //  result = this as TNode;
+    //  subidx = result != null ? idx - m_ParIdx.Start : -1;
+    //  return result != null;
+    //}
+
     /// <summary>
     /// Tries to return parameter value at some position
     /// WARNING: override this method carefully!
@@ -65,6 +107,24 @@ namespace ML.Core.ComputingNetworks
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
     public virtual bool TryGetParam(int idx, out double value)
     {
+      //if (!m_ParIdx.CheckEnd(idx))
+      //{
+      //  value = 0;
+      //  return false;
+      //}
+      //
+      //ComputingNode subnode;
+      //int subidx;
+      //var res = TryGetSubnodeByParamIndex(idx, out subnode, out subidx);
+      //if (res)
+      //{
+      //  value = subnode.DoGetParam(subidx);
+      //  return true;
+      //}
+      //
+      //value = 0;
+      //return false;
+
       if (!m_ParIdx.CheckEnd(idx))
       {
         value = 0;
@@ -87,6 +147,20 @@ namespace ML.Core.ComputingNetworks
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
     public virtual bool TrySetParam(int idx, double value, bool isDelta)
     {
+      //if (!m_ParIdx.CheckEnd(idx))
+      //  return false;
+      //
+      //ComputingNode subnode;
+      //int subidx;
+      //var res = TryGetSubnodeByParamIndex(idx, out subnode, out subidx);
+      //if (res)
+      //{
+      //  subnode.DoSetParam(subidx, value, isDelta);
+      //  return true;
+      //}
+      //
+      //return false;
+
       if (!m_ParIdx.CheckEnd(idx))
         return false;
 

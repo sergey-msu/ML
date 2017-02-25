@@ -3,9 +3,8 @@ CURRENT:
 - [INPROG] implement Perceptron algorithm according to new CN architecture
   - [DONE] refactor UseBias ( -> neurons threshold as additional parameter?) + cover with tests
   - [INPROG] Perceptron class
-  - simple learning
-  - backpropagation learning
-  - Accord learning
+  - [INPROG] backpropagation learning (+ play with public/private props/fields)
+  - batch learning
   - cover with tests
 
 - [INPROG] Play with ACCORD Framework

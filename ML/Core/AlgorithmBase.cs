@@ -62,9 +62,9 @@ namespace ML.Core
       /// <summary>
       /// Represents classification error
       /// </summary>
-      public class Error
+      public class ErrorInfo
       {
-        public Error(Point point, Class realClass, Class calcClass)
+        public ErrorInfo(Point point, Class realClass, Class calcClass)
         {
           Opject = point;
           RealClass = realClass;
@@ -143,15 +143,15 @@ namespace ML.Core
     /// <summary>
     /// Returns all errors of the given algorithm on some initially classified sample
     /// </summary>
-    public IEnumerable<Error> GetErrors(ClassifiedSample classifiedSample)
+    public IEnumerable<ErrorInfo> GetErrors(ClassifiedSample classifiedSample)
     {
-      var errors = new List<Error>();
+      var errors = new List<ErrorInfo>();
 
       foreach (var pData in classifiedSample)
       {
         var res = this.Classify(pData.Key);
         if (res != pData.Value)
-          errors.Add(new Error(pData.Key, pData.Value, res));
+          errors.Add(new ErrorInfo(pData.Key, pData.Value, res));
       }
 
       return errors;

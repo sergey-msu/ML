@@ -16,6 +16,7 @@ namespace ML.NeuralMethods.Model
     private IFunction m_ActivationFunction;
     protected int m_InputDim;
     protected bool m_UseBias;
+    private double m_Value;
 
     public Neuron(int inputDim, bool useBias)
     {
@@ -35,6 +36,11 @@ namespace ML.NeuralMethods.Model
       m_Layer = layer;
     }
 
+
+    /// <summary>
+    /// Caclulated pure value (before applying activation function)
+    /// </summary>
+    public double Value { get { return m_Value; } }
 
     /// <summary>
     /// Dimension of input vector
@@ -81,8 +87,8 @@ namespace ML.NeuralMethods.Model
       if (InputDim != input.Length)
         throw new MLException("Incorret input vector dimension");
 
-      var value = DoCalculate(input);
-      return m_ActivationFunction.Value(value);
+      m_Value = DoCalculate(input);
+      return m_ActivationFunction.Value(m_Value);
     }
 
     public override void DoBuild()

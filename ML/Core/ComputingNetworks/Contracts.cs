@@ -5,9 +5,7 @@ namespace ML.Core.ComputingNetworks
   /// <summary>
   /// Contract for a computing node as a black box that can accomplish some calculations
   /// </summary>
-  /// <typeparam name="TIn">Input object type</typeparam>
-  /// <typeparam name="TOut">Output object type</typeparam>
-  public interface IComputingNode<TIn, TOut>
+  public interface IComputingNode
   {
     /// <summary>
     /// Returns number of node parameters
@@ -17,12 +15,24 @@ namespace ML.Core.ComputingNetworks
     /// <summary>
     /// Calculates node result
     /// </summary>
-    TOut Calculate(TIn input);
+    object Calculate(object input);
 
     /// <summary>
     /// Builds node before use (build search index etc)
     /// </summary>
     void Build();
+
+    ///// <summary>
+    ///// Tries to return subnode which owns parameter with specified index
+    ///// WARNING: override this method carefully!
+    ///// Do not use base. as base methods operate with base class index which may differ from exact class index
+    ///// and so it will return wrong results. Override this method COMPLETELY or not override at all
+    ///// </summary>
+    ///// <param name="idx">Linear index of the parameter</param>
+    ///// <param name="TNode">Subnode</param>
+    ///// <param name="subidx">Internal index part within the subnode</param>
+    ///// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
+    //bool TryGetSubnodeByParamIndex<TNode>(int idx, out TNode result, out int subidx) where TNode : class, IComputingNode;
 
     /// <summary>
     /// Tries to update node parameters
@@ -49,6 +59,19 @@ namespace ML.Core.ComputingNetworks
     /// <param name="value">Parameter value</param>
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
     bool TryGetParam(int idx, out double value);
+  }
+
+  /// <summary>
+  /// Contract for a computing node as a black box that can accomplish some calculations
+  /// </summary>
+  /// <typeparam name="TIn">Input object type</typeparam>
+  /// <typeparam name="TOut">Output object type</typeparam>
+  public interface IComputingNode<TIn, TOut> : IComputingNode
+  {
+    /// <summary>
+    /// Calculates node result
+    /// </summary>
+    TOut Calculate(TIn input);
   }
 
 }
