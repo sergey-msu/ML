@@ -210,6 +210,8 @@ namespace ML.ConsoleTest
         InputDim = 2,
         OutputDim = 3,
         UseBias = true,
+        BatchSize = 10,
+        Mode = SingleLayerBackpropAlgorithm.TrainingMode.Batch,
         LearningRate = 0.1D,
         ActivationFunction = Registry.ActivationFunctions.Rational(1)
       };

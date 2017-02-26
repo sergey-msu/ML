@@ -3,9 +3,9 @@ CURRENT:
 - [INPROG] implement Perceptron algorithm according to new CN architecture
   - [DONE] refactor UseBias ( -> neurons threshold as additional parameter?) + cover with tests
   - [DONE] Perceptron algorithm
-  - [INPROG] backpropagation learning (+ play with public/private props/fields)
-  - [INPROG] batch learning
-  - all above for 1 Hidden Layet NN
+  - [DONE] backpropagation learning (+ play with public/private props/fields)
+  - [DONE] batch learning
+  - all above for 1 Hidden Layer NN
   - cover with tests
 
 - implement Gradient Descent algorithm for general NN
