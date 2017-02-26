@@ -174,12 +174,7 @@ namespace ML.ConsoleTest
       Console.WriteLine("Margin:");
       calculateMargin(alg);
 
-      Console.WriteLine("Errors:");
-      var errors = alg.GetErrors(Data.Data);
-      var ec = errors.Count();
-      var dc = Data.Data.Count;
-      var pct = Math.Round(100.0F * ec / dc, 2);
-      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+      outputError(alg);
 
       Visualizer.Run(alg);
     }
@@ -192,12 +187,7 @@ namespace ML.ConsoleTest
       var informativity = new DonskoyIndex();
       alg.Train(patterns, informativity);
 
-      Console.WriteLine("Errors:");
-      var errors = alg.GetErrors(Data.Data);
-      var ec = errors.Count();
-      var dc = Data.Data.Count;
-      var pct = Math.Round(100.0F * ec / dc, 2);
-      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+      outputError(alg);
 
       Visualizer.Run(alg);
     }
@@ -219,9 +209,20 @@ namespace ML.ConsoleTest
 
       Console.WriteLine(alg.Error);
 
+      outputError(alg);
+
       Visualizer.Run(alg);
     }
 
+    private void outputError(AlgorithmBase alg)
+    {
+      Console.WriteLine("Errors:");
+      var errors = alg.GetErrors(Data.Data);
+      var ec = errors.Count();
+      var dc = Data.Data.Count;
+      var pct = Math.Round(100.0F * ec / dc, 2);
+      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+    }
 
     private void calculateMargin(IMetricAlgorithm algorithm)
     {

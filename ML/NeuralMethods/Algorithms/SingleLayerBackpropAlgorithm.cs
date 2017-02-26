@@ -264,9 +264,6 @@ namespace ML.NeuralMethods.Algorithms
                                Point data, Class cls,
                                out double ierr2, out double istep2)
     {
-      var n = InputDim;
-      var m = OutputDim;
-      var rate = LearningRate;
       var layer = net[0];
       var serr2 = 0.0D;
       var sstep2 = 0.0D;
@@ -276,14 +273,14 @@ namespace ML.NeuralMethods.Algorithms
       var expect = m_ExpectedOutputs[cls];
 
       // error backpropagation
-      for (int j=0; j<m; j++)
+      for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = layer[j];
         var oj = neuron.Value;
         var ej = expect[j] - result[j];
-        var dj = rate * ej * neuron.ActivationFunction.Derivative(oj);
+        var dj = m_LearningRate * ej * neuron.ActivationFunction.Derivative(oj);
 
-        for (int i=0; i<n; i++)
+        for (int i=0; i<m_InputDim; i++)
         {
           var dwj = dj * data[i];
           neuron[i] += dwj;
@@ -292,7 +289,7 @@ namespace ML.NeuralMethods.Algorithms
 
         if (UseBias)
         {
-          neuron[n] += dj;
+          neuron[m_InputDim] += dj;
           sstep2 += dj*dj;
         }
 
@@ -318,8 +315,8 @@ namespace ML.NeuralMethods.Algorithms
 
     private void runBatchEpoch(NeuralNetwork net)
     {
-      int l = TrainingSample.Count;
-      var pcount = UseBias ? (InputDim+1)*OutputDim : InputDim*OutputDim;
+      var l = TrainingSample.Count;
+      var pcount = m_UseBias ? (m_InputDim+1)*m_OutputDim : m_InputDim*m_OutputDim;
       var deltas = new double[pcount];
       double ierr2;
       double terr2 = 0.0D;
@@ -332,7 +329,7 @@ namespace ML.NeuralMethods.Algorithms
       {
         runBatchIter(net, pdata.Key, pdata.Value, deltas, out ierr2);
 
-        if (bcount>=BatchSize || idx>=l-1)
+        if (bcount>=m_BatchSize || idx>=l-1)
         {
           updateWeights(net, deltas, out istep2);
           tstep2 = Math.Max(tstep2, istep2);
@@ -353,9 +350,6 @@ namespace ML.NeuralMethods.Algorithms
                               Point data, Class cls,
                               double[] deltas, out double ierr2)
     {
-      var n = InputDim;
-      var m = OutputDim;
-      var rate = LearningRate;
       var layer = net[0];
       var serr2 = 0.0D;
       var pidx = 0;
@@ -364,21 +358,21 @@ namespace ML.NeuralMethods.Algorithms
       var result = net.Calculate(data);
       var expect = m_ExpectedOutputs[cls];
 
-      // error backpropagation
-      for (int j=0; j<m; j++)
+      // error backpropagation & weights update
+      for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = layer[j];
         var oj = neuron.Value;
         var ej = expect[j] - result[j];
-        var dj = rate * ej * neuron.ActivationFunction.Derivative(oj);
+        var dj = m_LearningRate * ej * neuron.ActivationFunction.Derivative(oj);
 
-        for (int i=0; i<n; i++)
+        for (int i=0; i<m_InputDim; i++)
         {
           var dwj = dj * data[i];
           deltas[pidx++] += dwj;
         }
 
-        if (UseBias)
+        if (m_UseBias)
           deltas[pidx++] += dj;
 
         serr2 += ej*ej;
@@ -389,17 +383,15 @@ namespace ML.NeuralMethods.Algorithms
 
     public void updateWeights(NeuralNetwork net, double[] deltas, out double istep2)
     {
-      var n = InputDim;
-      var m = OutputDim;
       var layer = net[0];
       var sstep2 = 0.0D;
       var pidx = 0;
 
-      for (int j=0; j<m; j++)
+      for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = layer[j];
 
-        for (int i=0; i<n; i++)
+        for (int i=0; i<m_InputDim; i++)
         {
           var dwj = deltas[pidx];
           deltas[pidx++] = 0;
@@ -408,12 +400,12 @@ namespace ML.NeuralMethods.Algorithms
           sstep2 += dwj*dwj;
         }
 
-        if (UseBias)
+        if (m_UseBias)
         {
           var dj = deltas[pidx];
           deltas[pidx++] = 0;
 
-          neuron[n] += dj;
+          neuron[m_InputDim] += dj;
           sstep2 += dj*dj;
         }
 
