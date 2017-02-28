@@ -1,17 +1,10 @@
 CURRENT:
 
-- [INPROG] implement Perceptron algorithm according to new CN architecture
-  - [DONE] refactor UseBias ( -> neurons threshold as additional parameter?) + cover with tests
-  - [DONE] Perceptron algorithm
-  - [DONE] backpropagation learning (+ play with public/private props/fields)
-  - [DONE] batch learning
-  - all above for 1 Hidden Layer NN
-  - cover with tests
+- [INPROG] implement Backpropagation algorithm (1 hidden layer)
+  - [INPROG] implement algorithm
 
-- implement Gradient Descent algorithm for general NN
-  - with back propagation
-  - with stochastic
-  - cover with tests
+- [INPROG] implement Backpropagation algorithm for general NN
+  - [INPROG] implement algorithm
 
 - [INPROG] Play with ACCORD Framework
   - [INPROG] compare with ML (write benchmarks in .Tests assembly)
@@ -42,6 +35,12 @@ CURRENT:
    - implement C4.5 algorithm for decision trees
 
 DONE:
+
+- implement Perceptron algorithm (no hidden layers)
+  - refactor UseBias ( -> neurons threshold as additional parameter?) + cover with tests
+  - Perceptron algorithm
+  - backpropagation learning
+  - batch learning
 
 - Computing Networks/Layers: develop unified approach to multi-typed layers NN: Layer<TIn, TOut>
   - develop architecture

@@ -39,6 +39,11 @@ namespace ML.NeuralMethods.Model
     public int InputDim { get { return m_InputDim; } }
 
     /// <summary>
+    /// Total count of neurons
+    /// </summary>
+    public int NeuronCount { get { return SubNodes.Length; } }
+
+    /// <summary>
     /// If true, adds artificial +1 input value in the very end of input data array.
     /// All layers inherit this value by default
     /// </summary>

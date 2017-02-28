@@ -42,33 +42,26 @@ namespace ML.NeuralMethods.Algorithms
     #endregion
 
     private Dictionary<Class, double[]> m_ExpectedOutputs;
-    private double       m_PrevError;
-    private double       m_Error;
-    private double       m_Step;
-    private IFunction    m_ActivationFunction;
-    private int          m_InputDim;
-    private int          m_OutputDim;
-    private bool         m_UseBias;
-    private int          m_EpochCount;
-    private double       m_LearningRate;
+    private double m_PrevError;
+    private double m_Error;
+    private double m_Step;
+    private bool m_UseBias;
+    private IFunction m_ActivationFunction;
+    private int m_InputDim;
+    private int m_OutputDim;
+    private int m_EpochCount;
+    private double m_LearningRate;
     private TrainingMode m_Mode;
-    private int          m_BatchSize;
+    private int m_BatchSize;
     private StopCriteria m_Stop;
-    private double       m_ErrorDelta;
-    private double       m_StopStepLevel;
-    private double[]     m_InitialWeights;
+    private double m_ErrorDelta;
+    private double m_StopStepLevel;
+    private double[] m_InitialWeights;
 
     public SingleLayerBackpropAlgorithm(ClassifiedSample classifiedSample)
       : base(classifiedSample)
     {
-      ActivationFunction = DFT_ACTIVATION_FUNCTION;
-      UseBias            = DFT_USE_BIAS;
-      EpochCount         = DFT_EPOCH_COUNT;
-      Mode               = DTF_TRAINING_MODE;
-      Stop               = DTF_STOP_CRITERIA;
-      StopStepLevel      = DFT_STOP_STEP_LEVEL;
-      LearningRate       = DFT_LEARNING_RATE;
-      ErrorDelta         = DFT_ERROR_DELTA;
+      initParams();
     }
 
     #region Properties
@@ -76,11 +69,6 @@ namespace ML.NeuralMethods.Algorithms
     public override string ID { get { return "SL_BP"; } }
     public override string Name { get { return "Single Layer Percentron with Backpropagation"; } }
 
-    public IFunction ActivationFunction
-    {
-      get { return m_ActivationFunction; }
-      set { m_ActivationFunction = value; }
-    }
     public int InputDim
     {
       get { return m_InputDim; }
@@ -95,6 +83,11 @@ namespace ML.NeuralMethods.Algorithms
     {
       get { return m_UseBias; }
       set { m_UseBias = value; }
+    }
+    public IFunction ActivationFunction
+    {
+      get { return m_ActivationFunction; }
+      set { m_ActivationFunction = value; }
     }
     public int EpochCount
     {
@@ -144,14 +137,14 @@ namespace ML.NeuralMethods.Algorithms
 
     protected override NeuralNetwork DoTrain()
     {
-      check();
+      checkParams();
       prepareExpectedOutputs();
       var net = constructNetwork();
 
       switch (Mode)
       {
         case TrainingMode.Online: doOnlineTrain(net); break;
-        case TrainingMode.Batch:  doBatchTrain(net); break;
+        case TrainingMode.Batch: doBatchTrain(net); break;
         default: throw new MLException("Unknown training mode");
       }
 
@@ -160,7 +153,19 @@ namespace ML.NeuralMethods.Algorithms
 
     #region .pvt
 
-    private void check()
+    private void initParams()
+    {
+      ActivationFunction = DFT_ACTIVATION_FUNCTION;
+      UseBias            = DFT_USE_BIAS;
+      EpochCount         = DFT_EPOCH_COUNT;
+      Mode               = DTF_TRAINING_MODE;
+      Stop               = DTF_STOP_CRITERIA;
+      StopStepLevel      = DFT_STOP_STEP_LEVEL;
+      LearningRate       = DFT_LEARNING_RATE;
+      ErrorDelta         = DFT_ERROR_DELTA;
+    }
+
+    private void checkParams()
     {
       if (ActivationFunction==null) throw new MLException("Activaltion function is null");
       if (InputDim <= 0) throw new MLException("Input dimension must be positive");
@@ -241,7 +246,7 @@ namespace ML.NeuralMethods.Algorithms
 
     private void runEpoch(NeuralNetwork net)
     {
-      int l = TrainingSample.Count;
+      int iters = TrainingSample.Count;
       double ierr2;
       double terr2 = 0.0D;
       double istep2;
@@ -256,7 +261,7 @@ namespace ML.NeuralMethods.Algorithms
       }
 
       m_PrevError = m_Error;
-      m_Error = terr2/l;
+      m_Error = terr2/iters;
       m_Step = tstep2;
     }
 
@@ -280,13 +285,13 @@ namespace ML.NeuralMethods.Algorithms
         var ej = expect[j] - result[j];
         var dj = m_LearningRate * ej * neuron.ActivationFunction.Derivative(oj);
 
+        // weights update
         for (int i=0; i<m_InputDim; i++)
         {
           var dwj = dj * data[i];
           neuron[i] += dwj;
           sstep2 += dwj*dwj;
         }
-
         if (UseBias)
         {
           neuron[m_InputDim] += dj;
@@ -358,7 +363,7 @@ namespace ML.NeuralMethods.Algorithms
       var result = net.Calculate(data);
       var expect = m_ExpectedOutputs[cls];
 
-      // error backpropagation & weights update
+      // error backpropagation & weights accumulation
       for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = layer[j];
@@ -367,10 +372,7 @@ namespace ML.NeuralMethods.Algorithms
         var dj = m_LearningRate * ej * neuron.ActivationFunction.Derivative(oj);
 
         for (int i=0; i<m_InputDim; i++)
-        {
-          var dwj = dj * data[i];
-          deltas[pidx++] += dwj;
-        }
+          deltas[pidx++] += dj * data[i];
 
         if (m_UseBias)
           deltas[pidx++] += dj;
@@ -396,7 +398,7 @@ namespace ML.NeuralMethods.Algorithms
           var dwj = deltas[pidx];
           deltas[pidx++] = 0;
 
-          neuron[i] += dwj;
+          neuron[i] += dwj/m_BatchSize;
           sstep2 += dwj*dwj;
         }
 
@@ -405,7 +407,7 @@ namespace ML.NeuralMethods.Algorithms
           var dj = deltas[pidx];
           deltas[pidx++] = 0;
 
-          neuron[m_InputDim] += dj;
+          neuron[m_InputDim] += dj/m_BatchSize;
           sstep2 += dj*dj;
         }
 

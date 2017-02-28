@@ -18,6 +18,11 @@ namespace ML.NeuralMethods.Model
     }
 
     /// <summary>
+    /// Total count of network layers (hidden + output)
+    /// </summary>
+    public int LayerCount { get { return SubNodes.Length; } }
+
+    /// <summary>
     /// Dimension of input vector
     /// </summary>
     public int InputDim { get; set; }

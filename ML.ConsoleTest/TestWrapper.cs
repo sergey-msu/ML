@@ -60,7 +60,8 @@ namespace ML.ConsoleTest
 
         //doDecisionTreeAlgorithmTest();
 
-        doPerceptronAlgorithmTest();
+        //doPerceptronAlgorithmTest();
+        doMultilayerNNAlgorithmTest();
       }
     }
 
@@ -200,8 +201,25 @@ namespace ML.ConsoleTest
         InputDim = 2,
         OutputDim = 3,
         UseBias = true,
-        BatchSize = 10,
         Mode = SingleLayerBackpropAlgorithm.TrainingMode.Batch,
+        LearningRate = 0.1D,
+        ActivationFunction = Registry.ActivationFunctions.Rational(1)
+      };
+      alg.Train();
+
+      Console.WriteLine(alg.Error);
+
+      outputError(alg);
+
+      Visualizer.Run(alg);
+    }
+
+    private void doMultilayerNNAlgorithmTest()
+    {
+      var alg = new MultiLayerBackpropAlgorithm(Data.TrainingSample, new[] { 2, 4, 3 })
+      {
+        EpochCount = 10000,
+        UseBias = true,
         LearningRate = 0.1D,
         ActivationFunction = Registry.ActivationFunctions.Rational(1)
       };
