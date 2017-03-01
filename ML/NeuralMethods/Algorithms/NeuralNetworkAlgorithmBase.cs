@@ -51,13 +51,22 @@ namespace ML.NeuralMethods.Algorithms
     }
 
     /// <summary>
+    /// Prepares all the data to algorithm training
+    /// </summary>
+    public void Build()
+    {
+      m_Result = DoBuild();
+    }
+
+    /// <summary>
     /// Teaches algorithm, produces Network output
     /// </summary>
     public void Train()
     {
-      m_Result = DoTrain();
+      DoTrain();
     }
 
-    protected abstract NeuralNetwork DoTrain();
+    protected abstract NeuralNetwork DoBuild();
+    protected abstract void DoTrain();
   }
 }

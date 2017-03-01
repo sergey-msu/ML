@@ -53,15 +53,22 @@ namespace ML.ConsoleTest
     {
       using (var runner = new Runner())
       {
+        var start = DateTime.Now;
+
         //doNearestNeighbourAlgorithmTest();
         //doNearestKNeighboursAlgorithmTest();
         //doParzenFixedAlgorithmTest();
         //doPotentialFixedAlgorithmTest();
-
         //doDecisionTreeAlgorithmTest();
 
         //doPerceptronAlgorithmTest();
+        //var stop = DateTime.Now;
+        //Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
+
+        //start = DateTime.Now;
         doMultilayerNNAlgorithmTest();
+        var stop = DateTime.Now;
+        Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
       }
     }
 
@@ -197,14 +204,14 @@ namespace ML.ConsoleTest
     {
       var alg = new SingleLayerBackpropAlgorithm(Data.TrainingSample)
       {
-        EpochCount = 10000,
+        EpochCount = 1000,
         InputDim = 2,
         OutputDim = 3,
         UseBias = true,
-        Mode = SingleLayerBackpropAlgorithm.TrainingMode.Batch,
-        LearningRate = 0.1D,
-        ActivationFunction = Registry.ActivationFunctions.Rational(1)
+        ActivationFunction = Registry.ActivationFunctions.Identity
       };
+      alg.Build();
+
       alg.Train();
 
       Console.WriteLine(alg.Error);
@@ -216,16 +223,39 @@ namespace ML.ConsoleTest
 
     private void doMultilayerNNAlgorithmTest()
     {
-      var alg = new MultiLayerBackpropAlgorithm(Data.TrainingSample, new[] { 2, 4, 3 })
+      var alg = new MultiLayerBackpropAlgorithm(Data.TrainingSample, new[] { 2, 2, 3 })
       {
         EpochCount = 10000,
         UseBias = true,
         LearningRate = 0.1D,
-        ActivationFunction = Registry.ActivationFunctions.Rational(1)
+        ActivationFunction = Registry.ActivationFunctions.Logistic(2)
       };
-      alg.Train();
+      alg.Build();
+      //alg.SetInitialWeights(new[] { 1.0D, 0.0D, 0.0D, 1.0D, 0.0D, 0.0D }, 0);
+      //alg.SetInitialWeights(new[] { -1.0D, -1.0D, 2.0D, 1.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D }, 1);
+      //alg.SetInitialWeights(new[] { 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D }, 0);
+      //alg.SetInitialWeights(new[] { 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D }, 1);
 
-      Console.WriteLine(alg.Error);
+      var now = DateTime.Now;
+      alg.Train();
+      Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
+
+      Console.WriteLine("Error function: " + alg.Error);
+      Console.WriteLine("Step: " + alg.Step);
+      Console.WriteLine("Weights:");
+      for (int i=0; i<alg.Result.LayerCount; i++)
+      {
+        Console.WriteLine("layer {0}:", i);
+        var layer = alg.Result[i];
+        for (int j=0; j<layer.NeuronCount; j++)
+        {
+          Console.WriteLine("neuron {0}:", j);
+          var neuron = layer[j];
+          for (int k=0; k<neuron.ParamCount; k++)
+            Console.WriteLine(neuron[k]);
+        }
+      }
+
 
       outputError(alg);
 

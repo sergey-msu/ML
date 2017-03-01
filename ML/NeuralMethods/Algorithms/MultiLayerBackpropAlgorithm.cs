@@ -124,15 +124,29 @@ namespace ML.NeuralMethods.Algorithms
 
     #endregion
 
-    protected override NeuralNetwork DoTrain()
+    public void SetInitialWeights(double[] weights, int layerIdx)
+    {
+      if (weights==null || weights.Length<=0)
+        throw new MLException("Weights must be non empty");
+
+      var layer = Result[layerIdx];
+      var cursor = 0;
+      layer.TryUpdateParams(weights, false, ref cursor);
+    }
+
+    protected override NeuralNetwork DoBuild()
     {
       prepareData();
       checkParams();
       var net = m_Network ?? constructNetwork();
       checkNetwork();
-      doTrain(net);
 
       return net;
+    }
+
+    protected override void DoTrain()
+    {
+      doTrain(Result);
     }
 
     #region .pvt
@@ -253,6 +267,7 @@ namespace ML.NeuralMethods.Algorithms
       foreach (var pdata in TrainingSample)
       {
         runIter(net, pdata.Key, pdata.Value, out ierr2, out istep2);
+
         terr2 += ierr2;
         tstep2 = Math.Max(tstep2, istep2);
       }
@@ -284,51 +299,29 @@ namespace ML.NeuralMethods.Algorithms
       // error backpropagation
       for (int i=lcount-1; i>=0; i--)
       {
-        // calculate current layer errors
-        var layer = net[i];
+        var layer  = net[i];
         var ncount = layer.NeuronCount;
-        var derrors = new double[ncount];
         errors = m_BackErrors[i];
 
+        var prev    = (i>0) ? net[i-1] : null;
+        var pcount  = (i>0) ? prev.NeuronCount : m_InputDim;
+        var perrors = (i>0) ? m_BackErrors[i-1] : null;
+
         for (int j=0; j<ncount; j++)
         {
-          var neuron = layer[j];
+          // calculate current layer "errors"
+          var neuron  = layer[j];
           var ej = errors[j];
-          var oj = neuron.Value;
-          derrors[j] = ej * neuron.ActivationFunction.Derivative(oj);
-        }
-
-        // save errors for future use
-        int pcount;
-        NeuralLayer prev;
-        if (i>0)
-        {
-          prev = net[i-1];
-          pcount = prev.NeuronCount;
-          var perrors = m_BackErrors[i-1];
-          for (int h=0; h<pcount; h++)
-          {
-            var neuron = prev[h];
-            var perror = 0.0D;
-            for (int j=0; j<ncount; j++)
-              perror += derrors[j] * neuron[h];
-            perrors[h] = perror;
-          }
-        }
-        else
-        {
-          pcount = m_InputDim;
-          prev = null;
-        }
-
-        // gradient step - weights update
-        for (int j=0; j<ncount; j++)
-        {
-          var neuron = layer[j];
-          var dj = m_LearningRate * derrors[j];
+          var oj = neuron.NetValue;
+          var gj = ej * neuron.ActivationFunction.Derivative(oj);
+          var dj = m_LearningRate * gj;
 
           for (int h=0; h<pcount; h++)
           {
+            // save "errors" for future use
+            if (i>0) perrors[h] += gj * neuron[h];
+
+            // weights update
             var value = (i==0) ? data[h] : prev[h].Value;
             var dwj = dj * value;
             neuron[h] -= dwj;

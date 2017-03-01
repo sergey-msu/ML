@@ -62,6 +62,7 @@
     <EmbeddedResource Include="Data\ionosphere.csv" />
     <EmbeddedResource Include="Data\sonar.csv" />
     <EmbeddedResource Include="Data\breast-cancer.csv" />
+    <EmbeddedResource Include="Data\primitive.3classes.csv" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ML\ML.csproj">

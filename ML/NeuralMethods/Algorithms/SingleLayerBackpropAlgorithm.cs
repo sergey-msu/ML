@@ -135,20 +135,23 @@ namespace ML.NeuralMethods.Algorithms
 
     #endregion
 
-    protected override NeuralNetwork DoTrain()
+    protected override NeuralNetwork DoBuild()
     {
       checkParams();
       prepareExpectedOutputs();
       var net = constructNetwork();
 
+      return net;
+    }
+
+    protected override void DoTrain()
+    {
       switch (Mode)
       {
-        case TrainingMode.Online: doOnlineTrain(net); break;
-        case TrainingMode.Batch: doBatchTrain(net); break;
+        case TrainingMode.Online: doOnlineTrain(Result); break;
+        case TrainingMode.Batch: doBatchTrain(Result); break;
         default: throw new MLException("Unknown training mode");
       }
-
-      return net;
     }
 
     #region .pvt
@@ -281,7 +284,7 @@ namespace ML.NeuralMethods.Algorithms
       for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = layer[j];
-        var oj = neuron.Value;
+        var oj = neuron.NetValue;
         var ej = expect[j] - result[j];
         var dj = m_LearningRate * ej * neuron.ActivationFunction.Derivative(oj);
 
@@ -367,7 +370,7 @@ namespace ML.NeuralMethods.Algorithms
       for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = layer[j];
-        var oj = neuron.Value;
+        var oj = neuron.NetValue;
         var ej = expect[j] - result[j];
         var dj = m_LearningRate * ej * neuron.ActivationFunction.Derivative(oj);
 

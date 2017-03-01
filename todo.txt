@@ -1,10 +1,8 @@
 CURRENT:
 
-- [INPROG] implement Backpropagation algorithm (1 hidden layer)
+- [INPROG] implement Backpropagation algorithm for general full-connected NN
   - [INPROG] implement algorithm
-
-- [INPROG] implement Backpropagation algorithm for general NN
-  - [INPROG] implement algorithm
+  - add stochastic option
 
 - [INPROG] Play with ACCORD Framework
   - [INPROG] compare with ML (write benchmarks in .Tests assembly)

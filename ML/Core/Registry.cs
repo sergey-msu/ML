@@ -83,20 +83,19 @@ namespace ML.Core
       private static readonly ArctanActivation   m_Atan       = new ArctanActivation();
       private static readonly StepActivation     m_Step = new StepActivation();
       private static readonly IdentityActivation m_Identity   = new IdentityActivation();
-      private static readonly LogisticActivation m_Logistic   = new LogisticActivation();
       private static readonly ReLUActivation     m_ReLU       = new ReLUActivation();
       private static readonly TanhActivation     m_Tanh       = new TanhActivation();
       private static readonly ExpActivation      m_Exp        = new ExpActivation();
       private static readonly SignActivation     m_Sign       = new SignActivation();
-      private static readonly Dictionary<double, RationalActivation>    m_Rationals = new Dictionary<double, RationalActivation>();
-      private static readonly Dictionary<double, ShiftedStepActivation> m_ShiftedSteps= new Dictionary<double, ShiftedStepActivation>();
+      private static readonly Dictionary<double, RationalActivation> m_Rationals = new Dictionary<double, RationalActivation>();
+      private static readonly Dictionary<double, ShiftedStepActivation> m_ShiftedSteps = new Dictionary<double, ShiftedStepActivation>();
+      private static readonly Dictionary<double, LogisticActivation> m_Logistics = new Dictionary<double, LogisticActivation>();
 
       public static readonly Dictionary<string, IFunction> ByID = new Dictionary<string, IFunction>
       {
         { m_Atan.ID,       m_Atan },
         { m_Step.ID, m_Step },
         { m_Identity.ID,   m_Identity },
-        { m_Logistic.ID,   m_Logistic },
         { m_ReLU.ID,       m_ReLU },
         { m_Tanh.ID,       m_Tanh },
         { m_Exp.ID,        m_Exp },
@@ -106,7 +105,6 @@ namespace ML.Core
       public static ArctanActivation      Atan     { get { return m_Atan; } }
       public static StepActivation        Step     { get { return m_Step; } }
       public static IdentityActivation    Identity { get { return m_Identity; } }
-      public static LogisticActivation    Logistic { get { return m_Logistic; } }
       public static ReLUActivation        ReLU     { get { return m_ReLU; } }
       public static TanhActivation        Tanh     { get { return m_Tanh; } }
       public static ExpActivation         Exp      { get { return m_Exp; } }
@@ -129,6 +127,17 @@ namespace ML.Core
         {
           result = new RationalActivation(p);
           m_Rationals[p] = result;
+        }
+
+        return result;
+      }
+      public static LogisticActivation Logistic(double a)
+      {
+        LogisticActivation result;
+        if (!m_Logistics.TryGetValue(a, out result))
+        {
+          result = new LogisticActivation(a);
+          m_Logistics[a] = result;
         }
 
         return result;
