@@ -303,17 +303,17 @@ namespace ML.NeuralMethods.Algorithms
         var ncount = layer.NeuronCount;
         errors = m_BackErrors[i];
 
-        var prev    = (i>0) ? net[i-1] : null;
-        var pcount  = (i>0) ? prev.NeuronCount : m_InputDim;
+        var player  = (i>0) ? net[i-1] : null;
+        var pcount  = (i>0) ? player.NeuronCount : m_InputDim;
         var perrors = (i>0) ? m_BackErrors[i-1] : null;
+        if (perrors!=null) Array.Clear(perrors, 0, pcount);
 
         for (int j=0; j<ncount; j++)
         {
           // calculate current layer "errors"
           var neuron  = layer[j];
           var ej = errors[j];
-          var oj = neuron.NetValue;
-          var gj = ej * neuron.ActivationFunction.Derivative(oj);
+          var gj = ej * neuron.Derivative;
           var dj = m_LearningRate * gj;
 
           for (int h=0; h<pcount; h++)
@@ -322,7 +322,7 @@ namespace ML.NeuralMethods.Algorithms
             if (i>0) perrors[h] += gj * neuron[h];
 
             // weights update
-            var value = (i==0) ? data[h] : prev[h].Value;
+            var value = (i==0) ? data[h] : player[h].Value;
             var dwj = dj * value;
             neuron[h] -= dwj;
             sstep2 += dwj*dwj;

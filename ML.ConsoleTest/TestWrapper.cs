@@ -223,9 +223,9 @@ namespace ML.ConsoleTest
 
     private void doMultilayerNNAlgorithmTest()
     {
-      var alg = new MultiLayerBackpropAlgorithm(Data.TrainingSample, new[] { 2, 2, 3 })
+      var alg = new MultiLayerBackpropAlgorithm(Data.TrainingSample, new[] { 2, 70, 10, 3 })
       {
-        EpochCount = 10000,
+        EpochCount = 9000,
         UseBias = true,
         LearningRate = 0.1D,
         ActivationFunction = Registry.ActivationFunctions.Logistic(2)
@@ -233,8 +233,8 @@ namespace ML.ConsoleTest
       alg.Build();
       //alg.SetInitialWeights(new[] { 1.0D, 0.0D, 0.0D, 1.0D, 0.0D, 0.0D }, 0);
       //alg.SetInitialWeights(new[] { -1.0D, -1.0D, 2.0D, 1.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D }, 1);
-      //alg.SetInitialWeights(new[] { 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D }, 0);
-      //alg.SetInitialWeights(new[] { 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D }, 1);
+      alg.SetInitialWeights(new[] { 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D }, 0);
+      alg.SetInitialWeights(new[] { 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D, 0.1D }, 1);
 
       var now = DateTime.Now;
       alg.Train();
@@ -242,19 +242,19 @@ namespace ML.ConsoleTest
 
       Console.WriteLine("Error function: " + alg.Error);
       Console.WriteLine("Step: " + alg.Step);
-      Console.WriteLine("Weights:");
-      for (int i=0; i<alg.Result.LayerCount; i++)
-      {
-        Console.WriteLine("layer {0}:", i);
-        var layer = alg.Result[i];
-        for (int j=0; j<layer.NeuronCount; j++)
-        {
-          Console.WriteLine("neuron {0}:", j);
-          var neuron = layer[j];
-          for (int k=0; k<neuron.ParamCount; k++)
-            Console.WriteLine(neuron[k]);
-        }
-      }
+      //Console.WriteLine("Weights:");
+      //for (int i=0; i<alg.Result.LayerCount; i++)
+      //{
+      //  Console.WriteLine("layer {0}:", i);
+      //  var layer = alg.Result[i];
+      //  for (int j=0; j<layer.NeuronCount; j++)
+      //  {
+      //    Console.WriteLine("neuron {0}:", j);
+      //    var neuron = layer[j];
+      //    for (int k=0; k<neuron.ParamCount; k++)
+      //      Console.WriteLine(neuron[k]);
+      //  }
+      //}
 
 
       outputError(alg);

@@ -17,6 +17,7 @@ namespace ML.NeuralMethods.Model
     protected int  m_InputDim;
     protected bool m_UseBias;
     private double m_NetValue;
+    private double m_Derivative;
     private double m_Value;
 
     public Neuron(int inputDim, bool useBias)
@@ -42,6 +43,11 @@ namespace ML.NeuralMethods.Model
     /// Caclulated pure value (before applying activation function)
     /// </summary>
     public double NetValue { get { return m_NetValue; } }
+
+    /// <summary>
+    /// Cached derivative of pure calculated value
+    /// </summary>
+    public double Derivative { get { return m_Derivative; } }
 
     /// <summary>
     /// Caclulated value (after applying activation function)
@@ -94,6 +100,7 @@ namespace ML.NeuralMethods.Model
         throw new MLException("Incorret input vector dimension");
 
       m_NetValue = DoCalculate(input);
+      m_Derivative = m_ActivationFunction.Derivative(m_NetValue);
       m_Value = m_ActivationFunction.Value(m_NetValue);
 
       return m_Value;
