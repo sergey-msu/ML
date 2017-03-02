@@ -1,11 +1,16 @@
 CURRENT:
 
 - [INPROG] implement Backpropagation algorithm for general full-connected NN
-  - [INPROG] implement algorithm
-  - add stochastic option
+  - [DONE] implement algorithm
+  - [DONE] add start weight randomization
+  - read about momentum
+  - add stochastic optimization
+  - add events to NN algorithms
 
 - [INPROG] Play with ACCORD Framework
   - [INPROG] compare with ML (write benchmarks in .Tests assembly)
+
+- add ability to update paraters in a batch from some start index (extend TryUpdateParams)
 
 - General CN architecture
   - Read https://tproger.ru/translations/neural-network-zoo-1/ - NN zoo

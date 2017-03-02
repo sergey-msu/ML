@@ -266,7 +266,7 @@ namespace ML.NeuralMethods.Algorithms
 
       foreach (var pdata in TrainingSample)
       {
-        runIter(net, pdata.Key, pdata.Value, out ierr2, out istep2);
+        runIteration(net, pdata.Key, pdata.Value, out ierr2, out istep2);
 
         terr2 += ierr2;
         tstep2 = Math.Max(tstep2, istep2);
@@ -277,9 +277,9 @@ namespace ML.NeuralMethods.Algorithms
       m_Step = tstep2;
     }
 
-    private void runIter(NeuralNetwork net,
-                         Point data, Class cls,
-                         out double ierr2, out double istep2)
+    private void runIteration(NeuralNetwork net,
+                              Point data, Class cls,
+                              out double ierr2, out double istep2)
     {
       var lcount = net.LayerCount;
       var serr2 = 0.0D;

@@ -12,18 +12,24 @@ namespace ML.NeuralMethods.Algorithms
   /// </summary>
   public abstract class NeuralNetworkAlgorithmBase : AlgorithmBase
   {
+    private readonly RandomGenerator m_Random;
+    private NeuralNetwork m_Result;
+
     protected NeuralNetworkAlgorithmBase(ClassifiedSample classifiedSample)
       : base(classifiedSample)
     {
+      m_Random = new RandomGenerator();
     }
-
-    private NeuralNetwork m_Result;
 
     /// <summary>
     /// The result of the algorithm
     /// </summary>
     public NeuralNetwork Result { get { return m_Result; } }
 
+    /// <summary>
+    /// If true randomize in [0, 1] all neuron weights befor begin training
+    /// </summary>
+    public bool RandomizeInitialWeights { get; set; }
 
     /// <summary>
     /// Maps object to corresponding class
@@ -56,6 +62,8 @@ namespace ML.NeuralMethods.Algorithms
     public void Build()
     {
       m_Result = DoBuild();
+
+      if (RandomizeInitialWeights) randomizeWeights(m_Result);
     }
 
     /// <summary>
@@ -68,5 +76,19 @@ namespace ML.NeuralMethods.Algorithms
 
     protected abstract NeuralNetwork DoBuild();
     protected abstract void DoTrain();
+
+    #region .pvt
+
+    private void randomizeWeights(NeuralNetwork net)
+    {
+      foreach (var layer in net.SubNodes)
+      foreach (var neuron in layer.SubNodes)
+      {
+        for (int i=0; i<neuron.ParamCount; i++)
+          neuron[i] = m_Random.GenerateUniform(0, 1);
+      }
+    }
+
+    #endregion
   }
 }

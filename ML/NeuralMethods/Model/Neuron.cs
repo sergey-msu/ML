@@ -97,7 +97,7 @@ namespace ML.NeuralMethods.Model
     public override double Calculate(double[] input)
     {
       if (InputDim != input.Length)
-        throw new MLException("Incorret input vector dimension");
+        throw new MLException("Incorrect input vector dimension");
 
       m_NetValue = DoCalculate(input);
       m_Derivative = m_ActivationFunction.Derivative(m_NetValue);
