@@ -36,7 +36,17 @@ namespace ML.NeuralMethods.Model
     /// <summary>
     /// Dimension of input vector
     /// </summary>
-    public int InputDim { get { return m_InputDim; } }
+    public int InputDim
+    {
+      get { return m_InputDim; }
+      internal set
+      {
+        m_InputDim=value;
+
+        for (int i=0; i<NeuronCount; i++)
+          this[i].InputDim = value;
+      }
+    }
 
     /// <summary>
     /// Total count of neurons
@@ -82,8 +92,31 @@ namespace ML.NeuralMethods.Model
       where TNeuron : Neuron
     {
       var neuron = (TNeuron)Activator.CreateInstance(typeof(TNeuron), this, m_InputDim);
+      neuron.UseBias = UseBias;
       this.AddSubNode(neuron);
       return neuron;
+    }
+
+    /// <summary>
+    /// Add existing neuron in the end of the layer
+    /// </summary>
+    public void AddNeuron(Neuron neuron)
+    {
+      if (neuron==null)
+        throw new MLException("Neuron can not be null");
+      if (neuron.InputDim != this.InputDim)
+        throw new MLException("Neuron input dimension differs with layer's one");
+
+      this.AddSubNode(neuron);
+    }
+
+    /// <summary>
+    /// Randomizes layer's neuron weights
+    /// </summary>
+    public void Randomize(int seed=0)
+    {
+      foreach (var neuron in this.SubNodes)
+        neuron.Randomize(seed);
     }
 
     /// <summary>

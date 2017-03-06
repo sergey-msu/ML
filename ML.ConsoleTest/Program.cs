@@ -18,6 +18,7 @@ namespace ML.ConsoleTest
     {
       //generateNormal2Classes(200, 200);
       //generateNormal3Classes(100, 100, 100);
+      //generateFlower(100);
 
       //var file = "primitive.csv";
       //var file = "iris.csv";
@@ -25,8 +26,11 @@ namespace ML.ConsoleTest
       //var file = "normal.3classes.100.csv";
       //var file = "primitive.3classes.csv";
       //var file = "normal.2classes.1000.csv";
+      //var file = "normal.2classes.200.all.csv";
       //var file = "normal.2classes.200.csv";
-      var file = "normal.3classes.1000.csv";
+      //var file = "normal.3classes.1000.csv";
+      //var file = "normal.3classes.1000.all.csv";
+      var file = "flower.3classes.100.all.csv";
       //var file = "primitive3.csv";
       //var file = "ionosphere.csv";
       //var file = "sonar.csv";
@@ -90,6 +94,55 @@ namespace ML.ConsoleTest
           var p3 = m_Generator.GenerateNormalPoint(1.7, 1.8, 0.5);
           writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p3.X, 4), Math.Round(p3.Y, 4), "Blue", 3, i % s3 == 0 ? 1 : 0);
         }
+      }
+    }
+
+    private static void generateFlower(int n)
+    {
+      using (var file = File.Open(string.Format("flower.3classes.{0}.all.csv", n), FileMode.Create))
+      using (var writer = new StreamWriter(file))
+      {
+        writer.WriteLine("f1,f2,_class,_value,_training");
+
+        for (int i = 0; i < n; i++)
+        {
+          var p = m_Generator.GenerateNormalPoint(2, 1, 0.2);
+          writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p.X, 4), Math.Round(p.Y, 4), "Green", 1, 1);
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+          var p = m_Generator.GenerateNormalPoint(1.5, 0, 0.2);
+          writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p.X, 4), Math.Round(p.Y, 4), "Red", 2, 1);
+        }
+        for (int i = 0; i < n; i++)
+        {
+          var p = m_Generator.GenerateNormalPoint(1.5, 2.0, 0.2);
+          writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p.X, 4), Math.Round(p.Y, 4), "Red", 2, 1);
+        }
+        for (int i = 0; i < n; i++)
+        {
+          var p = m_Generator.GenerateNormalPoint(3.0, 1.0, 0.2);
+          writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p.X, 4), Math.Round(p.Y, 4), "Red", 2, 1);
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+          var p = m_Generator.GenerateNormalPoint(1.0, 1.0, 0.2);
+          writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p.X, 4), Math.Round(p.Y, 4), "Blue", 3, 1);
+        }
+        for (int i = 0; i < n; i++)
+        {
+          var p = m_Generator.GenerateNormalPoint(2.5, 2.0, 0.2);
+          writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p.X, 4), Math.Round(p.Y, 4), "Blue", 3, 1);
+        }
+        for (int i = 0; i < n; i++)
+        {
+          var p = m_Generator.GenerateNormalPoint(2.5, 0, 0.2);
+          writer.WriteLine("{0},{1},{2},{3},{4}", Math.Round(p.X, 4), Math.Round(p.Y, 4), "Blue", 3, 1);
+        }
+
+
       }
     }
   }

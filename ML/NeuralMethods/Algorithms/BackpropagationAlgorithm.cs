@@ -7,15 +7,20 @@ using ML.Contracts;
 
 namespace ML.NeuralMethods.Algorithms
 {
-  public class MultiLayerBackpropAlgorithm : NeuralNetworkAlgorithmBase
+  /// <summary>
+  /// Multi-layer neural network training algorithm.
+  /// Using Backpropagation principle as a core.
+  /// </summary>
+  public class BackpropagationAlgorithm : NeuralNetworkAlgorithmBase
   {
     #region Inner
 
     public enum StopCriteria
     {
       FullLoop = 0,
-      ErrorMin = 1,
-      StepMin = 2
+      ErrorFunc = 1,
+      StepMin  = 2,
+      QFunc    = 3
     }
 
     #endregion
@@ -25,8 +30,7 @@ namespace ML.NeuralMethods.Algorithms
     public const bool   DFT_USE_BIAS = true;
     public const int    DFT_EPOCH_COUNT = 1;
     public const double DFT_LEARNING_RATE = 0.1D;
-    public const double DFT_ERROR_DELTA = 0.0D;
-    public const double DFT_STOP_STEP_LEVEL = 0.0D;
+    public const double DFT_Q_LAMBDA = 0.9D;
     public const StopCriteria DTF_STOP_CRITERIA = StopCriteria.FullLoop;
     public static readonly IFunction DFT_ACTIVATION_FUNCTION = Registry.ActivationFunctions.Identity;
 
@@ -39,23 +43,36 @@ namespace ML.NeuralMethods.Algorithms
     private NeuralNetwork m_Network;
     private int[] m_Structure;
     private Dictionary<Class, double[]> m_ExpectedOutputs;
+    private int m_EpochLength;
 
-    private IFunction m_ActivationFunction;
+    private IFunction    m_ActivationFunction;
+    private StopCriteria m_Stop;
     private int    m_InputDim;
     private int    m_OutputDim;
-    private double m_PrevError;
-    private double m_Error;
-    private double m_Step;
     private bool   m_UseBias;
     private int    m_EpochCount;
     private double m_LearningRate;
-    private StopCriteria m_Stop;
+
+    private double m_IterErrorValue;
+    private double m_PrevErrorValue;
+    private double m_ErrorValue;
     private double m_ErrorDelta;
-    private double m_StopStepLevel;
+    private double m_ErrorStopDelta;
+
+    private double m_Step2;
+    private double m_StepStopValue;
+
+    private double m_QLambda;
+    private double m_PrevQValue;
+    private double m_QValue;
+    private double m_QDelta;
+    private double m_QStopDelta;
 
     #endregion
 
-    public MultiLayerBackpropAlgorithm(ClassifiedSample classifiedSample, NeuralNetwork net)
+    #region .ctor
+
+    public BackpropagationAlgorithm(ClassifiedSample classifiedSample, NeuralNetwork net)
       : base(classifiedSample)
     {
       if (net==null)
@@ -65,7 +82,7 @@ namespace ML.NeuralMethods.Algorithms
       initParams();
     }
 
-    public MultiLayerBackpropAlgorithm(ClassifiedSample classifiedSample, int[] structure)
+    public BackpropagationAlgorithm(ClassifiedSample classifiedSample, int[] structure)
       : base(classifiedSample)
     {
       if (structure==null)
@@ -75,32 +92,28 @@ namespace ML.NeuralMethods.Algorithms
       initParams();
     }
 
+    #endregion
+
+    #region Events
+
+    public event EventHandler EpochEndedEvent;
+
+    #endregion
 
     #region Properties
 
-    public override string ID { get { return "BP_NN"; } }
-    public override string Name { get { return "Backpropagation Neural Network"; } }
+    public override string ID { get { return "MLP_BP"; } }
+    public override string Name { get { return "MLP Neural Network with Backpropagation"; } }
 
-    public int InputDim { get { return m_InputDim; } }
-    public int OutputDim { get { return m_OutputDim; } }
-    public double Error { get { return m_Error; } }
-    public double Step { get { return m_Step; } }
+    public int InputDim           { get { return m_InputDim; } }
+    public int OutputDim          { get { return m_OutputDim; } }
+    public double IterErrorValue  { get { return m_IterErrorValue; } }
+    public double ErrorValue      { get { return m_ErrorValue; } }
+    public double ErrorDelta      { get { return m_ErrorDelta; } }
+    public double Step2           { get { return m_Step2; } }
+    public double QValue          { get { return m_QValue; } }
+    public double QDelta          { get { return m_QDelta; } }
 
-    public StopCriteria Stop
-    {
-      get { return m_Stop; }
-      set { m_Stop = value; }
-    }
-    public double ErrorDelta
-    {
-      get { return m_ErrorDelta; }
-      set { m_ErrorDelta = value; }
-    }
-    public double StopStepLevel
-    {
-      get { return m_StopStepLevel; }
-      set { m_StopStepLevel = value; }
-    }
     public bool UseBias
     {
       get { return m_UseBias; }
@@ -121,18 +134,47 @@ namespace ML.NeuralMethods.Algorithms
       get { return m_LearningRate; }
       set { m_LearningRate = value; }
     }
+    public StopCriteria Stop
+    {
+      get { return m_Stop; }
+      set { m_Stop = value; }
+    }
+    public double ErrorStopDelta
+    {
+      get { return m_ErrorStopDelta; }
+      set { m_ErrorStopDelta = value; }
+    }
+    public double StepStopValue
+    {
+      get { return m_StepStopValue; }
+      set { m_StepStopValue = value; }
+    }
+    public double QLambda
+    {
+      get { return m_QLambda; }
+      set { m_QLambda = value; }
+    }
+    public double QStopDelta
+    {
+      get { return m_QStopDelta; }
+      set { m_QStopDelta = value; }
+    }
 
     #endregion
 
-    public void SetInitialWeights(double[] weights, int layerIdx)
-    {
-      if (weights==null || weights.Length<=0)
-        throw new MLException("Weights must be non empty");
+    #region Public
 
-      var layer = Result[layerIdx];
-      var cursor = 0;
-      layer.TryUpdateParams(weights, false, ref cursor);
+    public void RunEpoch()
+    {
+      runEpoch(Result);
     }
+
+    public void RunIteration(Point data, Class cls)
+    {
+      runIteration(Result, data, cls);
+    }
+
+    #endregion
 
     protected override NeuralNetwork DoBuild()
     {
@@ -158,9 +200,9 @@ namespace ML.NeuralMethods.Algorithms
       EpochCount         = DFT_EPOCH_COUNT;
       LearningRate       = DFT_LEARNING_RATE;
       Stop               = DTF_STOP_CRITERIA;
-      StopStepLevel      = DFT_STOP_STEP_LEVEL;
-      LearningRate       = DFT_LEARNING_RATE;
-      ErrorDelta         = DFT_ERROR_DELTA;
+      QLambda            = DFT_Q_LAMBDA;
+
+      m_EpochLength = TrainingSample.Count;
     }
 
     private void checkParams()
@@ -177,6 +219,11 @@ namespace ML.NeuralMethods.Algorithms
       if (OutputDim <= 0)    throw new MLException("Output dimension nust be positive");
       if (EpochCount <= 0)   throw new MLException("Epoch count must be positive");
       if (LearningRate <= 0) throw new MLException("Learning rate must be positive");
+
+      if (ErrorStopDelta < 0) throw new MLException("Error Stop Delta must be non-negative");
+      if (QStopDelta < 0)     throw new MLException("Q Stop Delta must be non-negative");
+      if (StepStopValue < 0)  throw new MLException("Step Stop Value must be non-negative");
+      if (QLambda < 0 || QLambda > 1) throw new MLException("Lambda for Q-stop criteria must be in [0, 1] interval");
     }
 
     private void prepareData()
@@ -258,28 +305,21 @@ namespace ML.NeuralMethods.Algorithms
 
     private void runEpoch(NeuralNetwork net)
     {
-      var iters = TrainingSample.Count;
-      double ierr2;
-      double terr2 = 0.0D;
-      double istep2;
-      double tstep2 = 0.0D;
-
       foreach (var pdata in TrainingSample)
       {
-        runIteration(net, pdata.Key, pdata.Value, out ierr2, out istep2);
-
-        terr2 += ierr2;
-        tstep2 = Math.Max(tstep2, istep2);
+        runIteration(net, pdata.Key, pdata.Value);
       }
 
-      m_PrevError = m_Error;
-      m_Error = terr2/iters;
-      m_Step = tstep2;
+      // update stats
+      m_PrevErrorValue = m_ErrorValue;
+      m_ErrorValue = m_IterErrorValue/TrainingSample.Count;
+      m_ErrorDelta = m_ErrorValue-m_PrevErrorValue;
+      m_IterErrorValue = 0.0D;
+
+      if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
     }
 
-    private void runIteration(NeuralNetwork net,
-                              Point data, Class cls,
-                              out double ierr2, out double istep2)
+    private void runIteration(NeuralNetwork net, Point data, Class cls)
     {
       var lcount = net.LayerCount;
       var serr2 = 0.0D;
@@ -327,25 +367,30 @@ namespace ML.NeuralMethods.Algorithms
             neuron[h] -= dwj;
             sstep2 += dwj*dwj;
           }
-          if (UseBias)
+          if (neuron.UseBias)
           {
-            neuron[pcount] -= dj;
+            neuron.Bias -= dj;
             sstep2 += dj*dj;
           }
         }
       }
 
-      ierr2 = serr2/2;
-      istep2 = sstep2;
+      // update stats
+      m_IterErrorValue += serr2/2;
+      m_PrevQValue = m_QValue;
+      m_QValue = (1-m_QLambda)*m_QValue + m_QLambda*serr2/2;
+      m_QDelta = m_QValue-m_PrevQValue;
+      m_Step2 = sstep2;
     }
 
     private bool checkStopCriteria()
     {
       switch (Stop)
       {
-        case StopCriteria.FullLoop: return false;
-        case StopCriteria.ErrorMin: return Math.Abs(m_Error-m_PrevError) < ErrorDelta;
-        case StopCriteria.StepMin:  return m_Step < StopStepLevel;
+        case StopCriteria.FullLoop:  return false;
+        case StopCriteria.ErrorFunc: return Math.Abs(m_ErrorDelta) < m_ErrorStopDelta;
+        case StopCriteria.QFunc:     return Math.Abs(m_QDelta) < m_QStopDelta;
+        case StopCriteria.StepMin:   return m_Step2 < StepStopValue;
         default: throw new MLException("Unknown stop citeria");
       }
     }

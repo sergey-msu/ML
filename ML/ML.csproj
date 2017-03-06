@@ -93,9 +93,8 @@
     <Compile Include="MetricalMethods\Algorithms\ParzenFixedAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\ParzenVariableAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
-    <Compile Include="NeuralMethods\Algorithms\MultiLayerBackpropAlgorithm.cs" />
+    <Compile Include="NeuralMethods\Algorithms\BackpropagationAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
-    <Compile Include="NeuralMethods\Algorithms\SingleLayerBackpropAlgorithm.cs" />
     <Compile Include="NeuralMethods\Model\NeuralLayer.cs" />
     <Compile Include="NeuralMethods\Model\NeuralNetwork.cs" />
     <Compile Include="NeuralMethods\Model\Neuron.cs" />

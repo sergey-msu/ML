@@ -61,6 +61,39 @@ namespace ML.NeuralMethods.Model
     }
 
     /// <summary>
+    /// Add neuron in the end of some layer.
+    /// All neurons in the next layer will rearrange its weights correspondingly
+    /// </summary>
+    public void AddNeuron(Neuron neuron, int layerIdx)
+    {
+      if (neuron==null)
+        throw new MLException("Neuron can not be null");
+      if (layerIdx<0 || layerIdx>=LayerCount)
+        throw new MLException("Wrong layer index");
+
+      var layer = this[layerIdx];
+      layer.AddNeuron(neuron);
+
+      if (layerIdx < LayerCount-1)
+      {
+        var next = this[layerIdx+1];
+        next.InputDim++;
+        var ncount = next.NeuronCount;
+        for (int i=0; i<ncount; i++)
+          next[i].AddSynapse();
+      }
+    }
+
+    /// <summary>
+    /// Randomizes network weights
+    /// </summary>
+    public void Randomize(int seed=0)
+    {
+      foreach (var layer in SubNodes)
+        layer.Randomize(seed);
+    }
+
+    /// <summary>
     /// Calculates result array produced by network
     /// </summary>
     /// <param name="input">Input data array</param>

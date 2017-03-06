@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ML.Core.Mathematics
 {
@@ -7,6 +8,28 @@ namespace ML.Core.Mathematics
   /// </summary>
   public class RandomGenerator
   {
+    #region Static
+
+    private static Dictionary<int, RandomGenerator> m_Instances = new Dictionary<int, RandomGenerator>();
+
+    public static RandomGenerator Get(int seed)
+    {
+      RandomGenerator result;
+      if (!m_Instances.TryGetValue(seed % MAX_SEED, out result))
+      {
+        var instances = new Dictionary<int, RandomGenerator>(m_Instances);
+        result = new RandomGenerator(seed);
+        instances[seed] = result;
+        m_Instances = instances;
+      }
+
+      return result;
+    }
+
+    #endregion
+
+    private const int MAX_SEED = 100;
+
     private readonly Random m_Random = new Random();
 
     public RandomGenerator(int seed=0)

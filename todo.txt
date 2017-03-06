@@ -3,9 +3,26 @@ CURRENT:
 - [INPROG] implement Backpropagation algorithm for general full-connected NN
   - [DONE] implement algorithm
   - [DONE] add start weight randomization
-  - read about momentum
-  - add stochastic optimization
-  - add events to NN algorithms
+  - [DONE] add events to NN algorithms
+  - add stochastic gradient descent
+
+- [DONE] add neuron NN + unit tests
+
+- [DONE] neuron UseBias -> explicit neuron.BiasWeight value
+
+- integration tests: use data files
+
+- demos project (+data samples)
+
+- implement RBF algorith (https://en.wikipedia.org/wiki/Radial_basis_function_network, http://mccormickml.com/2013/08/15/radial-basis-function-network-rbfn-tutorial/)
+
+- implement more NN algorithms (https://habrahabr.ru/post/318970/)
+  - Nesterov
+  - Adagrad
+  - RMSProp
+  - Adadelta
+  - Adam
+  - Adamax
 
 - [INPROG] Play with ACCORD Framework
   - [INPROG] compare with ML (write benchmarks in .Tests assembly)

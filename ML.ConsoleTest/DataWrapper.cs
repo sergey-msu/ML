@@ -65,7 +65,9 @@ namespace ML.ConsoleTest
 
     private void readHeaders(StreamReader reader, out int[] featureIndxs, out int trainingIndx, out int classesIndx, out int clsValIdx)
     {
-      var line = reader.ReadLine();
+      string line;
+      do { line = reader.ReadLine(); }
+      while (line.StartsWith("//"));
 
       var headers = line.Split(',');
 
@@ -99,6 +101,7 @@ namespace ML.ConsoleTest
       {
         lineNum++;
         var line = reader.ReadLine();
+        if (line != null && line.StartsWith("//")) continue;
         if (string.IsNullOrWhiteSpace(line)) break;
         var data = line.Split(',');
 

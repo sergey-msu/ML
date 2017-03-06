@@ -9,6 +9,7 @@ using ML.LogicalMethods.Algorithms;
 using ML.MetricalMethods.Algorithms;
 using ML.Core.Logical;
 using ML.NeuralMethods.Algorithms;
+using ML.NeuralMethods.Model;
 
 namespace ML.ConsoleTest
 {
@@ -200,45 +201,66 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private void doPerceptronAlgorithmTest()
+    private BackpropagationAlgorithm createBPAlg(NeuralNetwork net)
     {
-      var alg = new SingleLayerBackpropAlgorithm(Data.TrainingSample)
-      {
-        EpochCount = 1000,
-        InputDim = 2,
-        OutputDim = 3,
-        UseBias = true,
-        ActivationFunction = Registry.ActivationFunctions.Identity
-      };
+
+      var alg = (net == null) ?
+                 new BackpropagationAlgorithm(Data.TrainingSample, new[] { 2, 15, 3 }) :
+                 new BackpropagationAlgorithm(Data.TrainingSample, net);
+      alg.EpochCount = 6000;
+      alg.UseBias = true;
+      alg.LearningRate = 0.1D;
+      alg.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
+      alg.RandomizeInitialWeights = (net == null);
+
       alg.Build();
 
-      alg.Train();
+      int epoch = 0;
+      alg.EpochEndedEvent += (o, e) =>
+                             {
+                               if (epoch++ % 100 != 0) return;
+                               Console.WriteLine("----------------Epoch #: {0}", epoch);
+                               Console.WriteLine("E:\t{0}",  alg.ErrorValue);
+                               Console.WriteLine("DE:\t{0}", alg.ErrorDelta);
+                               Console.WriteLine("Q:\t{0}",  alg.QValue);
+                               Console.WriteLine("DQ:\t{0}", alg.QDelta);
+                               Console.WriteLine("DW:\t{0}", alg.Step2);
+                             };
 
-      Console.WriteLine(alg.Error);
-
-      outputError(alg);
-
-      Visualizer.Run(alg);
+      return alg;
     }
 
     private void doMultilayerNNAlgorithmTest()
     {
-      var alg = new MultiLayerBackpropAlgorithm(Data.TrainingSample, new[] { 2, 100, 3 })
-      {
-        EpochCount = 1000,
-        UseBias = true,
-        LearningRate = 0.1D,
-        ActivationFunction = Registry.ActivationFunctions.Rational(1),
-        RandomizeInitialWeights = true
-      };
-      alg.Build();
+      var alg = createBPAlg(null);
 
       var now = DateTime.Now;
       alg.Train();
+
+      //var nc = 20;
+      //for (int i=0; i<nc; i++)
+      //{
+      //  Console.WriteLine("NEURON ADDED");
+      //  var net = alg.Result;
+      //
+      //  var neuron = new FullNeuron(2);
+      //  neuron.ActivationFunction = alg.ActivationFunction;
+      //  neuron.Randomize();
+      //  net.AddNeuron(neuron, 0);
+      //
+      //  neuron = new FullNeuron(i+3);
+      //  neuron.ActivationFunction = alg.ActivationFunction;
+      //  neuron.Randomize();
+      //  net.AddNeuron(neuron, 1);
+      //
+      //  alg = createBPAlg(net);
+      //  alg.Train();
+      //}
+
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
 
-      Console.WriteLine("Error function: " + alg.Error);
-      Console.WriteLine("Step: " + alg.Step);
+      Console.WriteLine("Error function: " + alg.ErrorValue);
+      Console.WriteLine("Step: " + alg.Step2);
 
       outputError(alg);
 

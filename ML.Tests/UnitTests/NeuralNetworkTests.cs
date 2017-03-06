@@ -24,16 +24,16 @@ namespace ML.Tests.UnitTests
         var n1 = this.CreateNeuron<TNeuron>();
         n1[0] = 1;
         n1[1] = -1;
-        if (useBias) n1[4] = 2;
+        if (useBias) n1.Bias = 2;
 
         var n2 = this.CreateNeuron<TNeuron>();
         n2[0] = 2;
         n2[2] = 3;
-        if (useBias) n2[4] = 1;
+        if (useBias) n2.Bias = 1;
 
         var n3 = this.CreateNeuron<TNeuron>();
         n3[3] = -2;
-        if (useBias) n3[4] = -1;
+        if (useBias) n3.Bias = -1;
       }
     }
 
@@ -120,7 +120,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_Build()
     {
-      var n = new SparseNeuron(4, false);
+      var n = new SparseNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -132,11 +132,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_UseBias_Build()
     {
-      var n = new SparseNeuron(4, true);
+      var n = new SparseNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 2.5D;
+      n.Bias = 2.5D;
       n.Build();
 
       Assert.AreEqual(4, n.ParamCount);
@@ -146,7 +147,7 @@ namespace ML.Tests.UnitTests
     [ExpectedException(typeof(MLException))]
     public void SparseNeuron_Calculate_WrongInput()
     {
-      var n = new SparseNeuron(4, false);
+      var n = new SparseNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -159,7 +160,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_Calculate()
     {
-      var n = new SparseNeuron(4, false);
+      var n = new SparseNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -174,11 +175,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_UseBias_Calculate()
     {
-      var n = new SparseNeuron(4, true);
+      var n = new SparseNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
       var input = new double[] { 1, 2, 3, 4 };
 
@@ -190,7 +192,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_Calculate_ActivationFunction()
     {
-      var n = new SparseNeuron(4, false);
+      var n = new SparseNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -206,7 +208,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_Indexer()
     {
-      var n = new SparseNeuron(4, false);
+      var n = new SparseNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -225,11 +227,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_UseBias_Indexer()
     {
-      var n = new SparseNeuron(4, true);
+      var n = new SparseNeuron(4);
+      n.UseBias = true;
       n[0] =  0.1D;
       n[2] = -0.2D;
       n[3] =  0.3D;
-      n[4] =  0.5D;
+      n.Bias =  0.5D;
       n.Build();
 
       n.RemoveWeight(0);
@@ -240,13 +243,13 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(0.5D, n[1]);
       Assert.AreEqual(0.6D, n[2]);
       Assert.AreEqual(0.3D, n[3]);
-      Assert.AreEqual(0.5D, n[4]);
+      Assert.AreEqual(0.5D, n.Bias);
     }
 
     [TestMethod]
     public void SparseNeuron_TryGetParam()
     {
-      var n = new SparseNeuron(4, false);
+      var n = new SparseNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -273,11 +276,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_UseBias_TryGetParam()
     {
-      var n = new SparseNeuron(4, true);
+      var n = new SparseNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
 
       double par1;
@@ -305,7 +309,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_TrySetParam()
     {
-      var n = new SparseNeuron(4, false);
+      var n = new SparseNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -328,11 +332,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_UseBias_TrySetParam()
     {
-      var n = new SparseNeuron(4, true);
+      var n = new SparseNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
 
       var res1 = n.TrySetParam(0, -1, false);
@@ -348,14 +353,14 @@ namespace ML.Tests.UnitTests
       Assert.IsTrue(res3);
       Assert.AreEqual(2, n[3]);
       Assert.IsTrue(res3);
-      Assert.AreEqual(4.5, n[4]);
+      Assert.AreEqual(4.5, n.Bias);
       Assert.IsFalse(res5);
     }
 
     [TestMethod]
     public void SparseNeuron_TryUpdateParams()
     {
-      var n = new SparseNeuron(4, false);
+      var n = new SparseNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -385,11 +390,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void SparseNeuron_UseBias_TryUpdateParams()
     {
-      var n = new SparseNeuron(4, true);
+      var n = new SparseNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
 
       var pars = new double[] { 1, 2, -1, 3, 1, 2, -3, -1, 1, 2, -2 };
@@ -401,7 +407,7 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(2,  n[0]);
       Assert.AreEqual(-1, n[2]);
       Assert.AreEqual(3,  n[3]);
-      Assert.AreEqual(1,  n[4]);
+      Assert.AreEqual(1,  n.Bias);
 
       res = n.TryUpdateParams(pars, true, ref cursor);
       Assert.IsTrue(res);
@@ -409,7 +415,7 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(4,  n[0]);
       Assert.AreEqual(-4, n[2]);
       Assert.AreEqual(2,  n[3]);
-      Assert.AreEqual(2,  n[4]);
+      Assert.AreEqual(2,  n.Bias);
 
       res = n.TryUpdateParams(pars, false, ref cursor);
       Assert.IsFalse(res);
@@ -419,7 +425,7 @@ namespace ML.Tests.UnitTests
     public void SparseNeuron_ComplexCalculation()
     {
       var cinput = 11;
-      var n = new SparseNeuron(cinput, false);
+      var n = new SparseNeuron(cinput);
       var input = new double[cinput];
       for (int i = 0; i < cinput; i++)
       {
@@ -459,7 +465,7 @@ namespace ML.Tests.UnitTests
     public void SparseNeuron_Bench_Calculate()
     {
       int cinput = 1000000;
-      var n = new SparseNeuron(cinput, false);
+      var n = new SparseNeuron(cinput);
       var input = new double[cinput];
       for (int i = 0; i < cinput; i++)
       {
@@ -482,7 +488,7 @@ namespace ML.Tests.UnitTests
     public void SparseNeuron_Bench_TryUpdateParams_Calculate()
     {
       int cinput = 1000000;
-      var n = new SparseNeuron(cinput, false);
+      var n = new SparseNeuron(cinput);
       for (int i = 0; i < cinput; i++)
       {
         if (i % 9 != 0) n[i] = ((double)(i % 1234)) / 1000;
@@ -510,7 +516,7 @@ namespace ML.Tests.UnitTests
     public void SparseNeuron_Bench_BulkSetVSIndexSet()
     {
       int cinput = 1000000;
-      var n = new SparseNeuron(cinput, false);
+      var n = new SparseNeuron(cinput);
       for (int i = 0; i < cinput; i++)
       {
         if (i % 9 != 0) n[i] = ((double)(i % 1234)) / 1000;
@@ -556,7 +562,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_Build()
     {
-      var n = new FullNeuron(4, false);
+      var n = new FullNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -568,11 +574,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_UseBias_Build()
     {
-      var n = new FullNeuron(4, true);
+      var n = new FullNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
 
       Assert.AreEqual(5, n.ParamCount);
@@ -582,7 +589,7 @@ namespace ML.Tests.UnitTests
     [ExpectedException(typeof(MLException))]
     public void FullNeuron_Calculate_WrongInput()
     {
-      var n = new FullNeuron(4, false);
+      var n = new FullNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -595,7 +602,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_Calculate()
     {
-      var n = new FullNeuron(4, false);
+      var n = new FullNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -610,11 +617,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_UseBias_Calculate()
     {
-      var n = new FullNeuron(4, true);
+      var n = new FullNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5;
+      n.Bias = 0.5;
       n.Build();
       var input = new double[] { 1, 2, 3, 4 };
 
@@ -626,7 +634,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_Calculate_ActivationFunction()
     {
-      var n = new FullNeuron(4, false);
+      var n = new FullNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -642,7 +650,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_Indexer()
     {
-      var n = new FullNeuron(4, false);
+      var n = new FullNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -657,24 +665,25 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_UseBias_Indexer()
     {
-      var n = new FullNeuron(4, true);
+      var n = new FullNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
 
       Assert.AreEqual(0.1D,  n[0]);
       Assert.AreEqual(0,     n[1]);
       Assert.AreEqual(-0.2D, n[2]);
       Assert.AreEqual(0.3D,  n[3]);
-      Assert.AreEqual(0.5D,  n[4]);
+      Assert.AreEqual(0.5D,  n.Bias);
     }
 
     [TestMethod]
     public void FullNeuron_TryGetParam()
     {
-      var n = new FullNeuron(4, false);
+      var n = new FullNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -702,11 +711,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_UseBias_TryGetParam()
     {
-      var n = new FullNeuron(4, true);
+      var n = new FullNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
 
       double par1;
@@ -738,7 +748,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_TrySetParam()
     {
-      var n = new FullNeuron(4, false);
+      var n = new FullNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -762,11 +772,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_UseBias_TrySetParam()
     {
-      var n = new FullNeuron(4, true);
+      var n = new FullNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
 
       var res1 = n.TrySetParam(0, -1, false);
@@ -786,13 +797,13 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(1,    n[1]);
       Assert.AreEqual(2,    n[2]);
       Assert.AreEqual(3.3D, n[3]);
-      Assert.AreEqual(4.5D, n[4]);
+      Assert.AreEqual(4.5D, n.Bias);
     }
 
     [TestMethod]
     public void FullNeuron_TryUpdateParams()
     {
-      var n = new FullNeuron(4, false);
+      var n = new FullNeuron(4);
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -824,11 +835,12 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void FullNeuron_UseBias_TryUpdateParams()
     {
-      var n = new FullNeuron(4, true);
+      var n = new FullNeuron(4);
+      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n[4] = 0.5D;
+      n.Bias = 0.5D;
       n.Build();
 
       var pars = new double[] { 1, 2, -1, 3, 1, 2, -3, -1, 1, 7, -1, 1 };
@@ -841,16 +853,16 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(-1, n[1]);
       Assert.AreEqual(3,  n[2]);
       Assert.AreEqual(1,  n[3]);
-      Assert.AreEqual(2,  n[4]);
+      Assert.AreEqual(2,  n.Bias);
 
       res = n.TryUpdateParams(pars, true, ref cursor);
       Assert.IsTrue(res);
       Assert.AreEqual(11, cursor);
-      Assert.AreEqual(-1,  n[0]);
-      Assert.AreEqual(-2,  n[1]);
-      Assert.AreEqual(4,   n[2]);
-      Assert.AreEqual(8,   n[3]);
-      Assert.AreEqual(1,   n[4]);
+      Assert.AreEqual(-1, n[0]);
+      Assert.AreEqual(-2, n[1]);
+      Assert.AreEqual(4,  n[2]);
+      Assert.AreEqual(8,  n[3]);
+      Assert.AreEqual(1,  n.Bias);
 
       res = n.TryUpdateParams(pars, false, ref cursor);
       Assert.IsFalse(res);
@@ -860,7 +872,7 @@ namespace ML.Tests.UnitTests
     public void FullNeuron_ComplexCalculation()
     {
       var cinput = 11;
-      var n = new FullNeuron(cinput, false);
+      var n = new FullNeuron(cinput);
       var input = new double[cinput];
       for (int i = 0; i < cinput; i++)
       {
@@ -900,7 +912,7 @@ namespace ML.Tests.UnitTests
     public void FullNeuron_Bench_Calculate()
     {
       int cinput = 1000000;
-      var n = new FullNeuron(cinput, false);
+      var n = new FullNeuron(cinput);
       var input = new double[cinput];
       for (int i = 0; i < cinput; i++)
       {
@@ -923,7 +935,7 @@ namespace ML.Tests.UnitTests
     public void FullNeuron_Bench_TryUpdateParams_Calculate()
     {
       int cinput = 1000000;
-      var n = new FullNeuron(cinput, false);
+      var n = new FullNeuron(cinput);
       for (int i = 0; i < cinput; i++)
       {
         if (i % 9 != 0) n[i] = ((double)(i % 1234)) / 1000;
@@ -951,7 +963,7 @@ namespace ML.Tests.UnitTests
     public void FullNeuron_Bench_BulkSetVSIndexSet()
     {
       int cinput = 1000000;
-      var n = new FullNeuron(cinput, false);
+      var n = new FullNeuron(cinput);
       for (int i = 0; i < cinput; i++)
       {
         if (i % 9 != 0) n[i] = ((double)(i % 1234)) / 1000;
@@ -995,7 +1007,7 @@ namespace ML.Tests.UnitTests
     #region NeuralLayer
 
     [TestMethod]
-    public void NeuralLayer_AddNeuron()
+    public void NeuralLayer_CreateNeuron()
     {
       var layer = new NeuralLayer(12);
       var n1 = layer.CreateNeuron<SparseNeuron>();
@@ -1206,6 +1218,17 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(30,  res[0]);
       Assert.AreEqual(19,  res[1]);
       Assert.AreEqual(-20, res[2]);
+    }
+
+    [TestMethod]
+    public void NeuralLayer_AddNeuron()
+    {
+      var layer = new SimpleFullLayer(true);
+      var neuron = new FullNeuron(layer.InputDim);
+
+      layer.AddNeuron(neuron);
+
+      Assert.AreEqual(neuron, layer[layer.NeuronCount-1]);
     }
 
     [TestMethod]
@@ -1496,6 +1519,44 @@ namespace ML.Tests.UnitTests
     }
 
     [TestMethod]
+    public void NeuralNetwork_AddSparseNeuron()
+    {
+      var net = new SimpleNetwork<SparseNeuron>();
+      net.Build();
+
+      var n14 = new SparseNeuron(3);
+      net.AddNeuron(n14, 0);
+
+      Assert.AreEqual(n14, net[0][3]);
+      Assert.AreEqual(4, net[1].InputDim);
+
+      var n23 = new SparseNeuron(4);
+      net.AddNeuron(n23, 1);
+
+      Assert.AreEqual(n23, net[1][2]);
+      Assert.AreEqual(3, net[2].InputDim);
+    }
+
+    [TestMethod]
+    public void NeuralNetwork_AddFullNeuron()
+    {
+      var net = new SimpleNetwork<FullNeuron>();
+      net.Build();
+
+      var n14 = new FullNeuron(3);
+      net.AddNeuron(n14, 0);
+
+      Assert.AreEqual(n14, net[0][3]);
+      Assert.AreEqual(4, net[1].InputDim);
+
+      var n23 = new FullNeuron(4);
+      net.AddNeuron(n23, 1);
+
+      Assert.AreEqual(n23, net[1][2]);
+      Assert.AreEqual(3, net[2].InputDim);
+    }
+
+    [TestMethod]
     public void NeuralNetwork_Bench_Calculate()
     {
       var ncount = 1000;
@@ -1560,46 +1621,5 @@ namespace ML.Tests.UnitTests
 
 
     #endregion
-
-    //[TestMethod]
-    //public void ___Test()
-    //{
-    //  var len = 40000;
-    //  var n1 = new FullNeuron(len, false);
-    //  var n2 = new SparseNeuron(len, false);
-    //  for (int i=0; i<len; i++)
-    //  {
-    //    n1[i] = i;
-    //    n2[i] = i;
-    //  }
-    //  n1.Build();
-    //  n2.Build();
-
-    //  var times = 1;
-    //  var timer = new Stopwatch();
-
-    //  timer.Restart();
-    //  for (int t=0; t<times; t++)
-    //  for (int i=0; i<len; i++)
-    //  {
-    //    double value;
-    //    n2.TryGetParam(i, out value);
-    //    n2.TrySetParam(i, 234, false);
-    //  }
-    //  timer.Stop();
-    //  Console.WriteLine("sparse neuron: {0}", timer.Elapsed.TotalMilliseconds/times);
-
-    //  timer.Restart();
-    //  for (int t=0; t<times; t++)
-    //  for (int i=0; i<len; i++)
-    //  {
-    //    double value;
-    //    n1.TryGetParam(i, out value);
-    //    n1.TrySetParam(i, 234, false);
-    //  }
-    //  timer.Stop();
-    //  Console.WriteLine("full neuron: {0}", timer.Elapsed.TotalMilliseconds/times);
-
-    //}
   }
 }
