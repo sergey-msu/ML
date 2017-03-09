@@ -82,6 +82,7 @@
     <Compile Include="Core\Registry.cs" />
     <Compile Include="Core\ComputingNetworks\Contracts.cs" />
     <Compile Include="Core\ComputingNetworks\SequenceNode.cs" />
+    <Compile Include="DeepMethods\Model\KernelNeuron.cs" />
     <Compile Include="LogicalMethods\Algorithms\DecisionTreeID3Algorithm.cs" />
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />
     <Compile Include="LogicalMethods\Model\DecisionNode.cs" />
@@ -101,7 +102,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Mathematics\MathUtils.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DeepMethods\Algorithms\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

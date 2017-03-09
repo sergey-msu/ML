@@ -27,7 +27,6 @@ namespace ML.NeuralMethods.Algorithms
 
     #region CONST
 
-    public const bool   DFT_USE_BIAS = true;
     public const int    DFT_EPOCH_COUNT = 1;
     public const double DFT_LEARNING_RATE = 0.1D;
     public const double DFT_Q_LAMBDA = 0.9D;
@@ -38,7 +37,7 @@ namespace ML.NeuralMethods.Algorithms
 
     #region Fields
 
-    private static double[][] m_BackErrors;
+    private static double[][] m_BackpropErrors;
 
     private NeuralNetwork m_Network;
     private int[] m_Structure;
@@ -49,7 +48,6 @@ namespace ML.NeuralMethods.Algorithms
     private StopCriteria m_Stop;
     private int    m_InputDim;
     private int    m_OutputDim;
-    private bool   m_UseBias;
     private int    m_EpochCount;
     private double m_LearningRate;
 
@@ -114,11 +112,6 @@ namespace ML.NeuralMethods.Algorithms
     public double QValue          { get { return m_QValue; } }
     public double QDelta          { get { return m_QDelta; } }
 
-    public bool UseBias
-    {
-      get { return m_UseBias; }
-      set { m_UseBias = value; }
-    }
     public IFunction ActivationFunction
     {
       get { return m_ActivationFunction; }
@@ -196,7 +189,6 @@ namespace ML.NeuralMethods.Algorithms
     private void initParams()
     {
       ActivationFunction = DFT_ACTIVATION_FUNCTION;
-      UseBias            = DFT_USE_BIAS;
       EpochCount         = DFT_EPOCH_COUNT;
       LearningRate       = DFT_LEARNING_RATE;
       Stop               = DTF_STOP_CRITERIA;
@@ -235,18 +227,18 @@ namespace ML.NeuralMethods.Algorithms
         var lcount = m_Structure.Length-1;
         m_InputDim = m_Structure[0];
         m_OutputDim = m_Structure[lcount];
-        m_BackErrors = new double[lcount][];
+        m_BackpropErrors = new double[lcount][];
         for (int i=0; i<lcount; i++)
-          m_BackErrors[i] = new double[m_Structure[i+1]];
+          m_BackpropErrors[i] = new double[m_Structure[i+1]];
       }
       else
       {
         var lcount = m_Network.LayerCount;
         m_InputDim = m_Network.InputDim;
         m_OutputDim = m_Network[lcount-1].NeuronCount;
-        m_BackErrors = new double[lcount][];
+        m_BackpropErrors = new double[lcount][];
         for (int i=0; i<lcount; i++)
-          m_BackErrors[i] = new double[m_Network[i].NeuronCount];
+          m_BackpropErrors[i] = new double[m_Network[i].NeuronCount];
       }
 
       // expected outputs
@@ -277,7 +269,6 @@ namespace ML.NeuralMethods.Algorithms
     {
       var net = new NeuralNetwork();
       net.InputDim = m_InputDim;
-      net.UseBias = UseBias;
       net.ActivationFunction = ActivationFunction;
 
       var lcount = m_Structure.Length-1;
@@ -310,7 +301,7 @@ namespace ML.NeuralMethods.Algorithms
         runIteration(net, pdata.Key, pdata.Value);
       }
 
-      // update stats
+      // update epoch stats
       m_PrevErrorValue = m_ErrorValue;
       m_ErrorValue = m_IterErrorValue/TrainingSample.Count;
       m_ErrorDelta = m_ErrorValue-m_PrevErrorValue;
@@ -319,19 +310,19 @@ namespace ML.NeuralMethods.Algorithms
       if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
     }
 
-    private void runIteration(NeuralNetwork net, Point data, Class cls)
+    private void runIteration(NeuralNetwork net, double[] input, Class cls)
     {
       var lcount = net.LayerCount;
       var serr2 = 0.0D;
       var sstep2 = 0.0D;
 
       // forward calculation
-      var result = net.Calculate(data);
+      var output = net.Calculate(input);
       var expect = m_ExpectedOutputs[cls];
-      var errors = m_BackErrors[lcount-1];
+      var errors = m_BackpropErrors[lcount-1];
       for (int j=0; j<m_OutputDim; j++)
       {
-        var ej = result[j] - expect[j];
+        var ej = output[j] - expect[j];
         errors[j] = ej;
         serr2 += ej*ej;
       }
@@ -341,11 +332,11 @@ namespace ML.NeuralMethods.Algorithms
       {
         var layer  = net[i];
         var ncount = layer.NeuronCount;
-        errors = m_BackErrors[i];
+        errors = m_BackpropErrors[i];
 
         var player  = (i>0) ? net[i-1] : null;
         var pcount  = (i>0) ? player.NeuronCount : m_InputDim;
-        var perrors = (i>0) ? m_BackErrors[i-1] : null;
+        var perrors = (i>0) ? m_BackpropErrors[i-1] : null;
         if (perrors!=null) Array.Clear(perrors, 0, pcount);
 
         for (int j=0; j<ncount; j++)
@@ -362,20 +353,19 @@ namespace ML.NeuralMethods.Algorithms
             if (i>0) perrors[h] += gj * neuron[h];
 
             // weights update
-            var value = (i==0) ? data[h] : player[h].Value;
+            var value = (i==0) ? input[h] : player[h].Value;
             var dwj = dj * value;
             neuron[h] -= dwj;
             sstep2 += dwj*dwj;
           }
-          if (neuron.UseBias)
-          {
-            neuron.Bias -= dj;
-            sstep2 += dj*dj;
-          }
+
+          // bias weight update
+          neuron.Bias -= dj;
+          sstep2 += dj*dj;
         }
       }
 
-      // update stats
+      // update iter stats
       m_IterErrorValue += serr2/2;
       m_PrevQValue = m_QValue;
       m_QValue = (1-m_QLambda)*m_QValue + m_QLambda*serr2/2;

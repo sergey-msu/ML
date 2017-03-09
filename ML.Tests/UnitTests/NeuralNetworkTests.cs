@@ -17,40 +17,30 @@ namespace ML.Tests.UnitTests
     public class SimpleLayer<TNeuron> : NeuralLayer
       where TNeuron : Neuron
     {
-      public SimpleLayer(bool useBias) : base(4)
+      public SimpleLayer() : base(4)
       {
-        UseBias = useBias;
-
         var n1 = this.CreateNeuron<TNeuron>();
         n1[0] = 1;
         n1[1] = -1;
-        if (useBias) n1.Bias = 2;
+        n1.Bias = 2;
 
         var n2 = this.CreateNeuron<TNeuron>();
         n2[0] = 2;
         n2[2] = 3;
-        if (useBias) n2.Bias = 1;
+        n2.Bias = 1;
 
         var n3 = this.CreateNeuron<TNeuron>();
         n3[3] = -2;
-        if (useBias) n3.Bias = -1;
+        n3.Bias = -1;
       }
     }
 
     public class SimpleSparseLayer : SimpleLayer<SparseNeuron>
     {
-      public SimpleSparseLayer(bool useBias)
-        : base(useBias)
-      {
-      }
     }
 
     public class SimpleFullLayer : SimpleLayer<FullNeuron>
     {
-      public SimpleFullLayer(bool useBias)
-        : base(useBias)
-      {
-      }
     }
 
     public class SimpleNetwork<TNeuron> : NeuralNetwork
@@ -124,19 +114,6 @@ namespace ML.Tests.UnitTests
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n.Build();
-
-      Assert.AreEqual(3, n.ParamCount);
-    }
-
-    [TestMethod]
-    public void SparseNeuron_UseBias_Build()
-    {
-      var n = new SparseNeuron(4);
-      n.UseBias = true;
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
       n.Bias = 2.5D;
       n.Build();
 
@@ -164,29 +141,16 @@ namespace ML.Tests.UnitTests
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n.Build();
-      var input = new double[] { 1, 2, 3, 4 };
-
-      var result = n.Calculate(input);
-
-      MLAssert.AreEpsEqual(0.7D, result, EPS);
-    }
-
-    [TestMethod]
-    public void SparseNeuron_UseBias_Calculate()
-    {
-      var n = new SparseNeuron(4);
-      n.UseBias = true;
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
       n.Bias = 0.5D;
       n.Build();
       var input = new double[] { 1, 2, 3, 4 };
 
       var result = n.Calculate(input);
 
-      MLAssert.AreEpsEqual(1.2D, result, EPS);
+      Assert.AreEqual(1.2D, result,       EPS);
+      Assert.AreEqual(1.2D, n.Value,      EPS);
+      Assert.AreEqual(1.2D, n.NetValue,   EPS);
+      Assert.AreEqual(1.0D, n.Derivative, EPS);
     }
 
     [TestMethod]
@@ -202,33 +166,16 @@ namespace ML.Tests.UnitTests
 
       var result = n.Calculate(input);
 
-      MLAssert.AreEpsEqual(Math.Exp(0.7D), result, EPS);
+      Assert.AreEqual(Math.Exp(0.7D), result,       EPS);
+      Assert.AreEqual(0.7D,           n.NetValue,   EPS);
+      Assert.AreEqual(Math.Exp(0.7D), n.Value,      EPS);
+      Assert.AreEqual(Math.Exp(0.7D), n.Derivative, EPS);
     }
 
     [TestMethod]
     public void SparseNeuron_Indexer()
     {
       var n = new SparseNeuron(4);
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
-      n.Build();
-
-      n.RemoveWeight(0);
-      n[1] = 0.5D;
-      n[2] = 0.6D;
-
-      Assert.AreEqual(0,    n[0]);
-      Assert.AreEqual(0.5D, n[1]);
-      Assert.AreEqual(0.6D, n[2]);
-      Assert.AreEqual(0.3D, n[3]);
-    }
-
-    [TestMethod]
-    public void SparseNeuron_UseBias_Indexer()
-    {
-      var n = new SparseNeuron(4);
-      n.UseBias = true;
       n[0] =  0.1D;
       n[2] = -0.2D;
       n[3] =  0.3D;
@@ -250,34 +197,6 @@ namespace ML.Tests.UnitTests
     public void SparseNeuron_TryGetParam()
     {
       var n = new SparseNeuron(4);
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
-      n.Build();
-
-      double par1;
-      double par2;
-      double par3;
-      double par4;
-      var res1 = n.TryGetParam(0, out par1);
-      var res2 = n.TryGetParam(1, out par2);
-      var res3 = n.TryGetParam(2, out par3);
-      var res4 = n.TryGetParam(3, out par4);
-
-      Assert.IsTrue(res1);
-      Assert.AreEqual(0.1D, par1);
-      Assert.IsTrue(res2);
-      Assert.AreEqual(-0.2D, par2);
-      Assert.IsTrue(res3);
-      Assert.AreEqual(0.3D, par3);
-      Assert.IsFalse(res4);
-    }
-
-    [TestMethod]
-    public void SparseNeuron_UseBias_TryGetParam()
-    {
-      var n = new SparseNeuron(4);
-      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -313,30 +232,6 @@ namespace ML.Tests.UnitTests
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n.Build();
-
-      var res1 = n.TrySetParam(0, -1, false);
-      var res2 = n.TrySetParam(1, 1, true);
-      var res3 = n.TrySetParam(2, 2, false);
-      var res4 = n.TrySetParam(3, 3, true);
-
-      Assert.IsTrue(res1);
-      Assert.AreEqual(-1, n[0]);
-      Assert.IsTrue(res2);
-      Assert.AreEqual(0.8D, n[2]);
-      Assert.IsTrue(res3);
-      Assert.AreEqual(2, n[3]);
-      Assert.IsFalse(res4);
-    }
-
-    [TestMethod]
-    public void SparseNeuron_UseBias_TrySetParam()
-    {
-      var n = new SparseNeuron(4);
-      n.UseBias = true;
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
       n.Bias = 0.5D;
       n.Build();
 
@@ -361,37 +256,6 @@ namespace ML.Tests.UnitTests
     public void SparseNeuron_TryUpdateParams()
     {
       var n = new SparseNeuron(4);
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
-      n.Build();
-
-      var pars = new double[] { 1, 2, -1, 3, 1, 2, -3, -1, 1 };
-      var cursor = 1;
-
-      var res = n.TryUpdateParams(pars, false, ref cursor);
-      Assert.IsTrue(res);
-      Assert.AreEqual(4, cursor);
-      Assert.AreEqual(2, n[0]);
-      Assert.AreEqual(-1, n[2]);
-      Assert.AreEqual(3, n[3]);
-
-      res = n.TryUpdateParams(pars, true, ref cursor);
-      Assert.IsTrue(res);
-      Assert.AreEqual(7, cursor);
-      Assert.AreEqual(3, n[0]);
-      Assert.AreEqual(1, n[2]);
-      Assert.AreEqual(0, n[3]);
-
-      res = n.TryUpdateParams(pars, false, ref cursor);
-      Assert.IsFalse(res);
-    }
-
-    [TestMethod]
-    public void SparseNeuron_UseBias_TryUpdateParams()
-    {
-      var n = new SparseNeuron(4);
-      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -452,13 +316,13 @@ namespace ML.Tests.UnitTests
       n.TryUpdateParams(pars, true, ref cursor);
 
       result = n.Calculate(input);
-      Assert.AreEqual(35, result);
+      Assert.AreEqual(36, result);
 
       cursor = 0;
       n.TryUpdateParams(pars, false, ref cursor);
 
       result = n.Calculate(input);
-      Assert.AreEqual(6, result);
+      Assert.AreEqual(7, result);
     }
 
     [TestMethod]
@@ -566,19 +430,6 @@ namespace ML.Tests.UnitTests
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n.Build();
-
-      Assert.AreEqual(4, n.ParamCount);
-    }
-
-    [TestMethod]
-    public void FullNeuron_UseBias_Build()
-    {
-      var n = new FullNeuron(4);
-      n.UseBias = true;
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
       n.Bias = 0.5D;
       n.Build();
 
@@ -606,29 +457,16 @@ namespace ML.Tests.UnitTests
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
-      n.Build();
-      var input = new double[] { 1, 2, 3, 4 };
-
-      var result = n.Calculate(input);
-
-      MLAssert.AreEpsEqual(0.7D, result, EPS);
-    }
-
-    [TestMethod]
-    public void FullNeuron_UseBias_Calculate()
-    {
-      var n = new FullNeuron(4);
-      n.UseBias = true;
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
       n.Bias = 0.5;
       n.Build();
       var input = new double[] { 1, 2, 3, 4 };
 
       var result = n.Calculate(input);
 
-      MLAssert.AreEpsEqual(1.2D, result, EPS);
+      Assert.AreEqual(1.2D, result, EPS);
+      Assert.AreEqual(1.2D, n.Value,      EPS);
+      Assert.AreEqual(1.2D, n.NetValue,   EPS);
+      Assert.AreEqual(1.0D, n.Derivative, EPS);
     }
 
     [TestMethod]
@@ -644,29 +482,16 @@ namespace ML.Tests.UnitTests
 
       var result = n.Calculate(input);
 
-      MLAssert.AreEpsEqual(Math.Exp(0.7D), result, EPS);
+      Assert.AreEqual(Math.Exp(0.7D), result,       EPS);
+      Assert.AreEqual(Math.Exp(0.7D), n.Value,      EPS);
+      Assert.AreEqual(0.7D,           n.NetValue,   EPS);
+      Assert.AreEqual(Math.Exp(0.7D), n.Derivative, EPS);
     }
 
     [TestMethod]
     public void FullNeuron_Indexer()
     {
       var n = new FullNeuron(4);
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
-      n.Build();
-
-      Assert.AreEqual(0.1D,  n[0]);
-      Assert.AreEqual(0,     n[1]);
-      Assert.AreEqual(-0.2D, n[2]);
-      Assert.AreEqual(0.3D,  n[3]);
-    }
-
-    [TestMethod]
-    public void FullNeuron_UseBias_Indexer()
-    {
-      var n = new FullNeuron(4);
-      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -684,35 +509,6 @@ namespace ML.Tests.UnitTests
     public void FullNeuron_TryGetParam()
     {
       var n = new FullNeuron(4);
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
-      n.Build();
-
-      double par1;
-      double par2;
-      double par3;
-      double par4;
-      var res1 = n.TryGetParam(0, out par1);
-      var res2 = n.TryGetParam(1, out par2);
-      var res3 = n.TryGetParam(2, out par3);
-      var res4 = n.TryGetParam(3, out par4);
-
-      Assert.IsTrue(res1);
-      Assert.IsTrue(res2);
-      Assert.IsTrue(res3);
-      Assert.IsTrue(res4);
-      Assert.AreEqual(0.1D, par1);
-      Assert.AreEqual(0, par2);
-      Assert.AreEqual(-0.2D, par3);
-      Assert.AreEqual(0.3D, par4);
-    }
-
-    [TestMethod]
-    public void FullNeuron_UseBias_TryGetParam()
-    {
-      var n = new FullNeuron(4);
-      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -746,34 +542,9 @@ namespace ML.Tests.UnitTests
     }
 
     [TestMethod]
-    public void FullNeuron_TrySetParam()
+    public void FullNeuron_rySetParam()
     {
       var n = new FullNeuron(4);
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
-      n.Build();
-
-      var res1 = n.TrySetParam(0, -1, false);
-      var res2 = n.TrySetParam(1,  1, true);
-      var res3 = n.TrySetParam(2,  2, false);
-      var res4 = n.TrySetParam(3,  3, true);
-
-      Assert.IsTrue(res1);
-      Assert.IsTrue(res2);
-      Assert.IsTrue(res3);
-      Assert.IsTrue(res4);
-      Assert.AreEqual(-1, n[0]);
-      Assert.AreEqual(1, n[1]);
-      Assert.AreEqual(2, n[2]);
-      Assert.AreEqual(3.3D, n[3]);
-    }
-
-    [TestMethod]
-    public void FullNeuron_UseBias_TrySetParam()
-    {
-      var n = new FullNeuron(4);
-      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -804,39 +575,6 @@ namespace ML.Tests.UnitTests
     public void FullNeuron_TryUpdateParams()
     {
       var n = new FullNeuron(4);
-      n[0] = 0.1D;
-      n[2] = -0.2D;
-      n[3] = 0.3D;
-      n.Build();
-
-      var pars = new double[] { 1, 2, -1, 3, 1, 2, -3, -1, 1, 7 };
-      var cursor = 1;
-
-      var res = n.TryUpdateParams(pars, false, ref cursor);
-      Assert.IsTrue(res);
-      Assert.AreEqual(5, cursor);
-      Assert.AreEqual(2,  n[0]);
-      Assert.AreEqual(-1, n[1]);
-      Assert.AreEqual(3,  n[2]);
-      Assert.AreEqual(1,  n[3]);
-
-      res = n.TryUpdateParams(pars, true, ref cursor);
-      Assert.IsTrue(res);
-      Assert.AreEqual(9, cursor);
-      Assert.AreEqual(4,  n[0]);
-      Assert.AreEqual(-4, n[1]);
-      Assert.AreEqual(2,  n[2]);
-      Assert.AreEqual(2, n[3]);
-
-      res = n.TryUpdateParams(pars, false, ref cursor);
-      Assert.IsFalse(res);
-    }
-
-    [TestMethod]
-    public void FullNeuron_UseBias_TryUpdateParams()
-    {
-      var n = new FullNeuron(4);
-      n.UseBias = true;
       n[0] = 0.1D;
       n[2] = -0.2D;
       n[3] = 0.3D;
@@ -899,13 +637,13 @@ namespace ML.Tests.UnitTests
       n.TryUpdateParams(pars, true, ref cursor);
 
       result = n.Calculate(input);
-      Assert.AreEqual(40, result);
+      Assert.AreEqual(41, result);
 
       cursor = 0;
       n.TryUpdateParams(pars, false, ref cursor);
 
       result = n.Calculate(input);
-      Assert.AreEqual(11, result);
+      Assert.AreEqual(12, result);
     }
 
     [TestMethod]
@@ -1018,38 +756,32 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void NeuralLayer_Build()
     {
-      var layer = new SimpleSparseLayer(false);
+      var layer = new SimpleSparseLayer();
       layer.Build();
 
       Assert.AreEqual(3, layer.SubNodes.Length);
-      Assert.AreEqual(2, layer[0].ParamCount);
-      Assert.AreEqual(2, layer[1].ParamCount);
-      Assert.AreEqual(1, layer[2].ParamCount);
+      Assert.AreEqual(3, layer[0].ParamCount);
+      Assert.AreEqual(3, layer[1].ParamCount);
+      Assert.AreEqual(2, layer[2].ParamCount);
     }
 
     [TestMethod]
     public void NeuralLayer_Calculate()
     {
-      var layer = new SimpleSparseLayer(false);
+      var layer = new SimpleSparseLayer();
       layer.Build();
 
       var res1 = layer.Calculate(new double[] { 1, 1, 1, 1 });
-      Assert.AreEqual(3, res1.Length);
-      Assert.AreEqual(0, res1[0]);
-      Assert.AreEqual(5, res1[1]);
-      Assert.AreEqual(-2, res1[2]);
-
-      var res2 = layer.Calculate(new double[] { 1, -1, 1, -1 });
-      Assert.AreEqual(3, res2.Length);
-      Assert.AreEqual(2, res2[0]);
-      Assert.AreEqual(5, res2[1]);
-      Assert.AreEqual(2, res2[2]);
+      Assert.AreEqual( 3, res1.Length);
+      Assert.AreEqual( 2, res1[0]);
+      Assert.AreEqual( 6, res1[1]);
+      Assert.AreEqual(-3, res1[2]);
     }
 
     [TestMethod]
     public void NeuralLayer_TryGetParam()
     {
-      var layer = new SimpleSparseLayer(false);
+      var layer = new SimpleSparseLayer();
       layer.Build();
 
       double par1;
@@ -1058,12 +790,14 @@ namespace ML.Tests.UnitTests
       double par4;
       double par5;
       double par6;
+      double par7;
       var res1 = layer.TryGetParam(0, out par1);
       var res2 = layer.TryGetParam(1, out par2);
-      var res3 = layer.TryGetParam(2, out par3);
-      var res4 = layer.TryGetParam(3, out par4);
-      var res5 = layer.TryGetParam(4, out par5);
-      var res6 = layer.TryGetParam(5, out par6);
+      var res3 = layer.TryGetParam(3, out par3);
+      var res4 = layer.TryGetParam(4, out par4);
+      var res5 = layer.TryGetParam(6, out par5);
+      var res6 = layer.TryGetParam(7, out par6);
+      var res7 = layer.TryGetParam(8, out par7);
 
       Assert.IsTrue(res1);
       Assert.AreEqual(1, par1);
@@ -1075,22 +809,25 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(3, par4);
       Assert.IsTrue(res5);
       Assert.AreEqual(-2, par5);
-      Assert.IsFalse(res6);
-      Assert.AreEqual(0, par6);
+      Assert.IsTrue(res6);
+      Assert.AreEqual(-1, par6);
+      Assert.IsFalse(res7);
+      Assert.AreEqual(0, par7);
     }
 
     [TestMethod]
     public void NeuralLayer_TrySetParam()
     {
-      var layer = new SimpleSparseLayer(false);
+      var layer = new SimpleSparseLayer();
       layer.Build();
 
-      var res1 = layer.TrySetParam(0, 1, false);
-      var res2 = layer.TrySetParam(1, 1, true);
-      var res3 = layer.TrySetParam(2, -2, false);
-      var res4 = layer.TrySetParam(3, -4, true);
-      var res5 = layer.TrySetParam(4, 4, false);
-      var res6 = layer.TrySetParam(5, 4, false);
+      var res1 = layer.TrySetParam(0,  1, false);
+      var res2 = layer.TrySetParam(1,  1, true);
+      var res3 = layer.TrySetParam(3, -2, false);
+      var res4 = layer.TrySetParam(4, -4, true);
+      var res5 = layer.TrySetParam(6,  4, false);
+      var res6 = layer.TrySetParam(7,  5, false);
+      var res7 = layer.TrySetParam(8,  4, false);
 
       Assert.IsTrue(res1);
       Assert.AreEqual(1, layer[0][0]);
@@ -1102,35 +839,44 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(-1, layer[1][2]);
       Assert.IsTrue(res5);
       Assert.AreEqual(4, layer[2][3]);
-      Assert.IsFalse(res6);
+      Assert.IsTrue(res6);
+      Assert.AreEqual(5, layer[2].Bias);
+      Assert.IsFalse(res7);
     }
 
     [TestMethod]
     public void NeuralLayer_TryUpdateParams()
     {
-      var layer = new SimpleSparseLayer(false);
+      var layer = new SimpleSparseLayer();
       layer.Build();
 
-      var pars = new double[] { 1, 2, 3, -4, -1, 3, 1, -1, 2, 5, 3, 5 };
+      var pars = new double[] { 1, 2, 3, 1, -4, -1, 2, 3, 2, 1 };
       var cursor = 1;
 
       var res = layer.TryUpdateParams(pars, false, ref cursor);
       Assert.IsTrue(res);
-      Assert.AreEqual(6, cursor);
-      Assert.AreEqual(2, layer[0][0]);
-      Assert.AreEqual(3, layer[0][1]);
+      Assert.AreEqual(9, cursor);
+      Assert.AreEqual( 2, layer[0][0]);
+      Assert.AreEqual( 3, layer[0][1]);
+      Assert.AreEqual( 1, layer[0].Bias);
       Assert.AreEqual(-4, layer[1][0]);
       Assert.AreEqual(-1, layer[1][2]);
-      Assert.AreEqual(3, layer[2][3]);
+      Assert.AreEqual( 2, layer[1].Bias);
+      Assert.AreEqual( 3, layer[2][3]);
+      Assert.AreEqual( 2, layer[2].Bias);
 
+      cursor=1;
       res = layer.TryUpdateParams(pars, true, ref cursor);
       Assert.IsTrue(res);
-      Assert.AreEqual(11, cursor);
-      Assert.AreEqual(3, layer[0][0]);
-      Assert.AreEqual(2, layer[0][1]);
-      Assert.AreEqual(-2, layer[1][0]);
-      Assert.AreEqual(4, layer[1][2]);
-      Assert.AreEqual(6, layer[2][3]);
+      Assert.AreEqual( 9, cursor);
+      Assert.AreEqual( 4, layer[0][0]);
+      Assert.AreEqual( 6, layer[0][1]);
+      Assert.AreEqual( 2, layer[0].Bias);
+      Assert.AreEqual(-8, layer[1][0]);
+      Assert.AreEqual(-2, layer[1][2]);
+      Assert.AreEqual( 4, layer[1].Bias);
+      Assert.AreEqual( 6, layer[2][3]);
+      Assert.AreEqual( 4, layer[2].Bias);
 
       res = layer.TryUpdateParams(pars, true, ref cursor);
       Assert.IsFalse(res);
@@ -1139,7 +885,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void NeuralSparseLayer_UseBias_Calculate()
     {
-      var layer = new SimpleSparseLayer(true);
+      var layer = new SimpleSparseLayer();
       layer.Build();
 
       var input = new double[] { 1, 1, 1, 1 };
@@ -1180,7 +926,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void NeuralFullLayer_UseBias_Calculate()
     {
-      var layer = new SimpleFullLayer(true);
+      var layer = new SimpleFullLayer();
       layer.Build();
 
       var input = new double[] { 1, 1, 1, 1 };
@@ -1223,7 +969,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void NeuralLayer_AddNeuron()
     {
-      var layer = new SimpleFullLayer(true);
+      var layer = new SimpleFullLayer();
       var neuron = new FullNeuron(layer.InputDim);
 
       layer.AddNeuron(neuron);
@@ -1330,29 +1076,29 @@ namespace ML.Tests.UnitTests
 
       Assert.AreEqual(3, net.SubNodes.Length);
 
-      Assert.AreEqual(1,  net[0][0].ParamCount);
+      Assert.AreEqual(2,  net[0][0].ParamCount);
       Assert.AreEqual(-1, net[0][0][0]);
       Assert.AreEqual(0,  net[0][0][1]);
       Assert.AreEqual(0,  net[0][0][2]);
-      Assert.AreEqual(2,  net[0][1].ParamCount);
+      Assert.AreEqual(3,  net[0][1].ParamCount);
       Assert.AreEqual(0,  net[0][1][0]);
       Assert.AreEqual(2,  net[0][1][1]);
       Assert.AreEqual(3,  net[0][1][2]);
-      Assert.AreEqual(1,  net[0][2].ParamCount);
+      Assert.AreEqual(2,  net[0][2].ParamCount);
       Assert.AreEqual(0,  net[0][2][0]);
       Assert.AreEqual(0,  net[0][2][1]);
       Assert.AreEqual(-2, net[0][2][2]);
 
-      Assert.AreEqual(2,  net[1][0].ParamCount);
+      Assert.AreEqual(3,  net[1][0].ParamCount);
       Assert.AreEqual(1,  net[1][0][0]);
       Assert.AreEqual(-1, net[1][0][1]);
       Assert.AreEqual(0,  net[1][0][2]);
-      Assert.AreEqual(1,  net[1][1].ParamCount);
+      Assert.AreEqual(2,  net[1][1].ParamCount);
       Assert.AreEqual(0,  net[1][1][0]);
       Assert.AreEqual(0,  net[1][1][1]);
       Assert.AreEqual(3,  net[1][1][2]);
 
-      Assert.AreEqual(2,  net[2][0].ParamCount);
+      Assert.AreEqual(3,  net[2][0].ParamCount);
       Assert.AreEqual(1,  net[2][0][0]);
       Assert.AreEqual(-1, net[2][0][1]);
     }
@@ -1379,41 +1125,21 @@ namespace ML.Tests.UnitTests
       double par3;
       double par4;
       double par5;
-      double par6;
-      double par7;
-      double par8;
-      double par9;
-      double par10;
-      var res1 = net.TryGetParam(0, out par1);
-      var res2 = net.TryGetParam(1, out par2);
-      var res3 = net.TryGetParam(2, out par3);
-      var res4 = net.TryGetParam(3, out par4);
-      var res5 = net.TryGetParam(4, out par5);
-      var res6 = net.TryGetParam(5, out par6);
-      var res7 = net.TryGetParam(6, out par7);
-      var res8 = net.TryGetParam(7, out par8);
-      var res9 = net.TryGetParam(8, out par9);
-      var res10 = net.TryGetParam(9, out par10);
+      var res1 = net.TryGetParam(0,  out par1);
+      var res2 = net.TryGetParam(3,  out par2);
+      var res3 = net.TryGetParam(9,  out par3);
+      var res4 = net.TryGetParam(12, out par4);
+      var res5 = net.TryGetParam(15, out par5);
 
       Assert.IsTrue(res1);
       Assert.IsTrue(res2);
       Assert.IsTrue(res3);
       Assert.IsTrue(res4);
-      Assert.IsTrue(res5);
-      Assert.IsTrue(res6);
-      Assert.IsTrue(res7);
-      Assert.IsTrue(res8);
-      Assert.IsTrue(res9);
-      Assert.IsFalse(res10);
+      Assert.IsFalse(res5);
       Assert.AreEqual(-1, par1);
-      Assert.AreEqual(2, par2);
-      Assert.AreEqual(3, par3);
-      Assert.AreEqual(-2, par4);
-      Assert.AreEqual(1, par5);
-      Assert.AreEqual(-1, par6);
-      Assert.AreEqual(3, par7);
-      Assert.AreEqual(1, par8);
-      Assert.AreEqual(-1, par9);
+      Assert.AreEqual( 3, par2);
+      Assert.AreEqual( 0, par3);
+      Assert.AreEqual( 1, par4);
     }
 
     [TestMethod]
@@ -1422,44 +1148,22 @@ namespace ML.Tests.UnitTests
       var net = new SimpleNetwork<SparseNeuron>();
       net.Build();
 
-      var res1 = net.TrySetParam(0,  1, false);
-      var res2 = net.TrySetParam(1,  1, true);
-      var res3 = net.TrySetParam(2, -2, false);
-      var res4 = net.TrySetParam(3, -4, true);
-      var res5 = net.TrySetParam(4,  1, false);
-      var res6 = net.TrySetParam(5,  2, true);
-      var res7 = net.TrySetParam(6, -3, false);
-      var res8 = net.TrySetParam(7, -1, true);
-      var res9 = net.TrySetParam(8,  2, false);
-      var res10 = net.TrySetParam(9, 4, false);
+      var res1  = net.TrySetParam(0,   1, false);
+      var res2  = net.TrySetParam(3,   1, true);
+      var res3  = net.TrySetParam(9,  -2, false);
+      var res4  = net.TrySetParam(12, -4, true);
+      var res5  = net.TrySetParam(15,  1, false);
 
       Assert.IsTrue(res1);
       Assert.IsTrue(res2);
       Assert.IsTrue(res3);
       Assert.IsTrue(res4);
-      Assert.IsTrue(res5);
-      Assert.IsTrue(res6);
-      Assert.IsTrue(res7);
-      Assert.IsTrue(res8);
-      Assert.IsTrue(res9);
-      Assert.IsFalse(res10);
+      Assert.IsFalse(res5);
+
       Assert.AreEqual(1,  net[0][0][0]);
-      Assert.AreEqual(0,  net[0][0][1]);
-      Assert.AreEqual(0,  net[0][0][2]);
-      Assert.AreEqual(0,  net[0][1][0]);
-      Assert.AreEqual(3,  net[0][1][1]);
-      Assert.AreEqual(-2, net[0][1][2]);
-      Assert.AreEqual(0,  net[0][2][0]);
-      Assert.AreEqual(0,  net[0][2][1]);
-      Assert.AreEqual(-6, net[0][2][2]);
-      Assert.AreEqual(1,  net[1][0][0]);
-      Assert.AreEqual(1,  net[1][0][1]);
-      Assert.AreEqual(0,  net[1][0][2]);
-      Assert.AreEqual(0,  net[1][1][0]);
-      Assert.AreEqual(0,  net[1][1][1]);
-      Assert.AreEqual(-3, net[1][1][2]);
-      Assert.AreEqual(0,  net[2][0][0]);
-      Assert.AreEqual(2,  net[2][0][1]);
+      Assert.AreEqual(4,  net[0][1][2]);
+      Assert.AreEqual(-2, net[1][0].Bias);
+      Assert.AreEqual(-3, net[2][0][0]);
     }
 
     [TestMethod]
@@ -1468,51 +1172,39 @@ namespace ML.Tests.UnitTests
       var net = new SimpleNetwork<SparseNeuron>();
       net.Build();
 
-      var pars = new double[] { 1, 2, 3, -4, -1, 3, 1, -1, 2, 5, 3, 5 };
+      var pars = new double[] { 1, 2, 1, 3, -4, 2, -1, 3, 1, -1, 2, 5, 3, 5, 1, -1, 2, -3, 4, 5 };
       var cursor = 1;
 
       var res = net.TryUpdateParams(pars, false, ref cursor);
       Assert.IsTrue(res);
-      Assert.AreEqual(10, cursor);
+      Assert.AreEqual(16, cursor);
       Assert.AreEqual(2,  net[0][0][0]);
       Assert.AreEqual(0,  net[0][0][1]);
       Assert.AreEqual(0,  net[0][0][2]);
+      Assert.AreEqual(1,  net[0][0].Bias);
       Assert.AreEqual(0,  net[0][1][0]);
       Assert.AreEqual(3,  net[0][1][1]);
       Assert.AreEqual(-4, net[0][1][2]);
-      Assert.AreEqual(0,  net[0][2][0]);
-      Assert.AreEqual(0,  net[0][2][1]);
-      Assert.AreEqual(-1, net[0][2][2]);
-      Assert.AreEqual(3,  net[1][0][0]);
-      Assert.AreEqual(1,  net[1][0][1]);
-      Assert.AreEqual(0,  net[1][0][2]);
-      Assert.AreEqual(0,  net[1][1][0]);
-      Assert.AreEqual(0,  net[1][1][1]);
-      Assert.AreEqual(-1, net[1][1][2]);
-      Assert.AreEqual(2,  net[2][0][0]);
-      Assert.AreEqual(5,  net[2][0][1]);
+      Assert.AreEqual(2,  net[0][1].Bias);
+      Assert.AreEqual(5,  net[1][1][2]);
+      Assert.AreEqual(5,  net[2][0][0]);
+      Assert.AreEqual(1,  net[2][0][1]);
 
-      cursor = 0;
+      cursor = 1;
       res = net.TryUpdateParams(pars, true, ref cursor);
       Assert.IsTrue(res);
-      Assert.AreEqual(9, cursor);
-      Assert.AreEqual(3,  net[0][0][0]);
+      Assert.AreEqual(16, cursor);
+      Assert.AreEqual(4,  net[0][0][0]);
       Assert.AreEqual(0,  net[0][0][1]);
       Assert.AreEqual(0,  net[0][0][2]);
+      Assert.AreEqual(2,  net[0][0].Bias);
       Assert.AreEqual(0,  net[0][1][0]);
-      Assert.AreEqual(5,  net[0][1][1]);
-      Assert.AreEqual(-1, net[0][1][2]);
-      Assert.AreEqual(0,  net[0][2][0]);
-      Assert.AreEqual(0,  net[0][2][1]);
-      Assert.AreEqual(-5, net[0][2][2]);
-      Assert.AreEqual(2,  net[1][0][0]);
-      Assert.AreEqual(4,  net[1][0][1]);
-      Assert.AreEqual(0,  net[1][0][2]);
-      Assert.AreEqual(0,  net[1][1][0]);
-      Assert.AreEqual(0,  net[1][1][1]);
-      Assert.AreEqual(0,  net[1][1][2]);
-      Assert.AreEqual(1,  net[2][0][0]);
-      Assert.AreEqual(7,  net[2][0][1]);
+      Assert.AreEqual(6,  net[0][1][1]);
+      Assert.AreEqual(-8, net[0][1][2]);
+      Assert.AreEqual(4,  net[0][1].Bias);
+      Assert.AreEqual(10, net[1][1][2]);
+      Assert.AreEqual(10, net[2][0][0]);
+      Assert.AreEqual(2,  net[2][0][1]);
 
       res = net.TryUpdateParams(pars, true, ref cursor);
       Assert.IsFalse(res);

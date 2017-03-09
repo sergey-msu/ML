@@ -29,7 +29,6 @@ namespace ML.NeuralMethods.Model
         throw new MLException("NeuronLayer.ctor(network=null)");
 
       m_Network = network;
-      UseBias = m_Network.UseBias;
     }
 
 
@@ -52,12 +51,6 @@ namespace ML.NeuralMethods.Model
     /// Total count of neurons
     /// </summary>
     public int NeuronCount { get { return SubNodes.Length; } }
-
-    /// <summary>
-    /// If true, adds artificial +1 input value in the very end of input data array.
-    /// All layers inherit this value by default
-    /// </summary>
-    public bool UseBias { get; set; }
 
     /// <summary>
     /// In true, norms output vector to the summ of absolute values of its components (give more 'probabalistic' meaning to the result)
@@ -91,8 +84,7 @@ namespace ML.NeuralMethods.Model
     public Neuron CreateNeuron<TNeuron>()
       where TNeuron : Neuron
     {
-      var neuron = (TNeuron)Activator.CreateInstance(typeof(TNeuron), this, m_InputDim);
-      neuron.UseBias = UseBias;
+      var neuron = (TNeuron)Activator.CreateInstance(typeof(TNeuron), this);
       this.AddSubNode(neuron);
       return neuron;
     }

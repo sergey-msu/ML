@@ -22,18 +22,6 @@ namespace ML.Core.ComputingNetworks
     /// </summary>
     void Build();
 
-    ///// <summary>
-    ///// Tries to return subnode which owns parameter with specified index
-    ///// WARNING: override this method carefully!
-    ///// Do not use base. as base methods operate with base class index which may differ from exact class index
-    ///// and so it will return wrong results. Override this method COMPLETELY or not override at all
-    ///// </summary>
-    ///// <param name="idx">Linear index of the parameter</param>
-    ///// <param name="TNode">Subnode</param>
-    ///// <param name="subidx">Internal index part within the subnode</param>
-    ///// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
-    //bool TryGetSubnodeByParamIndex<TNode>(int idx, out TNode result, out int subidx) where TNode : class, IComputingNode;
-
     /// <summary>
     /// Tries to update node parameters
     /// </summary>

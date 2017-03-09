@@ -208,7 +208,6 @@ namespace ML.ConsoleTest
                  new BackpropagationAlgorithm(Data.TrainingSample, new[] { 2, 15, 3 }) :
                  new BackpropagationAlgorithm(Data.TrainingSample, net);
       alg.EpochCount = 6000;
-      alg.UseBias = true;
       alg.LearningRate = 0.1D;
       alg.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
       alg.RandomizeInitialWeights = (net == null);

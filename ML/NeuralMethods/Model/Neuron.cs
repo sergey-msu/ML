@@ -13,14 +13,20 @@ namespace ML.NeuralMethods.Model
   /// </summary>
   public abstract class Neuron : ComputingNode<double[], double>
   {
+    #region Fields
+
     private readonly NeuralLayer m_Layer;
     private IFunction m_ActivationFunction;
-    protected int  m_InputDim;
-    protected bool m_UseBias;
-    protected double m_Bias;
+    protected int     m_InputDim;
+    protected double  m_Bias;
+
     private double m_NetValue;
     private double m_Derivative;
     private double m_Value;
+
+    #endregion
+
+    #region .ctor
 
     public Neuron(int inputDim)
     {
@@ -30,8 +36,8 @@ namespace ML.NeuralMethods.Model
       m_InputDim = inputDim;
     }
 
-    public Neuron(NeuralLayer layer, int inputDim)
-      : this(inputDim)
+    public Neuron(NeuralLayer layer)
+      : this(layer.InputDim)
     {
       if (layer==null)
         throw new MLException("Neuron.ctor(layer=null)");
@@ -39,22 +45,17 @@ namespace ML.NeuralMethods.Model
       m_Layer = layer;
     }
 
+    #endregion
+
+    #region Properties
+
     /// <summary>
-    /// Bias weight value (in use only if UseBias is true)
+    /// Bias weight value
     /// </summary>
     public double Bias
     {
       get { return m_Bias; }
       set { m_Bias = value; }
-    }
-
-    /// <summary>
-    /// Whether or not use bias connection - net value shift
-    /// </summary>
-    public bool UseBias
-    {
-      get { return m_UseBias; }
-      set { m_UseBias = value; }
     }
 
     /// <summary>
@@ -104,6 +105,10 @@ namespace ML.NeuralMethods.Model
     /// </summary>
     public abstract double this[int idx] { get; set; }
 
+    #endregion
+
+    #region Public
+
     /// <summary>
     /// Insert new synapse weight at specified index
     /// </summary>
@@ -116,7 +121,6 @@ namespace ML.NeuralMethods.Model
     {
       var random = RandomGenerator.Get(seed);
       DoRandomize(random);
-      if (m_UseBias) m_Bias = 2 * random.GenerateUniform(0, 1) / m_InputDim;
     }
 
     /// <summary>
@@ -128,16 +132,12 @@ namespace ML.NeuralMethods.Model
       if (m_InputDim != input.Length)
         throw new MLException("Incorrect input vector dimension");
 
-      m_NetValue = DoCalculate(input);
+      m_NetValue   = DoCalculate(input);
       m_Derivative = m_ActivationFunction.Derivative(m_NetValue);
-      m_Value = m_ActivationFunction.Value(m_NetValue);
+      m_Value      = m_ActivationFunction.Value(m_NetValue);
 
       return m_Value;
     }
-
-    protected abstract void DoRandomize(RandomGenerator random);
-
-    protected abstract double DoCalculate(double[] input);
 
     public override void DoBuild()
     {
@@ -149,6 +149,16 @@ namespace ML.NeuralMethods.Model
 
       base.DoBuild();
     }
+
+    #endregion
+
+    #region Protected
+
+    protected abstract void DoRandomize(RandomGenerator random);
+
+    protected abstract double DoCalculate(double[] input);
+
+    #endregion
   }
 
   /// <summary>
@@ -163,20 +173,20 @@ namespace ML.NeuralMethods.Model
     public FullNeuron(int inputDim)
       : base(inputDim)
     {
-      m_Weights = new double[inputDim];
+      m_Weights = new double[m_InputDim];
     }
 
-    public FullNeuron(NeuralLayer layer, int inputDim)
-      : base(layer, inputDim)
+    public FullNeuron(NeuralLayer layer)
+      : base(layer)
     {
-      m_Weights = new double[inputDim];
+      m_Weights = new double[m_InputDim];
     }
 
 
     /// <summary>
     /// Total count of existing connections between neuron and previous neural layer
     /// </summary>
-    public override int ParamCount { get { return m_Weights.Length + (m_UseBias ? 1 : 0); } }
+    public override int ParamCount { get { return m_Weights.Length + 1; } }
 
     public override double this[int idx]
     {
@@ -198,24 +208,24 @@ namespace ML.NeuralMethods.Model
     {
       for (int i=0; i<this.InputDim; i++)
         this[i] = 2 * random.GenerateUniform(0, 1) / m_InputDim;
+
+      m_Bias = 2 * random.GenerateUniform(0, 1) / m_InputDim;
     }
 
     protected override double DoCalculate(double[] input)
     {
-      var value = 0.0D;
+      var value = m_Bias;
 
       for (int i=0; i<m_InputDim; i++)
         value += m_Weights[i] * input[i];
-
-      if (m_UseBias) value += Bias;
 
       return value;
     }
 
     protected override double DoGetParam(int idx)
     {
-      if (idx<m_InputDim) return m_Weights[idx];
-      if (m_UseBias && idx==m_InputDim) return m_Bias;
+      if (idx<m_InputDim)  return m_Weights[idx];
+      if (idx==m_InputDim) return m_Bias;
 
       throw new MLException("Index out of range");
     }
@@ -229,7 +239,7 @@ namespace ML.NeuralMethods.Model
         else
           m_Weights[idx] = value;
       }
-      else if (m_UseBias && idx==m_InputDim)
+      else if (idx==m_InputDim)
       {
         if (isDelta)
           m_Bias += value;
@@ -248,13 +258,13 @@ namespace ML.NeuralMethods.Model
         for (int i=0; i<len; i++)
           m_Weights[i] += pars[cursor++];
 
-        if (m_UseBias) m_Bias += pars[cursor];
+        m_Bias += pars[cursor];
       }
       else
       {
         Array.Copy(pars, cursor, m_Weights, 0, len);
         cursor += len;
-        if (m_UseBias) m_Bias = pars[cursor];
+        m_Bias = pars[cursor];
       }
     }
   }
@@ -275,8 +285,8 @@ namespace ML.NeuralMethods.Model
       m_Weights = new Dictionary<int, double>();
     }
 
-    public SparseNeuron(NeuralLayer layer, int inputDim)
-      : base(layer, inputDim)
+    public SparseNeuron(NeuralLayer layer)
+      : base(layer)
     {
       m_Weights = new Dictionary<int, double>();
     }
@@ -284,7 +294,7 @@ namespace ML.NeuralMethods.Model
     /// <summary>
     /// Total count of existing connections between neuron and previous neural layer
     /// </summary>
-    public override int ParamCount { get { return m_Weights.Count + (m_UseBias ? 1 : 0); } }
+    public override int ParamCount { get { return m_Weights.Count + 1; } }
 
     public override double this[int idx]
     {
@@ -327,28 +337,25 @@ namespace ML.NeuralMethods.Model
     {
       foreach (var wdata in m_Weights)
         m_Weights[wdata.Key] = 2 * random.GenerateUniform(0, 1) / m_InputDim;
+
+      m_Bias = 2 * random.GenerateUniform(0, 1) / m_InputDim;
     }
 
     protected override double DoCalculate(double[] input)
     {
-      var value = 0.0D;
+      var value = m_Bias;
       var count = m_Weights.Count;
 
       foreach (var wdata in m_Weights)
-      {
-          value += wdata.Value * input[wdata.Key];
-      }
-
-      if (m_UseBias) // bias weight is the last element of weight array (by definition)
-        value += m_Bias;
+        value += wdata.Value * input[wdata.Key];
 
       return value;
     }
 
     protected override double DoGetParam(int idx)
     {
-      if (idx<m_Weights.Count) return m_Weights.ElementAt(idx).Value;
-      if (m_UseBias && idx==m_Weights.Count) return m_Bias;
+      if (idx<m_Weights.Count)  return m_Weights.ElementAt(idx).Value;
+      if (idx==m_Weights.Count) return m_Bias;
 
       throw new MLException("Index is out of range");
     }
@@ -363,7 +370,7 @@ namespace ML.NeuralMethods.Model
         else
           m_Weights[wdata.Key] = value;
       }
-      else if (m_UseBias && idx==m_Weights.Count)
+      else if (idx==m_Weights.Count)
       {
         if (isDelta)
           m_Bias += value;
@@ -382,14 +389,14 @@ namespace ML.NeuralMethods.Model
         foreach (var key in keys)
           m_Weights[key] += pars[cursor++];
 
-        if (m_UseBias) m_Bias += pars[cursor];
+        m_Bias += pars[cursor];
       }
       else
       {
         foreach (var key in keys)
           m_Weights[key] = pars[cursor++];
 
-        if (m_UseBias) m_Bias = pars[cursor];
+        m_Bias = pars[cursor];
       }
     }
   }

@@ -28,12 +28,6 @@ namespace ML.NeuralMethods.Model
     public int InputDim { get; set; }
 
     /// <summary>
-    /// If true, adds artificial +1 input value in the very end of input data array.
-    /// All layers inherit this value by default but may override it after creation
-    /// </summary>
-    public bool UseBias { get; set; }
-
-    /// <summary>
     /// Layer activation function. If null, the network's activation function will be used
     /// </summary>
     public IFunction ActivationFunction

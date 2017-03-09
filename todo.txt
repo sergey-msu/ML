@@ -1,14 +1,25 @@
 CURRENT:
 
-- [INPROG] implement Backpropagation algorithm for general full-connected NN
+- [INPROG] implement Convolution NN based on CN architecture
+  - [INPROG] read more about Convolution NN
+  - [INPROG] implement base CNN layer types
+  - implement CNN
+  - implement learning algorithm for NN
+  - testing with real images (MNIST images db: http://yann.lecun.com/exdb/mnist/index.html, https://web.archive.org/web/20160117040036/http://yann.lecun.com/exdb/mnist/)
+  - cover with tests
+
+- implement Backpropagation algorithm for general full-connected NN
   - [DONE] implement algorithm
   - [DONE] add start weight randomization
   - [DONE] add events to NN algorithms
   - add stochastic gradient descent
+  - add batching (+stochastic)
 
 - [DONE] add neuron NN + unit tests
 
 - [DONE] neuron UseBias -> explicit neuron.BiasWeight value
+
+- [DONE] Allwaye UseBias. Get rid of use_bias! fix tests
 
 - integration tests: use data files
 
@@ -35,14 +46,6 @@ CURRENT:
   - develop way to create simple base networks (factory methods)
   - add network-wide global context
   - review architecture: public/internal members - try to use assembly from ouside
-
-- implement Convolution NN based on CN architecture
-  - read more about Convolution NN
-  - implement base CNN layer types
-  - implement CNN
-  - implement learning algorithm for NN
-  - testing with real images
-  - cover with tests
 
  - General ML architcture review
    - review/rewrite Algorithm architecture
