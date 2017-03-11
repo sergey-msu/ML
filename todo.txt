@@ -5,7 +5,9 @@ CURRENT:
   - [INPROG] implement base CNN layer types
   - implement CNN
   - implement learning algorithm for NN
-  - testing with real images (MNIST images db: http://yann.lecun.com/exdb/mnist/index.html, https://web.archive.org/web/20160117040036/http://yann.lecun.com/exdb/mnist/)
+  - testing with real images
+      - MNIST images db: http://yann.lecun.com/exdb/mnist/index.html, https://web.archive.org/web/20160117040036/http://yann.lecun.com/exdb/mnist/)
+      - CIFAR-10 images db: http://www.cs.toronto.edu/~kriz/cifar.html
   - cover with tests
 
 - implement Backpropagation algorithm for general full-connected NN

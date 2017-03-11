@@ -39,12 +39,9 @@ namespace ML.NeuralMethods.Algorithms
 
     private static double[][] m_BackpropErrors;
 
-    private NeuralNetwork m_Network;
-    private int[] m_Structure;
     private Dictionary<Class, double[]> m_ExpectedOutputs;
     private int m_EpochLength;
 
-    private IFunction    m_ActivationFunction;
     private StopCriteria m_Stop;
     private int    m_InputDim;
     private int    m_OutputDim;
@@ -71,23 +68,9 @@ namespace ML.NeuralMethods.Algorithms
     #region .ctor
 
     public BackpropagationAlgorithm(ClassifiedSample classifiedSample, NeuralNetwork net)
-      : base(classifiedSample)
+      : base(classifiedSample, net)
     {
-      if (net==null)
-        throw new MLException("Network can not be null");
-
-      m_Network = net;
-      initParams();
-    }
-
-    public BackpropagationAlgorithm(ClassifiedSample classifiedSample, int[] structure)
-      : base(classifiedSample)
-    {
-      if (structure==null)
-        throw new MLException("Network structure can not be null");
-
-      m_Structure = structure;
-      initParams();
+      init();
     }
 
     #endregion
@@ -112,20 +95,25 @@ namespace ML.NeuralMethods.Algorithms
     public double QValue          { get { return m_QValue; } }
     public double QDelta          { get { return m_QDelta; } }
 
-    public IFunction ActivationFunction
-    {
-      get { return m_ActivationFunction; }
-      set { m_ActivationFunction = value; }
-    }
     public int EpochCount
     {
       get { return m_EpochCount; }
-      set { m_EpochCount = value; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("Epoch count must be positive");
+        m_EpochCount = value;
+      }
     }
     public double LearningRate
     {
       get { return m_LearningRate; }
-      set { m_LearningRate = value; }
+      set
+      {
+        if (LearningRate <= 0)
+          throw new MLException("Learning rate must be positive");
+        m_LearningRate = value;
+      }
     }
     public StopCriteria Stop
     {
@@ -135,22 +123,42 @@ namespace ML.NeuralMethods.Algorithms
     public double ErrorStopDelta
     {
       get { return m_ErrorStopDelta; }
-      set { m_ErrorStopDelta = value; }
+      set
+      {
+        if (ErrorStopDelta < 0)
+          throw new MLException("Error Stop Delta must be non-negative");
+        m_ErrorStopDelta = value;
+      }
     }
     public double StepStopValue
     {
       get { return m_StepStopValue; }
-      set { m_StepStopValue = value; }
+      set
+      {
+        if (StepStopValue < 0)
+          throw new MLException("Step Stop Value must be non-negative");
+        m_StepStopValue = value;
+      }
     }
     public double QLambda
     {
       get { return m_QLambda; }
-      set { m_QLambda = value; }
+      set
+      {
+        if (QLambda < 0 || QLambda > 1)
+          throw new MLException("Lambda for Q-stop criteria must be in [0, 1] interval");
+        m_QLambda = value;
+      }
     }
     public double QStopDelta
     {
       get { return m_QStopDelta; }
-      set { m_QStopDelta = value; }
+      set
+      {
+        if (QStopDelta < 0)
+          throw new MLException("Q Stop Delta must be non-negative");
+        m_QStopDelta = value;
+      }
     }
 
     #endregion
@@ -162,84 +170,39 @@ namespace ML.NeuralMethods.Algorithms
       runEpoch(Result);
     }
 
-    public void RunIteration(Point data, Class cls)
+    public void RunIteration(double[] data, Class cls)
     {
       runIteration(Result, data, cls);
     }
 
     #endregion
 
-    protected override NeuralNetwork DoBuild()
-    {
-      prepareData();
-      checkParams();
-      var net = m_Network ?? constructNetwork();
-      checkNetwork();
-
-      return net;
-    }
-
-    protected override void DoTrain()
+    public override void Train()
     {
       doTrain(Result);
     }
 
     #region .pvt
 
-    private void initParams()
+    private void init()
     {
-      ActivationFunction = DFT_ACTIVATION_FUNCTION;
-      EpochCount         = DFT_EPOCH_COUNT;
-      LearningRate       = DFT_LEARNING_RATE;
-      Stop               = DTF_STOP_CRITERIA;
-      QLambda            = DFT_Q_LAMBDA;
+      // apply defaults
 
-      m_EpochLength = TrainingSample.Count;
-    }
+      m_EpochCount   = DFT_EPOCH_COUNT;
+      m_LearningRate = DFT_LEARNING_RATE;
+      m_Stop         = DTF_STOP_CRITERIA;
+      m_QLambda      = DFT_Q_LAMBDA;
 
-    private void checkParams()
-    {
-      if (m_Network==null && m_Structure==null)
-        throw new MLException("Either network or network structure must be set");
-      if (m_Network!=null && m_Structure!=null)
-        throw new MLException("Network and network structucture can not be set both at the same time");
-      if (m_Structure!=null && m_Structure.Length<2)
-        throw new MLException("At least two lengths must be present in network structure description: [0] - input dimension, [last] - output dimension");
-
-      if (ActivationFunction==null) throw new MLException("Activaltion function is null");
-      if (InputDim <= 0)     throw new MLException("Input dimension must be positive");
-      if (OutputDim <= 0)    throw new MLException("Output dimension nust be positive");
-      if (EpochCount <= 0)   throw new MLException("Epoch count must be positive");
-      if (LearningRate <= 0) throw new MLException("Learning rate must be positive");
-
-      if (ErrorStopDelta < 0) throw new MLException("Error Stop Delta must be non-negative");
-      if (QStopDelta < 0)     throw new MLException("Q Stop Delta must be non-negative");
-      if (StepStopValue < 0)  throw new MLException("Step Stop Value must be non-negative");
-      if (QLambda < 0 || QLambda > 1) throw new MLException("Lambda for Q-stop criteria must be in [0, 1] interval");
-    }
-
-    private void prepareData()
-    {
       // parameters
 
-      if (m_Network==null)
-      {
-        var lcount = m_Structure.Length-1;
-        m_InputDim = m_Structure[0];
-        m_OutputDim = m_Structure[lcount];
-        m_BackpropErrors = new double[lcount][];
-        for (int i=0; i<lcount; i++)
-          m_BackpropErrors[i] = new double[m_Structure[i+1]];
-      }
-      else
-      {
-        var lcount = m_Network.LayerCount;
-        m_InputDim = m_Network.InputDim;
-        m_OutputDim = m_Network[lcount-1].NeuronCount;
-        m_BackpropErrors = new double[lcount][];
-        for (int i=0; i<lcount; i++)
-          m_BackpropErrors[i] = new double[m_Network[i].NeuronCount];
-      }
+      m_EpochLength  = TrainingSample.Count;
+
+      var lcount = Result.LayerCount;
+      m_InputDim = Result.InputDim;
+      m_OutputDim = Result[lcount-1].NeuronCount;
+      m_BackpropErrors = new double[lcount][];
+      for (int i=0; i<lcount; i++)
+        m_BackpropErrors[i] = new double[Result[i].NeuronCount];
 
       // expected outputs
 
@@ -258,31 +221,6 @@ namespace ML.NeuralMethods.Algorithms
         output[i] = 1.0D;
         m_ExpectedOutputs[cls] = output;
       }
-    }
-
-    private void checkNetwork()
-    {
-      // TODO : if NN was passed from outside we need to check its structure for consistency
-    }
-
-    private NeuralNetwork constructNetwork()
-    {
-      var net = new NeuralNetwork();
-      net.InputDim = m_InputDim;
-      net.ActivationFunction = ActivationFunction;
-
-      var lcount = m_Structure.Length-1;
-      for (int i=1; i<=lcount; i++)
-      {
-        var dim = m_Structure[i];
-        var layer = net.CreateLayer();
-        for (int j=0; j<dim; j++)
-          layer.CreateNeuron<FullNeuron>();
-      }
-
-      net.Build();
-
-      return net;
     }
 
     private void doTrain(NeuralNetwork net)
@@ -370,7 +308,7 @@ namespace ML.NeuralMethods.Algorithms
       m_PrevQValue = m_QValue;
       m_QValue = (1-m_QLambda)*m_QValue + m_QLambda*serr2/2;
       m_QDelta = m_QValue-m_PrevQValue;
-      m_Step2 = sstep2;
+      m_Step2  = sstep2;
     }
 
     private bool checkStopCriteria()

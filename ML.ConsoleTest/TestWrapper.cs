@@ -10,6 +10,7 @@ using ML.MetricalMethods.Algorithms;
 using ML.Core.Logical;
 using ML.NeuralMethods.Algorithms;
 using ML.NeuralMethods.Model;
+using ML.Utils;
 
 namespace ML.ConsoleTest
 {
@@ -201,18 +202,13 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private BackpropagationAlgorithm createBPAlg(NeuralNetwork net)
+    private BackpropagationAlgorithm createBPAlg()
     {
+      var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 2, 15, 3 }, Registry.ActivationFunctions.Logistic(1));
 
-      var alg = (net == null) ?
-                 new BackpropagationAlgorithm(Data.TrainingSample, new[] { 2, 15, 3 }) :
-                 new BackpropagationAlgorithm(Data.TrainingSample, net);
+      var alg = new BackpropagationAlgorithm(Data.TrainingSample, net);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.1D;
-      alg.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
-      alg.RandomizeInitialWeights = (net == null);
-
-      alg.Build();
 
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>
@@ -231,30 +227,10 @@ namespace ML.ConsoleTest
 
     private void doMultilayerNNAlgorithmTest()
     {
-      var alg = createBPAlg(null);
+      var alg = createBPAlg();
 
       var now = DateTime.Now;
       alg.Train();
-
-      //var nc = 20;
-      //for (int i=0; i<nc; i++)
-      //{
-      //  Console.WriteLine("NEURON ADDED");
-      //  var net = alg.Result;
-      //
-      //  var neuron = new FullNeuron(2);
-      //  neuron.ActivationFunction = alg.ActivationFunction;
-      //  neuron.Randomize();
-      //  net.AddNeuron(neuron, 0);
-      //
-      //  neuron = new FullNeuron(i+3);
-      //  neuron.ActivationFunction = alg.ActivationFunction;
-      //  neuron.Randomize();
-      //  net.AddNeuron(neuron, 1);
-      //
-      //  alg = createBPAlg(net);
-      //  alg.Train();
-      //}
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
 

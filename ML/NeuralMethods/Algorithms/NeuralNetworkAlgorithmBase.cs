@@ -14,25 +14,19 @@ namespace ML.NeuralMethods.Algorithms
   {
     private NeuralNetwork m_Result;
 
-    protected NeuralNetworkAlgorithmBase(ClassifiedSample classifiedSample)
+    protected NeuralNetworkAlgorithmBase(ClassifiedSample classifiedSample, NeuralNetwork net)
       : base(classifiedSample)
     {
+      if (net==null)
+        throw new MLException("Network can not be null");
+
+      m_Result = net;
     }
 
     /// <summary>
     /// The result of the algorithm
     /// </summary>
     public NeuralNetwork Result { get { return m_Result; } }
-
-    /// <summary>
-    /// If true randomize in [0, 1] all neuron weights befor begin training
-    /// </summary>
-    public bool RandomizeInitialWeights { get; set; }
-
-    /// <summary>
-    /// Seed for random generator if RandomizeInitialWeights is set to true
-    /// </summary>
-    public int RandomSeed { get; set; }
 
     /// <summary>
     /// Maps object to corresponding class
@@ -60,24 +54,8 @@ namespace ML.NeuralMethods.Algorithms
     }
 
     /// <summary>
-    /// Prepares all the data to algorithm training
-    /// </summary>
-    public void Build()
-    {
-      m_Result = DoBuild();
-
-      if (RandomizeInitialWeights) m_Result.Randomize(RandomSeed);
-    }
-
-    /// <summary>
     /// Teaches algorithm, produces Network output
     /// </summary>
-    public void Train()
-    {
-      DoTrain();
-    }
-
-    protected abstract NeuralNetwork DoBuild();
-    protected abstract void DoTrain();
+    public abstract void Train();
   }
 }
