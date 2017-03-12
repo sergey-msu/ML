@@ -85,9 +85,8 @@
     <Compile Include="Core\Registry.cs" />
     <Compile Include="Core\ComputingNetworks\Contracts.cs" />
     <Compile Include="Core\ComputingNetworks\SequenceNode.cs" />
-    <Compile Include="DeepMethods\Model\LeNetNetwork.cs" />
-    <Compile Include="DeepMethods\Model\PoolingMap.cs" />
-    <Compile Include="DeepMethods\Model\FeatureMap.cs" />
+    <Compile Include="DeepMethods\Model\DeepLayerBase.cs" />
+    <Compile Include="DeepMethods\Model\PoolingLayer.cs" />
     <Compile Include="DeepMethods\Model\ConvolutionalLayer.cs" />
     <Compile Include="DeepMethods\Model\ConvolutionalNetwork.cs" />
     <Compile Include="LogicalMethods\Algorithms\DecisionTreeID3Algorithm.cs" />

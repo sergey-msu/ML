@@ -64,7 +64,7 @@ namespace ML.Core.ComputingNetworks
     /// <summary>
     /// Randomizes network weights
     /// </summary>
-    public void RandomizeParameters(int seed=0)
+    public virtual void RandomizeParameters(int seed=0)
     {
       foreach (var layer in SubNodes)
         layer.RandomizeParameters(seed);
