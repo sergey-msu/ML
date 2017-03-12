@@ -11,7 +11,7 @@ namespace ML.NeuralMethods.Algorithms
   /// Multi-layer neural network training algorithm.
   /// Using Backpropagation principle as a core.
   /// </summary>
-  public class BackpropagationAlgorithm : NeuralNetworkAlgorithmBase
+  public class BackpropAlgorithm : NeuralNetworkAlgorithmBase
   {
     #region Inner
 
@@ -36,8 +36,6 @@ namespace ML.NeuralMethods.Algorithms
     #endregion
 
     #region Fields
-
-    private static double[][] m_BackpropErrors;
 
     private Dictionary<Class, double[]> m_ExpectedOutputs;
     private int m_EpochLength;
@@ -67,7 +65,7 @@ namespace ML.NeuralMethods.Algorithms
 
     #region .ctor
 
-    public BackpropagationAlgorithm(ClassifiedSample classifiedSample, NeuralNetwork net)
+    public BackpropAlgorithm(ClassifiedSample classifiedSample, NeuralNetwork net)
       : base(classifiedSample, net)
     {
       init();
@@ -186,25 +184,13 @@ namespace ML.NeuralMethods.Algorithms
 
     private void init()
     {
-      // apply defaults
-
       m_EpochCount   = DFT_EPOCH_COUNT;
       m_LearningRate = DFT_LEARNING_RATE;
       m_Stop         = DTF_STOP_CRITERIA;
       m_QLambda      = DFT_Q_LAMBDA;
-
-      // parameters
-
       m_EpochLength  = TrainingSample.Count;
-
-      var lcount = Result.LayerCount;
       m_InputDim = Result.InputDim;
-      m_OutputDim = Result[lcount-1].NeuronCount;
-      m_BackpropErrors = new double[lcount][];
-      for (int i=0; i<lcount; i++)
-        m_BackpropErrors[i] = new double[Result[i].NeuronCount];
-
-      // expected outputs
+      m_OutputDim = Result[Result.LayerCount-1].NeuronCount;
 
       m_ExpectedOutputs = new Dictionary<Class, double[]>();
       var count = Classes.Count;
@@ -250,57 +236,14 @@ namespace ML.NeuralMethods.Algorithms
 
     private void runIteration(NeuralNetwork net, double[] input, Class cls)
     {
-      var lcount = net.LayerCount;
-      var serr2 = 0.0D;
-      var sstep2 = 0.0D;
-
       // forward calculation
-      var output = net.Calculate(input);
-      var expect = m_ExpectedOutputs[cls];
-      var errors = m_BackpropErrors[lcount-1];
-      for (int j=0; j<m_OutputDim; j++)
-      {
-        var ej = output[j] - expect[j];
-        errors[j] = ej;
-        serr2 += ej*ej;
-      }
+      var serr2 = feedForward(net, input, cls);
 
       // error backpropagation
+      var lcount = net.LayerCount;
       for (int i=lcount-1; i>=0; i--)
       {
-        var layer  = net[i];
-        var ncount = layer.NeuronCount;
-        errors = m_BackpropErrors[i];
-
-        var player  = (i>0) ? net[i-1] : null;
-        var pcount  = (i>0) ? player.NeuronCount : m_InputDim;
-        var perrors = (i>0) ? m_BackpropErrors[i-1] : null;
-        if (perrors!=null) Array.Clear(perrors, 0, pcount);
-
-        for (int j=0; j<ncount; j++)
-        {
-          // calculate current layer "errors"
-          var neuron  = layer[j];
-          var ej = errors[j];
-          var gj = ej * neuron.Derivative;
-          var dj = m_LearningRate * gj;
-
-          for (int h=0; h<pcount; h++)
-          {
-            // save "errors" for future use
-            if (i>0) perrors[h] += gj * neuron[h];
-
-            // weights update
-            var value = (i==0) ? input[h] : player[h].Value;
-            var dwj = dj * value;
-            neuron[h] -= dwj;
-            sstep2 += dwj*dwj;
-          }
-
-          // bias weight update
-          neuron.Bias -= dj;
-          sstep2 += dj*dj;
-        }
+        feedBackward(net, net[i], i, input);
       }
 
       // update iter stats
@@ -308,6 +251,60 @@ namespace ML.NeuralMethods.Algorithms
       m_PrevQValue = m_QValue;
       m_QValue = (1-m_QLambda)*m_QValue + m_QLambda*serr2/2;
       m_QDelta = m_QValue-m_PrevQValue;
+    }
+
+    private double feedForward(NeuralNetwork net, double[] input, Class cls)
+    {
+      var serr2 = 0.0D;
+      var output = net.Calculate(input);
+      var expect = m_ExpectedOutputs[cls];
+      var llayer = net[net.LayerCount-1];
+
+      for (int j=0; j<m_OutputDim; j++)
+      {
+        var ej = output[j] - expect[j];
+        llayer[j].Error = ej;
+        serr2 += ej*ej;
+      }
+
+      return serr2;
+    }
+
+    private void feedBackward(NeuralNetwork net, NeuralLayer layer, int i, double[] input)
+    {
+      var ncount = layer.NeuronCount;
+      var player = (i>0) ? net[i-1] : null;
+      var pcount = (i>0) ? player.NeuronCount : m_InputDim;
+      if (i>0) for (int h=0; h<pcount; h++) player[h].Error = 0;
+
+      var sstep2 = 0.0D;
+
+      for (int j=0; j<ncount; j++)
+      {
+        // calculate current layer "errors"
+        var neuron = layer[j];
+        var ej = neuron.Error;
+        var gj = ej * neuron.Derivative;
+        var dj = m_LearningRate * gj;
+
+        for (int h=0; h<pcount; h++)
+        {
+          // save "errors" for future use
+          if (i>0) player[h].Error += gj * neuron[h];
+
+          // weights update
+          var value = (i==0) ? input[h] : player[h].Value;
+          var dwj = dj * value;
+          neuron[h] -= dwj;
+          sstep2 += dwj*dwj;
+        }
+
+        // bias weight update
+        neuron.Bias -= dj;
+        sstep2 += dj*dj;
+      }
+
+      // update iter stats
       m_Step2  = sstep2;
     }
 

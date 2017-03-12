@@ -26,6 +26,7 @@ namespace ML.DeepMethods.Model
     private int m_InputSize;
     private int m_OutputSize;
     private int m_Stride;
+    private int m_Padding;
     private int m_ParamCount;
 
     private double[,,] m_Kernel;
@@ -37,7 +38,8 @@ namespace ML.DeepMethods.Model
     public FeatureMap(int inputDim,
                       int inputSize,
                       int windowSize,
-                      int stride=0)
+                      int stride=0,
+                      int padding=0)
       : base(inputDim)
     {
       if (inputDim <= 0)
@@ -48,20 +50,22 @@ namespace ML.DeepMethods.Model
         throw new MLException("FeatureMap.ctor(windowSize>inputSize)");
       if (stride < 0)
         throw new MLException("FeatureMap.ctor(stride<0)");
+      if (padding < 0)
+        throw new MLException("FeatureMap.ctor(padding<0)");
 
-      m_InputDim     = inputDim;
       m_InputSize    = inputSize;
       m_WindowSize   = windowSize;
       m_WindowLength = windowSize*windowSize;
       m_Stride       = (stride == 0) ? m_WindowSize/2 : stride;
-      m_OutputSize   = (m_InputSize-m_WindowSize)/m_Stride+1;
+      m_Padding      = padding;
+      m_OutputSize   = (inputSize+2*padding-windowSize)/m_Stride+1;
+      m_ParamCount = inputDim*m_WindowLength+1;
+      m_Kernel     = new double[m_WindowSize, m_WindowSize, inputDim];
 
-      m_Kernel     = new double[m_WindowSize, m_WindowSize, m_InputDim];
-      m_Value      = new double[m_OutputSize, m_OutputSize];
-      m_NetValue   = new double[m_OutputSize, m_OutputSize];
-      m_Derivative = new double[m_OutputSize, m_OutputSize];
+      Value      = new double[m_OutputSize, m_OutputSize];
+      NetValue   = new double[m_OutputSize, m_OutputSize];
+      Derivative = new double[m_OutputSize, m_OutputSize];
 
-      m_ParamCount = m_InputDim*m_WindowLength+1;
     }
 
     #endregion
@@ -91,6 +95,13 @@ namespace ML.DeepMethods.Model
     /// 0 defaults to (int)m_WindowSize/2 (minimum overlapping that covers center)
     /// </summary>
     public int Stride { get { return m_Stride; } }
+
+    /// <summary>
+    /// An overlapping step during convolution calculation process.
+    /// 1 leads to maximum overlapping between neighour kernel windows
+    /// 0 defaults to (int)m_WindowSize/2 (minimum overlapping that covers center)
+    /// </summary>
+    public int Padding { get { return m_Padding; } }
 
     public override double this[int idx]
     {
@@ -129,36 +140,40 @@ namespace ML.DeepMethods.Model
 
       for (int i=0; i<m_WindowSize; i++)
       for (int j=0; j<m_WindowSize; j++)
-      for (int k=0; k<m_InputDim; k++)
+      for (int k=0; k<InputDim; k++)
       {
         m_Kernel[i, j, k] = 2 * random.GenerateUniform(0, 1) / pcount;
       }
 
-      m_Bias = 2 * random.GenerateUniform(0, 1) / pcount;
+      Bias = 2 * random.GenerateUniform(0, 1) / pcount;
     }
 
     protected override void DoCalculate(double[][,] input)
     {
-      if (m_InputDim != input.Length)
+      if (InputDim != input.Length)
         throw new MLException("Incorrect input dimensions");
 
       for (int i=0; i<m_OutputSize; i++)
       for (int j=0; j<m_OutputSize; j++)
       {
-        var net = m_Bias;
-        var xmin = j*m_Stride;
-        var ymin = i*m_Stride;
+        var net = Bias;
+        var xmin = j*m_Stride-m_Padding;
+        var ymin = i*m_Stride-m_Padding;
 
-        for (int k=0; k<m_InputDim; k++)
+        for (int k=0; k<InputDim; k++)
         for (int y=0; y<m_WindowSize; y++)
         for (int x=0; x<m_WindowSize; x++)
         {
-          net += m_Kernel[y, x, k]*input[k][y+ymin, x+xmin];
+          var xidx = x+xmin;
+          var yidx = y+ymin;
+          if (xidx>=0 && xidx<m_InputSize &&
+              yidx>=0 && yidx<m_InputSize)
+            net += m_Kernel[y, x, k]*input[k][yidx, xidx];
         }
 
-        m_NetValue[i, j]   = net;
-        m_Derivative[i, j] = m_ActivationFunction.Derivative(net);
-        m_Value[i, j]      = m_ActivationFunction.Value(net);
+        NetValue[i, j]   = net;
+        Derivative[i, j] = ActivationFunction.Derivative(net);
+        Value[i, j]      = ActivationFunction.Value(net);
       }
     }
 
@@ -173,7 +188,7 @@ namespace ML.DeepMethods.Model
         return m_Kernel[i, j, k];
       }
 
-      if (idx==m_ParamCount-1) return m_Bias;
+      if (idx==m_ParamCount-1) return Bias;
 
       throw new MLException("Index out of range");
     }
@@ -194,9 +209,9 @@ namespace ML.DeepMethods.Model
       else if (idx==m_ParamCount-1)
       {
         if (isDelta)
-          m_Bias += value;
+          Bias += value;
         else
-          m_Bias = value;
+          Bias = value;
       }
       else
         throw new MLException("Index out of range");
@@ -219,9 +234,9 @@ namespace ML.DeepMethods.Model
       }
 
       if (isDelta)
-        m_Bias += pars[cursor];
+        Bias += pars[cursor];
       else
-        m_Bias = pars[cursor];
+        Bias = pars[cursor];
     }
   }
 }

@@ -20,7 +20,7 @@ namespace ML.NeuralMethods.Model
 
     public Neuron(int inputDim) : base(inputDim)
     {
-      m_Weights = new double[m_InputDim];
+      m_Weights = new double[InputDim];
     }
 
     #endregion
@@ -39,14 +39,14 @@ namespace ML.NeuralMethods.Model
     /// <param name="input">Input data array</param>
     protected override void DoCalculate(double[] input)
     {
-      var net = m_Bias;
+      var net = Bias;
 
-      for (int i=0; i<m_InputDim; i++)
+      for (int i=0; i<InputDim; i++)
         net += m_Weights[i] * input[i];
 
-      m_NetValue   = net;
-      m_Value      = m_ActivationFunction.Value(net);
-      m_Derivative = m_ActivationFunction.Derivative(net);
+      NetValue   = net;
+      Value      = ActivationFunction.Value(net);
+      Derivative = ActivationFunction.Derivative(net);
     }
 
     #endregion
@@ -57,50 +57,38 @@ namespace ML.NeuralMethods.Model
       set { m_Weights[idx] = value; }
     }
 
-    /// <summary>
-    /// Insert new synapse weight at specified index
-    /// </summary>
-    //public override void AddSynapse(double weight = 0.0D)
-    //{
-    //  var weights = new double[m_InputDim];
-    //
-    //  Array.Copy(m_Weights, weights, m_InputDim-1);
-    //  weights[m_InputDim-1] = weight;
-    //
-    //  m_Weights = weights;
-    //}
 
     protected override void DoRandomizeParameters(RandomGenerator random)
     {
       for (int i=0; i<this.InputDim; i++)
-        this[i] = 2 * random.GenerateUniform(0, 1) / m_InputDim;
+        this[i] = 2 * random.GenerateUniform(0, 1) / InputDim;
 
-      m_Bias = 2 * random.GenerateUniform(0, 1) / m_InputDim;
+      Bias = 2 * random.GenerateUniform(0, 1) / InputDim;
     }
 
     protected override double DoGetParam(int idx)
     {
-      if (idx<m_InputDim)  return m_Weights[idx];
-      if (idx==m_InputDim) return m_Bias;
+      if (idx<InputDim)  return m_Weights[idx];
+      if (idx==InputDim) return Bias;
 
       throw new MLException("Index out of range");
     }
 
     protected override void DoSetParam(int idx, double value, bool isDelta)
     {
-      if (idx<m_InputDim)
+      if (idx<InputDim)
       {
         if (isDelta)
           m_Weights[idx] += value;
         else
           m_Weights[idx] = value;
       }
-      else if (idx==m_InputDim)
+      else if (idx==InputDim)
       {
         if (isDelta)
-          m_Bias += value;
+          Bias += value;
         else
-          m_Bias = value;
+          Bias = value;
       }
       else
         throw new MLException("Index out of range");
@@ -114,13 +102,13 @@ namespace ML.NeuralMethods.Model
         for (int i=0; i<len; i++)
           m_Weights[i] += pars[cursor++];
 
-        m_Bias += pars[cursor];
+        Bias += pars[cursor];
       }
       else
       {
         Array.Copy(pars, cursor, m_Weights, 0, len);
         cursor += len;
-        m_Bias = pars[cursor];
+        Bias = pars[cursor];
       }
     }
   }

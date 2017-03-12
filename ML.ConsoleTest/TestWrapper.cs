@@ -202,11 +202,11 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private BackpropagationAlgorithm createBPAlg()
+    private BackpropAlgorithm createBPAlg()
     {
       var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 2, 15, 3 }, Registry.ActivationFunctions.Logistic(1));
 
-      var alg = new BackpropagationAlgorithm(Data.TrainingSample, net);
+      var alg = new BackpropAlgorithm(Data.TrainingSample, net);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.1D;
 

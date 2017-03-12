@@ -14,12 +14,13 @@ namespace ML.Core.ComputingNetworks
   {
     #region Fields
 
-    protected IFunction m_ActivationFunction;
-    protected int  m_InputDim;
-    protected double m_Bias;
-    protected TPar m_NetValue;
-    protected TPar m_Derivative;
-    protected TPar m_Value;
+    private IFunction m_ActivationFunction;
+    private int    m_InputDim;
+    private double m_Bias;
+    private TPar   m_NetValue;
+    private TPar   m_Derivative;
+    private TPar   m_Value;
+    private TPar   m_Error;
 
     #endregion
 
@@ -49,17 +50,38 @@ namespace ML.Core.ComputingNetworks
     /// <summary>
     /// Calculated pure value (before applying activation function)
     /// </summary>
-    public TPar NetValue { get { return m_NetValue; } }
+    public TPar NetValue
+    {
+      get { return m_NetValue; }
+      set { m_NetValue = value; }
+    }
 
     /// <summary>
     /// Cached derivative of pure calculated value
     /// </summary>
-    public TPar Derivative { get { return m_Derivative; } }
+    public TPar Derivative
+    {
+      get { return m_Derivative; }
+      set { m_Derivative = value; }
+    }
 
     /// <summary>
     /// Calculated value (after applying activation function)
     /// </summary>
-    public TPar Value { get { return m_Value; } }
+    public TPar Value
+    {
+      get { return m_Value; }
+      set { m_Value = value; }
+    }
+
+    /// <summary>
+    /// Calculated error
+    /// </summary>
+    public TPar Error
+    {
+      get { return m_Error; }
+      set { m_Error = value; }
+    }
 
     /// <summary>
     /// Dimension of input vector
@@ -67,7 +89,6 @@ namespace ML.Core.ComputingNetworks
     public int InputDim
     {
       get { return m_InputDim; }
-      internal set { m_InputDim = value; }
     }
 
     /// <summary>
@@ -81,21 +102,12 @@ namespace ML.Core.ComputingNetworks
 
     /// <summary>
     /// Indexer for connection weights.
-    /// Warning! idx here is an index of neuron in the previous layer NOT SERIAL (indexed) parameter index.
-    /// Neuron may be connected with 0,1,4,7,8-th neurons in the previous layer,
-    /// while through parameter index will be serial: 0,1,2,3,4
-    /// (therefore one can not use DoGetParam/DoSetParam methods as they operate with serial indexed parameter indices).
     /// </summary>
     public abstract double this[int idx] { get; set; }
 
     #endregion
 
     #region Public
-
-    /// <summary>
-    /// Insert new synapse weight at specified index
-    /// </summary>
-    //public abstract void AddSynapse(double weight = 0.0D);
 
     /// <summary>
     /// Randomizes neuron weights
