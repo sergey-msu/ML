@@ -14,11 +14,11 @@ namespace ML.DeepMethods.Model
   /// 3D output - a set of 2D feature maps
   ///
   /// IO:
-  /// Input  - 3D array (input_size * input_size * input_length):    data[height_idx, width_idx, depth_idx]
-  /// Output - 3D array (output_size * output_size * output_length): feature_maps[height_idx, width_idx, depth_idx]
+  /// Input  - 3D array (input_length * input_size * input_size):    data[depth_idx, height_idx, width_idx]
+  /// Output - 3D array (output_size * output_size * output_length): feature_maps[depth_idx, height_idx, width_idx]
   ///
   /// Parameters:
-  /// Kernel - 4D array (win_size * win_size * input_length * output_length): kernel[height_idx, width_idx, input_idx, output_idx]
+  /// Kernel - 4D array (output_length * input_length * win_size * win_size): kernel[output_idx, input_idx, height_idx, width_idx]
   /// Biases - 1D array (output_length): biases[output_idx]
   ///
   /// Total count of parameters = (win_size * win_size * input_length + 1) * output_length;
@@ -26,6 +26,8 @@ namespace ML.DeepMethods.Model
   public class ConvolutionalLayer : DeepLayerBase
   {
     #region Fields
+
+    private bool m_IsTraining;
 
     private int m_WindowSize;
     private int m_Stride;
@@ -38,7 +40,6 @@ namespace ML.DeepMethods.Model
     private double[,,,] m_Kernel;
     private double[]    m_Biases;
     private double[,,]  m_NetValue;
-    private double[,,]  m_Value;
     private double[,,]  m_Derivative;
 
     #endregion
@@ -50,17 +51,23 @@ namespace ML.DeepMethods.Model
                               int outputDepth,
                               int windowSize,
                               int stride=1,
-                              int padding=0)
-      : base(inputDepth, inputSize, outputDepth, (inputSize - windowSize + 2*padding)/stride + 1)
+                              int padding=0,
+                              bool isTraining = false)
+      : base(inputDepth,
+             inputSize,
+             outputDepth,
+             (inputSize - windowSize + 2*padding)/stride + 1)
     {
       if (windowSize <= 0)
         throw new MLException("ConvolutionalLayer.ctor(windowSize<=0)");
       if (windowSize > inputSize)
         throw new MLException("ConvolutionalLayer.ctor(windowSize>inputSize)");
-      if (stride < 0)
-        throw new MLException("ConvolutionalLayer.ctor(stride<0)");
+      if (stride <= 0)
+        throw new MLException("ConvolutionalLayer.ctor(stride<=0)");
       if (padding < 0)
         throw new MLException("ConvolutionalLayer.ctor(padding<0)");
+
+      m_IsTraining = isTraining;
 
       m_WindowSize  = windowSize;
       m_Stride      = stride;
@@ -70,11 +77,14 @@ namespace ML.DeepMethods.Model
       m_FeatureMapParamCount = inputDepth*m_KernelParamCount + 1;
       m_ParamCount           = m_FeatureMapParamCount*outputDepth;
 
-      m_Kernel     = new double[windowSize, windowSize, inputDepth, outputDepth];
-      m_Biases     = new double[outputDepth];
-      m_Value      = new double[m_OutputSize, m_OutputSize, m_OutputDepth];
-      m_NetValue   = new double[m_OutputSize, m_OutputSize, m_OutputDepth];
-      m_Derivative = new double[m_OutputSize, m_OutputSize, m_OutputDepth];
+      m_Kernel = new double[outputDepth, inputDepth, windowSize, windowSize];
+      m_Biases = new double[outputDepth];
+
+      if (m_IsTraining)
+      {
+        m_NetValue   = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
+        m_Derivative = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
+      }
     }
 
     #endregion
@@ -82,6 +92,12 @@ namespace ML.DeepMethods.Model
     #region Properties
 
     public override int ParamCount { get { return m_ParamCount; } }
+
+    /// <summary>
+    /// If true, indicates that layer is not in production mode,
+    /// so it can store some additional values (i.e. net values, derivatives etc.)
+    /// </summary>
+    public bool IsTraining { get { return m_IsTraining; } }
 
     /// <summary>
     /// Size of square convolution window
@@ -99,6 +115,26 @@ namespace ML.DeepMethods.Model
     /// </summary>
     public int Padding { get { return m_Padding; } }
 
+    /// <summary>
+    /// Bias values (one for each output feature map)
+    /// </summary>
+    public double[] Biases { get { return m_Biases; } }
+
+    /// <summary>
+    /// Kernal wieght values
+    /// </summary>
+    public double[,,,] Kernel { get { return m_Kernel; } }
+
+    /// <summary>
+    /// Calculated pure value (before applying activation function)
+    /// </summary>
+    public double[,,] NetValue { get { return m_NetValue; } }
+
+    /// <summary>
+    /// Derivative (componentwise) of calculated net value
+    /// </summary>
+    public double[,,] Derivative { get { return m_Derivative; } }
+
     #endregion
 
     /// <summary>
@@ -114,7 +150,7 @@ namespace ML.DeepMethods.Model
         for (int i=0; i<m_WindowSize; i++)
         for (int j=0; j<m_WindowSize; j++)
         {
-          m_Kernel[i, j, p, q] = 2*random.GenerateUniform(0, 1) / m_ParamCount;
+          m_Kernel[q, p, i, j] = 2*random.GenerateUniform(0, 1) / m_ParamCount;
         }
 
         m_Biases[q] = 2*random.GenerateUniform(0, 1) / m_ParamCount;
@@ -123,18 +159,17 @@ namespace ML.DeepMethods.Model
 
     public override double[,,] Calculate(double[,,] input)
     {
-      if (m_InputDepth != input.GetLength(2))
+      if (m_InputDepth != input.GetLength(0))
         throw new MLException("Incorrect input depth");
 
       // output fm-s
       for (int q=0; q<m_OutputDepth; q++)
       {
-        var net = m_Biases[q];
-
         // fm neurons
         for (int i=0; i<m_OutputSize; i++)
         for (int j=0; j<m_OutputSize; j++)
         {
+          var net = m_Biases[q];
           var xmin = j*m_Stride-m_Padding;
           var ymin = i*m_Stride-m_Padding;
 
@@ -148,13 +183,17 @@ namespace ML.DeepMethods.Model
             {
               // inner product in depth (over input channel's neuron at fixed position)
               for (int p=0; p<m_InputDepth; p++)
-                net += m_Kernel[y, x, p, q]*input[yidx, xidx, p];
+                net += m_Kernel[q, p, y, x]*input[p, yidx, xidx];
             }
           }
 
-          m_NetValue[i, j, q]   = net;
-          m_Derivative[i, j, q] = ActivationFunction.Derivative(net);
-          m_Value[i, j, q]      = ActivationFunction.Value(net);
+          if (m_IsTraining)
+          {
+            m_NetValue[q, i, j]   = net;
+            m_Derivative[q, i, j] = ActivationFunction.Derivative(net);
+          }
+
+          m_Value[q, i, j] = ActivationFunction.Value(net);
         }
       }
 
@@ -174,7 +213,7 @@ namespace ML.DeepMethods.Model
       var yidx  = kpidx / m_WindowSize;
       var xidx  = kpidx % m_WindowSize;
 
-      return m_Kernel[yidx, xidx, kidx, fmidx];
+      return m_Kernel[fmidx, kidx, yidx, xidx];
     }
 
     protected override void DoSetParam(int idx, double value, bool isDelta)
@@ -194,16 +233,15 @@ namespace ML.DeepMethods.Model
       var yidx  = kpidx / m_WindowSize;
       var xidx  = kpidx % m_WindowSize;
 
-      if (isDelta) m_Kernel[yidx, xidx, kidx, fmidx] += value;
-      else m_Kernel[yidx, xidx, kidx, fmidx] = value;
+      if (isDelta) m_Kernel[fmidx, kidx, yidx, xidx] += value;
+      else m_Kernel[fmidx, kidx, yidx, xidx] = value;
     }
 
     protected override void DoUpdateParams(double[] pars, bool isDelta, int cursor)
     {
+      // TODO: Do it more intelligent!!!!!
       for (int i=0; i<m_ParamCount; i++)
         DoSetParam(i, pars[cursor+i], isDelta);
-
-      // TODO: Do it more intelligent!!!!!
 
       //var fmidx  = cursor / m_FeatureMapParamCount;
       //var fmpidx = cursor % m_FeatureMapParamCount;

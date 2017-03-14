@@ -27,7 +27,10 @@ namespace ML.DeepMethods.Model
                            int windowSize,
                            int stride=0,
                            int padding=0)
-      : base(inputDepth, inputSize, inputDepth, (inputSize - windowSize + 2*padding)/stride + 1)
+      : base(inputDepth,
+             inputSize,
+             inputDepth,
+             (inputSize - windowSize + 2*padding)/stride + 1)
     {
       if (windowSize <= 0)
         throw new MLException("PoolingLayer.ctor(windowSize<=0)");
@@ -40,7 +43,7 @@ namespace ML.DeepMethods.Model
 
       m_WindowSize = windowSize;
       m_Padding    = padding;
-      m_Stride     = (stride == 0) ? m_WindowSize : stride;
+      m_Stride     = (stride == 0) ? windowSize : stride;
     }
 
     #endregion
@@ -96,7 +99,6 @@ namespace ML.DeepMethods.Model
 
     public MaxPoolingLayer(int inputDepth,
                            int inputSize,
-                           int outputDepth,
                            int windowSize,
                            int stride=0,
                            int padding=0)
@@ -112,8 +114,6 @@ namespace ML.DeepMethods.Model
 
     public override double[,,] Calculate(double[,,] input)
     {
-      var result = new double[m_OutputSize, m_OutputSize, m_OutputDepth]; // input depth = output depth
-
       for (int q=0; q<m_OutputDepth; q++)
       {
         for (int i=0; i<m_OutputSize; i++)
@@ -131,16 +131,16 @@ namespace ML.DeepMethods.Model
             var yidx = ymin+y;
             if (xidx>=0 && xidx<m_InputSize && yidx>=0 && yidx<m_InputSize)
             {
-              var z = input[yidx, xidx, q];
+              var z = input[q, yidx, xidx];
               if (z > value) value = z;
             }
           }
 
-          result[i, j, q] = value;
+          m_Value[q, i, j] = value;
         }
       }
 
-      return result;
+      return m_Value;
     }
   }
 
@@ -153,7 +153,6 @@ namespace ML.DeepMethods.Model
 
     public AvgPoolingLayer(int inputDepth,
                            int inputSize,
-                           int outputDepth,
                            int windowSize,
                            int stride=0,
                            int padding=0)
@@ -169,8 +168,7 @@ namespace ML.DeepMethods.Model
 
     public override double[,,] Calculate(double[,,] input)
     {
-      var result = new double[m_OutputSize, m_OutputSize, m_OutputDepth]; // input depth = output depth
-      var l = m_OutputSize*m_OutputSize;
+      var l = m_WindowSize*m_WindowSize;
 
       // output fm-s
       for (int q=0; q<m_OutputDepth; q++)
@@ -191,15 +189,15 @@ namespace ML.DeepMethods.Model
             var yidx = ymin+y;
             if (xidx>=0 && xidx<m_InputSize && yidx>=0 && yidx<m_InputSize)
             {
-              value += input[yidx, xidx, q];
+              value += input[q, yidx, xidx];
             }
           }
 
-          result[i, j, q] = value/l;
+          m_Value[q, i, j] = value/l;
         }
       }
 
-      return result;
+      return m_Value;
     }
   }
 }

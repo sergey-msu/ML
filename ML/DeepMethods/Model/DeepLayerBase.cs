@@ -21,6 +21,8 @@ namespace ML.DeepMethods.Model
     protected readonly int m_OutputDepth;
     protected readonly int m_OutputSize;
 
+    protected readonly double[,,]  m_Value;
+
     #endregion
 
     #region .ctor
@@ -40,6 +42,8 @@ namespace ML.DeepMethods.Model
       m_InputSize   = inputSize;
       m_OutputDepth = outputDepth;
       m_OutputSize  = outputSize;
+
+      m_Value  = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
     }
 
     #endregion
@@ -74,6 +78,11 @@ namespace ML.DeepMethods.Model
       get { return m_ActivationFunction; }
       set { m_ActivationFunction = value; }
     }
+
+    /// <summary>
+    /// Calculated value
+    /// </summary>
+    public double[,,] Value { get { return m_Value; } }
 
     #endregion
 
