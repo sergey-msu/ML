@@ -26,9 +26,9 @@ namespace ML.LogicalMethods.Model
     /// <summary>
     /// Make a decision about input object
     /// </summary>
-    public virtual Class Decide(Point x)
+    public virtual Class Decide(double[] obj)
     {
-      return m_Root.Decide(x);
+      return m_Root.Decide(obj);
     }
   }
 }

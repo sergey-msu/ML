@@ -12,11 +12,11 @@ namespace ML.Contracts
     /// <summary>
     /// Calculates maximum of informativity function
     /// </summary>
-    Predicate<Point> Max(IEnumerable<Predicate<Point>> patterns, ClassifiedSample sample);
+    Predicate<double[]> Max(IEnumerable<Predicate<double[]>> patterns, ClassifiedSample sample);
 
     /// <summary>
     /// Calculates informativity function with respect to given pattern
     /// </summary>
-    double Calculate(Predicate<Point> pattern, ClassifiedSample sample);
+    double Calculate(Predicate<double[]> pattern, ClassifiedSample sample);
   }
 }

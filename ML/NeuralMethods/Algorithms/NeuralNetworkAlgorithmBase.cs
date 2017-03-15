@@ -28,10 +28,15 @@ namespace ML.NeuralMethods.Algorithms
     /// </summary>
     public NeuralNetwork Result { get { return m_Result; } }
 
+    public override Class Classify(object obj)
+    {
+      return Classify((double[])obj);
+    }
+
     /// <summary>
     /// Maps object to corresponding class
     /// </summary>
-    public override Class Classify(Point x)
+    public Class Classify(double[] x)
     {
       var result = m_Result.Calculate(x);
       var len = result.Length;

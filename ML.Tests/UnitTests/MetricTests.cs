@@ -21,8 +21,8 @@ namespace ML.Tests.UnitTests
     public void EuclideanMetric_Dist_Validation()
     {
       var metric = new EuclideanMetric();
-      var p1 = new Point(1.0F, 0.0F);
-      var p2 = new Point(0.0F, 1.0F, 3.0F);
+      var p1 = new double[] { 1.0F, 0.0F };
+      var p2 = new double[] { 0.0F, 1.0F, 3.0F };
 
       metric.Dist(p1, p2);
     }
@@ -31,9 +31,9 @@ namespace ML.Tests.UnitTests
     public void EuclideanMetric_Dist_Test()
     {
       var metric = new EuclideanMetric();
-      var p1 = new Point(1.0F, 0.0F);
-      var p2 = new Point(0.0F, 1.0F);
-      var p3 = new Point(1.0F, 3.0F);
+      var p1 = new double[] { 1.0F, 0.0F };
+      var p2 = new double[] { 0.0F, 1.0F };
+      var p3 = new double[] { 1.0F, 3.0F };
 
       var d12 = metric.Dist(p1, p2);
       var d21 = metric.Dist(p2, p1);
@@ -54,9 +54,9 @@ namespace ML.Tests.UnitTests
     public void EuclideanMetric_Dist2_Test()
     {
       var metric = new EuclideanMetric();
-      var p1 = new Point(1.0F, 0.0F);
-      var p2 = new Point(0.0F, 1.0F);
-      var p3 = new Point(1.0F, 3.0F);
+      var p1 = new double[] { 1.0F, 0.0F };
+      var p2 = new double[] { 0.0F, 1.0F };
+      var p3 = new double[] { 1.0F, 3.0F };
 
       var d12 = metric.Dist2(p1, p2);
       var d21 = metric.Dist2(p2, p1);
@@ -78,8 +78,8 @@ namespace ML.Tests.UnitTests
     public void LInftyMetric_Dist_Validation()
     {
       var metric = new LInftyMetric();
-      var p1 = new Point(1.0F, 0.0F);
-      var p2 = new Point(0.0F, 1.0F, 3.0F);
+      var p1 = new double[] {  1.0F, 0.0F };
+      var p2 = new double[] {  0.0F, 1.0F, 3.0F };
 
       metric.Dist(p1, p2);
     }
@@ -88,9 +88,9 @@ namespace ML.Tests.UnitTests
     public void LInftyMetric_Dist_Test()
     {
       var metric = new LInftyMetric();
-      var p1 = new Point(1.0F, 0.0F);
-      var p2 = new Point(0.0F, 1.0F);
-      var p3 = new Point(1.0F, 3.0F);
+      var p1 = new double[] { 1.0F, 0.0F };
+      var p2 = new double[] { 0.0F, 1.0F };
+      var p3 = new double[] { 1.0F, 3.0F };
 
       var d12 = metric.Dist(p1, p2);
       var d21 = metric.Dist(p2, p1);
@@ -112,8 +112,8 @@ namespace ML.Tests.UnitTests
     public void LpMetric_Dist_Validation()
     {
       var metric = new LpMetric(1.2F);
-      var p1 = new Point(1.0F, 0.0F);
-      var p2 = new Point(0.0F, 1.0F, 3.0F);
+      var p1 = new double[] { 1.0F, 0.0F };
+      var p2 = new double[] { 0.0F, 1.0F, 3.0F };
 
       metric.Dist(p1, p2);
     }
@@ -123,8 +123,8 @@ namespace ML.Tests.UnitTests
     public void LpMetric_Dist_Ctor()
     {
       var metric = new LpMetric(0.8F);
-      var p1 = new Point(1.0F, 0.0F);
-      var p2 = new Point(0.0F, 1.0F);
+      var p1 = new double[] { 1.0F, 0.0F };
+      var p2 = new double[] { 0.0F, 1.0F };
 
       metric.Dist(p1, p2);
     }
@@ -135,9 +135,9 @@ namespace ML.Tests.UnitTests
       var p = 3.8F;
       var metric1 = new LpMetric(1.0F);
       var metric2 = new LpMetric(p);
-      var p1 = new Point(1.0F, 0.0F);
-      var p2 = new Point(0.0F, 1.0F);
-      var p3 = new Point(1.0F, 3.0F);
+      var p1 = new double[] { 1.0F, 0.0F };
+      var p2 = new double[] { 0.0F, 1.0F };
+      var p3 = new double[] { 1.0F, 3.0F };
 
       var d12 = metric1.Dist(p1, p2);
       var d21 = metric1.Dist(p2, p1);

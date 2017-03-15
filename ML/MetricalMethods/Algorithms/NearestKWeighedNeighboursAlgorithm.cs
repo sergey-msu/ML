@@ -80,7 +80,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <param name="i">Point number in ordered training sample</param>
     /// <param name="x">Test point</param>
     /// <param name="orderedSample">Ordered training sample</param>
-    protected override double CalculateWeight(int i, Point x, Dictionary<Point, double> orderedSample)
+    protected override double CalculateWeight(int i, double[] x, Dictionary<double[], double> orderedSample)
     {
       return (i < m_K && i < m_Weights.Length) ? m_Weights[i] : 0;
     }

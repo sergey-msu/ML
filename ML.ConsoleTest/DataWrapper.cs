@@ -106,7 +106,7 @@ namespace ML.ConsoleTest
         var data = line.Split(',');
 
         var success = true;
-        var point = new Point(dim);
+        var point = new double[dim];
         for (var i = 0; i < dim; i++)
         {
           double result;

@@ -19,24 +19,24 @@ namespace ML.Tests.UnitTests
 
       public static readonly ClassifiedSample SAMPLE_2C = new ClassifiedSample
       {
-        { new Point(0.0F), CLASSES[0] },
-        { new Point(1.0F), CLASSES[0] },
-        { new Point(2.0F), CLASSES[1] },
-        { new Point(3.0F), CLASSES[1] },
-        { new Point(4.0F), CLASSES[1] },
+        { new double[] { 0.0F }, CLASSES[0] },
+        { new double[] { 1.0F }, CLASSES[0] },
+        { new double[] { 2.0F }, CLASSES[1] },
+        { new double[] { 3.0F }, CLASSES[1] },
+        { new double[] { 4.0F }, CLASSES[1] },
       };
 
       public static readonly ClassifiedSample SAMPLE_3C = new ClassifiedSample
       {
-        { new Point(0.0F), CLASSES[0] },
-        { new Point(1.0F), CLASSES[0] },
-        { new Point(2.0F), CLASSES[1] },
-        { new Point(3.0F), CLASSES[1] },
-        { new Point(4.0F), CLASSES[2] },
-        { new Point(5.0F), CLASSES[2] }
+        { new double[] { 0.0F }, CLASSES[0] },
+        { new double[] { 1.0F }, CLASSES[0] },
+        { new double[] { 2.0F }, CLASSES[1] },
+        { new double[] { 3.0F }, CLASSES[1] },
+        { new double[] { 4.0F }, CLASSES[2] },
+        { new double[] { 5.0F }, CLASSES[2] }
       };
 
-      public static Predicate<Point> SimplePattern(int idx, double a) { return p => p[idx] < a; }
+      public static Predicate<double[]> SimplePattern(int idx, double a) { return p => p[idx] < a; }
 
     #endregion
 

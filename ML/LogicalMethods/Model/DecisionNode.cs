@@ -8,7 +8,7 @@ namespace ML.LogicalMethods.Model
   /// </summary>
   public abstract class DecisionNode
   {
-    public abstract Class Decide(Point x);
+    public abstract Class Decide(double[] x);
   }
 
   /// <summary>
@@ -16,11 +16,11 @@ namespace ML.LogicalMethods.Model
   /// </summary>
   public class InnerNode : DecisionNode
   {
-    private readonly Predicate<Point> m_Condition;
+    private readonly Predicate<double[]> m_Condition;
     private DecisionNode m_NegativeNode;
     private DecisionNode m_PositiveNode;
 
-    public InnerNode(Predicate<Point> condition)
+    public InnerNode(Predicate<double[]> condition)
     {
       if (condition == null)
         throw new MLException("DecisionTree+InnerNode.ctor(condition=null)");
@@ -47,7 +47,7 @@ namespace ML.LogicalMethods.Model
       m_PositiveNode = node;
     }
 
-    public override Class Decide(Point x)
+    public override Class Decide(double[] x)
     {
       if (NegativeNode == null)
         throw new MLException("NegativeNode is null");
@@ -75,7 +75,7 @@ namespace ML.LogicalMethods.Model
 
     public Class Class { get { return m_Class; } }
 
-    public override Class Decide(Point x)
+    public override Class Decide(double[] x)
     {
       return m_Class;
     }

@@ -37,7 +37,7 @@ namespace ML.ConsoleTest
       m_XIdx = xidx;
       m_YIdx = yidx;
       m_Shear = shear;
-      m_InputDim = algorithm.TrainingSample.First().Key.Dimension;
+      m_InputDim = algorithm.TrainingSample.First().Key.Length;
 
       var fn = string.Format("data/{0}-{1:yyyyMMdd-hhmmss}.csv", algorithm.ID, DateTime.Now);
       using (var file = File.Create(fn))
@@ -82,9 +82,9 @@ namespace ML.ConsoleTest
       }
     }
 
-    private Point getPoint(int i, int j)
+    private double[] getPoint(int i, int j)
     {
-      var result = new Point(m_InputDim);
+      var result = new double[m_InputDim];
       if (m_Shear != null)
       {
         for (int k=0; k<m_InputDim; k++)
@@ -97,9 +97,9 @@ namespace ML.ConsoleTest
       return result;
     }
 
-    private Point getProjPoint(int i, int j)
+    private double[] getProjPoint(int i, int j)
     {
-      var result = new Point(2);
+      var result = new double[2];
       result[0] = m_XMin + (m_XMax-m_XMin)*i/(m_XCnt-1);
       result[1] = m_YMin + (m_YMax-m_YMin)*j/(m_YCnt-1);
       return result;

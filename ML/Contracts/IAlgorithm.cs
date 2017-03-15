@@ -19,9 +19,9 @@ namespace ML.Contracts
     Dictionary<string, Class> Classes { get; }
 
     /// <summary>
-    /// Do classify some point
+    /// Do classify some object
     /// </summary>
-    Class Classify(Point point);
+    Class Classify(object obj);
   }
 
   /// <summary>
@@ -37,7 +37,7 @@ namespace ML.Contracts
     /// <summary>
     /// Estimate point closeness to some class
     /// </summary>
-    double EstimateClose(Point point, Class cls);
+    double EstimateClose(object point, Class cls);
 
     /// <summary>
     /// Calculates margins

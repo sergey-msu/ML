@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ML.Core.Mathematics;
+using System;
 
 namespace ML.Core.Metric
 {
@@ -13,11 +14,11 @@ namespace ML.Core.Metric
     /// <summary>
     /// Distance between two points
     /// </summary>
-    public override double Dist(Point p1, Point p2)
+    public override double Dist(double[] p1, double[] p2)
     {
-      Point.CheckDimensions(p1, p2);
+      MathUtils.CheckDimensions(p1, p2);
 
-      var dim = p1.Dimension;
+      var dim = p1.Length;
       var max = double.MinValue;
 
       for (int i=0; i<dim; i++)

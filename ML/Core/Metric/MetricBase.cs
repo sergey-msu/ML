@@ -22,14 +22,14 @@ namespace ML.Core.Metric
     /// <summary>
     /// Distance between two points
     /// </summary>
-    public abstract double Dist(Point p1, Point p2);
+    public abstract double Dist(double[] p1, double[] p2);
 
     /// <summary>
     /// Sorts some point set with respect to the distance to some fixed point
     /// </summary>
     /// <param name="x">Origin point</param>
     /// <param name="sample">Sample point set</param>
-    public Dictionary<Point, double> Sort(Point x, IEnumerable<Point> sample)
+    public Dictionary<double[], double> Sort(double[] x, IEnumerable<double[]> sample)
     {
       if (sample == null) return null;
       return sample.Select(p => new { Point=p, Dist=Dist(x, p) })

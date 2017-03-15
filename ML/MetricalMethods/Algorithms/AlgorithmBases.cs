@@ -31,14 +31,14 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Classify point
     /// </summary>
-    public override Class Classify(Point x)
+    public override Class Classify(object obj)
     {
       Class result = null;
       var maxEst = double.MinValue;
 
       foreach (var cls in Classes.Values)
       {
-        var est = EstimateClose(x, cls);
+        var est = EstimateClose(obj, cls);
         if (est > maxEst)
         {
           maxEst = est;
@@ -52,7 +52,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public abstract double EstimateClose(Point point, Class cls);
+    public abstract double EstimateClose(double[] obj, Class cls);
 
     /// <summary>
     /// Calculates margins
@@ -83,6 +83,11 @@ namespace ML.MetricalMethods.Algorithms
 
       return result.OrderBy(r => r.Value).ToDictionary(r => r.Key, r => r.Value);
     }
+
+    public double EstimateClose(object obj, Class cls)
+    {
+      return EstimateClose((double[])obj, cls);
+    }
   }
 
   /// <summary>
@@ -98,12 +103,12 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public override double EstimateClose(Point x, Class cls)
+    public override double EstimateClose(double[] obj, Class cls)
     {
       var closeness = 0.0D;
       var sLength = TrainingSample.Count;
 
-      var orderedSample = Metric.Sort(x, TrainingSample.Points);
+      var orderedSample = Metric.Sort(obj, TrainingSample.Points);
 
       for (int i = 0; i < sLength; i++)
       {
@@ -111,7 +116,7 @@ namespace ML.MetricalMethods.Algorithms
         var sClass = TrainingSample[sPoint.Key];
         if (!sClass.Equals(cls)) continue;
 
-        closeness += CalculateWeight(i, x, orderedSample);
+        closeness += CalculateWeight(i, obj, orderedSample);
       }
 
       return closeness;
@@ -124,7 +129,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <param name="i">Point number in ordered training sample</param>
     /// <param name="x">Test point</param>
     /// <param name="orderedSample">Ordered training sample</param>
-    protected abstract double CalculateWeight(int i, Point x, Dictionary<Point, double> orderedSample);
+    protected abstract double CalculateWeight(int i, double[] x, Dictionary<double[], double> orderedSample);
   }
 
   /// <summary>

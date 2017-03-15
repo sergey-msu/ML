@@ -12,7 +12,7 @@ namespace ML.Core
   {
     #region Inner
 
-      public delegate bool SampleMaskDelegate(Point p, Class c, int i);
+      public delegate bool SampleMaskDelegate(object p, Class c, int i);
 
       public class MaskHandle : IDisposable
       {
@@ -64,9 +64,9 @@ namespace ML.Core
       /// </summary>
       public class ErrorInfo
       {
-        public ErrorInfo(Point point, Class realClass, Class calcClass)
+        public ErrorInfo(object obj, Class realClass, Class calcClass)
         {
-          Opject = point;
+          Object = obj;
           RealClass = realClass;
           CalcClass = calcClass;
         }
@@ -74,7 +74,7 @@ namespace ML.Core
         /// <summary>
         /// Classified object
         /// </summary>
-        public readonly Point Opject;
+        public readonly object Object;
 
         /// <summary>
         /// Real point class
@@ -89,8 +89,8 @@ namespace ML.Core
 
     #endregion
 
-    private readonly ClassifiedSample m_TrainingSample;
-    private readonly Dictionary<string, Class> m_Classes;
+    protected readonly ClassifiedSample m_TrainingSample;
+    protected readonly Dictionary<string, Class> m_Classes;
     private MaskHandle m_MaskHandle;
 
     protected AlgorithmBase(ClassifiedSample trainingSample)
@@ -132,7 +132,7 @@ namespace ML.Core
     /// <summary>
     /// Maps object to corresponding class
     /// </summary>
-    public abstract Class Classify(Point x);
+    public abstract Class Classify(object obj);
 
     public MaskHandle ApplySampleMask(SampleMaskDelegate mask)
     {

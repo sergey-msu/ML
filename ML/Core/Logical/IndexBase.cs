@@ -22,9 +22,9 @@ namespace ML.Core.Logical
     /// <summary>
     /// Calculates maximum of informativity function
     /// </summary>
-    public Predicate<Point> Max(IEnumerable<Predicate<Point>> patterns, ClassifiedSample sample)
+    public Predicate<double[]> Max(IEnumerable<Predicate<double[]>> patterns, ClassifiedSample sample)
     {
-      Predicate<Point> result = null;
+      Predicate<double[]> result = null;
       var maxIndex = double.MinValue;
 
       foreach (var pattern in patterns)
@@ -43,6 +43,6 @@ namespace ML.Core.Logical
     /// <summary>
     /// Calculates informativity function with respect to given pattern
     /// </summary>
-    public abstract double Calculate(Predicate<Point> pattern, ClassifiedSample sample);
+    public abstract double Calculate(Predicate<double[]> pattern, ClassifiedSample sample);
   }
 }

@@ -22,7 +22,7 @@ namespace ML.Core.Logical
     public override string ID { get {  return "ENTR"; } }
     public override string Name { get { return "Multiclass Entropy Index"; } }
 
-    public override double Calculate(Predicate<Point> pattern, ClassifiedSample sample)
+    public override double Calculate(Predicate<double[]> pattern, ClassifiedSample sample)
     {
       var clsInfos = new Dictionary<Class, ClassBag>();
       int p = 0;

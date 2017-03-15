@@ -261,10 +261,10 @@ namespace ML.ConsoleTest
       }
     }
 
-    private IEnumerable<Predicate<Point>> getSimpleLogicPatterns()
+    private IEnumerable<Predicate<double[]>> getSimpleLogicPatterns()
     {
       var sample = Data.TrainingSample;
-      var dim = sample.First().Key.Dimension;
+      var dim = sample.First().Key.Length;
       double step = 0.05F;
 
       for (int i=0; i<dim; i++)
@@ -276,7 +276,7 @@ namespace ML.ConsoleTest
         for (double l=min; l<=max; l += step)
         {
           var level = l;
-          yield return (p => idx>=p.Dimension ? true : p[idx]<level);
+          yield return (p => idx>=p.Length ? true : p[idx]<level);
         }
       }
     }

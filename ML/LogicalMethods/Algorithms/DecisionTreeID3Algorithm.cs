@@ -27,18 +27,18 @@ namespace ML.LogicalMethods.Algorithms
     /// </summary>
     public DecisionTree Result { get { return m_Result; } }
 
-    public override Class Classify(Point x)
+    public override Class Classify(object obj)
     {
       if (m_Result==null)
         throw new MLException("Decision tree is empty");
 
-      return m_Result.Decide(x);
+      return m_Result.Decide((double[])obj);
     }
 
     /// <summary>
     /// Generate decision tree via ID3 algorithm
     /// </summary>
-    public void Train(IEnumerable<Predicate<Point>> patterns, IInformIndex informativity)
+    public void Train(IEnumerable<Predicate<double[]>> patterns, IInformIndex informativity)
     {
       if (patterns==null || !patterns.Any())
         throw new MLException("Patterns are empty or null");
@@ -52,7 +52,7 @@ namespace ML.LogicalMethods.Algorithms
 
     #region .pvt
 
-      private DecisionNode trainID3Core(IEnumerable<Predicate<Point>> patterns, ClassifiedSample sample, IInformIndex informativity)
+      private DecisionNode trainID3Core(IEnumerable<Predicate<double[]>> patterns, ClassifiedSample sample, IInformIndex informativity)
       {
         if (!sample.Any()) throw new MLException("Empty sample");
 

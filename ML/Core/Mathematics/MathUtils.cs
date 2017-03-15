@@ -40,5 +40,44 @@ namespace ML.Core.Mathematics
       }
     }
 
+    /// <summary>
+    /// Calculates maximum value within array alog with its index
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void CalcMax(double[,,] array, out int iidx, out int jidx, out int kidx, out double max)
+    {
+      iidx = -1;
+      jidx = -1;
+      kidx = -1;
+      max = double.MinValue;
+
+      if (array==null) return;
+
+      int imax = array.GetLength(0);
+      int jmax = array.GetLength(1);
+      int kmax = array.GetLength(2);
+
+      for (int i=0; i<imax; i++)
+      for (int j=0; j<jmax; j++)
+      for (int k=0; k<kmax; k++)
+      {
+        var val = array[i,j,k];
+        if (iidx<0 || jidx<0 || kidx<0 || val > max)
+        {
+          iidx = i;
+          jidx = j;
+          kidx = k;
+          max = val;
+        }
+      }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void CheckDimensions(double[] p1, double[] p2)
+    {
+      if (p1.Length != p2.Length)
+        throw new MLException("Can not add point with different dimension");
+    }
+
   }
 }

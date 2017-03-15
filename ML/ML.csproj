@@ -85,6 +85,8 @@
     <Compile Include="Core\Registry.cs" />
     <Compile Include="Core\ComputingNetworks\Contracts.cs" />
     <Compile Include="Core\ComputingNetworks\SequenceNode.cs" />
+    <Compile Include="DeepMethods\Algorithms\BackpropAlgorithm.cs" />
+    <Compile Include="DeepMethods\Algorithms\ConvolutionalNetworkAlgorithmBase.cs" />
     <Compile Include="DeepMethods\Model\DeepLayerBase.cs" />
     <Compile Include="DeepMethods\Model\PoolingLayer.cs" />
     <Compile Include="DeepMethods\Model\ConvolutionalLayer.cs" />
@@ -109,9 +111,7 @@
     <Compile Include="Core\Mathematics\MathUtils.cs" />
     <Compile Include="Utils\NetworkFactory.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DeepMethods\Algorithms\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -12,10 +12,10 @@ namespace ML.Core.Logical
     public override string ID { get {  return "DONS"; } }
     public override string Name { get { return "Donskoy Index"; } }
 
-    public override double Calculate(Predicate<Point> pattern, ClassifiedSample sample)
+    public override double Calculate(Predicate<double[]> pattern, ClassifiedSample sample)
     {
       int result = 0;
-      var prevs = new List<KeyValuePair<Point, Class>>();
+      var prevs = new List<KeyValuePair<double[], Class>>();
 
       var array = sample.ToArray();
       var len = array.Length;
