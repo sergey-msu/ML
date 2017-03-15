@@ -13,7 +13,7 @@ namespace ML.MetricalMethods.Algorithms
   {
     private double m_H;
 
-    public ParzenFixedAlgorithm(ClassifiedSample classifiedSample,
+    public ParzenFixedAlgorithm(ClassifiedSample<double[]> classifiedSample,
                                 IMetric metric,
                                 IFunction kernel,
                                 double h)

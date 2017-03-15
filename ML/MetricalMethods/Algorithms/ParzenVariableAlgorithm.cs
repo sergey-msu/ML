@@ -13,7 +13,7 @@ namespace ML.MetricalMethods.Algorithms
   {
     private int m_K;
 
-    public ParzenVariableAlgorithm(ClassifiedSample classifiedSample,
+    public ParzenVariableAlgorithm(ClassifiedSample<double[]> classifiedSample,
                                    IMetric metric,
                                    IFunction kernel,
                                    int k)

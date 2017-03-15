@@ -7,12 +7,12 @@ namespace ML.Core.Logical
   /// <summary>
   /// Gini index
   /// </summary>
-  public class GiniIndex : IndexBase
+  public class GiniIndex<TObj> : IndexBase<TObj>
   {
     public override string ID { get {  return "GINI"; } }
     public override string Name { get { return "Gini Index"; } }
 
-    public override double Calculate(Predicate<double[]> pattern, ClassifiedSample sample)
+    public override double Calculate(Predicate<TObj> pattern, ClassifiedSample<TObj> sample)
     {
       int result = 0;
       var prevs = new List<KeyValuePair<double[], Class>>();

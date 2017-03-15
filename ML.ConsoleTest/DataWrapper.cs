@@ -30,8 +30,8 @@ namespace ML.ConsoleTest
 
     public readonly Dictionary<string, Class> Classes = new Dictionary<string, Class>();
     public readonly Dictionary<string, Feature> Features = new Dictionary<string, Feature>();
-    public readonly ClassifiedSample Data = new ClassifiedSample();
-    public readonly ClassifiedSample TrainingSample = new ClassifiedSample();
+    public readonly ClassifiedSample<double[]> Data = new ClassifiedSample<double[]>();
+    public readonly ClassifiedSample<double[]> TrainingSample = new ClassifiedSample<double[]>();
     public readonly List<DataError> Errors = new List<DataError>();
 
     public int Dimension { get; private set; }

@@ -13,7 +13,7 @@ namespace ML.MetricalMethods.Algorithms
   {
     private int m_K;
 
-    public NearestKNeighboursAlgorithm(ClassifiedSample classifiedSample,
+    public NearestKNeighboursAlgorithm(ClassifiedSample<double[]> classifiedSample,
                                        IMetric metric,
                                        int k)
       : base(classifiedSample, metric)

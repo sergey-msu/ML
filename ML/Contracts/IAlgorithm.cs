@@ -6,12 +6,12 @@ namespace ML.Contracts
   /// <summary>
   /// Contract of classification algorithm with training sample
   /// </summary>
-  public interface ISupervisedAlgorithm : IMnemonicNamed
+  public interface ISupervisedAlgorithm<TObj> : IMnemonicNamed
   {
     /// <summary>
     /// Initial classified training sample
     /// </summary>
-    ClassifiedSample TrainingSample { get; }
+    ClassifiedSample<TObj> TrainingSample { get; }
 
     /// <summary>
     /// Known classes
@@ -21,13 +21,13 @@ namespace ML.Contracts
     /// <summary>
     /// Do classify some object
     /// </summary>
-    Class Classify(object obj);
+    Class Classify(TObj obj);
   }
 
   /// <summary>
   /// Contract for general metric classification algorithm
   /// </summary>
-  public interface IMetricAlgorithm : ISupervisedAlgorithm
+  public interface IMetricAlgorithm<TObj> : ISupervisedAlgorithm<TObj>
   {
     /// <summary>
     /// Space metric
@@ -37,7 +37,7 @@ namespace ML.Contracts
     /// <summary>
     /// Estimate point closeness to some class
     /// </summary>
-    double EstimateClose(object point, Class cls);
+    double EstimateClose(TObj obj, Class cls);
 
     /// <summary>
     /// Calculates margins

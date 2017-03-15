@@ -6,11 +6,11 @@ namespace ML.LogicalMethods.Model
   /// <summary>
   /// Base class for decision tree nodes
   /// </summary>
-  public class DecisionTree
+  public class DecisionTree<TObj>
   {
-    private readonly DecisionNode m_Root;
+    private readonly DecisionNode<TObj> m_Root;
 
-    public DecisionTree(DecisionNode root)
+    public DecisionTree(DecisionNode<TObj> root)
     {
       if (root==null)
         throw new MLException("DecisionTree.ctor(node=null)");
@@ -21,12 +21,12 @@ namespace ML.LogicalMethods.Model
     /// <summary>
     /// Root node of the tree
     /// </summary>
-    public DecisionNode Root { get { return m_Root; } }
+    public DecisionNode<TObj> Root { get { return m_Root; } }
 
     /// <summary>
     /// Make a decision about input object
     /// </summary>
-    public virtual Class Decide(double[] obj)
+    public virtual Class Decide(TObj obj)
     {
       return m_Root.Decide(obj);
     }

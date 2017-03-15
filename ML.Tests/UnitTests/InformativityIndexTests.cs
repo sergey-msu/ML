@@ -17,7 +17,7 @@ namespace ML.Tests.UnitTests
                                                  new Class("C", 3)
                                                };
 
-      public static readonly ClassifiedSample SAMPLE_2C = new ClassifiedSample
+      public static readonly ClassifiedSample<double[]> SAMPLE_2C = new ClassifiedSample<double[]>
       {
         { new double[] { 0.0F }, CLASSES[0] },
         { new double[] { 1.0F }, CLASSES[0] },
@@ -26,7 +26,7 @@ namespace ML.Tests.UnitTests
         { new double[] { 4.0F }, CLASSES[1] },
       };
 
-      public static readonly ClassifiedSample SAMPLE_3C = new ClassifiedSample
+      public static readonly ClassifiedSample<double[]> SAMPLE_3C = new ClassifiedSample<double[]>
       {
         { new double[] { 0.0F }, CLASSES[0] },
         { new double[] { 1.0F }, CLASSES[0] },
@@ -51,7 +51,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void GiniIndex_Calculate_2C()
     {
-      var index = new GiniIndex();
+      var index = new GiniIndex<double[]>();
 
       var p1 = SimplePattern(0, -0.5F);
       var p2 = SimplePattern(0,  0.5F);
@@ -78,7 +78,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void GiniIndex_Calculate_3C()
     {
-      var index = new GiniIndex();
+      var index = new GiniIndex<double[]>();
 
       var p1  = SimplePattern(0, -0.5F);
       var p2  = SimplePattern(0,  0.5F);
@@ -108,7 +108,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void DonskoyIndex_Calculate_2C()
     {
-      var index = new DonskoyIndex();
+      var index = new DonskoyIndex<double[]>();
 
       var p1 = SimplePattern(0, -0.5F);
       var p2 = SimplePattern(0,  0.5F);
@@ -135,7 +135,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void DonskoyIndex_Calculate_3C()
     {
-      var index = new DonskoyIndex();
+      var index = new DonskoyIndex<double[]>();
 
       var p1  = SimplePattern(0, -0.5F);
       var p2  = SimplePattern(0,  0.5F);
@@ -165,7 +165,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void EntropyIndex_Calculate_2C()
     {
-      var index = new EntropyIndex();
+      var index = new EntropyIndex<double[]>();
 
       var p1 = SimplePattern(0, -0.5F);
       var p2 = SimplePattern(0,  0.5F);
@@ -192,7 +192,7 @@ namespace ML.Tests.UnitTests
     [TestMethod]
     public void EntropyIndex_Calculate_3C()
     {
-      var index = new EntropyIndex();
+      var index = new EntropyIndex<double[]>();
 
       var p1  = SimplePattern(0, -0.5F);
       var p2  = SimplePattern(0,  0.5F);

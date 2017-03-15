@@ -32,7 +32,7 @@ namespace ML.ConsoleTest
 
     public readonly DataWrapper Data;
 
-    public void Run(ISupervisedAlgorithm algorithm, int xidx=0, int yidx=1, double[] shear = null)
+    public void Run(ISupervisedAlgorithm<double[]> algorithm, int xidx=0, int yidx=1, double[] shear = null)
     {
       m_XIdx = xidx;
       m_YIdx = yidx;
@@ -59,7 +59,7 @@ namespace ML.ConsoleTest
       m_YCnt = 200;
     }
 
-    private void doCalc(ISupervisedAlgorithm algorithm, StreamWriter writer)
+    private void doCalc(ISupervisedAlgorithm<double[]> algorithm, StreamWriter writer)
     {
       for (var k=0; k<Math.Max(m_XCnt, m_YCnt); k++)
       {

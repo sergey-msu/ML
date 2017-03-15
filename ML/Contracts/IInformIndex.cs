@@ -7,16 +7,16 @@ namespace ML.Contracts
   /// <summary>
   /// Contract for Informativity function
   /// </summary>
-  public interface IInformIndex
+  public interface IInformIndex<TObj>
   {
     /// <summary>
     /// Calculates maximum of informativity function
     /// </summary>
-    Predicate<double[]> Max(IEnumerable<Predicate<double[]>> patterns, ClassifiedSample sample);
+    Predicate<TObj> Max(IEnumerable<Predicate<TObj>> patterns, ClassifiedSample<TObj> sample);
 
     /// <summary>
     /// Calculates informativity function with respect to given pattern
     /// </summary>
-    double Calculate(Predicate<double[]> pattern, ClassifiedSample sample);
+    double Calculate(Predicate<TObj> pattern, ClassifiedSample<TObj> sample);
   }
 }

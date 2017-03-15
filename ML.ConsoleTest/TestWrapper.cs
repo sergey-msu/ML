@@ -193,8 +193,8 @@ namespace ML.ConsoleTest
     {
       var patterns = getSimpleLogicPatterns();
 
-      var alg = new DecisionTreeID3Algorithm(Data.TrainingSample);
-      var informativity = new DonskoyIndex();
+      var alg = new DecisionTreeID3Algorithm<double[]>(Data.TrainingSample);
+      var informativity = new DonskoyIndex<double[]>();
       alg.Train(patterns, informativity);
 
       outputError(alg);
@@ -242,7 +242,7 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private void outputError(AlgorithmBase alg)
+    private void outputError(AlgorithmBase<double[]> alg)
     {
       Console.WriteLine("Errors:");
       var errors = alg.GetErrors(Data.Data);
@@ -252,7 +252,7 @@ namespace ML.ConsoleTest
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
     }
 
-    private void calculateMargin(IMetricAlgorithm algorithm)
+    private void calculateMargin(IMetricAlgorithm<double[]> algorithm)
     {
       var res = algorithm.CalculateMargins();
       foreach (var r in res)

@@ -7,24 +7,24 @@ namespace ML.Core
   /// <summary>
   /// Represents a classified (e.g. supplied with corrresponding class) set of points: [point, class]
   /// </summary>
-  public class ClassifiedSample : Dictionary<double[], Class>
+  public class ClassifiedSample<TObj> : Dictionary<TObj, Class>
   {
     public ClassifiedSample()
     {
     }
 
-    public ClassifiedSample(Dictionary<double[], Class> other) : base(other)
+    public ClassifiedSample(Dictionary<TObj, Class> other) : base(other)
     {
     }
 
-    public ClassifiedSample(ClassifiedSample other) : base(other)
+    public ClassifiedSample(ClassifiedSample<TObj> other) : base(other)
     {
     }
 
     /// <summary>
     /// All points
     /// </summary>
-    public IEnumerable<double[]> Points { get { return this.Keys; } }
+    public IEnumerable<TObj> Objects { get { return this.Keys; } }
 
     /// <summary>
     /// All classes

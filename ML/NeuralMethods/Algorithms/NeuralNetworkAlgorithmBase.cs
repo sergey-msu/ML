@@ -10,11 +10,11 @@ namespace ML.NeuralMethods.Algorithms
   /// <summary>
   /// Feedforward Neural Network machine learning algorithm
   /// </summary>
-  public abstract class NeuralNetworkAlgorithmBase : AlgorithmBase
+  public abstract class NeuralNetworkAlgorithmBase : AlgorithmBase<double[]>
   {
     private NeuralNetwork m_Result;
 
-    protected NeuralNetworkAlgorithmBase(ClassifiedSample classifiedSample, NeuralNetwork net)
+    protected NeuralNetworkAlgorithmBase(ClassifiedSample<double[]> classifiedSample, NeuralNetwork net)
       : base(classifiedSample)
     {
       if (net==null)
@@ -28,15 +28,10 @@ namespace ML.NeuralMethods.Algorithms
     /// </summary>
     public NeuralNetwork Result { get { return m_Result; } }
 
-    public override Class Classify(object obj)
-    {
-      return Classify((double[])obj);
-    }
-
     /// <summary>
     /// Maps object to corresponding class
     /// </summary>
-    public Class Classify(double[] x)
+    public override Class Classify(double[] x)
     {
       var result = m_Result.Calculate(x);
       var len = result.Length;

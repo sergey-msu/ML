@@ -7,7 +7,7 @@ namespace ML.Core.Logical
   /// <summary>
   /// Base class for Informativity functions
   /// </summary>
-  public abstract class IndexBase: IInformIndex, IMnemonicNamed
+  public abstract class IndexBase<TObj>: IInformIndex<TObj>, IMnemonicNamed
   {
     /// <summary>
     /// Index mnemonic ID
@@ -22,9 +22,9 @@ namespace ML.Core.Logical
     /// <summary>
     /// Calculates maximum of informativity function
     /// </summary>
-    public Predicate<double[]> Max(IEnumerable<Predicate<double[]>> patterns, ClassifiedSample sample)
+    public Predicate<TObj> Max(IEnumerable<Predicate<TObj>> patterns, ClassifiedSample<TObj> sample)
     {
-      Predicate<double[]> result = null;
+      Predicate<TObj> result = null;
       var maxIndex = double.MinValue;
 
       foreach (var pattern in patterns)
@@ -43,6 +43,6 @@ namespace ML.Core.Logical
     /// <summary>
     /// Calculates informativity function with respect to given pattern
     /// </summary>
-    public abstract double Calculate(Predicate<double[]> pattern, ClassifiedSample sample);
+    public abstract double Calculate(Predicate<TObj> pattern, ClassifiedSample<TObj> sample);
   }
 }

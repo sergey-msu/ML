@@ -6,21 +6,21 @@ namespace ML.LogicalMethods.Model
   /// <summary>
   /// Base class for decision tree nodes
   /// </summary>
-  public abstract class DecisionNode
+  public abstract class DecisionNode<TObj>
   {
-    public abstract Class Decide(double[] x);
+    public abstract Class Decide(TObj x);
   }
 
   /// <summary>
   /// Represents inner (predicate) decision tree node
   /// </summary>
-  public class InnerNode : DecisionNode
+  public class InnerNode<TObj> : DecisionNode<TObj>
   {
-    private readonly Predicate<double[]> m_Condition;
-    private DecisionNode m_NegativeNode;
-    private DecisionNode m_PositiveNode;
+    private readonly Predicate<TObj> m_Condition;
+    private DecisionNode<TObj> m_NegativeNode;
+    private DecisionNode<TObj> m_PositiveNode;
 
-    public InnerNode(Predicate<double[]> condition)
+    public InnerNode(Predicate<TObj> condition)
     {
       if (condition == null)
         throw new MLException("DecisionTree+InnerNode.ctor(condition=null)");
@@ -28,10 +28,10 @@ namespace ML.LogicalMethods.Model
       m_Condition = condition;
     }
 
-    public DecisionNode NegativeNode { get { return m_NegativeNode; } }
-    public DecisionNode PositiveNode { get { return m_PositiveNode; } }
+    public DecisionNode<TObj> NegativeNode { get { return m_NegativeNode; } }
+    public DecisionNode<TObj> PositiveNode { get { return m_PositiveNode; } }
 
-    public void SetNegativeNode(DecisionNode node)
+    public void SetNegativeNode(DecisionNode<TObj> node)
     {
       if (node == null)
         throw new MLException("Node can not be null");
@@ -39,7 +39,7 @@ namespace ML.LogicalMethods.Model
       m_NegativeNode = node;
     }
 
-    public void SetPositiveNode(DecisionNode node)
+    public void SetPositiveNode(DecisionNode<TObj> node)
     {
       if (node == null)
         throw new MLException("Node can not be null");
@@ -47,7 +47,7 @@ namespace ML.LogicalMethods.Model
       m_PositiveNode = node;
     }
 
-    public override Class Decide(double[] x)
+    public override Class Decide(TObj x)
     {
       if (NegativeNode == null)
         throw new MLException("NegativeNode is null");
@@ -61,7 +61,7 @@ namespace ML.LogicalMethods.Model
   /// <summary>
   /// Represents leaf (class) decision tree node
   /// </summary>
-  public class LeafNode : DecisionNode
+  public class LeafNode<TObj> : DecisionNode<TObj>
   {
     private readonly Class m_Class;
 
@@ -75,7 +75,7 @@ namespace ML.LogicalMethods.Model
 
     public Class Class { get { return m_Class; } }
 
-    public override Class Decide(double[] x)
+    public override Class Decide(TObj x)
     {
       return m_Class;
     }

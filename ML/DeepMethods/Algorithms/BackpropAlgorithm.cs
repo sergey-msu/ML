@@ -65,7 +65,7 @@ namespace ML.DeepMethods.Algorithms
 
     #region .ctor
 
-    public BackpropAlgorithm(ClassifiedSample classifiedSample, ConvolutionalNetwork net)
+    public BackpropAlgorithm(ClassifiedSample<double[,,]> classifiedSample, ConvolutionalNetwork net)
       : base(classifiedSample, net)
     {
       //init();

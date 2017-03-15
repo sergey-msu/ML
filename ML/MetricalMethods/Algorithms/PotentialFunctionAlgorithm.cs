@@ -6,7 +6,7 @@ using ML.Core;
 
 namespace ML.MetricalMethods.Algorithms
 {
-  public sealed class PotentialFunctionAlgorithm : MetricAlgorithmBase
+  public sealed class PotentialFunctionAlgorithm : MetricAlgorithmBase<double[]>
   {
     #region Inner
 
@@ -27,7 +27,7 @@ namespace ML.MetricalMethods.Algorithms
     private readonly IFunction m_Kernel;
     private KernelEquipment[] m_Eqps;
 
-    public PotentialFunctionAlgorithm(ClassifiedSample classifiedSample,
+    public PotentialFunctionAlgorithm(ClassifiedSample<double[]> classifiedSample,
                                       IMetric metric,
                                       IFunction kernel,
                                       KernelEquipment[] eqps)

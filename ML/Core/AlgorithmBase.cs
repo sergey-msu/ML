@@ -8,7 +8,7 @@ namespace ML.Core
   /// <summary>
   /// Base class for algorithm that accepts whole traing sample
   /// </summary>
-  public abstract class AlgorithmBase : ISupervisedAlgorithm
+  public abstract class AlgorithmBase<TObj> : ISupervisedAlgorithm<TObj>
   {
     #region Inner
 
@@ -18,12 +18,12 @@ namespace ML.Core
       {
         private static readonly SampleMaskDelegate ALL = (p, c, i) => true;
 
-        private AlgorithmBase m_Algorithm;
+        private AlgorithmBase<TObj> m_Algorithm;
         private SampleMaskDelegate m_Mask;
-        private ClassifiedSample m_MaskedSample;
+        private ClassifiedSample<TObj> m_MaskedSample;
         private bool m_Disposed;
 
-        public MaskHandle(AlgorithmBase algorithm, SampleMaskDelegate mask)
+        public MaskHandle(AlgorithmBase<TObj> algorithm, SampleMaskDelegate mask)
         {
           if (algorithm==null)
             throw new MLException("MaskHandle.ctor(algorithm=null)");
@@ -32,7 +32,7 @@ namespace ML.Core
           m_Mask = mask ?? ALL;
         }
 
-        public ClassifiedSample MaskedSample
+        public ClassifiedSample<TObj> MaskedSample
         {
           get
           {
@@ -44,7 +44,7 @@ namespace ML.Core
                                             .Where((kvp, i) => m_Mask(kvp.Key, kvp.Value, i))
                                             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-              m_MaskedSample = new ClassifiedSample(maskedSample);
+              m_MaskedSample = new ClassifiedSample<TObj>(maskedSample);
             }
 
             return m_MaskedSample;
@@ -89,16 +89,16 @@ namespace ML.Core
 
     #endregion
 
-    protected readonly ClassifiedSample m_TrainingSample;
+    protected readonly ClassifiedSample<TObj> m_TrainingSample;
     protected readonly Dictionary<string, Class> m_Classes;
     private MaskHandle m_MaskHandle;
 
-    protected AlgorithmBase(ClassifiedSample trainingSample)
+    protected AlgorithmBase(ClassifiedSample<TObj> trainingSample)
     {
       if (trainingSample == null || !trainingSample.Any())
         throw new MLException("AlrogithmBase.ctor(trainingSample=null|empty)");
 
-      m_TrainingSample = new ClassifiedSample(trainingSample);
+      m_TrainingSample = new ClassifiedSample<TObj>(trainingSample);
       m_Classes = m_TrainingSample.Classes.ToDictionary(c => c.Name);
     }
 
@@ -115,7 +115,7 @@ namespace ML.Core
     /// <summary>
     /// Training sample
     /// </summary>
-    public ClassifiedSample TrainingSample
+    public ClassifiedSample<TObj> TrainingSample
     {
       get
       {
@@ -132,7 +132,7 @@ namespace ML.Core
     /// <summary>
     /// Maps object to corresponding class
     /// </summary>
-    public abstract Class Classify(object obj);
+    public abstract Class Classify(TObj obj);
 
     public MaskHandle ApplySampleMask(SampleMaskDelegate mask)
     {
@@ -143,7 +143,7 @@ namespace ML.Core
     /// <summary>
     /// Returns all errors of the given algorithm on some initially classified sample
     /// </summary>
-    public IEnumerable<ErrorInfo> GetErrors(ClassifiedSample classifiedSample)
+    public IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<TObj> classifiedSample)
     {
       var errors = new List<ErrorInfo>();
 

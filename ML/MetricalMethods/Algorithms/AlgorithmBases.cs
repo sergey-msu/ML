@@ -9,12 +9,11 @@ namespace ML.MetricalMethods.Algorithms
   /// <summary>
   /// Base class for metric algorithm supplied with some spacial metric
   /// </summary>
-  public abstract class MetricAlgorithmBase : AlgorithmBase, IMetricAlgorithm
+  public abstract class MetricAlgorithmBase<TObj> : AlgorithmBase<TObj>, IMetricAlgorithm<TObj>
   {
     public readonly IMetric m_Metric;
 
-    protected MetricAlgorithmBase(ClassifiedSample classifiedSample,
-                                  IMetric metric)
+    protected MetricAlgorithmBase(ClassifiedSample<TObj> classifiedSample, IMetric metric)
       : base(classifiedSample)
     {
       if (metric == null)
@@ -31,7 +30,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Classify point
     /// </summary>
-    public override Class Classify(object obj)
+    public override Class Classify(TObj obj)
     {
       Class result = null;
       var maxEst = double.MinValue;
@@ -52,7 +51,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public abstract double EstimateClose(double[] obj, Class cls);
+    public abstract double EstimateClose(TObj obj, Class cls);
 
     /// <summary>
     /// Calculates margins
@@ -93,9 +92,9 @@ namespace ML.MetricalMethods.Algorithms
   /// <summary>
   /// Base class for metric algorithm that relies on order of training sample with respect to fixed test point
   /// </summary>
-  public abstract class OrderedMetricAlgorithmBase : MetricAlgorithmBase
+  public abstract class OrderedMetricAlgorithmBase : MetricAlgorithmBase<double[]>
   {
-    protected OrderedMetricAlgorithmBase(ClassifiedSample classifiedSample, IMetric metric)
+    protected OrderedMetricAlgorithmBase(ClassifiedSample<double[]> classifiedSample, IMetric metric)
       : base(classifiedSample, metric)
     {
     }
@@ -108,7 +107,7 @@ namespace ML.MetricalMethods.Algorithms
       var closeness = 0.0D;
       var sLength = TrainingSample.Count;
 
-      var orderedSample = Metric.Sort(obj, TrainingSample.Points);
+      var orderedSample = Metric.Sort(obj, TrainingSample.Objects);
 
       for (int i = 0; i < sLength; i++)
       {
@@ -139,7 +138,7 @@ namespace ML.MetricalMethods.Algorithms
   {
     private readonly IFunction m_Kernel;
 
-    public KernelAlgorithmBase(ClassifiedSample classifiedSample,
+    public KernelAlgorithmBase(ClassifiedSample<double[]> classifiedSample,
                                IMetric metric,
                                IFunction kernel)
       : base(classifiedSample, metric)

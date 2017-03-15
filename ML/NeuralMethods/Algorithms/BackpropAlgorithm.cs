@@ -65,7 +65,7 @@ namespace ML.NeuralMethods.Algorithms
 
     #region .ctor
 
-    public BackpropAlgorithm(ClassifiedSample classifiedSample, NeuralNetwork net)
+    public BackpropAlgorithm(ClassifiedSample<double[]> classifiedSample, NeuralNetwork net)
       : base(classifiedSample, net)
     {
       init();

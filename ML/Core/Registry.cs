@@ -60,22 +60,22 @@ namespace ML.Core
       }
     }
 
-    public static class Informativities
+    public static class Informativities<TObj>
     {
-      private static readonly GiniIndex    m_GiniInformativity    = new GiniIndex();
-      private static readonly DonskoyIndex m_DonskoyInformativity = new DonskoyIndex();
-      private static readonly EntropyIndex m_EntropyInformativity = new EntropyIndex();
+      private static readonly GiniIndex<TObj>    m_GiniInformativity    = new GiniIndex<TObj>();
+      private static readonly DonskoyIndex<TObj> m_DonskoyInformativity = new DonskoyIndex<TObj>();
+      private static readonly EntropyIndex<TObj> m_EntropyInformativity = new EntropyIndex<TObj>();
 
-      public static readonly Dictionary<string, IInformIndex> ByID = new Dictionary<string, IInformIndex>
+      public static readonly Dictionary<string, IInformIndex<TObj>> ByID = new Dictionary<string, IInformIndex<TObj>>
       {
         { m_GiniInformativity.ID,    m_GiniInformativity },
         { m_DonskoyInformativity.ID, m_DonskoyInformativity },
         { m_EntropyInformativity.ID, m_EntropyInformativity }
       };
 
-      public static GiniIndex    GiniInfomativity     { get { return m_GiniInformativity; } }
-      public static DonskoyIndex DonskoyInformativity { get { return m_DonskoyInformativity; } }
-      public static EntropyIndex EntropyInformativity { get { return m_EntropyInformativity; } }
+      public static GiniIndex<TObj>    GiniInfomativity     { get { return m_GiniInformativity; } }
+      public static DonskoyIndex<TObj> DonskoyInformativity { get { return m_DonskoyInformativity; } }
+      public static EntropyIndex<TObj> EntropyInformativity { get { return m_EntropyInformativity; } }
     }
 
     public static class ActivationFunctions

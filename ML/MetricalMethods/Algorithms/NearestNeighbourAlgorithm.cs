@@ -10,7 +10,7 @@ namespace ML.MetricalMethods.Algorithms
   /// </summary>
   public sealed class NearestNeighbourAlgorithm : OrderedMetricAlgorithmBase
   {
-    public NearestNeighbourAlgorithm(ClassifiedSample classifiedSample, IMetric metric)
+    public NearestNeighbourAlgorithm(ClassifiedSample<double[]> classifiedSample, IMetric metric)
       : base(classifiedSample, metric)
     {
     }

@@ -7,16 +7,14 @@ namespace ML.Core.Logical
   /// <summary>
   /// V.I. Donskoy Index
   /// </summary>
-  public class DonskoyIndex : IndexBase
+  public class DonskoyIndex<TObj> : IndexBase<TObj>
   {
-    public override string ID { get {  return "DONS"; } }
+    public override string ID { get {  return "DON"; } }
     public override string Name { get { return "Donskoy Index"; } }
 
-    public override double Calculate(Predicate<double[]> pattern, ClassifiedSample sample)
+    public override double Calculate(Predicate<TObj> pattern, ClassifiedSample<TObj> sample)
     {
       int result = 0;
-      var prevs = new List<KeyValuePair<double[], Class>>();
-
       var array = sample.ToArray();
       var len = array.Length;
 

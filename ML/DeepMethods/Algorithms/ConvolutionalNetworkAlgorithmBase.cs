@@ -10,11 +10,11 @@ namespace ML.DeepMethods.Algorithms
   /// <summary>
   /// Feedforward Convolutional Neural Network machine learning algorithm
   /// </summary>
-  public abstract class ConvolutionalNetworkAlgorithmBase: AlgorithmBase
+  public abstract class ConvolutionalNetworkAlgorithmBase: AlgorithmBase<double[,,]>
   {
     private ConvolutionalNetwork m_Result;
 
-    protected ConvolutionalNetworkAlgorithmBase(ClassifiedSample trainingSample, ConvolutionalNetwork net)
+    protected ConvolutionalNetworkAlgorithmBase(ClassifiedSample<double[,,]> trainingSample, ConvolutionalNetwork net)
       : base(trainingSample)
     {
       if (net==null)
@@ -28,15 +28,10 @@ namespace ML.DeepMethods.Algorithms
     /// </summary>
     public ConvolutionalNetwork Result { get { return m_Result; } }
 
-    public override Class Classify(object obj)
-    {
-      return Classify((double[,,])obj);
-    }
-
     /// <summary>
     /// Maps object to corresponding class
     /// </summary>
-    public Class Classify(double[,,] input)
+    public override Class Classify(double[,,] input)
     {
       var result = m_Result.Calculate(input);
       var len = result.GetLength(0);

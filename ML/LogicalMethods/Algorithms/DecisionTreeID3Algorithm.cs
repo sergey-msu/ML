@@ -10,11 +10,11 @@ namespace ML.LogicalMethods.Algorithms
   /// <summary>
   /// Decision Tree Algorithm
   /// </summary>
-  public class DecisionTreeID3Algorithm : AlgorithmBase
+  public class DecisionTreeID3Algorithm<TObj> : AlgorithmBase<TObj>
   {
-    private DecisionTree m_Result;
+    private DecisionTree<TObj> m_Result;
 
-    public DecisionTreeID3Algorithm(ClassifiedSample classifiedSample)
+    public DecisionTreeID3Algorithm(ClassifiedSample<TObj> classifiedSample)
       : base(classifiedSample)
     {
     }
@@ -25,20 +25,20 @@ namespace ML.LogicalMethods.Algorithms
     /// <summary>
     /// Tree root node
     /// </summary>
-    public DecisionTree Result { get { return m_Result; } }
+    public DecisionTree<TObj> Result { get { return m_Result; } }
 
-    public override Class Classify(object obj)
+    public override Class Classify(TObj obj)
     {
       if (m_Result==null)
         throw new MLException("Decision tree is empty");
 
-      return m_Result.Decide((double[])obj);
+      return m_Result.Decide(obj);
     }
 
     /// <summary>
     /// Generate decision tree via ID3 algorithm
     /// </summary>
-    public void Train(IEnumerable<Predicate<double[]>> patterns, IInformIndex informativity)
+    public void Train(IEnumerable<Predicate<TObj>> patterns, IInformIndex<TObj> informativity)
     {
       if (patterns==null || !patterns.Any())
         throw new MLException("Patterns are empty or null");
@@ -47,22 +47,22 @@ namespace ML.LogicalMethods.Algorithms
 
       var root = trainID3Core(patterns, TrainingSample, informativity);
 
-      m_Result = new DecisionTree(root);
+      m_Result = new DecisionTree<TObj>(root);
     }
 
     #region .pvt
 
-      private DecisionNode trainID3Core(IEnumerable<Predicate<double[]>> patterns, ClassifiedSample sample, IInformIndex informativity)
+      private DecisionNode<TObj> trainID3Core(IEnumerable<Predicate<TObj>> patterns, ClassifiedSample<TObj> sample, IInformIndex<TObj> informativity)
       {
         if (!sample.Any()) throw new MLException("Empty sample");
 
         var cls = sample.First().Value;
         if (sample.All(kvp => kvp.Value.Equals(cls)))
-          return new LeafNode(cls);
+          return new LeafNode<TObj>(cls);
 
         var pattern = informativity.Max(patterns, sample);
-        var negSample = new ClassifiedSample();
-        var posSample = new ClassifiedSample();
+        var negSample = new ClassifiedSample<TObj>();
+        var posSample = new ClassifiedSample<TObj>();
         foreach (var pData in sample)
         {
           if (pattern(pData.Key))
@@ -77,10 +77,10 @@ namespace ML.LogicalMethods.Algorithms
                                  .Select(g => new KeyValuePair<Class, int>(g.Key, g.Count()))
                                  .OrderByDescending(c => c.Value)
                                  .First();
-          return new LeafNode(majorClass.Key);
+          return new LeafNode<TObj>(majorClass.Key);
         }
 
-        var node = new InnerNode(pattern);
+        var node = new InnerNode<TObj>(pattern);
         var negNode = trainID3Core(patterns, negSample, informativity);
         var posNode = trainID3Core(patterns, posSample, informativity);
         node.SetNegativeNode(negNode);
