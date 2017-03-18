@@ -44,9 +44,7 @@ namespace ML.NeuralMethods.Model
       for (int i=0; i<InputDim; i++)
         net += m_Weights[i] * input[i];
 
-      NetValue   = net;
-      Value      = ActivationFunction.Value(net);
-      Derivative = ActivationFunction.Derivative(net);
+      Value = ActivationFunction.Value(net);
     }
 
     #endregion

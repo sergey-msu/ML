@@ -6,7 +6,7 @@ namespace ML.Core.ActivationFunctions
   /// <summary>
   /// Exponent Activation Function
   /// </summary>
-  public class ExpActivation : IFunction
+  public class ExpActivation : IActivationFunction
   {
     public string ID { get { return "EXP"; } }
     public string Name { get { return "Exponent"; } }
@@ -19,6 +19,11 @@ namespace ML.Core.ActivationFunctions
     public double Derivative(double r)
     {
       return Math.Exp(r);
+    }
+
+    public double DerivativeFromValue(double y)
+    {
+      return y;
     }
   }
 }

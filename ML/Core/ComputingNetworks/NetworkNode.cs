@@ -12,7 +12,7 @@ namespace ML.Core.ComputingNetworks
     where TNeuron : NeuronNode<TPar>
   {
     private int m_InputDim;
-    private IFunction m_ActivationFunction;
+    private IActivationFunction m_ActivationFunction;
 
     protected NetworkNode(int inputDim)
     {
@@ -35,7 +35,7 @@ namespace ML.Core.ComputingNetworks
     /// <summary>
     /// Layer activation function. If null, the network's activation function will be used
     /// </summary>
-    public IFunction ActivationFunction
+    public IActivationFunction ActivationFunction
     {
       get { return m_ActivationFunction; }
       set { m_ActivationFunction = value; }

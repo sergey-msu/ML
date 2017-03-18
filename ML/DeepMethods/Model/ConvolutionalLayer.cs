@@ -27,20 +27,12 @@ namespace ML.DeepMethods.Model
   {
     #region Fields
 
-    private bool m_IsTraining;
-
-    private int m_WindowSize;
-    private int m_Stride;
-    private int m_Padding;
-
     private int m_KernelParamCount;
     private int m_FeatureMapParamCount;
     private int m_ParamCount;
 
     private double[,,,] m_Kernel;
     private double[]    m_Biases;
-    private double[,,]  m_NetValue;
-    private double[,,]  m_Derivative;
 
     #endregion
 
@@ -56,35 +48,18 @@ namespace ML.DeepMethods.Model
       : base(inputDepth,
              inputSize,
              outputDepth,
-             (inputSize - windowSize + 2*padding)/stride + 1)
+             (inputSize - windowSize + 2*padding)/stride + 1,
+             windowSize,
+             stride,
+             padding,
+             isTraining)
     {
-      if (windowSize <= 0)
-        throw new MLException("ConvolutionalLayer.ctor(windowSize<=0)");
-      if (windowSize > inputSize)
-        throw new MLException("ConvolutionalLayer.ctor(windowSize>inputSize)");
-      if (stride <= 0)
-        throw new MLException("ConvolutionalLayer.ctor(stride<=0)");
-      if (padding < 0)
-        throw new MLException("ConvolutionalLayer.ctor(padding<0)");
-
-      m_IsTraining = isTraining;
-
-      m_WindowSize  = windowSize;
-      m_Stride      = stride;
-      m_Padding     = padding;
-
       m_KernelParamCount     = windowSize*windowSize;
       m_FeatureMapParamCount = inputDepth*m_KernelParamCount + 1;
       m_ParamCount           = m_FeatureMapParamCount*outputDepth;
 
       m_Kernel = new double[outputDepth, inputDepth, windowSize, windowSize];
       m_Biases = new double[outputDepth];
-
-      if (m_IsTraining)
-      {
-        m_NetValue   = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
-        m_Derivative = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
-      }
     }
 
     #endregion
@@ -92,28 +67,6 @@ namespace ML.DeepMethods.Model
     #region Properties
 
     public override int ParamCount { get { return m_ParamCount; } }
-
-    /// <summary>
-    /// If true, indicates that layer is not in production mode,
-    /// so it can store some additional values (i.e. net values, derivatives etc.)
-    /// </summary>
-    public bool IsTraining { get { return m_IsTraining; } }
-
-    /// <summary>
-    /// Size of square convolution window
-    /// </summary>
-    public int WindowSize { get { return m_WindowSize; } }
-
-    /// <summary>
-    /// An overlapping step during convolution calculation process.
-    /// 1 leads to maximum overlapping between neighour kernel windows
-    /// </summary>
-    public int Stride { get { return m_Stride; } }
-
-    /// <summary>
-    /// Padding of the input channel
-    /// </summary>
-    public int Padding { get { return m_Padding; } }
 
     /// <summary>
     /// Bias values (one for each output feature map)
@@ -125,16 +78,6 @@ namespace ML.DeepMethods.Model
     /// </summary>
     public double[,,,] Kernel { get { return m_Kernel; } }
 
-    /// <summary>
-    /// Calculated pure value (before applying activation function)
-    /// </summary>
-    public double[,,] NetValue { get { return m_NetValue; } }
-
-    /// <summary>
-    /// Derivative (componentwise) of calculated net value
-    /// </summary>
-    public double[,,] Derivative { get { return m_Derivative; } }
-
     #endregion
 
     /// <summary>
@@ -143,6 +86,7 @@ namespace ML.DeepMethods.Model
     public override void RandomizeParameters(int seed)
     {
       var random = RandomGenerator.Get(seed);
+      var coeff = m_InputDepth*m_WindowSize*m_WindowSize;
 
       for (int q=0; q<m_OutputDepth; q++)
       {
@@ -150,10 +94,10 @@ namespace ML.DeepMethods.Model
         for (int i=0; i<m_WindowSize; i++)
         for (int j=0; j<m_WindowSize; j++)
         {
-          m_Kernel[q, p, i, j] = 2*random.GenerateUniform(0, 1) / m_ParamCount;
+          m_Kernel[q, p, i, j] = 2*random.GenerateUniform(0, 1) / coeff;
         }
 
-        m_Biases[q] = 2*random.GenerateUniform(0, 1) / m_ParamCount;
+        m_Biases[q] = 2*random.GenerateUniform(0, 1) / coeff;
       }
     }
 
@@ -185,12 +129,6 @@ namespace ML.DeepMethods.Model
               for (int p=0; p<m_InputDepth; p++)
                 net += m_Kernel[q, p, y, x]*input[p, yidx, xidx];
             }
-          }
-
-          if (m_IsTraining)
-          {
-            m_NetValue[q, i, j]   = net;
-            m_Derivative[q, i, j] = ActivationFunction.Derivative(net);
           }
 
           m_Value[q, i, j] = ActivationFunction.Value(net);

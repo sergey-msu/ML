@@ -6,7 +6,7 @@ namespace ML.Core.ActivationFunctions
   /// <summary>
   /// Logistic Activation Function
   /// </summary>
-  public sealed class LogisticActivation : IFunction
+  public sealed class LogisticActivation : IActivationFunction
   {
     private double m_Alpha;
 
@@ -31,6 +31,11 @@ namespace ML.Core.ActivationFunctions
     {
       var val = 1.0D / (1.0D + Math.Exp(-m_Alpha*r));
       return m_Alpha * val * (1.0F - val);
+    }
+
+    public double DerivativeFromValue(double y)
+    {
+      return m_Alpha*y*(1.0D - y);
     }
   }
 }

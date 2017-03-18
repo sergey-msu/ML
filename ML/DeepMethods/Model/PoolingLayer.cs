@@ -12,25 +12,22 @@ namespace ML.DeepMethods.Model
   /// </summary>
   public abstract class PoolingLayer : DeepLayerBase
   {
-    #region Fields
-
-    protected readonly int m_WindowSize;
-    protected readonly int m_Stride;
-    protected readonly int m_Padding;
-
-    #endregion
-
     #region .ctor
 
     protected PoolingLayer(int inputDepth,
                            int inputSize,
                            int windowSize,
                            int stride=0,
-                           int padding=0)
+                           int padding=0,
+                           bool isTraining=false)
       : base(inputDepth,
              inputSize,
              inputDepth,
-             (inputSize - windowSize + 2*padding)/stride + 1)
+             (inputSize - windowSize + 2*padding)/stride + 1,
+             windowSize,
+             (stride==0) ? windowSize : stride,
+             padding,
+             isTraining)
     {
       if (windowSize <= 0)
         throw new MLException("PoolingLayer.ctor(windowSize<=0)");
@@ -41,9 +38,7 @@ namespace ML.DeepMethods.Model
       if (padding < 0)
         throw new MLException("PoolingLayer.ctor(padding<0)");
 
-      m_WindowSize = windowSize;
-      m_Padding    = padding;
-      m_Stride     = (stride == 0) ? windowSize : stride;
+      ActivationFunction = Registry.ActivationFunctions.Identity;
     }
 
     #endregion
@@ -51,22 +46,6 @@ namespace ML.DeepMethods.Model
     #region Properties
 
     public override int ParamCount { get { return 0; } }
-
-    /// <summary>
-    /// Size of square pooling window
-    /// </summary>
-    public int WindowSize { get { return m_WindowSize; } }
-
-    /// <summary>
-    /// An overlapping step during pooling process.
-    /// 1 leads to maximum overlapping between neighour windows
-    /// </summary>
-    public int Stride { get { return m_Stride; } }
-
-    /// <summary>
-    /// Padding of the input channel
-    /// </summary>
-    public int Padding { get { return m_Padding; } }
 
     #endregion
 
@@ -95,22 +74,29 @@ namespace ML.DeepMethods.Model
   /// </summary>
   public class MaxPoolingLayer : PoolingLayer
   {
+    private int[,,,] m_MaxIndexPositions;
+
     #region .ctor
 
     public MaxPoolingLayer(int inputDepth,
                            int inputSize,
                            int windowSize,
                            int stride=0,
-                           int padding=0)
+                           int padding=0,
+                           bool isTraining=false)
       : base(inputDepth,
              inputSize,
              windowSize,
              stride,
-             padding)
+             padding,
+             isTraining)
     {
+      m_MaxIndexPositions = new int[m_OutputDepth, m_OutputSize, m_OutputSize, 2];
     }
 
     #endregion
+
+    public int[,,,] MaxIndexPositions { get { return m_MaxIndexPositions; } }
 
     public override double[,,] Calculate(double[,,] input)
     {
@@ -120,6 +106,8 @@ namespace ML.DeepMethods.Model
         for (int j=0; j<m_OutputSize; j++)
         {
           var value = double.MinValue;
+          var xmaxIdx = -1;
+          var ymaxIdx = -1;
           var xmin = j*m_Stride-m_Padding;
           var ymin = i*m_Stride-m_Padding;
 
@@ -132,11 +120,18 @@ namespace ML.DeepMethods.Model
             if (xidx>=0 && xidx<m_InputSize && yidx>=0 && yidx<m_InputSize)
             {
               var z = input[q, yidx, xidx];
-              if (z > value) value = z;
+              if (z > value)
+              {
+                value = z;
+                xmaxIdx = xidx;
+                ymaxIdx = yidx;
+              }
             }
           }
 
           m_Value[q, i, j] = value;
+          m_MaxIndexPositions[q, i, j, 0] = xmaxIdx;
+          m_MaxIndexPositions[q, i, j, 1] = ymaxIdx;
         }
       }
 
@@ -155,12 +150,14 @@ namespace ML.DeepMethods.Model
                            int inputSize,
                            int windowSize,
                            int stride=0,
-                           int padding=0)
+                           int padding=0,
+                           bool isTraining=false)
       : base(inputDepth,
              inputSize,
              windowSize,
              stride,
-             padding)
+             padding,
+             isTraining)
     {
     }
 

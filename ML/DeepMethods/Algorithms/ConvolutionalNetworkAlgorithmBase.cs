@@ -37,26 +37,19 @@ namespace ML.DeepMethods.Algorithms
       var len = result.GetLength(0);
       Class cls;
 
-      if (len==1)
-      {
-        cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == (int)result[0,0,0]).Value ?? Class.None;
-      }
-      else
-      {
-        int iidx;
-        int jidx;
-        int kidx;
-        double max;
-        MathUtils.CalcMax(result, out iidx, out jidx, out kidx, out max);
+      int iidx;
+      int jidx;
+      int kidx;
+      double max;
+      MathUtils.CalcMax(result, out iidx, out jidx, out kidx, out max);
 
-        cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == iidx+1).Value  ?? Class.None;
-      }
+      cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == iidx+1).Value  ?? Class.None;
 
       return cls;
     }
 
     /// <summary>
-    /// Teaches algorithm, produces Network output
+    /// Teaches algorithm, produces Result output
     /// </summary>
     public abstract void Train();
   }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ML.NeuralMethods.Model;
+using ML.DeepMethods.Model;
 using ML.Contracts;
 using ML.Core;
 
@@ -10,8 +11,14 @@ namespace ML.Utils
 {
   public static class NetworkFactory
   {
+    /// <summary>
+    /// Creates fully connected NN
+    /// </summary>
+    /// <param name="topology">Network topology from input to output layer
+    /// (i.e. [2,10,3] means NN with 2D input, 1 hidden layer with 10 neurons and 3D output)</param>
+    /// <returns></returns>
     public static NeuralNetwork CreateFullyConnectedNetwork(int[] topology,
-                                                            IFunction activationFunction,
+                                                            IActivationFunction activationFunction,
                                                             bool randomizeInitialWeights = true,
                                                             int randomSeed = 0)
     {
@@ -45,7 +52,35 @@ namespace ML.Utils
       return net;
     }
 
-    // create LeNet
+    /// <summary>
+    /// Sreate CNN with original LeNet-1 architecture (see http://yann.lecun.com/exdb/publis/pdf/lecun-95b.pdf)
+    /// </summary>
+    /// <returns></returns>
+    public static ConvolutionalNetwork CreateLeNet1Network(IActivationFunction activationFunction = null)
+    {
+      var net = new ConvolutionalNetwork(1, 28);
+
+      var layer1 = new ConvolutionalLayer(1, 28, 4, 4, isTraining: true);
+      net.AddLayer(layer1);
+
+      var layer2 = new MaxPoolingLayer(4, 24, 2, isTraining: true);
+      net.AddLayer(layer2);
+
+      var layer3 = new ConvolutionalLayer(4, 12, 12, 5, isTraining: true);
+      net.AddLayer(layer3);
+
+      var layer4 = new MaxPoolingLayer(12, 8, 2, isTraining: true);
+      net.AddLayer(layer4);
+
+      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, isTraining: true);
+      net.AddLayer(layer5);
+
+      net.ActivationFunction = activationFunction ?? Registry.ActivationFunctions.Identity;
+
+      net.Build();
+
+      return net;
+    }
 
     // create AlexNet
 

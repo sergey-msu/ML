@@ -20,12 +20,17 @@ namespace ML.Core.ActivationFunctions
     {
       return 0;
     }
+
+    public double DerivativeFromValue(double y)
+    {
+      return 0;
+    }
   }
 
   /// <summary>
   /// Binary Step Activation Function
   /// </summary>
-  public sealed class ShiftedStepActivation : IFunction
+  public sealed class ShiftedStepActivation : IActivationFunction
   {
     private readonly double m_Threshold;
 
@@ -44,6 +49,11 @@ namespace ML.Core.ActivationFunctions
     }
 
     public double Derivative(double r)
+    {
+      return 0;
+    }
+
+    public double DerivativeFromValue(double y)
     {
       return 0;
     }

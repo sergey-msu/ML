@@ -6,7 +6,7 @@ namespace ML.Core.ActivationFunctions
   /// <summary>
   /// Rectified linear unit Activation Function
   /// </summary>
-  public class ReLUActivation : IFunction
+  public class ReLUActivation : IActivationFunction
   {
     public string ID { get { return "RELU"; } }
     public string Name { get { return "Rectified Linear Unit"; } }
@@ -19,6 +19,11 @@ namespace ML.Core.ActivationFunctions
     public double Derivative(double r)
     {
       return (r < 0) ? 0 : 1;
+    }
+
+    public double DerivativeFromValue(double y)
+    {
+      return (y==0) ? 0 : 1;
     }
   }
 }

@@ -6,7 +6,7 @@ namespace ML.Core.ActivationFunctions
   /// <summary>
   /// Identity Activation Function
   /// </summary>
-  public sealed class IdentityActivation : IFunction
+  public sealed class IdentityActivation : IActivationFunction
   {
     public string ID { get { return "IDT"; } }
     public string Name { get { return "Identity"; } }
@@ -17,6 +17,11 @@ namespace ML.Core.ActivationFunctions
     }
 
     public double Derivative(double r)
+    {
+      return 1.0D;
+    }
+
+    public double DerivativeFromValue(double y)
     {
       return 1.0D;
     }

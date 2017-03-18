@@ -68,7 +68,8 @@ namespace ML.ConsoleTest
         //Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
 
         //start = DateTime.Now;
-        doMultilayerNNAlgorithmTest();
+        //doMultilayerNNAlgorithmTest();
+        doCNNAlgorithmTest();
         var stop = DateTime.Now;
         Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
       }
@@ -213,7 +214,7 @@ namespace ML.ConsoleTest
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>
                              {
-                               if (epoch++ % 100 != 0) return;
+                               if (epoch++ % 300 != 0) return;
                                Console.WriteLine("----------------Epoch #: {0}", epoch);
                                Console.WriteLine("E:\t{0}",  alg.ErrorValue);
                                Console.WriteLine("DE:\t{0}", alg.ErrorDelta);
@@ -242,10 +243,87 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
+    private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg()
+    {
+      var cnn = new ML.DeepMethods.Model.ConvolutionalNetwork(2, 1);
+      var l1 = new ML.DeepMethods.Model.ConvolutionalLayer(2, 1, 15, 1, isTraining: true);
+      cnn.AddLayer(l1);
+      var l2 = new ML.DeepMethods.Model.ConvolutionalLayer(15, 1, 3, 1, isTraining: true);
+      cnn.AddLayer(l2);
+      cnn.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
+      cnn.RandomizeParameters(0);
+      cnn.Build();
+
+      var sample = new ClassifiedSample<double[,,]>();
+      foreach (var obj in Data.TrainingSample)
+      {
+        var data = obj.Key;
+        var key = new double[data.Length, 1, 1];
+        for (int i=0; i<data.Length; i++)
+          key[i, 0, 0] = data[i];
+        sample[key] = obj.Value;
+      }
+      var alg = new ML.DeepMethods.Algorithms.BackpropAlgorithm(sample, cnn);
+      alg.EpochCount = 6000;
+      alg.LearningRate = 0.1D;
+
+      int epoch = 0;
+      alg.EpochEndedEvent += (o, e) =>
+                             {
+                               if (epoch++ % 300 != 0) return;
+                               Console.WriteLine("----------------Epoch #: {0}", epoch);
+                               Console.WriteLine("E:\t{0}",  alg.ErrorValue);
+                               Console.WriteLine("DE:\t{0}", alg.ErrorDelta);
+                               Console.WriteLine("Q:\t{0}",  alg.QValue);
+                               Console.WriteLine("DQ:\t{0}", alg.QDelta);
+                               Console.WriteLine("DW:\t{0}", alg.Step2);
+                             };
+
+      return alg;
+    }
+
+    private void doCNNAlgorithmTest()
+    {
+      var alg = createCNNAlg();
+
+      var now = DateTime.Now;
+      alg.Train();
+
+      Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
+
+      Console.WriteLine("Error function: " + alg.ErrorValue);
+      Console.WriteLine("Step: " + alg.Step2);
+
+      outputError(alg);
+
+      //Visualizer.Run(alg);
+    }
+
     private void outputError(AlgorithmBase<double[]> alg)
     {
       Console.WriteLine("Errors:");
       var errors = alg.GetErrors(Data.Data);
+      var ec = errors.Count();
+      var dc = Data.Data.Count;
+      var pct = Math.Round(100.0F * ec / dc, 2);
+      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+    }
+
+    private void outputError(AlgorithmBase<double[,,]> alg)
+    {
+      Console.WriteLine("Errors:");
+
+      var sample = new ClassifiedSample<double[,,]>();
+      foreach (var obj in Data.Data)
+      {
+        var data = obj.Key;
+        var key = new double[data.Length, 1, 1];
+        for (int i=0; i<data.Length; i++)
+          key[i, 0, 0] = data[i];
+        sample[key] = obj.Value;
+      }
+
+      var errors = alg.GetErrors(sample);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);

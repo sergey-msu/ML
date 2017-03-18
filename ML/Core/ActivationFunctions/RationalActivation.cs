@@ -6,7 +6,7 @@ namespace ML.Core.ActivationFunctions
   /// <summary>
   /// Rational Activation Function
   /// </summary>
-  public class RationalActivation : IFunction
+  public class RationalActivation : IActivationFunction
   {
     private double m_Shift;
 
@@ -34,6 +34,13 @@ namespace ML.Core.ActivationFunctions
     {
       var d = Math.Abs(r) + m_Shift;
       return m_Shift / (2*d*d);
+    }
+
+    public double DerivativeFromValue(double y)
+    {
+      return y > 0.5D ?
+             2.0D*(1-y)*(1-y) / m_Shift :
+             2.0D*y*y / m_Shift;
     }
   }
 }

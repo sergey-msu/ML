@@ -59,47 +59,17 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(1, layer.Value[0, 1, 0]);
       Assert.AreEqual(2, layer.Value[0, 1, 1]);
 
-      Assert.AreEqual(2, layer.NetValue[0, 0, 0]);
-      Assert.AreEqual(1, layer.NetValue[0, 0, 1]);
-      Assert.AreEqual(1, layer.NetValue[0, 1, 0]);
-      Assert.AreEqual(2, layer.NetValue[0, 1, 1]);
-
-      Assert.AreEqual(1, layer.Derivative[0, 0, 0]);
-      Assert.AreEqual(1, layer.Derivative[0, 0, 1]);
-      Assert.AreEqual(1, layer.Derivative[0, 1, 0]);
-      Assert.AreEqual(1, layer.Derivative[0, 1, 1]);
-
       //fm #2
       Assert.AreEqual(5, layer.Value[1, 0, 0]);
       Assert.AreEqual(4, layer.Value[1, 0, 1]);
       Assert.AreEqual(4, layer.Value[1, 1, 0]);
       Assert.AreEqual(6, layer.Value[1, 1, 1]);
 
-      Assert.AreEqual(5, layer.NetValue[1, 0, 0]);
-      Assert.AreEqual(4, layer.NetValue[1, 0, 1]);
-      Assert.AreEqual(4, layer.NetValue[1, 1, 0]);
-      Assert.AreEqual(6, layer.NetValue[1, 1, 1]);
-
-      Assert.AreEqual(1, layer.Derivative[1, 0, 0]);
-      Assert.AreEqual(1, layer.Derivative[1, 0, 1]);
-      Assert.AreEqual(1, layer.Derivative[1, 1, 0]);
-      Assert.AreEqual(1, layer.Derivative[1, 1, 1]);
-
       //fm #3
       Assert.AreEqual(0, layer.Value[2, 0, 0]);
       Assert.AreEqual(0, layer.Value[2, 0, 1]);
       Assert.AreEqual(2, layer.Value[2, 1, 0]);
       Assert.AreEqual(0, layer.Value[2, 1, 1]);
-
-      Assert.AreEqual(0, layer.NetValue[2, 0, 0]);
-      Assert.AreEqual(0,  layer.NetValue[2, 0, 1]);
-      Assert.AreEqual(2,  layer.NetValue[2, 1, 0]);
-      Assert.AreEqual(-1, layer.NetValue[2, 1, 1]);
-
-      Assert.AreEqual(1, layer.Derivative[2, 0, 0]);
-      Assert.AreEqual(1, layer.Derivative[2, 0, 1]);
-      Assert.AreEqual(1, layer.Derivative[2, 1, 0]);
-      Assert.AreEqual(0, layer.Derivative[2, 1, 1]);
     }
 
     [TestMethod]
@@ -140,31 +110,11 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(2, layer.Value[0, 1, 0]);
       Assert.AreEqual(5, layer.Value[0, 1, 1]);
 
-      Assert.AreEqual(6, layer.NetValue[0, 0, 0]);
-      Assert.AreEqual(2, layer.NetValue[0, 0, 1]);
-      Assert.AreEqual(2, layer.NetValue[0, 1, 0]);
-      Assert.AreEqual(5, layer.NetValue[0, 1, 1]);
-
-      Assert.AreEqual(1, layer.Derivative[0, 0, 0]);
-      Assert.AreEqual(1, layer.Derivative[0, 0, 1]);
-      Assert.AreEqual(1, layer.Derivative[0, 1, 0]);
-      Assert.AreEqual(1, layer.Derivative[0, 1, 1]);
-
       //fm #2
       Assert.AreEqual(0, layer.Value[1, 0, 0]);
       Assert.AreEqual(0, layer.Value[1, 0, 1]);
       Assert.AreEqual(0, layer.Value[1, 1, 0]);
       Assert.AreEqual(2, layer.Value[1, 1, 1]);
-
-      Assert.AreEqual(-1, layer.NetValue[1, 0, 0]);
-      Assert.AreEqual(-2, layer.NetValue[1, 0, 1]);
-      Assert.AreEqual(0, layer.NetValue[1, 1, 0]);
-      Assert.AreEqual(2, layer.NetValue[1, 1, 1]);
-
-      Assert.AreEqual(0, layer.Derivative[1, 0, 0]);
-      Assert.AreEqual(0, layer.Derivative[1, 0, 1]);
-      Assert.AreEqual(1, layer.Derivative[1, 1, 0]);
-      Assert.AreEqual(1, layer.Derivative[1, 1, 1]);
     }
 
     #endregion

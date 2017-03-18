@@ -103,6 +103,7 @@ namespace ML.NeuralMethods.Algorithms
         m_EpochCount = value;
       }
     }
+
     public double LearningRate
     {
       get { return m_LearningRate; }
@@ -113,11 +114,13 @@ namespace ML.NeuralMethods.Algorithms
         m_LearningRate = value;
       }
     }
+
     public StopCriteria Stop
     {
       get { return m_Stop; }
       set { m_Stop = value; }
     }
+
     public double ErrorStopDelta
     {
       get { return m_ErrorStopDelta; }
@@ -128,6 +131,7 @@ namespace ML.NeuralMethods.Algorithms
         m_ErrorStopDelta = value;
       }
     }
+
     public double StepStopValue
     {
       get { return m_StepStopValue; }
@@ -138,6 +142,7 @@ namespace ML.NeuralMethods.Algorithms
         m_StepStopValue = value;
       }
     }
+
     public double QLambda
     {
       get { return m_QLambda; }
@@ -148,6 +153,7 @@ namespace ML.NeuralMethods.Algorithms
         m_QLambda = value;
       }
     }
+
     public double QStopDelta
     {
       get { return m_QStopDelta; }
@@ -189,13 +195,13 @@ namespace ML.NeuralMethods.Algorithms
       m_Stop         = DTF_STOP_CRITERIA;
       m_QLambda      = DFT_Q_LAMBDA;
       m_EpochLength  = TrainingSample.Count;
-      m_InputDim = Result.InputDim;
-      m_OutputDim = Result[Result.LayerCount-1].NeuronCount;
+      m_InputDim     = Result.InputDim;
+      m_OutputDim    = Result[Result.LayerCount-1].NeuronCount;
 
       m_ExpectedOutputs = new Dictionary<Class, double[]>();
       var count = Classes.Count;
       if (count != OutputDim)
-        throw new MLException("Number of classes must be equal to dimetsion of output vector");
+        throw new MLException("Number of classes must be equal to dimension of output vector");
 
       for (int i=0; i<count; i++)
       {
@@ -262,50 +268,58 @@ namespace ML.NeuralMethods.Algorithms
 
       for (int j=0; j<m_OutputDim; j++)
       {
+        var neuron = llayer[j];
         var ej = output[j] - expect[j];
-        llayer[j].Error = ej;
+        neuron.Error = ej*neuron.ActivationFunction.DerivativeFromValue(neuron.Value);
         serr2 += ej*ej;
       }
 
       return serr2;
     }
 
-    private void feedBackward(NeuralNetwork net, NeuralLayer layer, int i, double[] input)
+    private void feedBackward(NeuralNetwork net, NeuralLayer layer, int lidx, double[] input)
     {
       var ncount = layer.NeuronCount;
-      var player = (i>0) ? net[i-1] : null;
-      var pcount = (i>0) ? player.NeuronCount : m_InputDim;
-      if (i>0) for (int h=0; h<pcount; h++) player[h].Error = 0;
+      var player = (lidx>0) ? net[lidx-1] : null;
+      var pcount = (lidx>0) ? player.NeuronCount : m_InputDim;
 
       var sstep2 = 0.0D;
 
+      // save "errors" in previous layer for future use
+      if (lidx > 0)
+        for (int h=0; h<pcount; h++)
+        {
+          var eh = 0.0D;
+          for (int j=0; j<ncount; j++)
+          {
+            var neuron = layer[j];
+            eh += neuron.Error * neuron[h];
+          }
+
+          var pneuron = player[h];
+          pneuron.Error = eh * pneuron.ActivationFunction.DerivativeFromValue(pneuron.Value);
+        }
+
+      // update weights
       for (int j=0; j<ncount; j++)
       {
-        // calculate current layer "errors"
         var neuron = layer[j];
-        var ej = neuron.Error;
-        var gj = ej * neuron.Derivative;
-        var dj = m_LearningRate * gj;
+        var dj = m_LearningRate * neuron.Error;
 
         for (int h=0; h<pcount; h++)
         {
-          // save "errors" for future use
-          if (i>0) player[h].Error += gj * neuron[h];
-
-          // weights update
-          var value = (i==0) ? input[h] : player[h].Value;
+          var value = (lidx == 0) ? input[h] : player[h].Value;
           var dwj = dj * value;
           neuron[h] -= dwj;
-          sstep2 += dwj*dwj;
+          sstep2 += dwj * dwj;
         }
 
-        // bias weight update
         neuron.Bias -= dj;
-        sstep2 += dj*dj;
+        sstep2 += dj * dj;
       }
 
       // update iter stats
-      m_Step2  = sstep2;
+      m_Step2 = sstep2;
     }
 
     private bool checkStopCriteria()

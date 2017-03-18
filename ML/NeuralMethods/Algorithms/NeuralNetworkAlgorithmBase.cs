@@ -37,24 +37,17 @@ namespace ML.NeuralMethods.Algorithms
       var len = result.Length;
       Class cls;
 
-      if (len==1)
-      {
-        cls = Classes.FirstOrDefault(c => (int)c.Value.Value == (int)result[0]).Value ?? Class.None;
-      }
-      else
-      {
-        int idx;
-        double max;
-        MathUtils.CalcMax(result, out idx, out max);
+      int idx;
+      double max;
+      MathUtils.CalcMax(result, out idx, out max);
 
-        cls = Classes.FirstOrDefault(c => (int)c.Value.Value == idx+1).Value  ?? Class.None;
-      }
+      cls = Classes.FirstOrDefault(c => (int)c.Value.Value == idx+1).Value  ?? Class.None;
 
       return cls;
     }
 
     /// <summary>
-    /// Teaches algorithm, produces Network output
+    /// Teaches algorithm, produces Result output
     /// </summary>
     public abstract void Train();
   }

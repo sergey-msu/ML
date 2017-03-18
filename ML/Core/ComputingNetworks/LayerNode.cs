@@ -10,7 +10,7 @@ namespace ML.Core.ComputingNetworks
   {
     #region Fields
 
-    private IFunction m_ActivationFunction;
+    private IActivationFunction m_ActivationFunction;
     private int m_InputDim;
 
     #endregion
@@ -42,7 +42,7 @@ namespace ML.Core.ComputingNetworks
     /// <summary>
     /// Layer activation function. If null, the network's activation function will be used
     /// </summary>
-    public IFunction ActivationFunction
+    public IActivationFunction ActivationFunction
     {
       get { return m_ActivationFunction; }
       set { m_ActivationFunction = value; }

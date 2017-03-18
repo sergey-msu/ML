@@ -14,11 +14,9 @@ namespace ML.Core.ComputingNetworks
   {
     #region Fields
 
-    private IFunction m_ActivationFunction;
+    private IActivationFunction m_ActivationFunction;
     private int    m_InputDim;
     private double m_Bias;
-    private TPar   m_NetValue;
-    private TPar   m_Derivative;
     private TPar   m_Value;
     private TPar   m_Error;
 
@@ -45,24 +43,6 @@ namespace ML.Core.ComputingNetworks
     {
       get { return m_Bias; }
       set { m_Bias = value; }
-    }
-
-    /// <summary>
-    /// Calculated pure value (before applying activation function)
-    /// </summary>
-    public TPar NetValue
-    {
-      get { return m_NetValue; }
-      set { m_NetValue = value; }
-    }
-
-    /// <summary>
-    /// Cached derivative of pure calculated value
-    /// </summary>
-    public TPar Derivative
-    {
-      get { return m_Derivative; }
-      set { m_Derivative = value; }
     }
 
     /// <summary>
@@ -94,7 +74,7 @@ namespace ML.Core.ComputingNetworks
     /// <summary>
     /// Activation function. If null, the layer's activation function will be used
     /// </summary>
-    public IFunction ActivationFunction
+    public IActivationFunction ActivationFunction
     {
       get { return m_ActivationFunction; }
       set { m_ActivationFunction = value; }

@@ -6,7 +6,7 @@ namespace ML.Core.ActivationFunctions
   /// <summary>
   /// Signum Activation Function
   /// </summary>
-  public class SignActivation : IFunction
+  public class SignActivation : IActivationFunction
   {
     public SignActivation(double zeroValue = 1)
     {
@@ -24,6 +24,11 @@ namespace ML.Core.ActivationFunctions
     }
 
     public double Derivative(double r)
+    {
+      return 0;
+    }
+
+    public double DerivativeFromValue(double y)
     {
       return 0;
     }

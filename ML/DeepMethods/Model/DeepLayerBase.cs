@@ -14,20 +14,33 @@ namespace ML.DeepMethods.Model
   {
     #region Fields
 
-    private IFunction m_ActivationFunction;
+    private IActivationFunction m_ActivationFunction;
 
-    protected readonly int m_InputDepth;
-    protected readonly int m_InputSize;
-    protected readonly int m_OutputDepth;
-    protected readonly int m_OutputSize;
+    protected readonly bool m_IsTraining;
 
-    protected readonly double[,,]  m_Value;
+    protected readonly int  m_WindowSize;
+    protected readonly int  m_Stride;
+    protected readonly int  m_Padding;
+    protected readonly int  m_InputDepth;
+    protected readonly int  m_InputSize;
+    protected readonly int  m_OutputDepth;
+    protected readonly int  m_OutputSize;
+
+    protected readonly double[,,] m_Value;
+    protected readonly double[,,] m_Error;
 
     #endregion
 
     #region .ctor
 
-    public DeepLayerBase(int inputDepth, int inputSize, int outputDepth, int outputSize)
+    public DeepLayerBase(int inputDepth,
+                         int inputSize,
+                         int outputDepth,
+                         int outputSize,
+                         int windowSize,
+                         int stride=1,
+                         int padding=0,
+                         bool isTraining=false)
     {
       if (inputDepth <= 0)
         throw new MLException("DeepLayerBase.ctor(inputDepth<=0)");
@@ -37,18 +50,43 @@ namespace ML.DeepMethods.Model
         throw new MLException("DeepLayerBase.ctor(outputDepth<=0)");
       if (outputSize <= 0)
         throw new MLException("DeepLayerBase.ctor(outputSize<=0)");
+      if (windowSize <= 0)
+        throw new MLException("ConvolutionalLayer.ctor(windowSize<=0)");
+      if (windowSize > inputSize)
+        throw new MLException("ConvolutionalLayer.ctor(windowSize>inputSize)");
+      if (stride <= 0)
+        throw new MLException("ConvolutionalLayer.ctor(stride<=0)");
+      if (padding < 0)
+        throw new MLException("ConvolutionalLayer.ctor(padding<0)");
+
+      m_IsTraining = isTraining;
+
+      m_WindowSize  = windowSize;
+      m_Stride      = stride;
+      m_Padding     = padding;
 
       m_InputDepth  = inputDepth;
       m_InputSize   = inputSize;
       m_OutputDepth = outputDepth;
       m_OutputSize  = outputSize;
 
-      m_Value  = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
+      m_Value = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
+
+      if (isTraining)
+      {
+        m_Error = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
+      }
     }
 
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// If true, indicates that layer is not in production mode,
+    /// so it can store some additional values (i.e. errors, net values, derivatives etc.)
+    /// </summary>
+    public bool IsTraining { get { return m_IsTraining; } }
 
     /// <summary>
     /// Count of input channels
@@ -73,16 +111,37 @@ namespace ML.DeepMethods.Model
     /// <summary>
     /// Activation function. If null, the layer's activation function will be used
     /// </summary>
-    public IFunction ActivationFunction
+    public IActivationFunction ActivationFunction
     {
       get { return m_ActivationFunction; }
       set { m_ActivationFunction = value; }
     }
 
     /// <summary>
+    /// Size of square convolution window
+    /// </summary>
+    public int WindowSize { get { return m_WindowSize; } }
+
+    /// <summary>
+    /// An overlapping step during convolution calculation process.
+    /// 1 leads to maximum overlapping between neighour kernel windows
+    /// </summary>
+    public int Stride { get { return m_Stride; } }
+
+    /// <summary>
+    /// Padding of the input channel
+    /// </summary>
+    public int Padding { get { return m_Padding; } }
+
+    /// <summary>
     /// Calculated value
     /// </summary>
     public double[,,] Value { get { return m_Value; } }
+
+    /// <summary>
+    /// Saved error value
+    /// </summary>
+    public double[,,] Error { get { return m_Error; } }
 
     #endregion
 

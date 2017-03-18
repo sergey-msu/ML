@@ -13,7 +13,7 @@ namespace ML.DeepMethods.Model
   {
     #region Fields
 
-    private IFunction m_ActivationFunction;
+    private IActivationFunction m_ActivationFunction;
     private int m_InputSize;
     private int m_InputDepth;
 
@@ -50,7 +50,7 @@ namespace ML.DeepMethods.Model
     /// <summary>
     /// Activation function. If null, the layer's activation function will be used
     /// </summary>
-    public IFunction ActivationFunction
+    public IActivationFunction ActivationFunction
     {
       get { return m_ActivationFunction; }
       set { m_ActivationFunction = value; }

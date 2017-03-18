@@ -6,13 +6,21 @@
   public interface IFunction : IMnemonicNamed
   {
     /// <summary>
-    /// Do calculate function value
+    /// Calculates function value
     /// </summary>
     double Value(double r);
 
     /// <summary>
-    /// Do calculate function's derivative value
+    /// Calculates function's derivative value
     /// </summary>
     double Derivative(double r);
+  }
+
+  public interface IActivationFunction : IFunction
+  {
+    /// <summary>
+    /// Calculates function's derivative value by function value (i.e. y'(y) = y - for y=exp(x))
+    /// </summary>
+    double DerivativeFromValue(double y);
   }
 }
