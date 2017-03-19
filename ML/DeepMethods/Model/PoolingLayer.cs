@@ -17,7 +17,7 @@ namespace ML.DeepMethods.Model
     protected PoolingLayer(int inputDepth,
                            int inputSize,
                            int windowSize,
-                           int stride=0,
+                           int stride,
                            int padding=0,
                            bool isTraining=false)
       : base(inputDepth,
@@ -25,7 +25,7 @@ namespace ML.DeepMethods.Model
              inputDepth,
              (inputSize - windowSize + 2*padding)/stride + 1,
              windowSize,
-             (stride==0) ? windowSize : stride,
+             stride,
              padding,
              isTraining)
     {
@@ -81,7 +81,7 @@ namespace ML.DeepMethods.Model
     public MaxPoolingLayer(int inputDepth,
                            int inputSize,
                            int windowSize,
-                           int stride=0,
+                           int stride,
                            int padding=0,
                            bool isTraining=false)
       : base(inputDepth,
@@ -149,7 +149,7 @@ namespace ML.DeepMethods.Model
     public AvgPoolingLayer(int inputDepth,
                            int inputSize,
                            int windowSize,
-                           int stride=0,
+                           int stride,
                            int padding=0,
                            bool isTraining=false)
       : base(inputDepth,

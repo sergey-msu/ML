@@ -466,7 +466,7 @@ namespace ML.Tests.UnitTests
       const int stride  = 1;
       const int padding = 0;
 
-      var layer = (TPool)Activator.CreateInstance(typeof(TPool), inputDepth, inputSize, windowSize, stride, padding);
+      var layer = (TPool)Activator.CreateInstance(typeof(TPool), inputDepth, inputSize, windowSize, stride, padding, true);
 
       return layer;
     }
@@ -480,7 +480,7 @@ namespace ML.Tests.UnitTests
       const int stride  = 2;
       const int padding = 1;
 
-      var layer = (TPool)Activator.CreateInstance(typeof(TPool), inputDepth, inputSize, windowSize, stride, padding);
+      var layer = (TPool)Activator.CreateInstance(typeof(TPool), inputDepth, inputSize, windowSize, stride, padding, true);
 
       return layer;
     }
@@ -546,6 +546,7 @@ namespace ML.Tests.UnitTests
                                       inputSize: 2,
                                       outputDepth: 8,
                                       windowSize: 2,
+                                      stride: 1,
                                       isTraining: true);
       fc.ActivationFunction = Registry.ActivationFunctions.Identity;
       var pcount = (2*2*4+1)*8;
@@ -562,6 +563,7 @@ namespace ML.Tests.UnitTests
                                           inputSize: 1,
                                           outputDepth: 2,
                                           windowSize: 1,
+                                          stride: 1,
                                           isTraining: true);
       output.ActivationFunction = Registry.ActivationFunctions.Identity;
       pcount = (1*1*8+1)*2;

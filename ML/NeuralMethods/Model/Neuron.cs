@@ -12,15 +12,28 @@ namespace ML.NeuralMethods.Model
   /// Represents McCulloch–Pitts artificial neuron: a node with activation function and a list of pairs (index, weight).
   /// Neuron stores whole array of weights even if there are always-zero weights (connetion is not exist).
   /// </summary>
-  public class Neuron : NeuronNode<double>
+  public class Neuron : ComputingNode<double[], double>
   {
+    #region Fields
+
+    private IActivationFunction m_ActivationFunction;
+    private int      m_InputDim;
+    private double   m_Bias;
+    private double   m_Value;
+    private double   m_Error;
     private double[] m_Weights;
+
+    #endregion
 
     #region .ctor
 
-    public Neuron(int inputDim) : base(inputDim)
+    public Neuron(int inputDim)
     {
-      m_Weights = new double[InputDim];
+      if (inputDim <= 0)
+        throw new MLException("NeuronNode.ctor(inputDim<=0)");
+
+      m_InputDim = inputDim;
+      m_Weights = new double[inputDim];
     }
 
     #endregion
@@ -29,40 +42,113 @@ namespace ML.NeuralMethods.Model
 
     public override int ParamCount { get { return m_Weights.Length + 1; } }
 
-    #endregion
-
-    #region Public
-
     /// <summary>
-    /// Calculates result value produced by neuron
+    /// Bias weight value
     /// </summary>
-    /// <param name="input">Input data array</param>
-    protected override void DoCalculate(double[] input)
+    public double Bias
     {
-      var net = Bias;
-
-      for (int i=0; i<InputDim; i++)
-        net += m_Weights[i] * input[i];
-
-      Value = ActivationFunction.Value(net);
+      get { return m_Bias; }
+      set { m_Bias = value; }
     }
 
-    #endregion
+    /// <summary>
+    /// Calculated value (after applying activation function)
+    /// </summary>
+    public double Value
+    {
+      get { return m_Value; }
+      set { m_Value = value; }
+    }
 
-    public override double this[int idx]
+    /// <summary>
+    /// Calculates derivative
+    /// </summary>
+    public double Derivative
+    {
+      get { return ActivationFunction.DerivativeFromValue(m_Value); }
+    }
+
+    /// <summary>
+    /// Calculated error
+    /// </summary>
+    public double Error
+    {
+      get { return m_Error; }
+      set { m_Error = value; }
+    }
+
+    /// <summary>
+    /// Dimension of input vector
+    /// </summary>
+    public int InputDim
+    {
+      get { return m_InputDim; }
+    }
+
+    /// <summary>
+    /// Activation function. If null, the layer's activation function will be used
+    /// </summary>
+    public IActivationFunction ActivationFunction
+    {
+      get { return m_ActivationFunction; }
+      set { m_ActivationFunction = value; }
+    }
+
+    /// <summary>
+    /// Indexer for connection weights.
+    /// </summary>
+
+    public double this[int idx]
     {
       get { return m_Weights[idx]; }
       set { m_Weights[idx] = value; }
     }
 
+    #endregion
 
-    protected override void DoRandomizeParameters(RandomGenerator random)
+    #region Public
+
+    /// <summary>
+    /// Randomizes neuron weights
+    /// </summary>
+    public void RandomizeParameters(int seed=0)
     {
-      for (int i=0; i<this.InputDim; i++)
-        this[i] = 2 * random.GenerateUniform(0, 1) / InputDim;
+      var random = RandomGenerator.Get(seed);
 
-      Bias = 2 * random.GenerateUniform(0, 1) / InputDim;
+      for (int i=0; i<this.InputDim; i++)
+        m_Weights[i] = 2 * random.GenerateUniform(0, 1) / InputDim;
+
+      m_Bias = 2 * random.GenerateUniform(0, 1) / InputDim;
     }
+
+    /// <summary>
+    /// Calculates result value produced by neuron
+    /// </summary>
+    /// <param name="input">Input data array</param>
+    public override double Calculate(double[] input)
+    {
+      if (m_InputDim != input.Length)
+        throw new MLException("Incorrect input vector dimension");
+
+      var net = m_Bias;
+
+      for (int i=0; i<InputDim; i++)
+        net += m_Weights[i] * input[i];
+
+      m_Value = ActivationFunction.Value(net);
+
+      return m_Value;
+    }
+
+    public override void DoBuild()
+    {
+      if (m_InputDim <= 0)
+        throw new MLException("Input dimension has not been set");
+
+      base.DoBuild();
+    }
+
+    #endregion
 
     protected override double DoGetParam(int idx)
     {

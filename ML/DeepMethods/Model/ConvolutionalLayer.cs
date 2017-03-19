@@ -42,7 +42,7 @@ namespace ML.DeepMethods.Model
                               int inputSize,
                               int outputDepth,
                               int windowSize,
-                              int stride=1,
+                              int stride,
                               int padding=0,
                               bool isTraining = false)
       : base(inputDepth,

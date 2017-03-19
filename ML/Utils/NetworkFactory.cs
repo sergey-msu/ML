@@ -60,19 +60,19 @@ namespace ML.Utils
     {
       var net = new ConvolutionalNetwork(1, 28);
 
-      var layer1 = new ConvolutionalLayer(1, 28, 4, 4, isTraining: true);
+      var layer1 = new ConvolutionalLayer(1, 28, 4, 4, 1, isTraining: true);
       net.AddLayer(layer1);
 
-      var layer2 = new MaxPoolingLayer(4, 24, 2, isTraining: true);
+      var layer2 = new MaxPoolingLayer(4, 24, 2, 2, isTraining: true);
       net.AddLayer(layer2);
 
-      var layer3 = new ConvolutionalLayer(4, 12, 12, 5, isTraining: true);
+      var layer3 = new ConvolutionalLayer(4, 12, 12, 5, 1, isTraining: true);
       net.AddLayer(layer3);
 
-      var layer4 = new MaxPoolingLayer(12, 8, 2, isTraining: true);
+      var layer4 = new MaxPoolingLayer(12, 8, 2, 2, isTraining: true);
       net.AddLayer(layer4);
 
-      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, isTraining: true);
+      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, isTraining: true);
       net.AddLayer(layer5);
 
       net.ActivationFunction = activationFunction ?? Registry.ActivationFunctions.Identity;

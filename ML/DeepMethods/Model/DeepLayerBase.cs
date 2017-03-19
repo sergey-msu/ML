@@ -38,7 +38,7 @@ namespace ML.DeepMethods.Model
                          int outputDepth,
                          int outputSize,
                          int windowSize,
-                         int stride=1,
+                         int stride,
                          int padding=0,
                          bool isTraining=false)
     {
@@ -149,5 +149,13 @@ namespace ML.DeepMethods.Model
     /// Randomizes layer parameters (i.e. kernel weights, biases etc.)
     /// </summary>
     public abstract void RandomizeParameters(int seed);
+
+    /// <summary>
+    /// Calculates value's derivative
+    /// </summary>
+    public double Derivative(int p, int i, int j)
+    {
+      return ActivationFunction.DerivativeFromValue(Value[p, i, j]);
+    }
   }
 }

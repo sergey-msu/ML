@@ -59,9 +59,6 @@
     <Compile Include="Core\ComputingNetworks\ComputingNode.cs" />
     <Compile Include="Core\ComputingNetworks\Index.cs" />
     <Compile Include="Core\ComputingNetworks\JoinNode.cs" />
-    <Compile Include="Core\ComputingNetworks\LayerNode.cs" />
-    <Compile Include="Core\ComputingNetworks\NetworkNode.cs" />
-    <Compile Include="Core\ComputingNetworks\NeuronNode.cs" />
     <Compile Include="Core\Exceptions.cs" />
     <Compile Include="Core\Feature.cs" />
     <Compile Include="Core\Class.cs" />

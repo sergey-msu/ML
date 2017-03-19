@@ -280,7 +280,7 @@ namespace ML.DeepMethods.Algorithms
       for (int j=0; j<m_OutputDepth; j++)
       {
         var ej = output[j, 0, 0] - expect[j];
-        llayer.Error[j, 0, 0] = ej * llayer.ActivationFunction.DerivativeFromValue(llayer.Value[j, 0, 0]);
+        llayer.Error[j, 0, 0] = ej * llayer.Derivative(j, 0, 0);
         serr2 += ej * ej;
       }
 
@@ -306,7 +306,7 @@ namespace ML.DeepMethods.Algorithms
       {
         var xmaxIdx = layer.MaxIndexPositions[q, i, j, 0];
         var ymaxIdx = layer.MaxIndexPositions[q, i, j, 1];
-        player.Error[q, ymaxIdx, xmaxIdx] += layer.Error[q, i, j];
+        player.Error[q, ymaxIdx, xmaxIdx] += layer.Error[q, i, j] * player.Derivative(q, ymaxIdx, xmaxIdx);
       }
     }
 
@@ -352,7 +352,7 @@ namespace ML.DeepMethods.Algorithms
             }
           }
 
-          player.Error[p, i, j] = gpij * player.ActivationFunction.DerivativeFromValue(player.Value[p, i, j]);
+          player.Error[p, i, j] = gpij * player.Derivative(p, i, j);
         }
 
       // update weights

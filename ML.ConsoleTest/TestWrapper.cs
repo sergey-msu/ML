@@ -68,8 +68,8 @@ namespace ML.ConsoleTest
         //Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
 
         //start = DateTime.Now;
-        //doMultilayerNNAlgorithmTest();
-        doCNNAlgorithmTest();
+        doMultilayerNNAlgorithmTest();
+        //doCNNAlgorithmTest();
         var stop = DateTime.Now;
         Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
       }
@@ -243,13 +243,17 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg()
+    private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg_NN_ForTest()
     {
       var cnn = new ML.DeepMethods.Model.ConvolutionalNetwork(2, 1);
-      var l1 = new ML.DeepMethods.Model.ConvolutionalLayer(2, 1, 15, 1, isTraining: true);
+      var l1 = new ML.DeepMethods.Model.ConvolutionalLayer(2, 1, 15, 1, 1, isTraining: true);
       cnn.AddLayer(l1);
-      var l2 = new ML.DeepMethods.Model.ConvolutionalLayer(15, 1, 3, 1, isTraining: true);
+      var fl1 = new ML.DeepMethods.Model.MaxPoolingLayer(15, 1, 1, 1, isTraining: true);
+      cnn.AddLayer(fl1);
+      var l2 = new ML.DeepMethods.Model.ConvolutionalLayer(15, 1, 3, 1, 1, isTraining: true);
       cnn.AddLayer(l2);
+      var fl2 = new ML.DeepMethods.Model.MaxPoolingLayer(3, 1, 1, 1, isTraining: true);
+      cnn.AddLayer(fl2);
       cnn.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
       cnn.RandomizeParameters(0);
       cnn.Build();
@@ -284,7 +288,7 @@ namespace ML.ConsoleTest
 
     private void doCNNAlgorithmTest()
     {
-      var alg = createCNNAlg();
+      var alg = createCNNAlg_NN_ForTest();
 
       var now = DateTime.Now;
       alg.Train();
