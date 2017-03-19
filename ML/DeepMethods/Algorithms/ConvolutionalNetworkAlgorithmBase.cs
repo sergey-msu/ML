@@ -43,7 +43,7 @@ namespace ML.DeepMethods.Algorithms
       double max;
       MathUtils.CalcMax(result, out iidx, out jidx, out kidx, out max);
 
-      cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == iidx+1).Value  ?? Class.None;
+      cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == iidx).Value  ?? Class.None;
 
       return cls;
     }

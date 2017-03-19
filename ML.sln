@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{557FFEEA-F
 		todo.txt = todo.txt
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML.DeepTests", "ML.DeepTests\ML.DeepTests.csproj", "{3CF8DF2D-201E-4A73-B99C-F22A0BF657E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{CA5B14B3-851B-488D-874A-ED88F4E77E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA5B14B3-851B-488D-874A-ED88F4E77E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA5B14B3-851B-488D-874A-ED88F4E77E0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CF8DF2D-201E-4A73-B99C-F22A0BF657E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CF8DF2D-201E-4A73-B99C-F22A0BF657E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CF8DF2D-201E-4A73-B99C-F22A0BF657E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CF8DF2D-201E-4A73-B99C-F22A0BF657E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -41,7 +41,7 @@ namespace ML.NeuralMethods.Algorithms
       double max;
       MathUtils.CalcMax(result, out idx, out max);
 
-      cls = Classes.FirstOrDefault(c => (int)c.Value.Value == idx+1).Value  ?? Class.None;
+      cls = Classes.FirstOrDefault(c => (int)c.Value.Value == idx).Value  ?? Class.None;
 
       return cls;
     }

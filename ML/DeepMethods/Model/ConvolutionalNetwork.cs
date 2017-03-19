@@ -94,7 +94,7 @@ namespace ML.DeepMethods.Model
     public override void DoBuild()
     {
       foreach (var layer in this.SubNodes)
-        layer.ActivationFunction = layer.ActivationFunction ?? ActivationFunction;
+        if (layer.ActivationFunction == null) layer.ActivationFunction = ActivationFunction;
 
       base.DoBuild();
     }

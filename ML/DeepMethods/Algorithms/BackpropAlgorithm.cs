@@ -206,9 +206,9 @@ namespace ML.DeepMethods.Algorithms
       if (count != OutputDepth)
         throw new MLException("Number of classes must be equal to dimension of output vector");
 
-      for (int i = 0; i < count; i++)
+      for (int i=0; i<count; i++)
       {
-        var cls = Classes.FirstOrDefault(p => (int)p.Value.Value == i + 1).Value;
+        var cls = Classes.FirstOrDefault(p => (int)p.Value.Value == i).Value;
         if (cls == null)
           throw new MLException(string.Format("There is no class with value {0}. It is neccessary to have full set of classes with values from 0 to {1}", i, count));
 
@@ -319,6 +319,7 @@ namespace ML.DeepMethods.Algorithms
     {
       var depth   = layer.OutputDepth;
       var size    = layer.OutputSize;
+      var wsize   = layer.WindowSize;
       var padding = layer.Padding;
       var stride  = layer.Stride;
       var player  = (lidx > 0) ? net[lidx - 1] : null;
@@ -339,13 +340,13 @@ namespace ML.DeepMethods.Algorithms
           for (int k=0; k<size; k++)
           {
             var iidx = i+padding-k*stride;
-            if (iidx >= size) continue;
+            if (iidx >= wsize) continue;
             if (iidx < 0) break;
 
             for (int m=0; m<size; m++)
             {
               var jidx = j+padding-m*stride;
-              if (jidx >= size) continue;
+              if (jidx >= wsize) continue;
               if (jidx < 0) break;
 
               gpij += layer.Error[q, k, m] * layer.Kernel[q, p, iidx, jidx];

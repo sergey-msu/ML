@@ -84,14 +84,14 @@ namespace ML.NeuralMethods.Algorithms
     public override string ID { get { return "MLP_BP"; } }
     public override string Name { get { return "MLP Neural Network with Backpropagation"; } }
 
-    public int InputDim           { get { return m_InputDim; } }
-    public int OutputDim          { get { return m_OutputDim; } }
-    public double IterErrorValue  { get { return m_IterErrorValue; } }
-    public double ErrorValue      { get { return m_ErrorValue; } }
-    public double ErrorDelta      { get { return m_ErrorDelta; } }
-    public double Step2           { get { return m_Step2; } }
-    public double QValue          { get { return m_QValue; } }
-    public double QDelta          { get { return m_QDelta; } }
+    public int InputDim          { get { return m_InputDim; } }
+    public int OutputDim         { get { return m_OutputDim; } }
+    public double IterErrorValue { get { return m_IterErrorValue; } }
+    public double ErrorValue     { get { return m_ErrorValue; } }
+    public double ErrorDelta     { get { return m_ErrorDelta; } }
+    public double Step2          { get { return m_Step2; } }
+    public double QValue         { get { return m_QValue; } }
+    public double QDelta         { get { return m_QDelta; } }
 
     public int EpochCount
     {
@@ -205,7 +205,7 @@ namespace ML.NeuralMethods.Algorithms
 
       for (int i=0; i<count; i++)
       {
-        var cls = Classes.FirstOrDefault(p => (int)p.Value.Value == i+1).Value;
+        var cls = Classes.FirstOrDefault(p => (int)p.Value.Value == i).Value;
         if (cls==null)
           throw new MLException(string.Format("There is no class with value {0}. It is neccessary to have full set of classes with values from 0 to {1}", i, count));
 

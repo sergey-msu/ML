@@ -60,7 +60,7 @@ namespace ML.Utils
     {
       var net = new ConvolutionalNetwork(1, 28);
 
-      var layer1 = new ConvolutionalLayer(1, 28, 4, 4, 1, isTraining: true);
+      var layer1 = new ConvolutionalLayer(1, 28, 4, 5, 1, isTraining: true);
       net.AddLayer(layer1);
 
       var layer2 = new MaxPoolingLayer(4, 24, 2, 2, isTraining: true);
@@ -73,6 +73,7 @@ namespace ML.Utils
       net.AddLayer(layer4);
 
       var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, isTraining: true);
+      layer1.ActivationFunction = Registry.ActivationFunctions.Rational(2);
       net.AddLayer(layer5);
 
       net.ActivationFunction = activationFunction ?? Registry.ActivationFunctions.Identity;
