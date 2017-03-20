@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Core.Mathematics;
-using ML.DeepMethods.Model;
+using ML.DeepMethods.Models;
 
 namespace ML.DeepMethods.Algorithms
 {

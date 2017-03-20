@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NFX">
+      <HintPath>..\3rdparties\NFX.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -84,14 +87,14 @@
     <Compile Include="Core\ComputingNetworks\SequenceNode.cs" />
     <Compile Include="DeepMethods\Algorithms\BackpropAlgorithm.cs" />
     <Compile Include="DeepMethods\Algorithms\ConvolutionalNetworkAlgorithmBase.cs" />
-    <Compile Include="DeepMethods\Model\DeepLayerBase.cs" />
-    <Compile Include="DeepMethods\Model\PoolingLayer.cs" />
-    <Compile Include="DeepMethods\Model\ConvolutionalLayer.cs" />
-    <Compile Include="DeepMethods\Model\ConvolutionalNetwork.cs" />
+    <Compile Include="DeepMethods\Models\DeepLayerBase.cs" />
+    <Compile Include="DeepMethods\Models\PoolingLayer.cs" />
+    <Compile Include="DeepMethods\Models\ConvolutionalLayer.cs" />
+    <Compile Include="DeepMethods\Models\ConvolutionalNetwork.cs" />
     <Compile Include="LogicalMethods\Algorithms\DecisionTreeID3Algorithm.cs" />
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />
-    <Compile Include="LogicalMethods\Model\DecisionNode.cs" />
-    <Compile Include="LogicalMethods\Model\DecisionTree.cs" />
+    <Compile Include="LogicalMethods\Models\DecisionNode.cs" />
+    <Compile Include="LogicalMethods\Models\DecisionTree.cs" />
     <Compile Include="MetricalMethods\Algorithms\AlgorithmBases.cs" />
     <Compile Include="MetricalMethods\Algorithms\NearestKNeighboursAlgorithm.cs" />
     <Compile Include="MetricalMethods\Algorithms\NearestKWeighedNeighboursAlgorithm.cs" />
@@ -101,14 +104,16 @@
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\BackpropAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
-    <Compile Include="NeuralMethods\Model\NeuralLayer.cs" />
-    <Compile Include="NeuralMethods\Model\NeuralNetwork.cs" />
-    <Compile Include="NeuralMethods\Model\Neuron.cs" />
+    <Compile Include="NeuralMethods\Models\NeuralLayer.cs" />
+    <Compile Include="NeuralMethods\Models\NeuralNetwork.cs" />
+    <Compile Include="NeuralMethods\Models\Neuron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Mathematics\MathUtils.cs" />
     <Compile Include="Utils\NetworkFactory.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="MetricalMethods\Models\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

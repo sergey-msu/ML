@@ -4,7 +4,7 @@ using ML.Core.ComputingNetworks;
 using ML.Core;
 using ML.Contracts;
 
-namespace ML.DeepMethods.Model
+namespace ML.DeepMethods.Models
 {
   /// <summary>
   /// Represents "deep" layer - a building block of deep networks (i.e. CNN)

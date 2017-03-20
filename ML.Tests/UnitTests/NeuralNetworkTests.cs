@@ -3,7 +3,7 @@
 //using Microsoft.VisualStudio.TestTools.UnitTesting;
 //using ML.Core;
 //using ML.Core.ComputingNetworks;
-//using ML.NeuralMethods.Model;
+//using ML.NeuralMethods.Models;
 
 //namespace ML.Tests.UnitTests
 //{

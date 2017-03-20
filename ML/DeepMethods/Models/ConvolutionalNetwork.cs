@@ -4,7 +4,7 @@ using ML.Contracts;
 using ML.Core.ComputingNetworks;
 using ML.Core;
 
-namespace ML.DeepMethods.Model
+namespace ML.DeepMethods.Models
 {
   /// <summary>
   /// Represents feedforward CNN: set of convolutional layers with shared weights along with the pooling layers
@@ -98,5 +98,21 @@ namespace ML.DeepMethods.Model
 
       base.DoBuild();
     }
+
+    #region Serialization
+
+    public void Serialize(System.IO.Stream stream)
+    {
+      var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
+      serializer.Serialize(stream, this);
+    }
+
+    public static ConvolutionalNetwork Deserialize(System.IO.Stream stream)
+    {
+      var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
+      return (ConvolutionalNetwork)serializer.Deserialize(stream);
+    }
+
+    #endregion
   }
 }

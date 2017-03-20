@@ -9,7 +9,7 @@ using ML.LogicalMethods.Algorithms;
 using ML.MetricalMethods.Algorithms;
 using ML.Core.Logical;
 using ML.NeuralMethods.Algorithms;
-using ML.NeuralMethods.Model;
+using ML.NeuralMethods.Models;
 using ML.Utils;
 
 namespace ML.ConsoleTest
@@ -245,14 +245,14 @@ namespace ML.ConsoleTest
 
     private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg_NN_ForTest()
     {
-      var cnn = new ML.DeepMethods.Model.ConvolutionalNetwork(2, 1);
-      var l1 = new ML.DeepMethods.Model.ConvolutionalLayer(2, 1, 15, 1, 1, isTraining: true);
+      var cnn = new ML.DeepMethods.Models.ConvolutionalNetwork(2, 1);
+      var l1 = new ML.DeepMethods.Models.ConvolutionalLayer(2, 1, 15, 1, 1, isTraining: true);
       cnn.AddLayer(l1);
-      var fl1 = new ML.DeepMethods.Model.MaxPoolingLayer(15, 1, 1, 1, isTraining: true);
+      var fl1 = new ML.DeepMethods.Models.MaxPoolingLayer(15, 1, 1, 1, isTraining: true);
       cnn.AddLayer(fl1);
-      var l2 = new ML.DeepMethods.Model.ConvolutionalLayer(15, 1, 3, 1, 1, isTraining: true);
+      var l2 = new ML.DeepMethods.Models.ConvolutionalLayer(15, 1, 3, 1, 1, isTraining: true);
       cnn.AddLayer(l2);
-      var fl2 = new ML.DeepMethods.Model.MaxPoolingLayer(3, 1, 1, 1, isTraining: true);
+      var fl2 = new ML.DeepMethods.Models.MaxPoolingLayer(3, 1, 1, 1, isTraining: true);
       cnn.AddLayer(fl2);
       cnn.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
       cnn.RandomizeParameters(0);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Core.Mathematics;
-using ML.NeuralMethods.Model;
+using ML.NeuralMethods.Models;
 
 namespace ML.NeuralMethods.Algorithms
 {

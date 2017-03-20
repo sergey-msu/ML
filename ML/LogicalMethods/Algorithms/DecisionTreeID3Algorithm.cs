@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Contracts;
-using ML.LogicalMethods.Model;
+using ML.LogicalMethods.Models;
 
 namespace ML.LogicalMethods.Algorithms
 {

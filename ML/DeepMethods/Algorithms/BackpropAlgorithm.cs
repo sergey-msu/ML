@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
-using ML.DeepMethods.Model;
+using ML.DeepMethods.Models;
 using ML.Contracts;
 
 namespace ML.DeepMethods.Algorithms
@@ -31,7 +31,6 @@ namespace ML.DeepMethods.Algorithms
     public const double DFT_LEARNING_RATE = 0.1D;
     public const double DFT_Q_LAMBDA = 0.9D;
     public const StopCriteria DTF_STOP_CRITERIA = StopCriteria.FullLoop;
-    public static readonly IFunction DFT_ACTIVATION_FUNCTION = Registry.ActivationFunctions.Identity;
 
     #endregion
 
@@ -367,7 +366,7 @@ namespace ML.DeepMethods.Algorithms
 
           for (int k=0; k<size; k++)
           {
-            var iidx = i-padding+stride*k ;
+            var iidx = i-padding+stride*k;
             if (iidx<0) continue;
             if (iidx>=psize) break;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using ML.Core;
 
-namespace ML.LogicalMethods.Model
+namespace ML.LogicalMethods.Models
 {
   /// <summary>
   /// Base class for decision tree nodes

@@ -3,7 +3,7 @@ using ML.Contracts;
 using ML.Core;
 using ML.Core.ComputingNetworks;
 
-namespace ML.NeuralMethods.Model
+namespace ML.NeuralMethods.Models
 {
   /// <summary>
   /// Represents artificial neural layer as a list of neurons

@@ -6,7 +6,7 @@ using ML.Core;
 using ML.Core.ComputingNetworks;
 using ML.Core.Mathematics;
 
-namespace ML.NeuralMethods.Model
+namespace ML.NeuralMethods.Models
 {
   /// <summary>
   /// Represents McCulloch–Pitts artificial neuron: a node with activation function and a list of pairs (index, weight).

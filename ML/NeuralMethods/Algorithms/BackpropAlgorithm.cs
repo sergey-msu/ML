@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
-using ML.NeuralMethods.Model;
+using ML.NeuralMethods.Models;
 using ML.Contracts;
 
 namespace ML.NeuralMethods.Algorithms
@@ -31,7 +31,6 @@ namespace ML.NeuralMethods.Algorithms
     public const double DFT_LEARNING_RATE = 0.1D;
     public const double DFT_Q_LAMBDA = 0.9D;
     public const StopCriteria DTF_STOP_CRITERIA = StopCriteria.FullLoop;
-    public static readonly IFunction DFT_ACTIVATION_FUNCTION = Registry.ActivationFunctions.Identity;
 
     #endregion
 

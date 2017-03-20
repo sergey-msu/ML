@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ML.NeuralMethods.Model;
-using ML.DeepMethods.Model;
+using ML.NeuralMethods.Models;
+using ML.DeepMethods.Models;
 using ML.Contracts;
 using ML.Core;
 
@@ -56,7 +56,10 @@ namespace ML.Utils
     /// Sreate CNN with original LeNet-1 architecture (see http://yann.lecun.com/exdb/publis/pdf/lecun-95b.pdf)
     /// </summary>
     /// <returns></returns>
-    public static ConvolutionalNetwork CreateLeNet1Network(IActivationFunction activationFunction = null)
+    public static ConvolutionalNetwork CreateLeNet1Network(IActivationFunction convActivation = null,
+                                                           IActivationFunction fullConnectedActivation = null,
+                                                           bool randomizeInitialWeights = true,
+                                                           int randomSeed = 0)
     {
       var net = new ConvolutionalNetwork(1, 28);
 
@@ -73,12 +76,15 @@ namespace ML.Utils
       net.AddLayer(layer4);
 
       var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, isTraining: true);
-      layer1.ActivationFunction = Registry.ActivationFunctions.Rational(2);
+      layer1.ActivationFunction = fullConnectedActivation ?? Registry.ActivationFunctions.Rational(2);
       net.AddLayer(layer5);
 
-      net.ActivationFunction = activationFunction ?? Registry.ActivationFunctions.Identity;
+      net.ActivationFunction = convActivation ?? Registry.ActivationFunctions.Identity;
 
       net.Build();
+
+      if (randomizeInitialWeights)
+        net.RandomizeParameters(randomSeed);
 
       return net;
     }

@@ -6,7 +6,7 @@ using ML.Core;
 using ML.Core.ComputingNetworks;
 using ML.Core.Mathematics;
 
-namespace ML.DeepMethods.Model
+namespace ML.DeepMethods.Models
 {
   /// <summary>
   /// Represents convolution layer: a 4D convolution tensor kernel that accepts

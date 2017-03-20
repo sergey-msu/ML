@@ -19,6 +19,7 @@ namespace ML.DeepTests
     const string MNIST_TRAIN      = MNIST_PATH+@"\train";
     const string MNIST_IMG_FILE   = "img_{0}.png";
     const string MNIST_LABEL_FILE = "labels.csv";
+    const string RESULTS_FOLDER   = @"\results";
 
     static readonly ClassifiedSample<double[,,]> m_Training = new ClassifiedSample<double[,,]>();
     static readonly ClassifiedSample<double[,,]> m_Test     = new ClassifiedSample<double[,,]>();
@@ -54,21 +55,29 @@ namespace ML.DeepTests
       var lenet1 = NetworkFactory.CreateLeNet1Network();
 
       // create algorithm
+      var epochs = 50;
       var alg = new BackpropAlgorithm(m_Training, lenet1)
       {
-        EpochCount = 6000,
-        LearningRate = 0.1D
+        EpochCount = epochs,
+        LearningRate = 0.005D
       };
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>
                              {
-                               //if (epoch++ % 300 != 0) return;
-                               Console.WriteLine("----------------Epoch #: {0}", epoch);
+                               Console.WriteLine("---------------- Epoch #: {0} ({1})", ++epoch, DateTime.Now);
                                Console.WriteLine("E:\t{0}",  alg.ErrorValue);
                                Console.WriteLine("DE:\t{0}", alg.ErrorDelta);
                                Console.WriteLine("Q:\t{0}",  alg.QValue);
                                Console.WriteLine("DQ:\t{0}", alg.QDelta);
                                Console.WriteLine("DW:\t{0}", alg.Step2);
+
+                               Console.WriteLine("Errors:");
+
+                               var errors = alg.GetErrors(m_Test);
+                               var ec = errors.Count();
+                               var dc = m_Test.Count;
+                               var pct = Math.Round(100.0F * ec / dc, 2);
+                               Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
                              };
 
       // run training process
@@ -77,20 +86,18 @@ namespace ML.DeepTests
       Console.WriteLine("Training started at {0}", now);
       alg.Train();
 
-      // output results
-
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
-      Console.WriteLine("Error function: " + alg.ErrorValue);
-      Console.WriteLine("Step: " + alg.Step2);
-      Console.WriteLine("Errors:");
 
-      var errors = alg.GetErrors(m_Test);
-      var ec = errors.Count();
-      var dc = m_Test.Count;
-      var pct = Math.Round(100.0F * ec / dc, 2);
-      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+      // save results
+      var path = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)+RESULTS_FOLDER;
+      if (!Directory.Exists(RESULTS_FOLDER)) Directory.CreateDirectory(path);
+      var fileName = string.Format("cn_e{0}-{1:MMdd-hhmmss}.mld", epochs, DateTime.Now);
+      var filePath = Path.Combine(path, fileName);
+      using (var stream = File.Open(filePath, FileMode.Create))
+      {
+        lenet1.Serialize(stream);
+      }
     }
-
 
     #endregion
 
@@ -127,8 +134,6 @@ namespace ML.DeepTests
 
         for (int q=0; q<count; q++)
         {
-          if (q%10000 == 0) Console.WriteLine("Loaded: {0}", q);
-
           var data = new double[1, rows, cols];
           for (int i=0; i<rows; i++)
           for (int j=0; j<cols; j++)
@@ -141,6 +146,9 @@ namespace ML.DeepTests
           var label = lfile.ReadByte();
           sample.Add(data, m_Classes[label]);
         }
+
+        Console.WriteLine("Loaded: {0}", ipath);
+        Console.WriteLine("Loaded: {0}", lpath);
       }
     }
 
@@ -187,7 +195,7 @@ namespace ML.DeepTests
       if (!Directory.Exists(opath)) Directory.CreateDirectory(opath);
       var oname = Path.Combine(opath, string.Format(MNIST_IMG_FILE, counter));
 
-      using (var ofile = File.Open(oname, FileMode.OpenOrCreate, FileAccess.Write))
+      using (var ofile = File.Open(oname, FileMode.Create, FileAccess.Write))
       {
         var image = new Bitmap(cols, rows);
 
@@ -216,7 +224,7 @@ namespace ML.DeepTests
 
         if (!Directory.Exists(opath)) Directory.CreateDirectory(opath);
         var oname = Path.Combine(opath, MNIST_LABEL_FILE);
-        using (var ofile = File.Open(oname, FileMode.OpenOrCreate, FileAccess.Write))
+        using (var ofile = File.Open(oname, FileMode.Create, FileAccess.Write))
         using (var writer = new StreamWriter(ofile))
         {
           var count = ReadInt32BigEndian(ifile);

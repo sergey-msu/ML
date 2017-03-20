@@ -4,7 +4,7 @@ using ML.Contracts;
 using ML.Core;
 using ML.Core.ComputingNetworks;
 
-namespace ML.NeuralMethods.Model
+namespace ML.NeuralMethods.Models
 {
   /// <summary>
   /// Represents feedforward artificial neural network: set of layers with neuron nodes and weighted connections

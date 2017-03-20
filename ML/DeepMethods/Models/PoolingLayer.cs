@@ -5,7 +5,7 @@ using ML.Contracts;
 using ML.Core;
 using ML.Core.ComputingNetworks;
 
-namespace ML.DeepMethods.Model
+namespace ML.DeepMethods.Models
 {
   /// <summary>
   /// Represents pooling layer (i.e. max pooling, average pooling etc.)

@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core;
 using ML.Core.ComputingNetworks;
-using ML.DeepMethods.Model;
+using ML.DeepMethods.Models;
 
 namespace ML.Tests.UnitTests
 {
