@@ -53,7 +53,7 @@ namespace ML.DeepTests
       // create CNN
       var lenet1 = NetworkFactory.CreateLeNet1Network();
 
-      // creat algorithm
+      // create algorithm
       var alg = new BackpropAlgorithm(m_Training, lenet1)
       {
         EpochCount = 6000,
@@ -62,7 +62,7 @@ namespace ML.DeepTests
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>
                              {
-                               if (epoch++ % 300 != 0) return;
+                               //if (epoch++ % 300 != 0) return;
                                Console.WriteLine("----------------Epoch #: {0}", epoch);
                                Console.WriteLine("E:\t{0}",  alg.ErrorValue);
                                Console.WriteLine("DE:\t{0}", alg.ErrorDelta);
@@ -73,6 +73,8 @@ namespace ML.DeepTests
 
       // run training process
       var now = DateTime.Now;
+      Console.WriteLine();
+      Console.WriteLine("Training started at {0}", now);
       alg.Train();
 
       // output results

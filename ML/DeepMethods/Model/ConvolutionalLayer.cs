@@ -21,6 +21,10 @@ namespace ML.DeepMethods.Model
   /// Kernel - 4D array (output_length * input_length * win_size * win_size): kernel[output_idx, input_idx, height_idx, width_idx]
   /// Biases - 1D array (output_length): biases[output_idx]
   ///
+  /// We use tied bias approach
+  /// http://datascience.stackexchange.com/questions/17671
+  /// https://harmdevries89.wordpress.com/2015/03/27/tied-biases-vs-untied-biases/
+  ///
   /// Total count of parameters = (win_size * win_size * input_length + 1) * output_length;
   /// </summary>
   public class ConvolutionalLayer : DeepLayerBase

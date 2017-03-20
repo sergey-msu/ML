@@ -337,7 +337,7 @@ namespace ML.DeepMethods.Algorithms
           var gpij = 0.0D;
 
           for (int q=0; q<depth; q++)
-          for (int k=0; k<size; k++)
+          for (int k=0; k<size;  k++)
           {
             var iidx = i+padding-k*stride;
             if (iidx >= wsize) continue;
@@ -359,28 +359,44 @@ namespace ML.DeepMethods.Algorithms
       // update weights
       for (int q=0; q<depth; q++)
       {
-        var berr = 0.0D; // TODO: we assume that bias is shared among all cells in each output feature map
-                         //       i.e. there is ONLY ONE bias value FOR EACH feature map
-                         //       Is it correct? Should we have m_Biases[q,i,j] instaed of m_Biases[q] ???
-                         // http://datascience.stackexchange.com/questions/17671 - my question
-
-        for (int i=0; i<size; i++)
-        for (int j=0; j<size; j++)
+        for (int p=0; p<pdepth; p++)
+        for (int i=0; i<wsize;  i++)
+        for (int j=0; j<wsize;  j++)
         {
-          var dj = m_LearningRate * layer.Error[q, i, j];
-          berr += dj;
+          var dw = 0.0D;
 
-          for (int p=0; p<pdepth; p++)
+          for (int k=0; k<size; k++)
           {
-            var value = (lidx == 0) ? input[p, i, j] : player.Value[p, i, j];
-            var dwj = dj * value;
-            layer.Kernel[q, p, i, j] -= dwj;
-            sstep2 += dwj * dwj;
+            var iidx = i-padding+stride*k ;
+            if (iidx<0) continue;
+            if (iidx>=psize) break;
+
+            for (int m=0; m<size; m++)
+            {
+              var jidx = j-padding+stride*m;
+              if (jidx<0) continue;
+              if (jidx>=psize) break;
+
+              var value = (lidx == 0) ? input[p, iidx, jidx] : player.Value[p, iidx, jidx];
+              dw += layer.Error[q, k, m] * value;
+            }
           }
+
+          dw = m_LearningRate * dw;
+          layer.Kernel[q, p, i, j] -= dw;
+          sstep2 += dw * dw;
         }
 
-        layer.Biases[q] -= berr;
-        sstep2 += berr*berr;
+        // update biases
+        var db = 0.0D;
+        for (int k=0; k<size; k++)
+        for (int m=0; m<size; m++)
+        {
+          db += layer.Error[q, k, m];
+        }
+        db *= m_LearningRate;
+        layer.Biases[q] -= db;
+        sstep2 += db*db;
       }
 
       // update iter stats
@@ -391,10 +407,10 @@ namespace ML.DeepMethods.Algorithms
     {
       switch (Stop)
       {
-        case StopCriteria.FullLoop: return false;
+        case StopCriteria.FullLoop:  return false;
         case StopCriteria.ErrorFunc: return Math.Abs(m_ErrorDelta) < m_ErrorStopDelta;
-        case StopCriteria.QFunc: return Math.Abs(m_QDelta) < m_QStopDelta;
-        case StopCriteria.StepMin: return m_Step2 < StepStopValue;
+        case StopCriteria.QFunc:     return Math.Abs(m_QDelta) < m_QStopDelta;
+        case StopCriteria.StepMin:   return m_Step2 < StepStopValue;
         default: throw new MLException("Unknown stop citeria");
       }
     }

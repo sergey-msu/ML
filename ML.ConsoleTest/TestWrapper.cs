@@ -68,8 +68,8 @@ namespace ML.ConsoleTest
         //Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
 
         //start = DateTime.Now;
-        doMultilayerNNAlgorithmTest();
-        //doCNNAlgorithmTest();
+        //doMultilayerNNAlgorithmTest();
+        doCNNAlgorithmTest();
         var stop = DateTime.Now;
         Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
       }
