@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rdparties", "3rdparties", 
 		3rdparties\NFX.dll = 3rdparties\NFX.dll
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{33324725-C2FE-4FB0-88BE-29839C2181F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,5 +48,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EA8B4D1C-10D4-44C0-ACAA-1A54477C5F7B} = {33324725-C2FE-4FB0-88BE-29839C2181F2}
+		{3CF8DF2D-201E-4A73-B99C-F22A0BF657E7} = {33324725-C2FE-4FB0-88BE-29839C2181F2}
 	EndGlobalSection
 EndGlobal

@@ -58,28 +58,29 @@ namespace ML.Utils
     /// <returns></returns>
     public static ConvolutionalNetwork CreateLeNet1Network(IActivationFunction convActivation = null,
                                                            IActivationFunction fullConnectedActivation = null,
+                                                           BiasMode biasMode = BiasMode.Tied,
                                                            bool randomizeInitialWeights = true,
                                                            int randomSeed = 0)
     {
       var net = new ConvolutionalNetwork(1, 28);
 
-      var layer1 = new ConvolutionalLayer(1, 28, 4, 5, 1, isTraining: true);
+      var layer1 = new ConvolutionalLayer(1, 28, 4, 5, 1, biasMode: biasMode, isTraining: true);
       net.AddLayer(layer1);
 
       var layer2 = new MaxPoolingLayer(4, 24, 2, 2, isTraining: true);
       net.AddLayer(layer2);
 
-      var layer3 = new ConvolutionalLayer(4, 12, 12, 5, 1, isTraining: true);
+      var layer3 = new ConvolutionalLayer(4, 12, 12, 5, 1, biasMode: biasMode, isTraining: true);
       net.AddLayer(layer3);
 
       var layer4 = new MaxPoolingLayer(12, 8, 2, 2, isTraining: true);
       net.AddLayer(layer4);
 
-      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, isTraining: true);
+      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, biasMode: biasMode, isTraining: true);
       layer1.ActivationFunction = fullConnectedActivation ?? Registry.ActivationFunctions.Rational(2);
       net.AddLayer(layer5);
 
-      net.ActivationFunction = convActivation ?? Registry.ActivationFunctions.Identity;
+      net.ActivationFunction = convActivation ?? Registry.ActivationFunctions.ReLU;
 
       net.Build();
 

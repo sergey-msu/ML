@@ -8,6 +8,7 @@ using System.Text;
 using ML.Core;
 using ML.Utils;
 using ML.DeepMethods.Algorithms;
+using ML.DeepMethods.Models;
 
 namespace ML.DeepTests
 {
@@ -52,7 +53,13 @@ namespace ML.DeepTests
     static void doTrain()
     {
       // create CNN
-      var lenet1 = NetworkFactory.CreateLeNet1Network();
+      var lenet1 = NetworkFactory.CreateLeNet1Network(biasMode: BiasMode.Untied);
+      //ConvolutionalNetwork lenet1;
+      //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cn_e50-0321-033838.mld";
+      //using (var stream = File.Open(filePath1, FileMode.Open))
+      //{
+      //  lenet1 = ConvolutionalNetwork.Deserialize(stream);
+      //}
 
       // create algorithm
       var epochs = 50;
@@ -78,6 +85,18 @@ namespace ML.DeepTests
                                var dc = m_Test.Count;
                                var pct = Math.Round(100.0F * ec / dc, 2);
                                Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+
+                               if (epoch%10==0)
+                               {
+                                 var opath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)+RESULTS_FOLDER;
+                                 if (!Directory.Exists(opath)) Directory.CreateDirectory(opath);
+                                 var ofileName = string.Format("cn_e{0}-{1:MMdd-hhmmss}.mld", epoch, DateTime.Now);
+                                 var ofilePath = Path.Combine(opath, ofileName);
+                                 using (var stream = File.Open(ofilePath, FileMode.Create))
+                                 {
+                                   lenet1.Serialize(stream);
+                                 }
+                               }
                              };
 
       // run training process

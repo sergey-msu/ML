@@ -27,7 +27,7 @@ CURRENT:
 
 - demos project (+data samples)
 
-- implement RBF algorith (https://en.wikipedia.org/wiki/Radial_basis_function_network, http://mccormickml.com/2013/08/15/radial-basis-function-network-rbfn-tutorial/)
+- implement  RBF algorith (https://en.wikipedia.org/wiki/Radial_basis_function_network, http://mccormickml.com/2013/08/15/radial-basis-function-network-rbfn-tutorial/)
 
 - implement more NN algorithms (https://habrahabr.ru/post/318970/)
   - Nesterov

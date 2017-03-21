@@ -8,6 +8,12 @@ using ML.Core.Mathematics;
 
 namespace ML.DeepMethods.Models
 {
+  public enum BiasMode
+  {
+    Tied = 0,  // one bias per convolutional kernel
+    Untied = 1 // one bias per kernel and output location
+  }
+
   /// <summary>
   /// Represents convolution layer: a 4D convolution tensor kernel that accepts
   /// 3D input  - a set of 2D matrix data, and produces
@@ -32,11 +38,14 @@ namespace ML.DeepMethods.Models
     #region Fields
 
     private int m_KernelParamCount;
+    private int m_BiasParamCount;
     private int m_FeatureMapParamCount;
     private int m_ParamCount;
+    private BiasMode m_BiasMode;
 
     private double[,,,] m_Kernel;
     private double[]    m_Biases;
+    private double[,,]  m_UntiedBiases;
 
     #endregion
 
@@ -48,6 +57,7 @@ namespace ML.DeepMethods.Models
                               int windowSize,
                               int stride,
                               int padding=0,
+                              BiasMode biasMode = BiasMode.Tied,
                               bool isTraining = false)
       : base(inputDepth,
              inputSize,
@@ -59,11 +69,17 @@ namespace ML.DeepMethods.Models
              isTraining)
     {
       m_KernelParamCount     = windowSize*windowSize;
-      m_FeatureMapParamCount = inputDepth*m_KernelParamCount + 1;
+      m_BiasParamCount = (biasMode==BiasMode.Tied) ? 1 : m_OutputSize*m_OutputSize;
+      m_FeatureMapParamCount = inputDepth*m_KernelParamCount + m_BiasParamCount;
       m_ParamCount           = m_FeatureMapParamCount*outputDepth;
 
       m_Kernel = new double[outputDepth, inputDepth, windowSize, windowSize];
-      m_Biases = new double[outputDepth];
+
+      m_BiasMode = biasMode;
+      if (biasMode==BiasMode.Tied)
+        m_Biases = new double[outputDepth];
+      else
+        m_UntiedBiases = new double[outputDepth, m_OutputSize, m_OutputSize];
     }
 
     #endregion
@@ -73,9 +89,19 @@ namespace ML.DeepMethods.Models
     public override int ParamCount { get { return m_ParamCount; } }
 
     /// <summary>
-    /// Bias values (one for each output feature map)
+    /// Bias mode: tied or undied
+    /// </summary>
+    public BiasMode BiasMode { get { return m_BiasMode; } }
+
+    /// <summary>
+    /// Tied bias values (one for each output feature map)
     /// </summary>
     public double[] Biases { get { return m_Biases; } }
+
+    /// <summary>
+    /// Untied bias values (one for each output feature map)
+    /// </summary>
+    public double[,,] UntiedBiases{ get { return m_UntiedBiases; } }
 
     /// <summary>
     /// Kernal wieght values
@@ -101,7 +127,16 @@ namespace ML.DeepMethods.Models
           m_Kernel[q, p, i, j] = 2*random.GenerateUniform(0, 1) / coeff;
         }
 
-        m_Biases[q] = 2*random.GenerateUniform(0, 1) / coeff;
+        if (m_BiasMode==BiasMode.Tied)
+          m_Biases[q] = 2*random.GenerateUniform(0, 1) / coeff;
+        else
+        {
+          for (int i=0; i<m_OutputSize; i++)
+          for (int j=0; j<m_OutputSize; j++)
+          {
+            m_UntiedBiases[q, i, j] = 2*random.GenerateUniform(0, 1) / coeff;
+          }
+        }
       }
     }
 
@@ -117,7 +152,7 @@ namespace ML.DeepMethods.Models
         for (int i=0; i<m_OutputSize; i++)
         for (int j=0; j<m_OutputSize; j++)
         {
-          var net = m_Biases[q];
+          var net = (m_BiasMode==BiasMode.Tied) ? m_Biases[q] : m_UntiedBiases[q, i, j];
           var xmin = j*m_Stride-m_Padding;
           var ymin = i*m_Stride-m_Padding;
 
@@ -144,46 +179,52 @@ namespace ML.DeepMethods.Models
 
     protected override double DoGetParam(int idx)
     {
-      var fmidx  = idx / m_FeatureMapParamCount;
-      var fmpidx = idx % m_FeatureMapParamCount;
-
-      if (fmpidx == m_FeatureMapParamCount-1)
-        return m_Biases[fmidx];
-
-      var kidx  = fmpidx / m_KernelParamCount;
-      var kpidx = fmpidx % m_KernelParamCount;
-      var yidx  = kpidx / m_WindowSize;
-      var xidx  = kpidx % m_WindowSize;
-
-      return m_Kernel[fmidx, kidx, yidx, xidx];
+      throw new NotImplementedException();
+      //var fmidx  = idx / m_FeatureMapParamCount;
+      //var fmpidx = idx % m_FeatureMapParamCount;
+      //
+      //if (fmpidx < m_FeatureMapParamCount-m_BiasParamCount) // kernel params
+      //{
+      //  var kidx  = fmpidx / m_KernelParamCount;
+      //  var kpidx = fmpidx % m_KernelParamCount;
+      //  var yidx  = kpidx / m_WindowSize;
+      //  var xidx  = kpidx % m_WindowSize;
+      //
+      //  return m_Kernel[fmidx, kidx, yidx, xidx];
+      //}
+      //
+      //// bias params
+      //return m_Biases[fmidx];
     }
 
     protected override void DoSetParam(int idx, double value, bool isDelta)
     {
-      var fmidx  = idx / m_FeatureMapParamCount;
-      var fmpidx = idx % m_FeatureMapParamCount;
-
-      if (fmpidx == m_FeatureMapParamCount-1)
-      {
-        if (isDelta) m_Biases[fmidx] += value;
-        else m_Biases[fmidx] = value;
-        return;
-      }
-
-      var kidx  = fmpidx / m_KernelParamCount;
-      var kpidx = fmpidx % m_KernelParamCount;
-      var yidx  = kpidx / m_WindowSize;
-      var xidx  = kpidx % m_WindowSize;
-
-      if (isDelta) m_Kernel[fmidx, kidx, yidx, xidx] += value;
-      else m_Kernel[fmidx, kidx, yidx, xidx] = value;
+      throw new NotImplementedException();
+      //var fmidx  = idx / m_FeatureMapParamCount;
+      //var fmpidx = idx % m_FeatureMapParamCount;
+      //
+      //if (fmpidx == m_FeatureMapParamCount-1)
+      //{
+      //  if (isDelta) m_Biases[fmidx] += value;
+      //  else m_Biases[fmidx] = value;
+      //  return;
+      //}
+      //
+      //var kidx  = fmpidx / m_KernelParamCount;
+      //var kpidx = fmpidx % m_KernelParamCount;
+      //var yidx  = kpidx / m_WindowSize;
+      //var xidx  = kpidx % m_WindowSize;
+      //
+      //if (isDelta) m_Kernel[fmidx, kidx, yidx, xidx] += value;
+      //else m_Kernel[fmidx, kidx, yidx, xidx] = value;
     }
 
     protected override void DoUpdateParams(double[] pars, bool isDelta, int cursor)
     {
+      throw new NotImplementedException();
       // TODO: Do it more intelligent!!!!!
-      for (int i=0; i<m_ParamCount; i++)
-        DoSetParam(i, pars[cursor+i], isDelta);
+      //for (int i=0; i<m_ParamCount; i++)
+      //  DoSetParam(i, pars[cursor+i], isDelta);
 
       //var fmidx  = cursor / m_FeatureMapParamCount;
       //var fmpidx = cursor % m_FeatureMapParamCount;
