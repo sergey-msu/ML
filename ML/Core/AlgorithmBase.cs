@@ -146,9 +146,10 @@ namespace ML.Core
     public IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<TObj> classifiedSample)
     {
       var errors = new List<ErrorInfo>();
-
+      int c = 0;
       foreach (var pData in classifiedSample)
       {
+        c++;
         var res = this.Classify(pData.Key);
         if (res != pData.Value)
           errors.Add(new ErrorInfo(pData.Key, pData.Value, res));

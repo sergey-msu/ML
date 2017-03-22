@@ -77,7 +77,7 @@ namespace ML.Utils
       net.AddLayer(layer4);
 
       var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, biasMode: biasMode, isTraining: true);
-      layer1.ActivationFunction = fullConnectedActivation ?? Registry.ActivationFunctions.Rational(2);
+      layer5.ActivationFunction = fullConnectedActivation ?? Registry.ActivationFunctions.Rational(2);
       net.AddLayer(layer5);
 
       net.ActivationFunction = convActivation ?? Registry.ActivationFunctions.ReLU;

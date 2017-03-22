@@ -53,9 +53,9 @@ namespace ML.DeepTests
     static void doTrain()
     {
       // create CNN
-      var lenet1 = NetworkFactory.CreateLeNet1Network(biasMode: BiasMode.Untied);
+      var lenet1 = NetworkFactory.CreateLeNet1Network();
       //ConvolutionalNetwork lenet1;
-      //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cn_e50-0321-033838.mld";
+      //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";
       //using (var stream = File.Open(filePath1, FileMode.Open))
       //{
       //  lenet1 = ConvolutionalNetwork.Deserialize(stream);
@@ -68,6 +68,50 @@ namespace ML.DeepTests
         EpochCount = epochs,
         LearningRate = 0.005D
       };
+
+      //var data = new double[1,28,28]
+      //{
+      //  {
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0 },
+      //    { 0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0 },
+      //    { 0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+      //    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+      //  }
+      //};
+      //var x = alg.Classify(data);
+      //
+      //
+      //var errors1 = alg.GetErrors(m_Test);
+      //var ec1 = errors1.Count();
+      //var dc1 = m_Test.Count;
+      //var pct1 = Math.Round(100.0F * ec1 / dc1, 2);
+      //Console.WriteLine("{0} of {1} ({2}%)", ec1, dc1, pct1);
+
+
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>
                              {
@@ -106,16 +150,6 @@ namespace ML.DeepTests
       alg.Train();
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
-
-      // save results
-      var path = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)+RESULTS_FOLDER;
-      if (!Directory.Exists(RESULTS_FOLDER)) Directory.CreateDirectory(path);
-      var fileName = string.Format("cn_e{0}-{1:MMdd-hhmmss}.mld", epochs, DateTime.Now);
-      var filePath = Path.Combine(path, fileName);
-      using (var stream = File.Open(filePath, FileMode.Create))
-      {
-        lenet1.Serialize(stream);
-      }
     }
 
     #endregion
@@ -157,8 +191,7 @@ namespace ML.DeepTests
           for (int i=0; i<rows; i++)
           for (int j=0; j<cols; j++)
           {
-            var value = ifile.ReadByte();
-            var shade = 255-value;
+            var shade = ifile.ReadByte();
             data[0, i, j] = shade/255.0D;
           }
 
@@ -221,8 +254,7 @@ namespace ML.DeepTests
         for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
         {
-          var value = ifile.ReadByte();
-          var shade = 255-value;
+          var shade = ifile.ReadByte();
           image.SetPixel(j, i, Color.FromArgb(shade, shade, shade));
         }
 
