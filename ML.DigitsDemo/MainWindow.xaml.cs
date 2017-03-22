@@ -53,6 +53,17 @@ namespace ML.DigitsDemo
     private void btnClear_Click(object sender, RoutedEventArgs e)
     {
       m_Canvas.Children.Clear();
+      m_NormalizedCanvas.Children.Clear();
+
+      for (int i=0; i<10; i++)
+      {
+        var barName = string.Format("m_Bar{0}", i);
+        var probName = string.Format("m_Prob{0}", i);
+        ((Rectangle)this.FindName(barName)).Width = 1;
+        ((TextBlock)this.FindName(probName)).Text = "";
+      }
+
+      m_TbResult.Text = "";
     }
 
     private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
@@ -63,7 +74,7 @@ namespace ML.DigitsDemo
 
     private void canvas_MouseMove(object sender, MouseEventArgs e)
     {
-      var half = 3.5D;
+      var half = 5.5D;
       var thickness = 2*half;
 
       if (e.LeftButton == MouseButtonState.Pressed)
@@ -136,16 +147,20 @@ namespace ML.DigitsDemo
       //  }
       //};
 
-
-
       var result = m_Network.Calculate(data);
-      var prob = 0.0D;
+      var maxProb = 0.0D;
       var digit = -1;
-      for (int i=0; i<9; i++)
+      for (int i=0; i<10; i++)
       {
-        if (result[i,0,0]>prob)
+        var prob = Math.Round(result[i, 0, 0], 2);
+        var barName = string.Format("m_Bar{0}", i);
+        var probName = string.Format("m_Prob{0}", i);
+        ((Rectangle)this.FindName(barName)).Width = prob*30;
+        ((TextBlock)this.FindName(probName)).Text = prob.ToString();
+
+        if (result[i,0,0]>maxProb)
         {
-          prob=result[i,0,0];
+          maxProb=result[i,0,0];
           digit=i;
         }
       }
@@ -284,6 +299,21 @@ namespace ML.DigitsDemo
                           (d01-d00)*(xidx-xm) +
                           (d10-d00)*(yidx-ym) +
                           d00;
+      }
+
+      // fill normalized canvas
+      m_NormalizedCanvas.Children.Clear();
+      for (var v=0; v<28; v++)
+      for (var u=0; u<28; u++)
+      {
+        var shade = result[0, v, u];
+        if (shade == 0) continue;
+
+        var color = (byte)(255*(1-shade));
+        var pixel = new Rectangle { Height=1, Width=1, Fill=new SolidColorBrush(Color.FromRgb(color, color, color)) };
+        m_NormalizedCanvas.Children.Add(pixel);
+        Canvas.SetLeft(pixel, u);
+        Canvas.SetTop(pixel, v);
       }
 
       return result;

@@ -9,45 +9,99 @@
 
   <Grid>
     <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="*"/>
-      <RowDefinition/>
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto"/>
       <ColumnDefinition Width="Auto"/>
       <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition Width="Auto"/>
     </Grid.ColumnDefinitions>
 
-    <StackPanel Grid.Row="0" Grid.ColumnSpan="2"
-                Orientation="Horizontal"
-                Margin="5">
-      <Button Name="m_BtnClear" Height="24" Width="75">Clear</Button>
-    </StackPanel>
-
     <Border Grid.Column="0"
-            Grid.Row="1"
             Margin="5"
             BorderBrush="Black"
             BorderThickness="0.5">
       <Canvas Name="m_Canvas"
-              Height="300"
-              Width="300"
+              Height="200"
+              Width="200"
               Background="White"/>
     </Border>
 
-    <Button Name="m_BtnRecognize"
-            Grid.Column="1" Grid.Row="1"
-            Margin="10"
-            Height="24" Width="75">Recognize ></Button>
 
+    <StackPanel Grid.Column="1"
+                VerticalAlignment="Center"
+                Margin="5">
+      <Button Name="m_BtnRecognize"
+              Margin="5"
+              Height="24" Width="75">Recognize</Button>
+      <Button Name="m_BtnClear"
+              Margin="5"
+              Height="24"
+              Width="75">Clear</Button>
+    </StackPanel>
 
     <TextBlock Name="m_TbResult"
-               Grid.Column="2" Grid.Row="1"
+               Width="60"
+               Grid.Column="2"
                VerticalAlignment="Center"
-               Margin="10,30,30,45"
+               Margin="10,30"
                FontSize="80"/>
 
+    <StackPanel Grid.Column="3" VerticalAlignment="Center"
+                Width="80">
+      <Canvas Name="m_NormalizedCanvas" Height="28" Width="28" Background="White" Margin="0,0,0,10"></Canvas>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>0: </TextBlock>
+        <Rectangle Name="m_Bar0" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob0"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>1:</TextBlock>
+        <Rectangle Name="m_Bar1" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob1"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>2:</TextBlock>
+        <Rectangle Name="m_Bar2" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob2"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>3:</TextBlock>
+        <Rectangle Name="m_Bar3" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob3"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>4:</TextBlock>
+        <Rectangle Name="m_Bar4" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob4"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>5:</TextBlock>
+        <Rectangle Name="m_Bar5" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob5"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>6:</TextBlock>
+        <Rectangle Name="m_Bar6" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob6"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>7:</TextBlock>
+        <Rectangle Name="m_Bar7" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob7"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>8:</TextBlock>
+        <Rectangle Name="m_Bar8" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob8"></TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock>9:</TextBlock>
+        <Rectangle Name="m_Bar9" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
+        <TextBlock Name="m_Prob9"></TextBlock>
+      </StackPanel>
+
+    </StackPanel>
   </Grid>
 
 </Window>
