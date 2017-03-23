@@ -330,8 +330,8 @@ namespace ML.DeepMethods.Algorithms
       // backpropagate "errors" to previous layer for future use
       if (lidx > 0)
         for (int p=0; p<pdepth; p++)
-        for (int i=0; i<psize; i++)
-        for (int j=0; j<psize; j++)
+        for (int i=0; i<psize;  i++)
+        for (int j=0; j<psize;  j++)
         {
           var gpij = 0.0D;
 

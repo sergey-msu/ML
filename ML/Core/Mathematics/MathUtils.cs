@@ -4,18 +4,19 @@ using System.Runtime.CompilerServices;
 namespace ML.Core.Mathematics
 {
   /// <summary>
-  /// Unitilitary functions
+  /// Utilitary Math functions
   /// </summary>
-  public static class MathUtils
+  public static partial class MathUtils
   {
+    public const double ENTROPY_COEFF = 1.44269504089F; // 1/ln(2)
+
     /// <summary>
-    /// Calculates h(z) = -z log2(z)
+    /// Calculates h(z) = -z*log2(z)
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double EntropyH(double z)
     {
-      const double COEFF = 1.44269504089F; // 1/ln(2)
-      return (0.0D <= z && z < double.Epsilon) ? 0.0D : -z*Math.Log(z)*COEFF;
+      return (0.0D <= z && z < double.Epsilon) ? 0.0D : -z*Math.Log(z)*ENTROPY_COEFF;
     }
 
     /// <summary>
@@ -41,7 +42,7 @@ namespace ML.Core.Mathematics
     }
 
     /// <summary>
-    /// Calculates maximum value within array alog with its index
+    /// Calculates maximum value within array alog with its indices
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void CalcMax(double[,,] array, out int iidx, out int jidx, out int kidx, out double max)
@@ -72,12 +73,14 @@ namespace ML.Core.Mathematics
       }
     }
 
+    /// <summary>
+    /// Throws if arrays have different lenghts
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void CheckDimensions(double[] p1, double[] p2)
     {
       if (p1.Length != p2.Length)
         throw new MLException("Can not add point with different dimension");
     }
-
   }
 }

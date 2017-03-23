@@ -36,7 +36,6 @@ namespace ML.DeepMethods.Models
     public DeepLayerBase(int inputDepth,
                          int inputSize,
                          int outputDepth,
-                         int outputSize,
                          int windowSize,
                          int stride,
                          int padding=0,
@@ -48,8 +47,6 @@ namespace ML.DeepMethods.Models
         throw new MLException("DeepLayerBase.ctor(inputSize<=0)");
       if (outputDepth <= 0)
         throw new MLException("DeepLayerBase.ctor(outputDepth<=0)");
-      if (outputSize <= 0)
-        throw new MLException("DeepLayerBase.ctor(outputSize<=0)");
       if (windowSize <= 0)
         throw new MLException("ConvolutionalLayer.ctor(windowSize<=0)");
       if (windowSize > inputSize)
@@ -68,7 +65,7 @@ namespace ML.DeepMethods.Models
       m_InputDepth  = inputDepth;
       m_InputSize   = inputSize;
       m_OutputDepth = outputDepth;
-      m_OutputSize  = outputSize;
+      m_OutputSize  = (inputSize - windowSize + 2*padding)/stride + 1;
 
       m_Value = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
 
@@ -151,11 +148,11 @@ namespace ML.DeepMethods.Models
     public abstract void RandomizeParameters(int seed);
 
     /// <summary>
-    /// Calculates value's derivative
+    /// Calculates net value's derivative
     /// </summary>
     public double Derivative(int p, int i, int j)
     {
-      return ActivationFunction.DerivativeFromValue(Value[p, i, j]);
+      return m_ActivationFunction.DerivativeFromValue(m_Value[p, i, j]);
     }
   }
 }

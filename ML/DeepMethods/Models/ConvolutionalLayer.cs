@@ -62,7 +62,6 @@ namespace ML.DeepMethods.Models
       : base(inputDepth,
              inputSize,
              outputDepth,
-             (inputSize - windowSize + 2*padding)/stride + 1,
              windowSize,
              stride,
              padding,
@@ -145,34 +144,7 @@ namespace ML.DeepMethods.Models
       if (m_InputDepth != input.GetLength(0))
         throw new MLException("Incorrect input depth");
 
-      // output fm-s
-      for (int q=0; q<m_OutputDepth; q++)
-      {
-        // fm neurons
-        for (int i=0; i<m_OutputSize; i++)
-        for (int j=0; j<m_OutputSize; j++)
-        {
-          var net = (m_BiasMode==BiasMode.Tied) ? m_Biases[q] : m_UntiedBiases[q, i, j];
-          var xmin = j*m_Stride-m_Padding;
-          var ymin = i*m_Stride-m_Padding;
-
-          // window
-          for (int y=0; y<m_WindowSize; y++)
-          for (int x=0; x<m_WindowSize; x++)
-          {
-            var xidx = xmin+x;
-            var yidx = ymin+y;
-            if (xidx>=0 && xidx<m_InputSize && yidx>=0 && yidx<m_InputSize)
-            {
-              // inner product in depth (over input channel's neuron at fixed position)
-              for (int p=0; p<m_InputDepth; p++)
-                net += m_Kernel[q, p, y, x]*input[p, yidx, xidx];
-            }
-          }
-
-          m_Value[q, i, j] = ActivationFunction.Value(net);
-        }
-      }
+      MathUtils.Tensors.Convolute(input, m_Biases, m_Value, m_Kernel, m_Stride, m_Padding, ActivationFunction);
 
       return m_Value;
     }

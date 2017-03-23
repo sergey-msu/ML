@@ -77,6 +77,7 @@
     <Compile Include="Core\Logical\DonskoyIndex.cs" />
     <Compile Include="Core\Logical\IndexBase.cs" />
     <Compile Include="Core\Logical\GiniIndex.cs" />
+    <Compile Include="Core\Mathematics\Tensors.cs" />
     <Compile Include="Core\Metric\LInftyMetric.cs" />
     <Compile Include="Core\Metric\MetricBase.cs" />
     <Compile Include="Core\Metric\LpMetric.cs" />

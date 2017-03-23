@@ -56,31 +56,34 @@ namespace ML.Utils
     /// Sreate CNN with original LeNet-1 architecture (see http://yann.lecun.com/exdb/publis/pdf/lecun-95b.pdf)
     /// </summary>
     /// <returns></returns>
-    public static ConvolutionalNetwork CreateLeNet1Network(IActivationFunction convActivation = null,
-                                                           IActivationFunction fullConnectedActivation = null,
+    public static ConvolutionalNetwork CreateLeNet1Network(IActivationFunction activation = null,
                                                            BiasMode biasMode = BiasMode.Tied,
                                                            bool randomizeInitialWeights = true,
                                                            int randomSeed = 0)
     {
+      activation = activation ?? Registry.ActivationFunctions.ReLU;
+
       var net = new ConvolutionalNetwork(1, 28);
 
       var layer1 = new ConvolutionalLayer(1, 28, 4, 5, 1, biasMode: biasMode, isTraining: true);
+      layer1.ActivationFunction = activation;
       net.AddLayer(layer1);
 
       var layer2 = new MaxPoolingLayer(4, 24, 2, 2, isTraining: true);
+      layer2.ActivationFunction = activation;
       net.AddLayer(layer2);
 
       var layer3 = new ConvolutionalLayer(4, 12, 12, 5, 1, biasMode: biasMode, isTraining: true);
+      layer3.ActivationFunction = activation;
       net.AddLayer(layer3);
 
       var layer4 = new MaxPoolingLayer(12, 8, 2, 2, isTraining: true);
+      layer4.ActivationFunction = activation;
       net.AddLayer(layer4);
 
       var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, biasMode: biasMode, isTraining: true);
-      layer5.ActivationFunction = fullConnectedActivation ?? Registry.ActivationFunctions.Rational(2);
+      layer5.ActivationFunction = activation;
       net.AddLayer(layer5);
-
-      net.ActivationFunction = convActivation ?? Registry.ActivationFunctions.ReLU;
 
       net.Build();
 
@@ -89,6 +92,8 @@ namespace ML.Utils
 
       return net;
     }
+
+    // create LeNet-5
 
     // create AlexNet
 

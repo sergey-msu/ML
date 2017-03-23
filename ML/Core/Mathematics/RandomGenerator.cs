@@ -15,7 +15,7 @@ namespace ML.Core.Mathematics
     public static RandomGenerator Get(int seed)
     {
       RandomGenerator result;
-      if (!m_Instances.TryGetValue(seed % MAX_SEED, out result))
+      if (!m_Instances.TryGetValue(seed, out result))
       {
         var instances = new Dictionary<int, RandomGenerator>(m_Instances);
         result = new RandomGenerator(seed);
@@ -28,9 +28,7 @@ namespace ML.Core.Mathematics
 
     #endregion
 
-    private const int MAX_SEED = 100;
-
-    private readonly Random m_Random = new Random();
+    private readonly Random m_Random;
 
     public RandomGenerator(int seed=0)
     {

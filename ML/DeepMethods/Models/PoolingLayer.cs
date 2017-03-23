@@ -23,7 +23,6 @@ namespace ML.DeepMethods.Models
       : base(inputDepth,
              inputSize,
              inputDepth,
-             (inputSize - windowSize + 2*padding)/stride + 1,
              windowSize,
              stride,
              padding,

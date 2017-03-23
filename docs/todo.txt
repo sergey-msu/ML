@@ -1,14 +1,15 @@
 CURRENT:
 
-- [INPROG] implement Convolution NN based on CN architecture
-  - [INPROG] read more about Convolution NN
-  - [INPROG] implement base CNN layer types
-  - implement CNN
-  - implement learning algorithm for NN
-  - testing with real images
-      - MNIST images db: http://yann.lecun.com/exdb/mnist/index.html, https://web.archive.org/web/20160117040036/http://yann.lecun.com/exdb/mnist/)
-      - CIFAR-10 images db: http://www.cs.toronto.edu/~kriz/cifar.html
-  - cover with tests
+- Unit tests
+  - fix NN tests
+  - cover CNN with tests
+  - cover NN Backprops with tests
+  - cover CNN Backprop with tests
+
+- implement different CNN architectures
+  - LeNet-5
+  - AlexNet
+  - test with CIFAR-10 images db: http://www.cs.toronto.edu/~kriz/cifar.html
 
 - implement Backpropagation algorithm for general full-connected NN
   - [DONE] implement algorithm
@@ -42,7 +43,7 @@ CURRENT:
 
 - add ability to update paraters in a batch from some start index (extend TryUpdateParams)
 
-- General CN architecture
+- General NN architecture
   - Read https://tproger.ru/translations/neural-network-zoo-1/ - NN zoo
   - add ability to loop nodes
   - develop way to create simple base networks (factory methods)
@@ -60,6 +61,14 @@ CURRENT:
    - implement C4.5 algorithm for decision trees
 
 DONE:
+
+- implement Convolution NN based on CN architecture
+  - read more about Convolution NN
+  - implement base CNN layer types
+  - implement CNN
+  - implement learning algorithm for NN
+  - testing with real images
+      - MNIST images db: http://yann.lecun.com/exdb/mnist/index.html, https://web.archive.org/web/20160117040036/http://yann.lecun.com/exdb/mnist/)
 
 - implement Perceptron algorithm (no hidden layers)
   - refactor UseBias ( -> neurons threshold as additional parameter?) + cover with tests

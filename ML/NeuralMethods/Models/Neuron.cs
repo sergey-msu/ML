@@ -115,10 +115,10 @@ namespace ML.NeuralMethods.Models
     {
       var random = RandomGenerator.Get(seed);
 
-      for (int i=0; i<this.InputDim; i++)
-        m_Weights[i] = 2 * random.GenerateUniform(0, 1) / InputDim;
+      for (int i=0; i<m_InputDim; i++)
+        m_Weights[i] = 2 * random.GenerateUniform(0, 1) / m_InputDim;
 
-      m_Bias = 2 * random.GenerateUniform(0, 1) / InputDim;
+      m_Bias = 2 * random.GenerateUniform(0, 1) / m_InputDim;
     }
 
     /// <summary>
