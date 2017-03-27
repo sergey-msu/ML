@@ -54,6 +54,7 @@ namespace ML.DeepTests
     {
       // create CNN
       var lenet1 = NetworkFactory.CreateLeNet1MNetwork();
+      lenet1[lenet1.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.Logistic(1);
       //ConvolutionalNetwork lenet1;
       //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";
       //using (var stream = File.Open(filePath1, FileMode.Open))
@@ -65,6 +66,7 @@ namespace ML.DeepTests
       var epochs = 30;
       var alg = new BackpropAlgorithm(m_Training, lenet1)
       {
+        LossFunction = Registry.LossFunctions.CrossEntropySoftMax,
         EpochCount = epochs,
         LearningRate = 0.005D
       };

@@ -38,7 +38,7 @@ namespace ML.LogicalMethods.Algorithms
     /// <summary>
     /// Generate decision tree via ID3 algorithm
     /// </summary>
-    public void Train(IEnumerable<Predicate<TObj>> patterns, IInformIndex<TObj> informativity)
+    public void Train(IEnumerable<Predicate<TObj>> patterns, IInformativityIndex<TObj> informativity)
     {
       if (patterns==null || !patterns.Any())
         throw new MLException("Patterns are empty or null");
@@ -52,7 +52,7 @@ namespace ML.LogicalMethods.Algorithms
 
     #region .pvt
 
-      private DecisionNode<TObj> trainID3Core(IEnumerable<Predicate<TObj>> patterns, ClassifiedSample<TObj> sample, IInformIndex<TObj> informativity)
+      private DecisionNode<TObj> trainID3Core(IEnumerable<Predicate<TObj>> patterns, ClassifiedSample<TObj> sample, IInformativityIndex<TObj> informativity)
       {
         if (!sample.Any()) throw new MLException("Empty sample");
 

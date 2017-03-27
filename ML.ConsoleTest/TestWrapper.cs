@@ -210,6 +210,7 @@ namespace ML.ConsoleTest
       var alg = new BackpropAlgorithm(Data.TrainingSample, net);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.1D;
+      alg.LossFunction = Registry.LossFunctions.Euclidean;
 
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>
@@ -270,6 +271,7 @@ namespace ML.ConsoleTest
       var alg = new ML.DeepMethods.Algorithms.BackpropAlgorithm(sample, cnn);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.1D;
+      alg.LossFunction = Registry.LossFunctions.Euclidean;
 
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>

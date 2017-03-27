@@ -4,6 +4,7 @@ using ML.Core.Metric;
 using ML.Core.Logical;
 using ML.Core.ActivationFunctions;
 using ML.Contracts;
+using ML.Core.LossFunctions;
 
 namespace ML.Core
 {
@@ -11,42 +12,42 @@ namespace ML.Core
   {
     public static class Kernels
     {
-      public static readonly GaussianKernel    GaussianKernel    = new GaussianKernel();
-      public static readonly QuadraticKernel   QuadraticKernel   = new QuadraticKernel();
-      public static readonly QuarticKernel     QuarticKernel     = new QuarticKernel();
-      public static readonly RectangularKernel RectangularKernel = new RectangularKernel();
-      public static readonly TriangularKernel  TriangularKernel  = new TriangularKernel();
+      public static readonly GaussianKernel    Gaussian    = new GaussianKernel();
+      public static readonly QuadraticKernel   Quadratic   = new QuadraticKernel();
+      public static readonly QuarticKernel     Quartic     = new QuarticKernel();
+      public static readonly RectangularKernel Rectangular = new RectangularKernel();
+      public static readonly TriangularKernel  Triangular  = new TriangularKernel();
 
       public static readonly Dictionary<string, IFunction> ByID = new Dictionary<string, IFunction>
       {
-        { GaussianKernel.ID,    GaussianKernel },
-        { QuadraticKernel.ID,   QuadraticKernel },
-        { QuarticKernel.ID,     QuarticKernel },
-        { RectangularKernel.ID, RectangularKernel },
-        { TriangularKernel.ID,  TriangularKernel }
+        { Gaussian.ID,    Gaussian },
+        { Quadratic.ID,   Quadratic },
+        { Quartic.ID,     Quartic },
+        { Rectangular.ID, Rectangular },
+        { Triangular.ID,  Triangular }
       };
     }
 
     public static class Metrics
     {
-      private static readonly Dictionary<double, LpMetric> m_LpMetrics = new Dictionary<double, LpMetric>();
+      private static readonly Dictionary<double, LpMetric> m_Lp = new Dictionary<double, LpMetric>();
 
-      public static readonly EuclideanMetric EuclideanMetric = new EuclideanMetric();
-      public static readonly LInftyMetric    LInftyMetric    = new LInftyMetric();
+      public static readonly EuclideanMetric Euclidean = new EuclideanMetric();
+      public static readonly LInftyMetric    LInfty    = new LInftyMetric();
 
       public static readonly Dictionary<string, IMetric> ByID = new Dictionary<string, IMetric>
       {
-        { EuclideanMetric.ID, EuclideanMetric },
-        { LInftyMetric.ID,    LInftyMetric }
+        { Euclidean.ID, Euclidean },
+        { LInfty.ID,    LInfty }
       };
 
-      public static LpMetric LpMetric(double p)
+      public static LpMetric Lp(double p)
       {
         LpMetric result;
-        if (!m_LpMetrics.TryGetValue(p, out result))
+        if (!m_Lp.TryGetValue(p, out result))
         {
           result = new LpMetric(p);
-          m_LpMetrics[p] = result;
+          m_Lp[p] = result;
         }
 
         return result;
@@ -55,15 +56,15 @@ namespace ML.Core
 
     public static class Informativities<TObj>
     {
-      public static readonly GiniIndex<TObj>    GiniInformativity    = new GiniIndex<TObj>();
-      public static readonly DonskoyIndex<TObj> DonskoyInformativity = new DonskoyIndex<TObj>();
-      public static readonly EntropyIndex<TObj> EntropyInformativity = new EntropyIndex<TObj>();
+      public static readonly GiniIndex<TObj>    Gini    = new GiniIndex<TObj>();
+      public static readonly DonskoyIndex<TObj> Donskoy = new DonskoyIndex<TObj>();
+      public static readonly EntropyIndex<TObj> Entropy = new EntropyIndex<TObj>();
 
-      public static readonly Dictionary<string, IInformIndex<TObj>> ByID = new Dictionary<string, IInformIndex<TObj>>
+      public static readonly Dictionary<string, IInformativityIndex<TObj>> ByID = new Dictionary<string, IInformativityIndex<TObj>>
       {
-        { GiniInformativity.ID,    GiniInformativity },
-        { DonskoyInformativity.ID, DonskoyInformativity },
-        { EntropyInformativity.ID, EntropyInformativity }
+        { Gini.ID,    Gini },
+        { Donskoy.ID, Donskoy },
+        { Entropy.ID, Entropy }
       };
     }
 
@@ -123,6 +124,27 @@ namespace ML.Core
         {
           result = new LogisticActivation(a);
           m_Logistics[a] = result;
+        }
+
+        return result;
+      }
+    }
+
+    public static class LossFunctions
+    {
+      private static readonly Dictionary<double, LpLoss> m_Lp = new Dictionary<double, LpLoss>();
+
+      public static readonly EuclideanLoss           Euclidean           = new EuclideanLoss();
+      public static readonly CrossEntropyLoss        CrossEntropy        = new CrossEntropyLoss();
+      public static readonly CrossEntropySoftMaxLoss CrossEntropySoftMax = new CrossEntropySoftMaxLoss();
+
+      public static LpLoss Lp(double p)
+      {
+        LpLoss result;
+        if (!m_Lp.TryGetValue(p, out result))
+        {
+          result = new LpLoss(p);
+          m_Lp[p] = result;
         }
 
         return result;

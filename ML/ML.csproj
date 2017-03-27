@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contracts\IInformIndex.cs" />
+    <Compile Include="Contracts\IInformativityIndex.cs" />
     <Compile Include="Core\ActivationFunctions\ArctanActivation.cs" />
     <Compile Include="Core\ActivationFunctions\BinaryStepActivation.cs" />
     <Compile Include="Core\ActivationFunctions\ExpActivation.cs" />
@@ -77,6 +77,10 @@
     <Compile Include="Core\Logical\DonskoyIndex.cs" />
     <Compile Include="Core\Logical\IndexBase.cs" />
     <Compile Include="Core\Logical\GiniIndex.cs" />
+    <Compile Include="Core\LossFunctions\CrossEntropySoftMaxLoss.cs" />
+    <Compile Include="Core\LossFunctions\CrossEntropyLoss.cs" />
+    <Compile Include="Core\LossFunctions\LpLoss.cs" />
+    <Compile Include="Core\LossFunctions\EuclideanLoss.cs" />
     <Compile Include="Core\Metric\LInftyMetric.cs" />
     <Compile Include="Core\Metric\MetricBase.cs" />
     <Compile Include="Core\Metric\LpMetric.cs" />

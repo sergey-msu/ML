@@ -16,11 +16,30 @@
     double Derivative(double r);
   }
 
+  /// <summary>
+  /// Contract for neural networks activation function
+  /// </summary>
   public interface IActivationFunction : IFunction
   {
     /// <summary>
     /// Calculates function's derivative value by function value (i.e. y'(y) = y - for y=exp(x))
     /// </summary>
     double DerivativeFromValue(double y);
+  }
+
+  /// <summary>
+  /// Contract for loss function
+  /// </summary>
+  public interface ILossFunction
+  {
+    /// <summary>
+    /// Calculates loss value for a given actual and expected input
+    /// </summary>
+    double Value(double[] actual, double[] expected);
+
+    /// <summary>
+    /// Calculates idx-th derivative for a given actual and expected input
+    /// </summary>
+    double Derivative(int idx, double[] actual, double[] expected);
   }
 }

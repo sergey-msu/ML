@@ -7,7 +7,7 @@ namespace ML.Contracts
   /// <summary>
   /// Contract for Informativity function
   /// </summary>
-  public interface IInformIndex<TObj>
+  public interface IInformativityIndex<TObj>
   {
     /// <summary>
     /// Calculates maximum of informativity function

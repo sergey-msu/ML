@@ -39,6 +39,8 @@ namespace ML.DeepMethods.Algorithms
     private Dictionary<Class, double[]> m_ExpectedOutputs;
     private int m_EpochLength;
 
+    private ILossFunction m_LossFunction;
+
     private StopCriteria m_Stop;
     private int m_InputDepth;
     private int m_InputSize;
@@ -93,6 +95,12 @@ namespace ML.DeepMethods.Algorithms
     public double Step2 { get { return m_Step2; } }
     public double QValue { get { return m_QValue; } }
     public double QDelta { get { return m_QDelta; } }
+
+    public ILossFunction LossFunction
+    {
+      get { return m_LossFunction; }
+      set { m_LossFunction = value; }
+    }
 
     public int EpochCount
     {
@@ -245,7 +253,7 @@ namespace ML.DeepMethods.Algorithms
     private void runIteration(ConvolutionalNetwork net, double[,,] input, Class cls)
     {
       // forward calculation
-      var serr2 = feedForward(net, input, cls);
+      var serr = feedForward(net, input, cls);
 
       // error backpropagation
       var lcount = net.LayerCount;
@@ -263,27 +271,29 @@ namespace ML.DeepMethods.Algorithms
       }
 
       // update iter stats
-      m_IterErrorValue += serr2/2;
+      m_IterErrorValue += serr;
       m_PrevQValue = m_QValue;
-      m_QValue = (1 - m_QLambda) * m_QValue + m_QLambda * serr2 / 2;
+      m_QValue = (1 - m_QLambda) * m_QValue + m_QLambda * serr;
       m_QDelta = m_QValue - m_PrevQValue;
     }
 
     private double feedForward(ConvolutionalNetwork net, double[,,] input, Class cls)
     {
-      var serr2 = 0.0D;
-      var output = net.Calculate(input);
+      var result = net.Calculate(input);
+      var len = result.GetLength(0);
+      var output = new double[len];
+      for (int j=0; j<len; j++) output[j] = result[j, 0, 0];
+
       var expect = m_ExpectedOutputs[cls];
       var llayer = net[net.LayerCount - 1];
 
       for (int j=0; j<m_OutputDepth; j++)
       {
-        var ej = output[j, 0, 0] - expect[j];
-        llayer.Error[j, 0, 0] = ej * llayer.Derivative(j, 0, 0);
-        serr2 += ej * ej;
+        var ej = m_LossFunction.Derivative(j, output, expect);
+        llayer.Error[j, 0, 0] = ej* llayer.Derivative(j, 0, 0);
       }
 
-      return serr2;
+      return m_LossFunction.Value(output, expect);
     }
 
     private void feedBackward(ConvolutionalNetwork net, MaxPoolingLayer layer, int lidx, double[,,] input)

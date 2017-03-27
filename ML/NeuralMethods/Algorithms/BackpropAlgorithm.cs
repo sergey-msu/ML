@@ -39,6 +39,8 @@ namespace ML.NeuralMethods.Algorithms
     private Dictionary<Class, double[]> m_ExpectedOutputs;
     private int m_EpochLength;
 
+    private ILossFunction m_LossFunction;
+
     private StopCriteria m_Stop;
     private int    m_InputDim;
     private int    m_OutputDim;
@@ -91,6 +93,12 @@ namespace ML.NeuralMethods.Algorithms
     public double Step2          { get { return m_Step2; } }
     public double QValue         { get { return m_QValue; } }
     public double QDelta         { get { return m_QDelta; } }
+
+    public ILossFunction LossFunction
+    {
+      get { return m_LossFunction; }
+      set { m_LossFunction = value; }
+    }
 
     public int EpochCount
     {
@@ -242,7 +250,7 @@ namespace ML.NeuralMethods.Algorithms
     private void runIteration(NeuralNetwork net, double[] input, Class cls)
     {
       // forward calculation
-      var serr2 = feedForward(net, input, cls);
+      var serr = feedForward(net, input, cls);
 
       // error backpropagation
       var lcount = net.LayerCount;
@@ -252,15 +260,14 @@ namespace ML.NeuralMethods.Algorithms
       }
 
       // update iter stats
-      m_IterErrorValue += serr2/2;
+      m_IterErrorValue += serr;
       m_PrevQValue = m_QValue;
-      m_QValue = (1-m_QLambda)*m_QValue + m_QLambda*serr2/2;
+      m_QValue = (1-m_QLambda)*m_QValue + m_QLambda*serr;
       m_QDelta = m_QValue-m_PrevQValue;
     }
 
     private double feedForward(NeuralNetwork net, double[] input, Class cls)
     {
-      var serr2 = 0.0D;
       var output = net.Calculate(input);
       var expect = m_ExpectedOutputs[cls];
       var llayer = net[net.LayerCount-1];
@@ -268,12 +275,11 @@ namespace ML.NeuralMethods.Algorithms
       for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = llayer[j];
-        var ej = output[j] - expect[j];
-        neuron.Error = ej*neuron.ActivationFunction.DerivativeFromValue(neuron.Value);
-        serr2 += ej*ej;
+        var ej = m_LossFunction.Derivative(j, output, expect);
+        neuron.Error = ej * neuron.Derivative;
       }
 
-      return serr2;
+      return m_LossFunction.Value(output, expect);
     }
 
     private void feedBackward(NeuralNetwork net, NeuralLayer layer, int lidx, double[] input)
@@ -296,7 +302,7 @@ namespace ML.NeuralMethods.Algorithms
           }
 
           var pneuron = player[h];
-          pneuron.Error = eh * pneuron.ActivationFunction.DerivativeFromValue(pneuron.Value);
+          pneuron.Error = eh * pneuron.Derivative;
         }
 
       // update weights
