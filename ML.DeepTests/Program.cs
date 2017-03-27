@@ -53,7 +53,7 @@ namespace ML.DeepTests
     static void doTrain()
     {
       // create CNN
-      var lenet1 = NetworkFactory.CreateLeNet1Network();
+      var lenet1 = NetworkFactory.CreateLeNet1MNetwork();
       //ConvolutionalNetwork lenet1;
       //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";
       //using (var stream = File.Open(filePath1, FileMode.Open))
@@ -62,7 +62,7 @@ namespace ML.DeepTests
       //}
 
       // create algorithm
-      var epochs = 50;
+      var epochs = 30;
       var alg = new BackpropAlgorithm(m_Training, lenet1)
       {
         EpochCount = epochs,
@@ -70,6 +70,7 @@ namespace ML.DeepTests
       };
 
       int epoch = 0;
+      var errPct = 100.0D;
       alg.EpochEndedEvent += (o, e) =>
                              {
                                Console.WriteLine("---------------- Epoch #: {0} ({1})", ++epoch, DateTime.Now);
@@ -83,16 +84,21 @@ namespace ML.DeepTests
                                var pct = Math.Round(100.0F * ec / dc, 2);
                                Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
 
-                               if (epoch%10==0)
+                               if (pct < errPct)
                                {
+                                 errPct = pct;
                                  var opath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)+RESULTS_FOLDER;
                                  if (!Directory.Exists(opath)) Directory.CreateDirectory(opath);
-                                 var ofileName = string.Format("cn_e{0}-{1:MMdd-hhmmss}.mld", epoch, DateTime.Now);
+                                 var ofileName = string.Format("cn_e{0}_p{1}.mld", epoch, Math.Round(errPct, 2), DateTime.Now);
                                  var ofilePath = Path.Combine(opath, ofileName);
                                  using (var stream = File.Open(ofilePath, FileMode.Create))
                                  {
                                    lenet1.Serialize(stream);
                                  }
+                               }
+                               else
+                               {
+                                 alg.LearningRate /= 2;
                                }
                              };
 

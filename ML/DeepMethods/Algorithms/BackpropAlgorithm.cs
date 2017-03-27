@@ -388,25 +388,14 @@ namespace ML.DeepMethods.Algorithms
 
         // update biases
         var db = 0.0D;
-        if (layer.BiasMode==BiasMode.Tied)
+        for (int k=0; k<size; k++)
+        for (int m=0; m<size; m++)
         {
-          for (int k=0; k<size; k++)
-          for (int m=0; m<size; m++)
-            db += layer.Error[q, k, m];
-          db *= m_LearningRate;
-          layer.Biases[q] -= db;
-          sstep2 += db*db;
+          db += layer.Error[q, k, m];
         }
-        else
-        {
-          for (int k=0; k<size; k++)
-          for (int m=0; m<size; m++)
-          {
-            db = m_LearningRate * layer.Error[q, k, m];
-            layer.UntiedBiases[q, k, m] -= db;
-            sstep2 += db*db;
-          }
-        }
+        db *= m_LearningRate;
+        layer.Biases[q] -= db;
+        sstep2 += db*db;
       }
 
       // update iter stats
