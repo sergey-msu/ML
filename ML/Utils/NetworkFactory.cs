@@ -62,7 +62,7 @@ namespace ML.Utils
 
       var net = new ConvolutionalNetwork(1, 28);
 
-      var layer1 = new ConvolutionalLayer(1, 28, 4, 5, 1, isTraining: true);
+      var layer1 = new ConvolutionalLayer(1, 28, 4, 5, isTraining: true);
       layer1.ActivationFunction = activation;
       net.AddLayer(layer1);
 
@@ -70,7 +70,7 @@ namespace ML.Utils
       layer2.ActivationFunction = activation;
       net.AddLayer(layer2);
 
-      var layer3 = new ConvolutionalLayer(4, 12, 12, 5, 1, isTraining: true);
+      var layer3 = new ConvolutionalLayer(4, 12, 12, 5, isTraining: true);
       layer3.ActivationFunction = activation;
       net.AddLayer(layer3);
 
@@ -78,7 +78,7 @@ namespace ML.Utils
       layer4.ActivationFunction = activation;
       net.AddLayer(layer4);
 
-      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, isTraining: true);
+      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, isTraining: true);
       layer5.ActivationFunction = activation;
       net.AddLayer(layer5);
 
@@ -101,7 +101,7 @@ namespace ML.Utils
 
       var net = new ConvolutionalNetwork(1, 28);
 
-      var layer1 = new ConvolutionalLayer(1, 28, 8, 5, 1, isTraining: true);
+      var layer1 = new ConvolutionalLayer(1, 28, 8, 5, isTraining: true);
       layer1.ActivationFunction = activation;
       net.AddLayer(layer1);
 
@@ -109,7 +109,7 @@ namespace ML.Utils
       layer2.ActivationFunction = activation;
       net.AddLayer(layer2);
 
-      var layer3 = new ConvolutionalLayer(8, 12, 12, 5, 1, isTraining: true);
+      var layer3 = new ConvolutionalLayer(8, 12, 12, 5, isTraining: true);
       layer3.ActivationFunction = activation;
       net.AddLayer(layer3);
 
@@ -117,7 +117,7 @@ namespace ML.Utils
       layer4.ActivationFunction = activation;
       net.AddLayer(layer4);
 
-      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, 1, isTraining: true);
+      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, isTraining: true);
       layer5.ActivationFunction = activation;
       net.AddLayer(layer5);
 

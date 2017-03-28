@@ -247,11 +247,11 @@ namespace ML.ConsoleTest
     private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg_NN_ForTest()
     {
       var cnn = new ML.DeepMethods.Models.ConvolutionalNetwork(2, 1);
-      var l1 = new ML.DeepMethods.Models.ConvolutionalLayer(2, 1, 15, 1, 1, isTraining: true);
+      var l1 = new ML.DeepMethods.Models.ConvolutionalLayer(2, 1, 15, 1, isTraining: true);
       cnn.AddLayer(l1);
       var fl1 = new ML.DeepMethods.Models.MaxPoolingLayer(15, 1, 1, 1, isTraining: true);
       cnn.AddLayer(fl1);
-      var l2 = new ML.DeepMethods.Models.ConvolutionalLayer(15, 1, 3, 1, 1, isTraining: true);
+      var l2 = new ML.DeepMethods.Models.ConvolutionalLayer(15, 1, 3, 1, isTraining: true);
       cnn.AddLayer(l2);
       var fl2 = new ML.DeepMethods.Models.MaxPoolingLayer(3, 1, 1, 1, isTraining: true);
       cnn.AddLayer(fl2);

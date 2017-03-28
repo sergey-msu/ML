@@ -335,7 +335,7 @@ namespace ML.NeuralMethods.Algorithms
         case StopCriteria.ErrorFunc: return Math.Abs(m_ErrorDelta) < m_ErrorStopDelta;
         case StopCriteria.QFunc:     return Math.Abs(m_QDelta) < m_QStopDelta;
         case StopCriteria.StepMin:   return m_Step2 < StepStopValue;
-        default: throw new MLException("Unknown stop citeria");
+        default: throw new MLException("Unknown stop criteria");
       }
     }
 

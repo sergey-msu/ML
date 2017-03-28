@@ -144,8 +144,8 @@ namespace ML.DigitsDemo
       var dv = new DrawingVisual();
       using (var dc = dv.RenderOpen())
       {
-          var vb = new VisualBrush(m_Canvas);
-          dc.DrawRectangle(vb, null, new Rect(new Point(), bounds.Size));
+        var vb = new VisualBrush(m_Canvas);
+        dc.DrawRectangle(vb, null, new Rect(new Point(), bounds.Size));
       }
       rtb.Render(dv);
 
@@ -167,7 +167,7 @@ namespace ML.DigitsDemo
         byte blue  = pixels[index+2];
         byte alpha = pixels[index+3];
 
-        var shade = 255-red;
+        var shade = 255-red; // invert 255-* color format because we want to keep logical format: 0=white, 255=black - not image color format!
         result[y, x] = shade/255.0D;
       }
 

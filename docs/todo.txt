@@ -1,5 +1,21 @@
 CURRENT:
 
+- CNN:
+  - stochastic gradient training
+  - batch learning
+  - batch normalization https://arxiv.org/pdf/1502.03167.pdf
+  - dropout
+  - GPU parallelization
+  - extract stop criteria from backpropalgorithm
+
+- implement more NN algorithms (https://habrahabr.ru/post/318970/)
+  - Nesterov
+  - Adagrad
+  - RMSProp
+  - Adadelta
+  - Adam
+  - Adamax
+
 - Unit tests
   - fix NN tests
   - cover CNN with tests
@@ -7,8 +23,9 @@ CURRENT:
   - cover CNN Backprop with tests
 
 - implement different CNN architectures
-  - LeNet-5
+  - [FUTURE] LeNet-5
   - AlexNet
+  - U-Net
   - test with CIFAR-10 images db: http://www.cs.toronto.edu/~kriz/cifar.html
 
 - implement Backpropagation algorithm for general full-connected NN
@@ -30,13 +47,6 @@ CURRENT:
 
 - implement  RBF algorith (https://en.wikipedia.org/wiki/Radial_basis_function_network, http://mccormickml.com/2013/08/15/radial-basis-function-network-rbfn-tutorial/)
 
-- implement more NN algorithms (https://habrahabr.ru/post/318970/)
-  - Nesterov
-  - Adagrad
-  - RMSProp
-  - Adadelta
-  - Adam
-  - Adamax
 
 - [INPROG] Play with ACCORD Framework
   - [INPROG] compare with ML (write benchmarks in .Tests assembly)

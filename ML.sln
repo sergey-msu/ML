@@ -9,14 +9,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML", "ML\ML.csproj", "{4D82
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML.Tests", "ML.Tests\ML.Tests.csproj", "{CA5B14B3-851B-488D-874A-ED88F4E77E0A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{557FFEEA-F578-4569-AC1D-E4FE1BDB4A07}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_docs", "_docs", "{557FFEEA-F578-4569-AC1D-E4FE1BDB4A07}"
 	ProjectSection(SolutionItems) = preProject
 		docs\todo.txt = docs\todo.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML.DeepTests", "ML.DeepTests\ML.DeepTests.csproj", "{3CF8DF2D-201E-4A73-B99C-F22A0BF657E7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rdparties", "3rdparties", "{6276B9D3-CB20-4126-A9CC-224560D72934}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_3rdparties", "_3rdparties", "{6276B9D3-CB20-4126-A9CC-224560D72934}"
 	ProjectSection(SolutionItems) = preProject
 		3rdparties\NFX.dll = 3rdparties\NFX.dll
 	EndProjectSection

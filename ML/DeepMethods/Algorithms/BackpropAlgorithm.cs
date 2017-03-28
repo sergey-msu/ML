@@ -309,6 +309,7 @@ namespace ML.DeepMethods.Algorithms
 
       Array.Clear(player.Error, 0, player.Error.Length);
 
+      // backpropagate "errors" to previous layer for future use
       for (int q=0; q<depth; q++)
       for (int i=0; i<size;  i++)
       for (int j=0; j<size;  j++)
@@ -420,7 +421,7 @@ namespace ML.DeepMethods.Algorithms
         case StopCriteria.ErrorFunc: return Math.Abs(m_ErrorDelta) < m_ErrorStopDelta;
         case StopCriteria.QFunc:     return Math.Abs(m_QDelta) < m_QStopDelta;
         case StopCriteria.StepMin:   return m_Step2 < StepStopValue;
-        default: throw new MLException("Unknown stop citeria");
+        default: throw new MLException("Unknown stop criteria");
       }
     }
 
