@@ -53,7 +53,7 @@ namespace ML.DeepTests
     private static void doTrain()
     {
       // create CNN
-      var lenet1 = NetworkFactory.CreateLeNet1MNetwork();
+      var lenet1 = NetworkFactory.CreateLeNet1Network();
       lenet1[lenet1.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.Logistic(1);
       //ConvolutionalNetwork lenet1;
       //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";
@@ -116,10 +116,10 @@ namespace ML.DeepTests
     private static void testMnistData()
     {
       ConvolutionalNetwork lenet1;
-      //var opath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)+KAGGLE_RESULTS_FOLDER;
-      //var fpath = Path.Combine(opath, "cn_e26_p0.06.mld");
+      var opath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)+KAGGLE_RESULTS_FOLDER;
+      var fpath = Path.Combine(opath, "cn_e26_p0.06.mld");
+      //var fpath = @"F:\Work\git\ML\solution\ML.DigitsDemo\lenet1.mld";
 
-      var fpath = @"F:\Work\git\ML\solution\ML.DigitsDemo\lenet1.mld";
       using (var stream = File.Open(fpath, FileMode.Open))
       {
         lenet1 = ConvolutionalNetwork.Deserialize(stream);

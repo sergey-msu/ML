@@ -6,8 +6,8 @@ namespace ML.DeepTests
   {
     static void Main(string[] args)
     {
-      //OriginalMNIST.Run(args);
-      KaggleMNIST.Run(args);
+      OriginalMNIST.Run(args);
+      //KaggleMNIST.Run(args);
 
       Console.ReadLine();
     }

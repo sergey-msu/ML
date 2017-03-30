@@ -66,7 +66,7 @@ namespace ML.DeepMethods.Models
     /// <summary>
     /// Adds new deep layer in the end of layer list
     /// </summary>
-    public virtual void AddLayer(DeepLayerBase layer)
+    public virtual ConvolutionalNetwork AddLayer(DeepLayerBase layer)
     {
       if (layer==null)
         throw new MLException("Layer can not be null");
@@ -80,6 +80,8 @@ namespace ML.DeepMethods.Models
         throw new MLException("Layer input size differs with prevous layer's one / input");
 
       this.AddSubNode(layer);
+
+      return this;
     }
 
     /// <summary>

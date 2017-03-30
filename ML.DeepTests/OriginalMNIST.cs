@@ -51,7 +51,7 @@ namespace ML.DeepTests
     private static void doTrain()
     {
       // create CNN
-      var lenet1 = NetworkFactory.CreateLeNet1MNetwork();
+      var lenet1 = NetworkFactory.CreateLeNet1Network();
       //lenet1[lenet1.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.Logistic(1);
       //ConvolutionalNetwork lenet1;
       //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";

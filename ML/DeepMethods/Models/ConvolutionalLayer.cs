@@ -219,9 +219,6 @@ namespace ML.DeepMethods.Models
       //  else
       //    m_Kernel[yidx, xidx, kidx, fmidx] = value;
       //}
-
-
-
     }
   }
 }

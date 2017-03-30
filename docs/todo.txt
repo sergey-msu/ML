@@ -7,6 +7,7 @@ CURRENT:
   - dropout
   - GPU parallelization
   - extract stop criteria from backpropalgorithm
+  - split 'size' into 'height' and 'width' in all layers
 
 - implement more NN algorithms (https://habrahabr.ru/post/318970/)
   - Nesterov

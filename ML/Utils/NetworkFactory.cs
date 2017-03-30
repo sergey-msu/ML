@@ -60,76 +60,49 @@ namespace ML.Utils
     {
       activation = activation ?? Registry.ActivationFunctions.ReLU;
 
-      var net = new ConvolutionalNetwork(1, 28);
+      var net = new ConvolutionalNetwork(1, 28) { ActivationFunction = activation };
 
-      var layer1 = new ConvolutionalLayer(1, 28, 4, 5, isTraining: true);
-      layer1.ActivationFunction = activation;
-      net.AddLayer(layer1);
-
-      var layer2 = new MaxPoolingLayer(4, 24, 2, 2, isTraining: true);
-      layer2.ActivationFunction = activation;
-      net.AddLayer(layer2);
-
-      var layer3 = new ConvolutionalLayer(4, 12, 12, 5, isTraining: true);
-      layer3.ActivationFunction = activation;
-      net.AddLayer(layer3);
-
-      var layer4 = new MaxPoolingLayer(12, 8, 2, 2, isTraining: true);
-      layer4.ActivationFunction = activation;
-      net.AddLayer(layer4);
-
-      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, isTraining: true);
-      layer5.ActivationFunction = activation;
-      net.AddLayer(layer5);
-
-      net.Build();
-
-      if (randomizeInitialWeights)
-        net.RandomizeParameters(randomSeed);
-
-      return net;
-    }
-
-    /// <summary>
-    /// Sreate CNN with modified LeNet-1 architecture
-    /// </summary>
-    public static ConvolutionalNetwork CreateLeNet1MNetwork(IActivationFunction activation = null,
-                                                            bool randomizeInitialWeights = true,
-                                                            int randomSeed = 0)
-    {
-      activation = activation ?? Registry.ActivationFunctions.ReLU;
-
-      var net = new ConvolutionalNetwork(1, 28);
-
-      var layer1 = new ConvolutionalLayer(1, 28, 8, 5, isTraining: true);
-      layer1.ActivationFunction = activation;
-      net.AddLayer(layer1);
-
-      var layer2 = new MaxPoolingLayer(8, 24, 2, 2, isTraining: true);
-      layer2.ActivationFunction = activation;
-      net.AddLayer(layer2);
-
-      var layer3 = new ConvolutionalLayer(8, 12, 12, 5, isTraining: true);
-      layer3.ActivationFunction = activation;
-      net.AddLayer(layer3);
-
-      var layer4 = new MaxPoolingLayer(12, 8, 2, 2, isTraining: true);
-      layer4.ActivationFunction = activation;
-      net.AddLayer(layer4);
-
-      var layer5 = new ConvolutionalLayer(12, 4, 10, 4, isTraining: true);
-      layer5.ActivationFunction = activation;
-      net.AddLayer(layer5);
-
-      net.Build();
+      net.AddLayer(new ConvolutionalLayer(
+                         inputDepth:  1,
+                         inputSize:   28,
+                         outputDepth: 4,
+                         windowSize:  5,
+                         isTraining:  true))
+         .AddLayer(new MaxPoolingLayer(
+                         inputDepth: 4,
+                         inputSize:  24,
+                         windowSize: 2,
+                         stride:     2,
+                         isTraining: true))
+         .AddLayer(new ConvolutionalLayer(
+                         inputDepth:  4,
+                         inputSize:   12,
+                         outputDepth: 12,
+                         windowSize:  5,
+                         isTraining:  true))
+         .AddLayer(new MaxPoolingLayer(
+                         inputDepth: 12,
+                         inputSize:  8,
+                         windowSize: 2,
+                         stride:     2,
+                         isTraining: true))
+         .AddLayer(new FlattenLayer(
+                         inputDepth: 12,
+                         inputSize:  4,
+                         outputDim:  10,
+                         isTraining: true));
 
       if (randomizeInitialWeights)
         net.RandomizeParameters(randomSeed);
+
+      net.Build();
 
       return net;
     }
 
     // create AlexNet
+
+    // create U-net
 
     // create N-M-K ConvNet :  INPUT -> [[CONV -> RELU]*N -> POOL?]*M -> [FC -> RELU]*K -> FC
   }

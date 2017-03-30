@@ -105,6 +105,14 @@ namespace ML.DigitsDemo
 
     private void btnRecognize_Click(object sender, RoutedEventArgs e)
     {
+      for (int i=0; i<10; i++)
+      {
+        var barName = string.Format("m_Bar{0}", i);
+        var probName = string.Format("m_Prob{0}", i);
+        ((Rectangle)this.FindName(barName)).Width = 0;
+        ((TextBlock)this.FindName(probName)).Text = "";
+      }
+
       var snapshot = takeCanvasSnapshot();
       var data = normalizeData(snapshot);
       if (data==null)
@@ -114,10 +122,15 @@ namespace ML.DigitsDemo
       }
 
       var result = m_Network.Calculate(data);
-      var maxProb = 0.0D;
+      var max = 0.0D;
       var digit = -1;
       var total = 0.0D;
       for (int i=0; i<10; i++) { total += result[i,0,0]; }
+      if (total <= 0)
+      {
+        m_TbResult.Text = "?";
+        return;
+      }
 
       for (int i=0; i<10; i++)
       {
@@ -127,9 +140,9 @@ namespace ML.DigitsDemo
         ((Rectangle)this.FindName(barName)).Width = prob*30;
         ((TextBlock)this.FindName(probName)).Text = prob.ToString();
 
-        if (result[i,0,0]>maxProb)
+        if (result[i,0,0] > max)
         {
-          maxProb=result[i,0,0]/total;
+          max=result[i,0,0];
           digit=i;
         }
       }
@@ -158,8 +171,8 @@ namespace ML.DigitsDemo
       byte[] pixels = new byte[size];
       rtb.CopyPixels(pixels, stride, 0);
 
-      for(int y=0; y<m_Canvas.ActualHeight; y++)
-      for(int x=0; x<m_Canvas.ActualWidth; x++)
+      for (int y=0; y<m_Canvas.ActualHeight; y++)
+      for (int x=0; x<m_Canvas.ActualWidth;  x++)
       {
         int index = y*stride + 4*x;
         byte red   = pixels[index];

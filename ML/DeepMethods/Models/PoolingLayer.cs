@@ -36,8 +36,6 @@ namespace ML.DeepMethods.Models
         throw new MLException("PoolingLayer.ctor(stride<0)");
       if (padding < 0)
         throw new MLException("PoolingLayer.ctor(padding<0)");
-
-      ActivationFunction = Registry.ActivationFunctions.Identity;
     }
 
     #endregion
