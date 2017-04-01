@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using ML.Core.ComputingNetworks;
 using ML.Core;
 using ML.Contracts;
@@ -14,65 +13,42 @@ namespace ML.DeepMethods.Models
   {
     #region Fields
 
-    private IActivationFunction m_ActivationFunction;
+    private bool m_IsTraining;
+    protected IActivationFunction m_ActivationFunction;
 
-    protected readonly bool m_IsTraining;
+    internal  int m_InputSize;
+    internal  int m_InputDepth;
+    protected int m_OutputSize;
+    protected int m_OutputDepth;
+    protected int m_WindowSize;
+    protected int m_Stride;
+    protected int m_Padding;
 
-    protected readonly int  m_WindowSize;
-    protected readonly int  m_Stride;
-    protected readonly int  m_Padding;
-    protected readonly int  m_InputDepth;
-    protected readonly int  m_InputSize;
-    protected readonly int  m_OutputDepth;
-    protected readonly int  m_OutputSize;
-
-    protected readonly double[,,] m_Value;
-    protected readonly double[,,] m_Error;
+    protected double[,,] m_Value;
+    protected double[,,] m_Error;
 
     #endregion
 
     #region .ctor
 
-    public DeepLayerBase(int inputDepth,
-                         int inputSize,
-                         int outputDepth,
+    public DeepLayerBase(int outputDepth,
                          int windowSize,
                          int stride,
-                         int padding=0,
-                         bool isTraining=false)
+                         int padding=0)
     {
-      if (inputDepth <= 0)
-        throw new MLException("DeepLayerBase.ctor(inputDepth<=0)");
-      if (inputSize <= 0)
-        throw new MLException("DeepLayerBase.ctor(inputSize<=0)");
       if (outputDepth <= 0)
         throw new MLException("DeepLayerBase.ctor(outputDepth<=0)");
       if (windowSize <= 0)
-        throw new MLException("ConvolutionalLayer.ctor(windowSize<=0)");
-      if (windowSize > inputSize)
-        throw new MLException("ConvolutionalLayer.ctor(windowSize>inputSize)");
+        throw new MLException("DeepLayerBase.ctor(windowSize<=0)");
       if (stride <= 0)
-        throw new MLException("ConvolutionalLayer.ctor(stride<=0)");
+        throw new MLException("DeepLayerBase.ctor(stride<=0)");
       if (padding < 0)
-        throw new MLException("ConvolutionalLayer.ctor(padding<0)");
-
-      m_IsTraining = isTraining;
+        throw new MLException("DeepLayerBase.ctor(padding<0)");
 
       m_WindowSize  = windowSize;
       m_Stride      = stride;
       m_Padding     = padding;
-
-      m_InputDepth  = inputDepth;
-      m_InputSize   = inputSize;
       m_OutputDepth = outputDepth;
-      m_OutputSize  = (inputSize - windowSize + 2*padding)/stride + 1;
-
-      m_Value = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
-
-      if (isTraining)
-      {
-        m_Error = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
-      }
     }
 
     #endregion
@@ -80,10 +56,14 @@ namespace ML.DeepMethods.Models
     #region Properties
 
     /// <summary>
-    /// If true, indicates that layer is not in production mode,
+    /// If true, indicates that layer is in training mode,
     /// so it can store some additional values (i.e. errors, net values, derivatives etc.)
     /// </summary>
-    public bool IsTraining { get { return m_IsTraining; } }
+    public bool IsTraining
+    {
+      get { return m_IsTraining; }
+      set { m_IsTraining=value; }
+    }
 
     /// <summary>
     /// Count of input channels
@@ -91,7 +71,7 @@ namespace ML.DeepMethods.Models
     public int InputDepth { get { return m_InputDepth; } }
 
     /// <summary>
-    /// Size of square input channel
+    /// Size of squared input channel
     /// </summary>
     public int InputSize { get { return m_InputSize; } }
 
@@ -153,6 +133,23 @@ namespace ML.DeepMethods.Models
     public double Derivative(int p, int i, int j)
     {
       return m_ActivationFunction.DerivativeFromValue(m_Value[p, i, j]);
+    }
+
+
+    public override void DoBuild()
+    {
+      base.DoBuild();
+
+      m_OutputSize = (m_InputSize - m_WindowSize + 2*m_Padding)/m_Stride + 1;
+      if (m_OutputSize <= 0)
+        throw new MLException("Output tensor is empty. Check input shape datas");
+
+      m_Value = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
+
+      if (m_IsTraining)
+      {
+        m_Error = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
+      }
     }
   }
 }

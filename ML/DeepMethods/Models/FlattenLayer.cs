@@ -3,22 +3,23 @@
 namespace ML.DeepMethods.Models
 {
   /// <summary>
-  /// Flattening layer that transform multidimensional array data into flat one-dimendional fully-connected layer
+  /// Flattening layer that transform multidimensional array data into flat one-dimensional fully-connected layer
   /// </summary>
   public class FlattenLayer : ConvolutionalLayer
   {
-    public FlattenLayer(int inputDepth,
-                        int inputSize,
-                        int outputDim,
-                        bool isTraining = false)
-      : base(inputDepth,
-             inputSize,
-             outputDim,
-             inputSize,
+    public FlattenLayer(int outputDim)
+      : base(outputDim,
+             windowSize: 1, // to be overridden with input size on build
              stride: 1,
-             padding: 0,
-             isTraining: isTraining)
+             padding: 0)
     {
+    }
+
+    public override void DoBuild()
+    {
+      m_WindowSize = m_InputSize;
+
+      base.DoBuild();
     }
   }
 }

@@ -42,27 +42,15 @@ namespace ML.DeepMethods.Models
 
     #region .ctor
 
-    public ConvolutionalLayer(int inputDepth,
-                              int inputSize,
-                              int outputDepth,
+    public ConvolutionalLayer(int outputDepth,
                               int windowSize,
                               int stride=1,
-                              int padding=0,
-                              bool isTraining = false)
-      : base(inputDepth,
-             inputSize,
-             outputDepth,
+                              int padding=0)
+      : base(outputDepth,
              windowSize,
              stride,
-             padding,
-             isTraining)
+             padding)
     {
-      m_KernelParamCount     = windowSize*windowSize;
-      m_FeatureMapParamCount = inputDepth*m_KernelParamCount + 1;
-      m_ParamCount           = m_FeatureMapParamCount*outputDepth;
-
-      m_Kernel = new double[outputDepth, inputDepth, windowSize, windowSize];
-      m_Biases = new double[outputDepth];
     }
 
     #endregion
@@ -140,6 +128,21 @@ namespace ML.DeepMethods.Models
 
       return m_Value;
     }
+
+    public override void DoBuild()
+    {
+      base.DoBuild();
+
+      m_KernelParamCount     = m_WindowSize*m_WindowSize;
+      m_FeatureMapParamCount = m_InputDepth*m_KernelParamCount + 1;
+      m_ParamCount           = m_FeatureMapParamCount*m_OutputDepth;
+
+      m_Kernel = new double[m_OutputDepth, m_InputDepth, m_WindowSize, m_WindowSize];
+      m_Biases = new double[m_OutputDepth];
+    }
+
+
+
 
     protected override double DoGetParam(int idx)
     {

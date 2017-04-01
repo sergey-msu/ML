@@ -247,23 +247,15 @@ namespace ML.ConsoleTest
 
     private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg_NN_ForTest()
     {
-      //var cnn = new ConvolutionalNetwork(2, 1)
-      //            .AddLayer(new ConvolutionalLayer(2, 1, 15, 1, isTraining: true))
-      //            //.AddLayer(new MaxPoolingLayer(15, 1, 1, 1, isTraining: true))
-      //            .AddLayer(new ConvolutionalLayer(15, 1, 3, 1, isTraining: true))
-      //            //.AddLayer(new MaxPoolingLayer(3, 1, 1, 1, isTraining: true))
-      //            ;
-
-      var cnn = new ConvolutionalNetwork(2, 1)
-                  .AddLayer(new DenseLayer(2, 15, isTraining: true))
-                  //.AddLayer(new MaxPoolingLayer(15, 1, 1, 1, isTraining: true))
-                  .AddLayer(new DenseLayer(15, 3, isTraining: true))
-                  //.AddLayer(new MaxPoolingLayer(3, 1, 1, 1, isTraining: true))
-                  ;
+      var cnn = new ConvolutionalNetwork(2, 1);
+      cnn.AddLayer(new DenseLayer(15));
+      cnn.AddLayer(new MaxPoolingLayer(1, 1));
+      cnn.AddLayer(new DenseLayer(3));
+      cnn.AddLayer(new MaxPoolingLayer(1, 1));
 
       cnn.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
-      cnn.RandomizeParameters(0);
       cnn.Build();
+      cnn.RandomizeParameters(0);
 
       var sample = new ClassifiedSample<double[,,]>();
       foreach (var obj in Data.TrainingSample)

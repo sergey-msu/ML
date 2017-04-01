@@ -33,6 +33,11 @@ namespace ML.DeepMethods.Models
     #region Properties
 
     /// <summary>
+    /// Truw for using the network training mode
+    /// </summary>
+    public bool IsTraining { get; set; }
+
+    /// <summary>
     /// Total count of network layers (hidden + output)
     /// </summary>
     public int LayerCount { get { return SubNodes.Length; } }
@@ -66,22 +71,12 @@ namespace ML.DeepMethods.Models
     /// <summary>
     /// Adds new deep layer in the end of layer list
     /// </summary>
-    public virtual ConvolutionalNetwork AddLayer(DeepLayerBase layer)
+    public virtual void AddLayer(DeepLayerBase layer)
     {
       if (layer==null)
         throw new MLException("Layer can not be null");
 
-      var player = (LayerCount == 0) ? null : this[LayerCount-1];
-      var pdepth = (player==null) ? InputDepth : player.OutputDepth;
-      var psize  = (player==null) ? InputSize : player.OutputSize;
-      if (layer.InputDepth != pdepth)
-        throw new MLException("Layer input depth differs with prevous layer's one / input");
-      if (layer.InputSize != psize)
-        throw new MLException("Layer input size differs with prevous layer's one / input");
-
       this.AddSubNode(layer);
-
-      return this;
     }
 
     /// <summary>
@@ -95,10 +90,22 @@ namespace ML.DeepMethods.Models
 
     public override void DoBuild()
     {
-      foreach (var layer in this.SubNodes)
-        if (layer.ActivationFunction == null) layer.ActivationFunction = ActivationFunction;
+      var depth = InputDepth;
+      var size  = InputSize;
 
-      base.DoBuild();
+      foreach (var layer in this.SubNodes)
+      {
+        if (layer.ActivationFunction == null) layer.ActivationFunction = ActivationFunction;
+        layer.IsTraining = true;
+        layer.m_InputDepth = depth;
+        layer.m_InputSize  = size;
+        layer.Build();
+
+        depth = layer.OutputDepth;
+        size = layer.OutputSize;
+      }
+
+      //base.DoBuild();
     }
 
     #region Serialization

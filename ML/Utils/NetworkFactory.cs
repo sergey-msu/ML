@@ -52,58 +52,72 @@ namespace ML.Utils
     }
 
     /// <summary>
-    /// Sreate CNN with original LeNet-1 architecture (see http://yann.lecun.com/exdb/publis/pdf/lecun-95b.pdf)
+    /// Creates CNN with original LeNet-1 architecture (see http://yann.lecun.com/exdb/publis/pdf/lecun-95b.pdf)
     /// </summary>
-    public static ConvolutionalNetwork CreateLeNet1Network(IActivationFunction activation = null,
-                                                           bool randomizeInitialWeights = true,
-                                                           int randomSeed = 0)
+    public static ConvolutionalNetwork CreateLeNet1(IActivationFunction activation = null,
+                                                    bool randomizeInitialWeights = true,
+                                                    int randomSeed = 0)
     {
       activation = activation ?? Registry.ActivationFunctions.ReLU;
 
-      var net = new ConvolutionalNetwork(1, 28) { ActivationFunction = activation };
+      var net = new ConvolutionalNetwork(1, 28)
+      {
+        ActivationFunction = activation,
+        IsTraining = true
+      };
 
-      net.AddLayer(new ConvolutionalLayer(
-                         inputDepth:  1,
-                         inputSize:   28,
-                         outputDepth: 4,
-                         windowSize:  5,
-                         isTraining:  true))
-         .AddLayer(new MaxPoolingLayer(
-                         inputDepth: 4,
-                         inputSize:  24,
-                         windowSize: 2,
-                         stride:     2,
-                         isTraining: true))
-         .AddLayer(new ConvolutionalLayer(
-                         inputDepth:  4,
-                         inputSize:   12,
-                         outputDepth: 12,
-                         windowSize:  5,
-                         isTraining:  true))
-         .AddLayer(new MaxPoolingLayer(
-                         inputDepth: 12,
-                         inputSize:  8,
-                         windowSize: 2,
-                         stride:     2,
-                         isTraining: true))
-         .AddLayer(new FlattenLayer(
-                         inputDepth: 12,
-                         inputSize:  4,
-                         outputDim:  10,
-                         isTraining: true));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 4, windowSize: 5));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 12, windowSize: 5));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new FlattenLayer(outputDim: 10));
+
+      net.Build();
 
       if (randomizeInitialWeights)
         net.RandomizeParameters(randomSeed);
 
+      return net;
+    }
+
+    /// <summary>
+    /// Creates CNN for CIFAR-10 training
+    /// </summary>
+    public static ConvolutionalNetwork CreateCIFAR10Net(IActivationFunction activation = null,
+                                                        bool randomizeInitialWeights = true,
+                                                        int randomSeed = 0)
+    {
+      activation = activation ?? Registry.ActivationFunctions.ReLU;
+
+      var net = new ConvolutionalNetwork(3, 32)
+      {
+        ActivationFunction = activation,
+        IsTraining = true
+      };
+
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 32, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 32, windowSize: 3, padding: 1));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 64, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 64, windowSize: 3, padding: 1));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new FlattenLayer(outputDim: 512));
+      net.AddLayer(new DenseLayer(outputDim: 10) { ActivationFunction=Registry.ActivationFunctions.Logistic(1) });
+
       net.Build();
+
+      if (randomizeInitialWeights)
+        net.RandomizeParameters(randomSeed);
 
       return net;
     }
+
+    // create VGG16 CNN (see https://arxiv.org/pdf/1409.1556.pdf - D column in Table 1)
 
     // create AlexNet
 
     // create U-net
 
-    // create N-M-K ConvNet :  INPUT -> [[CONV -> RELU]*N -> POOL?]*M -> [FC -> RELU]*K -> FC
+    // create general N-M-K ConvNet :  INPUT -> [[CONV -> RELU]*N -> POOL?]*M -> [FC -> RELU]*K -> FC
   }
 }

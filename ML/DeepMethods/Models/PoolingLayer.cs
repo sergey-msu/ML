@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ML.Contracts;
 using ML.Core;
-using ML.Core.ComputingNetworks;
 
 namespace ML.DeepMethods.Models
 {
@@ -14,28 +10,15 @@ namespace ML.DeepMethods.Models
   {
     #region .ctor
 
-    protected PoolingLayer(int inputDepth,
-                           int inputSize,
-                           int windowSize,
+    protected PoolingLayer(int windowSize,
                            int stride,
-                           int padding=0,
-                           bool isTraining=false)
-      : base(inputDepth,
-             inputSize,
-             inputDepth,
+                           int padding=0)
+      : base(1, // to be overridden with input depth on build
              windowSize,
              stride,
-             padding,
-             isTraining)
+             padding)
     {
-      if (windowSize <= 0)
-        throw new MLException("PoolingLayer.ctor(windowSize<=0)");
-      if (windowSize > inputSize)
-        throw new MLException("PoolingLayer.ctor(windowSize>inputSize)");
-      if (stride < 0)
-        throw new MLException("PoolingLayer.ctor(stride<0)");
-      if (padding < 0)
-        throw new MLException("PoolingLayer.ctor(padding<0)");
+      m_ActivationFunction = Registry.ActivationFunctions.Identity;
     }
 
     #endregion
@@ -48,6 +31,13 @@ namespace ML.DeepMethods.Models
 
     public override void RandomizeParameters(int seed)
     {
+    }
+
+    public override void DoBuild()
+    {
+      m_OutputDepth = m_InputDepth;
+
+      base.DoBuild();
     }
 
     protected override double DoGetParam(int idx)
@@ -75,20 +65,13 @@ namespace ML.DeepMethods.Models
 
     #region .ctor
 
-    public MaxPoolingLayer(int inputDepth,
-                           int inputSize,
-                           int windowSize,
+    public MaxPoolingLayer(int windowSize,
                            int stride,
-                           int padding=0,
-                           bool isTraining=false)
-      : base(inputDepth,
-             inputSize,
-             windowSize,
+                           int padding=0)
+      : base(windowSize,
              stride,
-             padding,
-             isTraining)
+             padding)
     {
-      m_MaxIndexPositions = new int[m_OutputDepth, m_OutputSize, m_OutputSize, 2];
     }
 
     #endregion
@@ -134,6 +117,13 @@ namespace ML.DeepMethods.Models
 
       return m_Value;
     }
+
+    public override void DoBuild()
+    {
+      base.DoBuild();
+
+      m_MaxIndexPositions = new int[m_OutputDepth, m_OutputSize, m_OutputSize, 2];
+    }
   }
 
   /// <summary>
@@ -143,18 +133,12 @@ namespace ML.DeepMethods.Models
   {
     #region .ctor
 
-    public AvgPoolingLayer(int inputDepth,
-                           int inputSize,
-                           int windowSize,
+    public AvgPoolingLayer(int windowSize,
                            int stride,
-                           int padding=0,
-                           bool isTraining=false)
-      : base(inputDepth,
-             inputSize,
-             windowSize,
+                           int padding=0)
+      : base(windowSize,
              stride,
-             padding,
-             isTraining)
+             padding)
     {
     }
 

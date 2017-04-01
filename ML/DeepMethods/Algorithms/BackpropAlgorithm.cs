@@ -63,6 +63,9 @@ namespace ML.DeepMethods.Algorithms
     private double m_QDelta;
     private double m_QStopDelta;
 
+    private int m_Epoch;
+    private int m_Iteration;
+
     #endregion
 
     #region .ctor
@@ -174,6 +177,11 @@ namespace ML.DeepMethods.Algorithms
       }
     }
 
+
+    public int Epoch { get { return m_Epoch; } }
+
+    public int Iteration { get { return m_Iteration; } }
+
     #endregion
 
     #region Public
@@ -236,8 +244,10 @@ namespace ML.DeepMethods.Algorithms
 
     private void runEpoch(ConvolutionalNetwork net)
     {
+      int i=1;
       foreach (var pdata in TrainingSample)
       {
+        if ((i++)%1000==0) Console.WriteLine("{0} - iteration: {1}", DateTime.Now, i);
         runIteration(net, pdata.Key, pdata.Value);
       }
 
@@ -246,6 +256,8 @@ namespace ML.DeepMethods.Algorithms
       m_ErrorValue = m_IterErrorValue / TrainingSample.Count;
       m_ErrorDelta = m_ErrorValue - m_PrevErrorValue;
       m_IterErrorValue = 0.0D;
+      m_Epoch++;
+      m_Iteration = 0;
 
       if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
     }
@@ -290,7 +302,7 @@ namespace ML.DeepMethods.Algorithms
       for (int j=0; j<m_OutputDepth; j++)
       {
         var ej = m_LossFunction.Derivative(j, output, expect);
-        llayer.Error[j, 0, 0] = ej* llayer.Derivative(j, 0, 0);
+        llayer.Error[j, 0, 0] = ej * llayer.Derivative(j, 0, 0);
       }
 
       return m_LossFunction.Value(output, expect);

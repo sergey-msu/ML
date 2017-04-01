@@ -6,6 +6,7 @@ CURRENT:
   - batch normalization https://arxiv.org/pdf/1502.03167.pdf
   - dropout
   - GPU parallelization
+  - Rerad training set from hard drive not in-memory!
   - extract stop criteria from backpropalgorithm
   - split 'size' into 'height' and 'width' in all layers
 

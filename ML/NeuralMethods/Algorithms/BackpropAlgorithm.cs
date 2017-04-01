@@ -62,6 +62,9 @@ namespace ML.NeuralMethods.Algorithms
     private double m_QDelta;
     private double m_QStopDelta;
 
+    private int m_Epoch;
+    private int m_Iteration;
+
     #endregion
 
     #region .ctor
@@ -172,6 +175,10 @@ namespace ML.NeuralMethods.Algorithms
       }
     }
 
+    public int Epoch { get { return m_Epoch; } }
+
+    public int Iteration { get { return m_Iteration; } }
+
     #endregion
 
     #region Public
@@ -204,6 +211,14 @@ namespace ML.NeuralMethods.Algorithms
       m_EpochLength  = TrainingSample.Count;
       m_InputDim     = Result.InputDim;
       m_OutputDim    = Result[Result.LayerCount-1].NeuronCount;
+
+      //var lcount = Result.LayerCount;
+      //m_Updates = new double[lcount][,];
+      //for (int i=0; i<lcount; i++)
+      //{
+      //  var layer = Result[i];
+      //  m_Updates[i] = new double[layer.NeuronCount, layer.InputDim+1];
+      //}
 
       m_ExpectedOutputs = new Dictionary<Class, double[]>();
       var count = Classes.Count;
@@ -243,6 +258,8 @@ namespace ML.NeuralMethods.Algorithms
       m_ErrorValue = m_IterErrorValue/TrainingSample.Count;
       m_ErrorDelta = m_ErrorValue-m_PrevErrorValue;
       m_IterErrorValue = 0.0D;
+      m_Epoch++;
+      m_Iteration = 0;
 
       if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
     }
