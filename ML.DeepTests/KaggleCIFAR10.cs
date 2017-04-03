@@ -133,6 +133,7 @@ namespace ML.DeepTests
     {
       // create CNN
       var net = NetworkFactory.CreateCIFAR10Net();
+
       //net[net.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.ReLU;
 
       // create algorithm
@@ -144,6 +145,7 @@ namespace ML.DeepTests
         LearningRate = 0.005D
       };
       Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training, ResultsFolder); // we do not have public test data in kaggle :(
+
 
       // run training process
       var now = DateTime.Now;

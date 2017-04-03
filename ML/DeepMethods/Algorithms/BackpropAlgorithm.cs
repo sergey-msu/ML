@@ -244,10 +244,10 @@ namespace ML.DeepMethods.Algorithms
 
     private void runEpoch(ConvolutionalNetwork net)
     {
-      int i=1;
+      //int i=1;
       foreach (var pdata in TrainingSample)
       {
-        if ((i++)%1000==0) Console.WriteLine("{0} - iteration: {1}", DateTime.Now, i);
+        //if ((i++)%1000==0) Console.WriteLine("{0} - iteration: {1}", DateTime.Now, i);
         runIteration(net, pdata.Key, pdata.Value);
       }
 

@@ -123,11 +123,6 @@ namespace ML.DeepMethods.Models
     #endregion
 
     /// <summary>
-    /// Randomizes layer parameters (i.e. kernel weights, biases etc.)
-    /// </summary>
-    public abstract void RandomizeParameters(int seed);
-
-    /// <summary>
     /// Calculates net value's derivative
     /// </summary>
     public double Derivative(int p, int i, int j)
@@ -135,6 +130,17 @@ namespace ML.DeepMethods.Models
       return m_ActivationFunction.DerivativeFromValue(m_Value[p, i, j]);
     }
 
+    public override double[,,] Calculate(double[,,] input)
+    {
+      if (m_InputDepth != input.GetLength(0))
+        throw new MLException("Incorrect input depth");
+      if (m_InputSize != input.GetLength(1))
+        throw new MLException("Incorrect input size");
+      if (m_InputSize != input.GetLength(2))
+        throw new MLException("Incorrect input size");
+
+      return DoCalculate(input);
+    }
 
     public override void DoBuild()
     {
@@ -151,5 +157,12 @@ namespace ML.DeepMethods.Models
         m_Error = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
       }
     }
+
+    /// <summary>
+    /// Randomizes layer parameters (i.e. kernel weights, biases etc.)
+    /// </summary>
+    public abstract void RandomizeParameters(int seed);
+
+    protected abstract double[,,] DoCalculate(double[,,] input);
   }
 }

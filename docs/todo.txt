@@ -9,6 +9,13 @@ CURRENT:
   - Rerad training set from hard drive not in-memory!
   - extract stop criteria from backpropalgorithm
   - split 'size' into 'height' and 'width' in all layers
+  - serialization/deserialization
+
+- COMMIT A WILLFUL DECISION: do we need ComputingLayer architecture? Does Build/DoBuild implenter in a proper way?
+
+- NN and CNN:
+  - possibility to train - add nodex/layers - train etc...
+  - possibolity to remove layer/node from network
 
 - implement more NN algorithms (https://habrahabr.ru/post/318970/)
   - Nesterov

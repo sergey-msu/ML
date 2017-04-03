@@ -78,7 +78,7 @@ namespace ML.DeepMethods.Models
 
     public int[,,,] MaxIndexPositions { get { return m_MaxIndexPositions; } }
 
-    public override double[,,] Calculate(double[,,] input)
+    protected override double[,,] DoCalculate(double[,,] input)
     {
       for (int q=0; q<m_OutputDepth; q++)
       {
@@ -144,7 +144,7 @@ namespace ML.DeepMethods.Models
 
     #endregion
 
-    public override double[,,] Calculate(double[,,] input)
+    protected override double[,,] DoCalculate(double[,,] input)
     {
       var l = m_WindowSize*m_WindowSize;
 

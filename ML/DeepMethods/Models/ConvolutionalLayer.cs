@@ -92,11 +92,8 @@ namespace ML.DeepMethods.Models
       }
     }
 
-    public override double[,,] Calculate(double[,,] input)
+    protected override double[,,] DoCalculate(double[,,] input)
     {
-      if (m_InputDepth != input.GetLength(0))
-        throw new MLException("Incorrect input depth");
-
       // output fm-s
       for (int q=0; q<m_OutputDepth; q++)
       {

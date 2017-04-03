@@ -99,13 +99,11 @@ namespace ML.DeepMethods.Models
         layer.IsTraining = true;
         layer.m_InputDepth = depth;
         layer.m_InputSize  = size;
-        layer.Build();
+        layer.DoBuild();
 
         depth = layer.OutputDepth;
         size = layer.OutputSize;
       }
-
-      //base.DoBuild();
     }
 
     #region Serialization
