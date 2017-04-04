@@ -9,33 +9,38 @@ using ML.Core.Mathematics;
 namespace ML.DeepMethods.Models
 {
   /// <summary>
-  /// Represents dropout layer
-  /// (see http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf)
+  /// Represents dropout layer (see http://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf)
+  /// Inverted dropout is used instead of vanilla dropout (see http://cs231n.github.io/neural-networks-2)
   /// </summary>
   public class DropoutLayer : DeepLayerBase
   {
     #region Fields
 
-    private double m_DropRate;
-    private double m_RetainRate;
+    private double   m_DropRate;
+    private double   m_RetainRate;
     private byte[,,] m_Mask;
+
+    private RandomGenerator m_Generator;
 
     #endregion
 
     #region .ctor
 
-    public DropoutLayer(double rate)
+    public DropoutLayer(double rate,
+                        int seed = 0,
+                        IActivationFunction activation = null)
       : base(1, // to be overridden with input depth on build
              windowSize: 1,
              stride : 1,
-             padding : 0)
+             padding : 0,
+             activation: activation)
     {
       if (rate<=0 || rate>=1)
         throw new MLException("Incorrect dropout rate");
 
       m_DropRate = rate;
       m_RetainRate = 1-rate;
-      m_ActivationFunction = Registry.ActivationFunctions.Identity;
+      m_Generator = RandomGenerator.Get(seed);
     }
 
     #endregion
@@ -56,17 +61,16 @@ namespace ML.DeepMethods.Models
     {
       if (m_IsTraining)
       {
-        var random = RandomGenerator.Get(0);
-
         for (int p=0; p<m_InputDepth; p++)
         for (int i=0; i<m_InputSize;  i++)
         for (int j=0; j<m_InputSize;  j++)
         {
-          var retain = random.Bernoulli(m_RetainRate);
+          var retain = m_Generator.Bernoulli(m_RetainRate);
           if (retain)
           {
             m_Mask[p, i, j] = 1;
-            m_Value[p, i, j] = input[p, i, j];
+            var net = input[p, i, j] / m_RetainRate;
+            m_Value[p, i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
           }
           else
           {
@@ -77,11 +81,16 @@ namespace ML.DeepMethods.Models
       }
       else
       {
-        for (int p=0; p<m_InputDepth; p++)
-        for (int i=0; i<m_InputSize;  i++)
-        for (int j=0; j<m_InputSize;  j++)
+        if (m_ActivationFunction==null)
+          m_Value = input;
+        else
         {
-          m_Value[p, i, j] = input[p, i, j] / m_RetainRate;
+          for (int p=0; p<m_InputDepth; p++)
+          for (int i=0; i<m_InputSize;  i++)
+          for (int j=0; j<m_InputSize;  j++)
+          {
+            m_Value[p, i, j] = m_ActivationFunction.Value(input[p, i, j]);
+          }
         }
       }
 

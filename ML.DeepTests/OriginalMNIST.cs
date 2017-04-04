@@ -9,6 +9,7 @@ using ML.Core;
 using ML.Utils;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Models;
+using ML.Core.Registry;
 
 namespace ML.DeepTests
 {
@@ -210,7 +211,7 @@ namespace ML.DeepTests
       var epochs = 30;
       Alg = new BackpropAlgorithm(m_Training, lenet1)
       {
-        LossFunction = Registry.LossFunctions.Euclidean,
+        LossFunction = Loss.Euclidean,
         EpochCount = epochs,
         LearningRate = 0.005D
       };

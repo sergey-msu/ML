@@ -198,7 +198,7 @@ namespace ML.DeepMethods.Algorithms
 
     #endregion
 
-    public override void Train()
+    protected override void DoTrain()
     {
       doTrain(Result);
     }
@@ -247,7 +247,7 @@ namespace ML.DeepMethods.Algorithms
       int i=1;
       foreach (var pdata in TrainingSample)
       {
-        if ((i++)%1000==0) Console.WriteLine("{0} - iteration: {1}", DateTime.Now, i);
+        if ((i++)%10000==0) Console.WriteLine("{0} - iteration: {1}", DateTime.Now, i);
         runIteration(net, pdata.Key, pdata.Value);
       }
 
@@ -351,7 +351,8 @@ namespace ML.DeepMethods.Algorithms
         for (int i=0; i<size;  i++)
         for (int j=0; j<size;  j++)
         {
-          player.Error[p, i, j] = layer.Mask[p, i, j] * layer.Error[p, i, j] * player.Derivative(p, i, j);
+          var mask = layer.Mask[p, i, j];
+          player.Error[p, i, j] = (mask==0) ? 0 : layer.Error[p, i, j] * player.Derivative(p, i, j);
         }
     }
 

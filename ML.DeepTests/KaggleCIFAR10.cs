@@ -6,6 +6,7 @@ using System.Linq;
 using ML.Core;
 using ML.Utils;
 using ML.DeepMethods.Algorithms;
+using ML.Core.Registry;
 
 namespace ML.DeepTests
 {
@@ -140,7 +141,7 @@ namespace ML.DeepTests
       var epochs = 100;
       Alg = new BackpropAlgorithm(m_Training, net)
       {
-        LossFunction = Registry.LossFunctions.CrossEntropySoftMax,
+        LossFunction = Loss.CrossEntropySoftMax,
         EpochCount = epochs,
         LearningRate = 0.005D
       };

@@ -6,6 +6,7 @@ using ML.NeuralMethods.Models;
 using ML.DeepMethods.Models;
 using ML.Contracts;
 using ML.Core;
+using ML.Core.Registry;
 
 namespace ML.Utils
 {
@@ -17,17 +18,14 @@ namespace ML.Utils
     /// <param name="topology">Network topology from input to output layer
     /// (i.e. [2,10,3] means NN with 2D input, 1 hidden layer with 10 neurons and 3D output)</param>
     public static NeuralNetwork CreateFullyConnectedNetwork(int[] topology,
-                                                            IActivationFunction activationFunction,
+                                                            IActivationFunction activation = null,
                                                             bool randomizeInitialWeights = true,
                                                             int randomSeed = 0)
     {
       if (topology==null || topology.Length<2)
         throw new MLException("Network topology must have at least input and output dimensions");
-      if (activationFunction==null)
-        throw new MLException("Activation function is null");
 
-      var net = new NeuralNetwork(topology[0]);
-      net.ActivationFunction = activationFunction;
+      var net = new NeuralNetwork(topology[0], activation);
 
       var lcount = topology.Length-1;
       for (int i=1; i<=lcount; i++)
@@ -52,19 +50,14 @@ namespace ML.Utils
                                                     bool randomizeInitialWeights = true,
                                                     int randomSeed = 0)
     {
-      activation = activation ?? Registry.ActivationFunctions.ReLU;
+      activation = activation ?? Activation.ReLU;
+      var net = new ConvolutionalNetwork(1, 28) { IsTraining=true };
 
-      var net = new ConvolutionalNetwork(1, 28)
-      {
-        ActivationFunction = activation,
-        IsTraining = true
-      };
-
-      net.AddLayer(new ConvolutionalLayer(outputDepth: 4, windowSize: 5));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 8, windowSize: 5, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
-      net.AddLayer(new ConvolutionalLayer(outputDepth: 12, windowSize: 5));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 18, windowSize: 5, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
-      net.AddLayer(new FlattenLayer(outputDim: 10));
+      net.AddLayer(new FlattenLayer(outputDim: 10, activation: activation));
 
       net.Build();
 
@@ -81,25 +74,22 @@ namespace ML.Utils
                                                         bool randomizeInitialWeights = true,
                                                         int randomSeed = 0)
     {
-      activation = activation ?? Registry.ActivationFunctions.ReLU;
+      activation = activation ?? Activation.ReLU;
+      var net = new ConvolutionalNetwork(3, 32) { IsTraining=true };
 
-      var net = new ConvolutionalNetwork(3, 32)
-      {
-        ActivationFunction = activation,
-        IsTraining = true
-      };
-
-      net.AddLayer(new ConvolutionalLayer(outputDepth: 32, windowSize: 3, padding: 1));
-      net.AddLayer(new ConvolutionalLayer(outputDepth: 32, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
       net.AddLayer(new DropoutLayer(0.25));
-      net.AddLayer(new ConvolutionalLayer(outputDepth: 64, windowSize: 3, padding: 1));
-      net.AddLayer(new ConvolutionalLayer(outputDepth: 64, windowSize: 3, padding: 1));
+
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
       net.AddLayer(new DropoutLayer(0.25));
-      net.AddLayer(new FlattenLayer(outputDim: 512));
+
+      net.AddLayer(new FlattenLayer(outputDim: 512, activation: Activation.ReLU));
       net.AddLayer(new DropoutLayer(0.5));
-      net.AddLayer(new DenseLayer(outputDim: 10) { ActivationFunction=Registry.ActivationFunctions.Logistic(1) });
+      net.AddLayer(new DenseLayer(outputDim: 10, activation: Activation.Logistic(1)));
 
       net.Build();
 

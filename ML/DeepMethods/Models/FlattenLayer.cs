@@ -1,4 +1,5 @@
 ﻿using System;
+using ML.Contracts;
 
 namespace ML.DeepMethods.Models
 {
@@ -7,11 +8,12 @@ namespace ML.DeepMethods.Models
   /// </summary>
   public class FlattenLayer : ConvolutionalLayer
   {
-    public FlattenLayer(int outputDim)
+    public FlattenLayer(int outputDim, IActivationFunction activation = null)
       : base(outputDim,
              windowSize: 1, // to be overridden with input size on build
              stride: 1,
-             padding: 0)
+             padding: 0,
+             activation: activation)
     {
     }
 

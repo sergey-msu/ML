@@ -1,5 +1,5 @@
 ﻿using System;
-using ML.Core;
+using ML.Contracts;
 
 namespace ML.DeepMethods.Models
 {
@@ -12,13 +12,14 @@ namespace ML.DeepMethods.Models
 
     protected PoolingLayer(int windowSize,
                            int stride,
-                           int padding=0)
+                           int padding=0,
+                           IActivationFunction activation = null)
       : base(1, // to be overridden with input depth on build
              windowSize,
              stride,
-             padding)
+             padding,
+             activation)
     {
-      m_ActivationFunction = Registry.ActivationFunctions.Identity;
     }
 
     #endregion
@@ -63,10 +64,12 @@ namespace ML.DeepMethods.Models
 
     public MaxPoolingLayer(int windowSize,
                            int stride,
-                           int padding=0)
+                           int padding=0,
+                           IActivationFunction activation = null)
       : base(windowSize,
              stride,
-             padding)
+             padding,
+             activation)
     {
     }
 
@@ -81,7 +84,7 @@ namespace ML.DeepMethods.Models
         for (int i=0; i<m_OutputSize; i++)
         for (int j=0; j<m_OutputSize; j++)
         {
-          var value = double.MinValue;
+          var net = double.MinValue;
           var xmaxIdx = -1;
           var ymaxIdx = -1;
           var xmin = j*m_Stride-m_Padding;
@@ -96,16 +99,16 @@ namespace ML.DeepMethods.Models
             if (xidx>=0 && xidx<m_InputSize && yidx>=0 && yidx<m_InputSize)
             {
               var z = input[q, yidx, xidx];
-              if (z > value)
+              if (z > net)
               {
-                value = z;
+                net = z;
                 xmaxIdx = xidx;
                 ymaxIdx = yidx;
               }
             }
           }
 
-          m_Value[q, i, j] = value;
+          m_Value[q, i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
           m_MaxIndexPositions[q, i, j, 0] = xmaxIdx;
           m_MaxIndexPositions[q, i, j, 1] = ymaxIdx;
         }
@@ -131,10 +134,12 @@ namespace ML.DeepMethods.Models
 
     public AvgPoolingLayer(int windowSize,
                            int stride,
-                           int padding=0)
+                           int padding=0,
+                           IActivationFunction activation = null)
       : base(windowSize,
              stride,
-             padding)
+             padding,
+             activation)
     {
     }
 
@@ -151,7 +156,7 @@ namespace ML.DeepMethods.Models
         for (int i=0; i<m_OutputSize; i++)
         for (int j=0; j<m_OutputSize; j++)
         {
-          var value = 0.0D;
+          var net = 0.0D;
           var xmin = j*m_Stride-m_Padding;
           var ymin = i*m_Stride-m_Padding;
 
@@ -163,11 +168,13 @@ namespace ML.DeepMethods.Models
             var yidx = ymin+y;
             if (xidx>=0 && xidx<m_InputSize && yidx>=0 && yidx<m_InputSize)
             {
-              value += input[q, yidx, xidx];
+              net += input[q, yidx, xidx];
             }
           }
 
-          m_Value[q, i, j] = value/l;
+          net /= l;
+
+          m_Value[q, i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
         }
       }
 

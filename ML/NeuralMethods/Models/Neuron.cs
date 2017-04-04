@@ -32,10 +32,11 @@ namespace ML.NeuralMethods.Models
 
     #region .ctor
 
-    public Neuron()
+    public Neuron(IActivationFunction activation = null)
     {
       m_LastRetained = true;
       m_RetainRate = 1;
+      m_ActivationFunction = activation;
     }
 
     #endregion
@@ -54,7 +55,8 @@ namespace ML.NeuralMethods.Models
     }
 
     /// <summary>
-    /// Probability on the neuron to be propped
+    /// Probability on the neuron to be propped.
+    /// Inverted Dropout is used instead of vanilla dropout (see http://cs231n.github.io/neural-networks-2)
     /// </summary>
     public double DropoutRate
     {
@@ -174,6 +176,7 @@ namespace ML.NeuralMethods.Models
           for (int i=0; i<InputDim; i++)
             net += m_Weights[i] * input[i];
 
+          net /= m_RetainRate;
           m_Value = ActivationFunction.Value(net);
         }
         else
@@ -184,10 +187,8 @@ namespace ML.NeuralMethods.Models
         for (int i=0; i<InputDim; i++)
           net += m_Weights[i] * input[i];
 
-        net /= m_RetainRate;
         m_Value = ActivationFunction.Value(net);
       }
-
 
       return m_Value;
     }

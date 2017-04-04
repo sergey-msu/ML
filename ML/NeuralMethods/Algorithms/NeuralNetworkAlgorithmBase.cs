@@ -51,10 +51,15 @@ namespace ML.NeuralMethods.Algorithms
     {
       var isTraining = m_Result.IsTraining;
       m_Result.IsTraining = false;
-      var errors = base.GetErrors(classifiedSample);
-      m_Result.IsTraining = isTraining;
+      try
+      {
+        return base.GetErrors(classifiedSample);
+      }
+      finally
+      {
+        m_Result.IsTraining = isTraining;
+      }
 
-      return errors;
     }
 
     /// <summary>
@@ -62,8 +67,15 @@ namespace ML.NeuralMethods.Algorithms
     /// </summary>
     public void Train()
     {
-      DoTrain();
-      m_Result.IsTraining = false;
+      m_Result.IsTraining = true;
+      try
+      {
+        DoTrain();
+      }
+      finally
+      {
+        m_Result.IsTraining = false;
+      }
     }
 
     protected abstract void DoTrain();

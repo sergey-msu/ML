@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core;
 using ML.Core.ComputingNetworks;
 using ML.DeepMethods.Models;
+using ML.Core.Registry;
 
 namespace ML.Tests.UnitTests
 {
@@ -371,7 +372,7 @@ namespace ML.Tests.UnitTests
       const int padding = 0;
 
       var layer = new ConvolutionalLayer(outputDepth, windowSize, stride, padding) { IsTraining=true };
-      layer.ActivationFunction = Registry.ActivationFunctions.ReLU;
+      layer.ActivationFunction = Activation.ReLU;
 
       const int plen = (windowSize*windowSize*inputDepth + 1)*outputDepth;
       var kernel = new double[plen]
@@ -418,7 +419,7 @@ namespace ML.Tests.UnitTests
       const int padding = 1;
 
       var layer = new ConvolutionalLayer(outputDepth, windowSize, stride, padding) { IsTraining=true };
-      layer.ActivationFunction = Registry.ActivationFunctions.ReLU;
+      layer.ActivationFunction = Activation.ReLU;
 
       const int plen = (windowSize*windowSize*inputDepth + 1)*outputDepth;
       var kernel = new double[plen]
@@ -493,7 +494,7 @@ namespace ML.Tests.UnitTests
                                         windowSize: 4,
                                         stride: 2,
                                         padding: 1) { IsTraining=true };
-      conv.ActivationFunction = Registry.ActivationFunctions.ReLU;
+      conv.ActivationFunction = Activation.ReLU;
       var kernel = new double[(4*4*1+1)*4]
                    {
                      // fm #1
@@ -540,7 +541,7 @@ namespace ML.Tests.UnitTests
       var fc = new ConvolutionalLayer(outputDepth: 8,
                                       windowSize: 2,
                                       stride: 1) { IsTraining=true };
-      fc.ActivationFunction = Registry.ActivationFunctions.Identity;
+      fc.ActivationFunction = Activation.Identity;
       var pcount = (2*2*4+1)*8;
       kernel = new double[pcount];
       for (int i=0; i<pcount; i++)
@@ -554,7 +555,7 @@ namespace ML.Tests.UnitTests
       var output = new ConvolutionalLayer(outputDepth: 2,
                                           windowSize: 1,
                                           stride: 1) { IsTraining=true };
-      output.ActivationFunction = Registry.ActivationFunctions.Identity;
+      output.ActivationFunction = Activation.Identity;
       pcount = (1*1*8+1)*2;
       kernel = new double[pcount];
       for (int i=0; i<pcount; i++)

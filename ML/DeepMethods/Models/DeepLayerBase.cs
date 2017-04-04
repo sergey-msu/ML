@@ -34,7 +34,8 @@ namespace ML.DeepMethods.Models
     public DeepLayerBase(int outputDepth,
                          int windowSize,
                          int stride,
-                         int padding=0)
+                         int padding=0,
+                         IActivationFunction activation = null)
     {
       if (outputDepth <= 0)
         throw new MLException("DeepLayerBase.ctor(outputDepth<=0)");
@@ -49,6 +50,7 @@ namespace ML.DeepMethods.Models
       m_Stride      = stride;
       m_Padding     = padding;
       m_OutputDepth = outputDepth;
+      m_ActivationFunction = activation;
     }
 
     #endregion
@@ -127,7 +129,9 @@ namespace ML.DeepMethods.Models
     /// </summary>
     public double Derivative(int p, int i, int j)
     {
-      return m_ActivationFunction.DerivativeFromValue(m_Value[p, i, j]);
+      return (m_ActivationFunction != null) ?
+              m_ActivationFunction.DerivativeFromValue(m_Value[p, i, j]) :
+              1;
     }
 
     public override double[,,] Calculate(double[,,] input)

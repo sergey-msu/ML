@@ -45,11 +45,13 @@ namespace ML.DeepMethods.Models
     public ConvolutionalLayer(int outputDepth,
                               int windowSize,
                               int stride=1,
-                              int padding=0)
+                              int padding=0,
+                              IActivationFunction activation = null)
       : base(outputDepth,
              windowSize,
              stride,
-             padding)
+             padding,
+             activation)
     {
     }
 
@@ -119,7 +121,7 @@ namespace ML.DeepMethods.Models
             }
           }
 
-          m_Value[q, i, j] = ActivationFunction.Value(net);
+          m_Value[q, i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
         }
       }
 

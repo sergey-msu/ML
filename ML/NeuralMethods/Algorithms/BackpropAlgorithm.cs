@@ -17,10 +17,10 @@ namespace ML.NeuralMethods.Algorithms
 
     public enum StopCriteria
     {
-      FullLoop = 0,
+      FullLoop  = 0,
       ErrorFunc = 1,
-      StepMin  = 2,
-      QFunc    = 3
+      StepMin   = 2,
+      QFunc     = 3
     }
 
     #endregion

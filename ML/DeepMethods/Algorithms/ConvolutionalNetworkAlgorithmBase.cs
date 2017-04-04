@@ -52,15 +52,33 @@ namespace ML.DeepMethods.Algorithms
     {
       var isTraining = m_Result.IsTraining;
       m_Result.IsTraining = false;
-      var errors = base.GetErrors(classifiedSample);
-      m_Result.IsTraining = isTraining;
+      try
+      {
+        return base.GetErrors(classifiedSample);
+      }
+      finally
+      {
+        m_Result.IsTraining = isTraining;
+      }
 
-      return errors;
     }
 
     /// <summary>
     /// Teaches algorithm, produces Result output
     /// </summary>
-    public abstract void Train();
+    public void Train()
+    {
+      m_Result.IsTraining = true;
+      try
+      {
+        DoTrain();
+      }
+      finally
+      {
+        m_Result.IsTraining = false;
+      }
+    }
+
+    protected abstract void DoTrain();
   }
 }

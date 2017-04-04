@@ -7,9 +7,9 @@ namespace ML.DeepTests
     static void Main(string[] args)
     {
       var runner =
-        //new OriginalMNIST();
+        new OriginalMNIST();
         //new KaggleMNIST();
-        new KaggleCIFAR10();
+        //new KaggleCIFAR10();
 
       try
       {

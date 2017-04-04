@@ -12,6 +12,7 @@ using ML.NeuralMethods.Algorithms;
 using ML.NeuralMethods.Models;
 using ML.Utils;
 using ML.DeepMethods.Models;
+using ML.Core.Registry;
 
 namespace ML.ConsoleTest
 {
@@ -69,8 +70,8 @@ namespace ML.ConsoleTest
         //Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
 
         //start = DateTime.Now;
-        doMultilayerNNAlgorithmTest();
-        //doCNNAlgorithmTest();
+        //doMultilayerNNAlgorithmTest();
+        doCNNAlgorithmTest();
         var stop = DateTime.Now;
         Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
       }
@@ -206,14 +207,14 @@ namespace ML.ConsoleTest
 
     private BackpropAlgorithm createBPAlg()
     {
-      var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 2, 15, 3 }, Registry.ActivationFunctions.Logistic(1));
+      var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 2, 15, 3 }, Activation.Logistic(1));
+      net[0].DropoutRate = 0.1D;
       net.IsTraining = true;
-      net[0].DropoutRate = 0.5D;
 
       var alg = new BackpropAlgorithm(Data.TrainingSample, net);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.1D;
-      alg.LossFunction = Registry.LossFunctions.Euclidean;
+      alg.LossFunction = Loss.Euclidean;
 
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>
@@ -244,20 +245,17 @@ namespace ML.ConsoleTest
 
       outputError(alg);
 
-      Visualizer.Run(alg);
+      //Visualizer.Run(alg);
     }
 
     private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg_NN_ForTest()
     {
-      var cnn = new ConvolutionalNetwork(2, 1);
+      var cnn = new ConvolutionalNetwork(2, 1) { IsTraining=true };
       cnn.AddLayer(new DenseLayer(15));
-      cnn.AddLayer(new MaxPoolingLayer(1, 1));
-      cnn.AddLayer(new DropoutLayer(0.5));
-      cnn.AddLayer(new DenseLayer(3));
-      cnn.AddLayer(new MaxPoolingLayer(1, 1));
-
-      cnn.IsTraining = true;
-      cnn.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
+      //cnn.AddLayer(new MaxPoolingLayer(1, 1));
+      cnn.AddLayer(new DropoutLayer(0.1, activation: Activation.Logistic(1)));
+      cnn.AddLayer(new DenseLayer(3, activation: Activation.Logistic(1)));
+      //cnn.AddLayer(new MaxPoolingLayer(1, 1));
 
       cnn.Build();
       cnn.RandomizeParameters(0);
@@ -271,10 +269,11 @@ namespace ML.ConsoleTest
           key[i, 0, 0] = data[i];
         sample[key] = obj.Value;
       }
+
       var alg = new ML.DeepMethods.Algorithms.BackpropAlgorithm(sample, cnn);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.1D;
-      alg.LossFunction = Registry.LossFunctions.Euclidean;
+      alg.LossFunction = Loss.Euclidean;
 
       int epoch = 0;
       alg.EpochEndedEvent += (o, e) =>

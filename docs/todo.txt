@@ -1,10 +1,16 @@
+
+- update mnist demo
+- create mnist-cnn demo from keras architecture
+
+
 ***************************** CURRENT *****************************
 
 - CNN:
   - stochastic gradient training
   - batch learning
   - batch normalization https://arxiv.org/pdf/1502.03167.pdf
-  - [INPROG] dropout
+  - [DONE] dropout
+  - add activation layer
   - GPU parallelization
   - Read training set from hard drive not in-memory!
   - extract stop criteria from backpropalgorithm

@@ -21,12 +21,13 @@ namespace ML.NeuralMethods.Models
 
     #region .ctor
 
-    public NeuralNetwork(int inputDim)
+    public NeuralNetwork(int inputDim, IActivationFunction activation = null)
     {
       if (inputDim <= 0)
         throw new MLException("NeuralLayer.ctor(inputDim<=0)");
 
       m_InputDim = inputDim;
+      m_ActivationFunction = activation;
     }
 
     #endregion

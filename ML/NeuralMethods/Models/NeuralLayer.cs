@@ -21,10 +21,12 @@ namespace ML.NeuralMethods.Models
 
     #region .ctor
 
-    public NeuralLayer(int neuronCount)
+    public NeuralLayer(int neuronCount, IActivationFunction actiovation = null)
     {
       if (neuronCount <= 0)
         throw new MLException("NeuralLayer.ctor(neuronCount<=0)");
+
+      m_ActivationFunction = actiovation;
 
       for (int i=0; i<neuronCount; i++)
       {

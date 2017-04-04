@@ -16,10 +16,11 @@ namespace ML.DeepMethods.Models
     private IActivationFunction m_ActivationFunction;
     private int m_InputSize;
     private int m_InputDepth;
+    private bool m_IsTraining;
 
     #endregion
 
-    public ConvolutionalNetwork(int inputDepth, int inputSize)
+    public ConvolutionalNetwork(int inputDepth, int inputSize, IActivationFunction activation = null)
     {
       if (inputDepth <= 0)
         throw new MLException("ConvolutionalNetwork.ctor(inputDepth<=0)");
@@ -28,6 +29,7 @@ namespace ML.DeepMethods.Models
 
       m_InputDepth = inputDepth;
       m_InputSize = inputSize;
+      m_ActivationFunction = activation;
     }
 
     #region Properties
@@ -35,7 +37,16 @@ namespace ML.DeepMethods.Models
     /// <summary>
     /// True for using the network in training mode
     /// </summary>
-    public bool IsTraining { get; set; }
+    public bool IsTraining
+    {
+      get { return m_IsTraining; }
+      set
+      {
+        m_IsTraining=value;
+        foreach (var layer in SubNodes)
+          layer.IsTraining = value;
+      }
+    }
 
     /// <summary>
     /// Total count of network layers (hidden + output)
