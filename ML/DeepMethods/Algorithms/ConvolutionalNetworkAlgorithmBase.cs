@@ -48,6 +48,16 @@ namespace ML.DeepMethods.Algorithms
       return cls;
     }
 
+    public override IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<double[,,]> classifiedSample)
+    {
+      var isTraining = m_Result.IsTraining;
+      m_Result.IsTraining = false;
+      var errors = base.GetErrors(classifiedSample);
+      m_Result.IsTraining = isTraining;
+
+      return errors;
+    }
+
     /// <summary>
     /// Teaches algorithm, produces Result output
     /// </summary>

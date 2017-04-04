@@ -143,7 +143,7 @@ namespace ML.Core
     /// <summary>
     /// Returns all errors of the given algorithm on some initially classified sample
     /// </summary>
-    public IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<TObj> classifiedSample)
+    public virtual IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<TObj> classifiedSample)
     {
       var errors = new List<ErrorInfo>();
       int c = 0;

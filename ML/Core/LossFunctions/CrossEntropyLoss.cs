@@ -20,7 +20,7 @@ namespace ML.Core.LossFunctions
 
     public double Derivative(int idx, double[] actual, double[] expected)
     {
-      return - MathUtils.ENTROPY_COEFF * expected[idx] / actual[idx];
+      return -MathUtils.ENTROPY_COEFF * expected[idx] / actual[idx];
     }
   }
 }

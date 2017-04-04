@@ -14,18 +14,18 @@ namespace ML.DeepMethods.Models
   /// 3D output - a set of 2D feature maps
   ///
   /// IO:
-  /// Input  - 3D array (input_length * input_size * input_size):    data[depth_idx, height_idx, width_idx]
-  /// Output - 3D array (output_size * output_size * output_length): feature_maps[depth_idx, height_idx, width_idx]
+  /// Input  - 3D array (input_length*input_size*input_size):    data[depth_idx, height_idx, width_idx]
+  /// Output - 3D array (output_size*output_size*output_length): feature_maps[depth_idx, height_idx, width_idx]
   ///
   /// Parameters:
-  /// Kernel - 4D array (output_length * input_length * win_size * win_size): kernel[output_idx, input_idx, height_idx, width_idx]
+  /// Kernel - 4D array (output_length*input_length*win_size*win_size): kernel[output_idx, input_idx, height_idx, width_idx]
   /// Biases - 1D array (output_length): biases[output_idx]
   ///
   /// We use tied bias approach
   /// http://datascience.stackexchange.com/questions/17671
   /// https://harmdevries89.wordpress.com/2015/03/27/tied-biases-vs-untied-biases/
   ///
-  /// Total count of parameters = (win_size * win_size * input_length + 1) * output_length;
+  /// Total count of parameters = (win_size*win_size*input_length + 1) * output_length;
   /// </summary>
   public class ConvolutionalLayer : DeepLayerBase
   {

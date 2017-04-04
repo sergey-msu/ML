@@ -13,8 +13,9 @@ namespace ML.NeuralMethods.Models
   {
     #region Fields
 
-    private int m_InputDim;
     private IActivationFunction m_ActivationFunction;
+    private bool m_IsTraining;
+    private int m_InputDim;
 
     #endregion
 
@@ -31,6 +32,20 @@ namespace ML.NeuralMethods.Models
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// True for using the network in training mode
+    /// </summary>
+    public bool IsTraining
+    {
+      get { return m_IsTraining; }
+      set
+      {
+        m_IsTraining=value;
+        foreach (var layer in SubNodes)
+          layer.IsTraining = value;
+      }
+    }
 
     /// <summary>
     /// Total count of network layers (hidden + output)
@@ -68,10 +83,6 @@ namespace ML.NeuralMethods.Models
       if (layer==null)
         throw new MLException("Layer can not be null");
 
-      var prevOutputDim = (LayerCount == 0) ? InputDim : this[LayerCount-1].NeuronCount;
-      if (layer.InputDim != prevOutputDim)
-        throw new MLException("Layer input dimension differs with layer's one");
-
       this.AddSubNode(layer);
     }
 
@@ -101,10 +112,33 @@ namespace ML.NeuralMethods.Models
       if (InputDim <= 0)
         throw new MLException("Input dimension has not been set");
 
-      foreach (var layer in this.SubNodes)
-        layer.ActivationFunction = layer.ActivationFunction ?? ActivationFunction;
+      var dim = InputDim;
 
-      base.DoBuild();
+      foreach (var layer in this.SubNodes)
+      {
+        layer.ActivationFunction = layer.ActivationFunction ?? ActivationFunction;
+        layer.IsTraining = IsTraining;
+        layer.m_InputDim = dim;
+        layer.DoBuild();
+
+        dim = layer.NeuronCount;
+      }
+    }
+
+    #endregion
+
+    #region Serialization
+
+    public void Serialize(System.IO.Stream stream)
+    {
+      var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
+      serializer.Serialize(stream, this);
+    }
+
+    public static NeuralNetwork Deserialize(System.IO.Stream stream)
+    {
+      var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
+      return (NeuralNetwork)serializer.Deserialize(stream);
     }
 
     #endregion

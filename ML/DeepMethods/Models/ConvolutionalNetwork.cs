@@ -33,7 +33,7 @@ namespace ML.DeepMethods.Models
     #region Properties
 
     /// <summary>
-    /// Truw for using the network training mode
+    /// True for using the network in training mode
     /// </summary>
     public bool IsTraining { get; set; }
 
@@ -90,13 +90,18 @@ namespace ML.DeepMethods.Models
 
     public override void DoBuild()
     {
+      if (InputDepth<=0)
+        throw new MLException("Input depth < 0");
+      if (InputSize<=0)
+        throw new MLException("Input size < 0");
+
       var depth = InputDepth;
       var size  = InputSize;
 
       foreach (var layer in this.SubNodes)
       {
         if (layer.ActivationFunction == null) layer.ActivationFunction = ActivationFunction;
-        layer.IsTraining = true;
+        layer.IsTraining = IsTraining;
         layer.m_InputDepth = depth;
         layer.m_InputSize  = size;
         layer.DoBuild();

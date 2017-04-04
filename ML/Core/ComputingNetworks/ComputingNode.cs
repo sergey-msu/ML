@@ -50,8 +50,8 @@ namespace ML.Core.ComputingNetworks
     /// </summary>
     public void Build()
     {
-      BuildIndex(0);
       DoBuild();
+      BuildIndex(0);
     }
 
     /// <summary>

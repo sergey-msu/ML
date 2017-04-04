@@ -36,6 +36,16 @@ namespace ML.Core.Mathematics
     }
 
     /// <summary>
+    /// Bernoulli distribution inplementation: returns true with p probability
+    /// </summary>
+    public bool Bernoulli(double p)
+    {
+      if (p<0 || p>1) throw new MLException("Invalid probability range");
+
+      return m_Random.NextDouble() < p;
+    }
+
+    /// <summary>
     /// Returns uniformly distributed random value
     /// </summary>
     /// <param name="a">Min value</param>

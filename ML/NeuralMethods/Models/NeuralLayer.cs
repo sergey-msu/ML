@@ -13,23 +13,54 @@ namespace ML.NeuralMethods.Models
     #region Fields
 
     private IActivationFunction m_ActivationFunction;
-    private int m_InputDim;
+    private bool m_IsTraining;
+    private double m_DropoutRate;
+    internal int m_InputDim;
 
     #endregion
 
     #region .ctor
 
-    public NeuralLayer(int inputDim)
+    public NeuralLayer(int neuronCount)
     {
-      if (inputDim <= 0)
-        throw new MLException("NeuralLayer.ctor(inputDim<=0)");
+      if (neuronCount <= 0)
+        throw new MLException("NeuralLayer.ctor(neuronCount<=0)");
 
-      m_InputDim = inputDim;
+      for (int i=0; i<neuronCount; i++)
+      {
+        var neuron = new Neuron();
+        AddNeuron(neuron);
+      }
     }
 
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// If true, indicates that layer is in training mode
+    /// </summary>
+    public bool IsTraining
+    {
+      get { return m_IsTraining; }
+      set
+      {
+        m_IsTraining=value;
+        foreach (var neuron in SubNodes)
+          neuron.IsTraining = value;
+      }
+    }
+
+    public double DropoutRate
+    {
+      get { return m_DropoutRate; }
+      set
+      {
+        m_DropoutRate=value;
+        foreach (var neuron in SubNodes)
+          neuron.DropoutRate = value;
+      }
+    }
 
     /// <summary>
     /// Dimension of input vector
@@ -66,8 +97,6 @@ namespace ML.NeuralMethods.Models
     {
       if (neuron==null)
         throw new MLException("Neuron can not be null");
-      if (neuron.InputDim != m_InputDim)
-        throw new MLException("Neuron input dimension differs with layer's one");
 
       this.AddSubNode(neuron);
     }
@@ -87,7 +116,7 @@ namespace ML.NeuralMethods.Models
     /// <param name="input">Input data array</param>
     public override double[] Calculate(double[] input)
     {
-      if (InputDim != input.Length)
+      if (m_InputDim != input.Length)
         throw new MLException("Incorrect input vector dimension");
 
       return base.Calculate(input);
@@ -99,9 +128,14 @@ namespace ML.NeuralMethods.Models
         throw new MLException("Input dimension has not been set");
 
       foreach (var neuron in this.SubNodes)
+      {
         neuron.ActivationFunction = neuron.ActivationFunction ?? ActivationFunction;
+        neuron.IsTraining = IsTraining;
+        if (m_DropoutRate>0) neuron.DropoutRate = DropoutRate;
+        neuron.m_InputDim = m_InputDim;
 
-      base.DoBuild();
+        neuron.DoBuild();
+      }
     }
 
     #endregion

@@ -21,6 +21,7 @@ namespace ML.NeuralMethods.Algorithms
         throw new MLException("Network can not be null");
 
       m_Result = net;
+      net.IsTraining = true;
     }
 
     /// <summary>
@@ -46,9 +47,25 @@ namespace ML.NeuralMethods.Algorithms
       return cls;
     }
 
+    public override IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<double[]> classifiedSample)
+    {
+      var isTraining = m_Result.IsTraining;
+      m_Result.IsTraining = false;
+      var errors = base.GetErrors(classifiedSample);
+      m_Result.IsTraining = isTraining;
+
+      return errors;
+    }
+
     /// <summary>
     /// Teaches algorithm, produces Result output
     /// </summary>
-    public abstract void Train();
+    public void Train()
+    {
+      DoTrain();
+      m_Result.IsTraining = false;
+    }
+
+    protected abstract void DoTrain();
   }
 }

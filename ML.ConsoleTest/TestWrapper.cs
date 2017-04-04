@@ -69,8 +69,8 @@ namespace ML.ConsoleTest
         //Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
 
         //start = DateTime.Now;
-        //doMultilayerNNAlgorithmTest();
-        doCNNAlgorithmTest();
+        doMultilayerNNAlgorithmTest();
+        //doCNNAlgorithmTest();
         var stop = DateTime.Now;
         Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
       }
@@ -207,6 +207,8 @@ namespace ML.ConsoleTest
     private BackpropAlgorithm createBPAlg()
     {
       var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 2, 15, 3 }, Registry.ActivationFunctions.Logistic(1));
+      net.IsTraining = true;
+      net[0].DropoutRate = 0.5D;
 
       var alg = new BackpropAlgorithm(Data.TrainingSample, net);
       alg.EpochCount = 6000;
@@ -250,10 +252,13 @@ namespace ML.ConsoleTest
       var cnn = new ConvolutionalNetwork(2, 1);
       cnn.AddLayer(new DenseLayer(15));
       cnn.AddLayer(new MaxPoolingLayer(1, 1));
+      cnn.AddLayer(new DropoutLayer(0.5));
       cnn.AddLayer(new DenseLayer(3));
       cnn.AddLayer(new MaxPoolingLayer(1, 1));
 
+      cnn.IsTraining = true;
       cnn.ActivationFunction = Registry.ActivationFunctions.Logistic(1);
+
       cnn.Build();
       cnn.RandomizeParameters(0);
 

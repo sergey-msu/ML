@@ -13,7 +13,7 @@ namespace ML.DeepMethods.Models
   {
     #region Fields
 
-    private bool m_IsTraining;
+    protected bool m_IsTraining;
     protected IActivationFunction m_ActivationFunction;
 
     internal  int m_InputSize;
@@ -161,7 +161,9 @@ namespace ML.DeepMethods.Models
     /// <summary>
     /// Randomizes layer parameters (i.e. kernel weights, biases etc.)
     /// </summary>
-    public abstract void RandomizeParameters(int seed);
+    public virtual void RandomizeParameters(int seed)
+    {
+    }
 
     protected abstract double[,,] DoCalculate(double[,,] input);
   }

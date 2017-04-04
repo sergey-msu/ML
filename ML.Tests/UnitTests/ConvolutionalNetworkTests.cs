@@ -365,7 +365,6 @@ namespace ML.Tests.UnitTests
     private ConvolutionalLayer getSimpleConvolutionLayer()
     {
       const int inputDepth  = 2;
-      const int inputSize   = 3;
       const int outputDepth = 3;
       const int windowSize  = 2;
       const int stride  = 1;
@@ -413,7 +412,6 @@ namespace ML.Tests.UnitTests
     private ConvolutionalLayer getMediumConvolutionLayer()
     {
       const int inputDepth  = 2;
-      const int inputSize   = 4;
       const int outputDepth = 2;
       const int windowSize  = 4;
       const int stride  = 2;
@@ -466,7 +464,7 @@ namespace ML.Tests.UnitTests
       const int stride  = 1;
       const int padding = 0;
 
-      var layer = (TPool)Activator.CreateInstance(typeof(TPool), inputDepth, inputSize, windowSize, stride, padding, true);
+      var layer = (TPool)Activator.CreateInstance(typeof(TPool), windowSize, stride, padding, true);
 
       return layer;
     }
@@ -480,7 +478,7 @@ namespace ML.Tests.UnitTests
       const int stride  = 2;
       const int padding = 1;
 
-      var layer = (TPool)Activator.CreateInstance(typeof(TPool), inputDepth, inputSize, windowSize, stride, padding, true);
+      var layer = (TPool)Activator.CreateInstance(typeof(TPool), windowSize, stride, padding, true);
 
       return layer;
     }

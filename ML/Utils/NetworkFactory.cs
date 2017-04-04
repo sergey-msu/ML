@@ -32,15 +32,9 @@ namespace ML.Utils
       var lcount = topology.Length-1;
       for (int i=1; i<=lcount; i++)
       {
-        var pdim = topology[i-1];
-        var dim = topology[i];
-        var layer = new NeuralLayer(pdim);
+        var neuronCount = topology[i];
+        var layer = new NeuralLayer(neuronCount);
         net.AddLayer(layer);
-        for (int j=0; j<dim; j++)
-        {
-          var neuron = new Neuron(layer.InputDim);
-          layer.AddNeuron(neuron);
-        }
       }
 
       net.Build();
@@ -98,10 +92,13 @@ namespace ML.Utils
       net.AddLayer(new ConvolutionalLayer(outputDepth: 32, windowSize: 3, padding: 1));
       net.AddLayer(new ConvolutionalLayer(outputDepth: 32, windowSize: 3, padding: 1));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
       net.AddLayer(new ConvolutionalLayer(outputDepth: 64, windowSize: 3, padding: 1));
       net.AddLayer(new ConvolutionalLayer(outputDepth: 64, windowSize: 3, padding: 1));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
       net.AddLayer(new FlattenLayer(outputDim: 512));
+      net.AddLayer(new DropoutLayer(0.5));
       net.AddLayer(new DenseLayer(outputDim: 10) { ActivationFunction=Registry.ActivationFunctions.Logistic(1) });
 
       net.Build();

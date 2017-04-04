@@ -1,12 +1,12 @@
-CURRENT:
+***************************** CURRENT *****************************
 
 - CNN:
   - stochastic gradient training
   - batch learning
   - batch normalization https://arxiv.org/pdf/1502.03167.pdf
-  - dropout
+  - [INPROG] dropout
   - GPU parallelization
-  - Rerad training set from hard drive not in-memory!
+  - Read training set from hard drive not in-memory!
   - extract stop criteria from backpropalgorithm
   - split 'size' into 'height' and 'width' in all layers
   - serialization/deserialization
@@ -15,7 +15,7 @@ CURRENT:
 
 - NN and CNN:
   - possibility to train - add nodex/layers - train etc...
-  - possibolity to remove layer/node from network
+  - possibility to remove layer/node from network
 
 - implement more NN algorithms (https://habrahabr.ru/post/318970/)
   - Nesterov
@@ -79,7 +79,7 @@ CURRENT:
  - Implement more algorithms
    - implement C4.5 algorithm for decision trees
 
-DONE:
+***************************** DONE *****************************
 
 - implement Convolution NN based on CN architecture
   - read more about Convolution NN

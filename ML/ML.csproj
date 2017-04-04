@@ -91,6 +91,7 @@
     <Compile Include="Core\ComputingNetworks\SequenceNode.cs" />
     <Compile Include="DeepMethods\Algorithms\BackpropAlgorithm.cs" />
     <Compile Include="DeepMethods\Algorithms\ConvolutionalNetworkAlgorithmBase.cs" />
+    <Compile Include="DeepMethods\Models\DropoutLayer.cs" />
     <Compile Include="DeepMethods\Models\DeepLayerBase.cs" />
     <Compile Include="DeepMethods\Models\DenseLayer.cs" />
     <Compile Include="DeepMethods\Models\FlattenLayer.cs" />

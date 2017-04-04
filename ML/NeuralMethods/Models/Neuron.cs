@@ -17,23 +17,25 @@ namespace ML.NeuralMethods.Models
     #region Fields
 
     private IActivationFunction m_ActivationFunction;
-    private int      m_InputDim;
+    private bool   m_IsTraining;
+    internal int   m_InputDim;
+    private double m_Value;
+    private double m_Error;
+    private double m_DropoutRate;
+    private double m_RetainRate;
+    private bool   m_LastRetained;
+
     private double   m_Bias;
-    private double   m_Value;
-    private double   m_Error;
     private double[] m_Weights;
 
     #endregion
 
     #region .ctor
 
-    public Neuron(int inputDim)
+    public Neuron()
     {
-      if (inputDim <= 0)
-        throw new MLException("NeuronNode.ctor(inputDim<=0)");
-
-      m_InputDim = inputDim;
-      m_Weights = new double[inputDim];
+      m_LastRetained = true;
+      m_RetainRate = 1;
     }
 
     #endregion
@@ -43,6 +45,36 @@ namespace ML.NeuralMethods.Models
     public override int ParamCount { get { return m_Weights.Length + 1; } }
 
     /// <summary>
+    /// If true, indicates that layer is in training mode
+    /// </summary>
+    public bool IsTraining
+    {
+      get { return m_IsTraining; }
+      set { m_IsTraining=value; }
+    }
+
+    /// <summary>
+    /// Probability on the neuron to be propped
+    /// </summary>
+    public double DropoutRate
+    {
+      get { return m_DropoutRate; }
+      set
+      {
+        if (value<0 || value>=1)
+          throw new MLException("Incorrect dropuot value");
+
+        m_DropoutRate=value;
+        m_RetainRate = 1-value;
+      }
+    }
+
+    /// <summary>
+    /// Probability on the neuron to survive dropout
+    /// </summary>
+    public double RetainRate { get { return m_RetainRate; } }
+
+    /// <summary>
     /// Bias weight value
     /// </summary>
     public double Bias
@@ -50,6 +82,8 @@ namespace ML.NeuralMethods.Models
       get { return m_Bias; }
       set { m_Bias = value; }
     }
+
+    public bool LastRetained { get { return m_LastRetained; } }
 
     /// <summary>
     /// Calculated value (after applying activation function)
@@ -132,10 +166,28 @@ namespace ML.NeuralMethods.Models
 
       var net = m_Bias;
 
-      for (int i=0; i<InputDim; i++)
-        net += m_Weights[i] * input[i];
+      if (m_IsTraining)
+      {
+        m_LastRetained = (m_RetainRate<1) ? RandomGenerator.Get(0).Bernoulli(m_RetainRate) : true;
+        if (m_LastRetained)
+        {
+          for (int i=0; i<InputDim; i++)
+            net += m_Weights[i] * input[i];
 
-      m_Value = ActivationFunction.Value(net);
+          m_Value = ActivationFunction.Value(net);
+        }
+        else
+          m_Value = 0;
+      }
+      else
+      {
+        for (int i=0; i<InputDim; i++)
+          net += m_Weights[i] * input[i];
+
+        net /= m_RetainRate;
+        m_Value = ActivationFunction.Value(net);
+      }
+
 
       return m_Value;
     }
@@ -144,6 +196,8 @@ namespace ML.NeuralMethods.Models
     {
       if (m_InputDim <= 0)
         throw new MLException("Input dimension has not been set");
+
+      m_Weights = new double[m_InputDim];
 
       base.DoBuild();
     }

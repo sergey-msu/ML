@@ -195,9 +195,13 @@ namespace ML.NeuralMethods.Algorithms
 
     #endregion
 
-    public override void Train()
+    protected override void DoTrain()
     {
-      doTrain(Result);
+      for (int epoch=0; epoch<m_EpochCount; epoch++)
+      {
+        runEpoch(Result);
+        if (checkStopCriteria()) break;
+      }
     }
 
     #region .pvt
@@ -211,14 +215,6 @@ namespace ML.NeuralMethods.Algorithms
       m_EpochLength  = TrainingSample.Count;
       m_InputDim     = Result.InputDim;
       m_OutputDim    = Result[Result.LayerCount-1].NeuronCount;
-
-      //var lcount = Result.LayerCount;
-      //m_Updates = new double[lcount][,];
-      //for (int i=0; i<lcount; i++)
-      //{
-      //  var layer = Result[i];
-      //  m_Updates[i] = new double[layer.NeuronCount, layer.InputDim+1];
-      //}
 
       m_ExpectedOutputs = new Dictionary<Class, double[]>();
       var count = Classes.Count;
@@ -234,15 +230,6 @@ namespace ML.NeuralMethods.Algorithms
         var output = new double[count];
         output[i] = 1.0D;
         m_ExpectedOutputs[cls] = output;
-      }
-    }
-
-    private void doTrain(NeuralNetwork net)
-    {
-      for (int epoch=0; epoch<m_EpochCount; epoch++)
-      {
-        runEpoch(net);
-        if (checkStopCriteria()) break;
       }
     }
 
@@ -311,14 +298,22 @@ namespace ML.NeuralMethods.Algorithms
       if (lidx > 0)
         for (int h=0; h<pcount; h++)
         {
+          var pneuron = player[h];
+          if (!pneuron.LastRetained)
+          {
+            pneuron.Error = 0;
+            continue;
+          }
+
           var eh = 0.0D;
           for (int j=0; j<ncount; j++)
           {
             var neuron = layer[j];
+            if (!neuron.LastRetained) continue;
+
             eh += neuron.Error * neuron[h];
           }
 
-          var pneuron = player[h];
           pneuron.Error = eh * pneuron.Derivative;
         }
 
@@ -326,10 +321,14 @@ namespace ML.NeuralMethods.Algorithms
       for (int j=0; j<ncount; j++)
       {
         var neuron = layer[j];
+        if (!neuron.LastRetained) continue;
+
         var dj = m_LearningRate * neuron.Error;
 
         for (int h=0; h<pcount; h++)
         {
+          if ((lidx != 0) && !player[h].LastRetained) continue;
+
           var value = (lidx == 0) ? input[h] : player[h].Value;
           var dwj = dj * value;
           neuron[h] -= dwj;

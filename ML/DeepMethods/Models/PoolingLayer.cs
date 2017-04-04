@@ -29,10 +29,6 @@ namespace ML.DeepMethods.Models
 
     #endregion
 
-    public override void RandomizeParameters(int seed)
-    {
-    }
-
     public override void DoBuild()
     {
       m_OutputDepth = m_InputDepth;
