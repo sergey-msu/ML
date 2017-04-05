@@ -253,8 +253,10 @@ namespace ML.ConsoleTest
       var cnn = new ConvolutionalNetwork(2, 1) { IsTraining=true };
       cnn.AddLayer(new DenseLayer(15));
       //cnn.AddLayer(new MaxPoolingLayer(1, 1));
-      cnn.AddLayer(new DropoutLayer(0.1, activation: Activation.Logistic(1)));
-      cnn.AddLayer(new DenseLayer(3, activation: Activation.Logistic(1)));
+      cnn.AddLayer(new ActivationLayer(Activation.Logistic(1)));
+      //cnn.AddLayer(new DropoutLayer(0.1));
+      cnn.AddLayer(new DenseLayer(3));
+      cnn.AddLayer(new ActivationLayer(Activation.Logistic(1)));
       //cnn.AddLayer(new MaxPoolingLayer(1, 1));
 
       cnn.Build();

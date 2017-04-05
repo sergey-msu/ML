@@ -198,20 +198,22 @@ namespace ML.DeepTests
     protected override void Train()
     {
       // create CNN
-      var lenet1 = NetworkFactory.CreateLeNet1();
-      //lenet1[lenet1.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.Logistic(1);
-      //ConvolutionalNetwork lenet1;
+
+      //var net = NetworkFactory.CreateLeNet1();
+      var net = NetworkFactory.CreateMNISTDemo();
+      //net[net.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.Logistic(1);
+      //ConvolutionalNetwork net;
       //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";
       //using (var stream = File.Open(filePath1, FileMode.Open))
       //{
-      //  lenet1 = ConvolutionalNetwork.Deserialize(stream);
+      //  net = ConvolutionalNetwork.Deserialize(stream);
       //}
 
       // create algorithm
       var epochs = 30;
-      Alg = new BackpropAlgorithm(m_Training, lenet1)
+      Alg = new BackpropAlgorithm(m_Training, net)
       {
-        LossFunction = Loss.Euclidean,
+        LossFunction = Loss.CrossEntropySoftMax,
         EpochCount = epochs,
         LearningRate = 0.005D
       };

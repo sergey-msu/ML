@@ -31,11 +31,11 @@ namespace ML.DeepMethods.Models
 
     #region .ctor
 
-    public DeepLayerBase(int outputDepth,
-                         int windowSize,
-                         int stride,
-                         int padding=0,
-                         IActivationFunction activation = null)
+    protected DeepLayerBase(int outputDepth,
+                            int windowSize,
+                            int stride,
+                            int padding=0,
+                            IActivationFunction activation = null)
     {
       if (outputDepth <= 0)
         throw new MLException("DeepLayerBase.ctor(outputDepth<=0)");
@@ -148,8 +148,6 @@ namespace ML.DeepMethods.Models
 
     public override void DoBuild()
     {
-      base.DoBuild();
-
       m_OutputSize = (m_InputSize - m_WindowSize + 2*m_Padding)/m_Stride + 1;
       if (m_OutputSize <= 0)
         throw new MLException("Output tensor is empty. Check input shape datas");

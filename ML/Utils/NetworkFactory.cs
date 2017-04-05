@@ -53,8 +53,8 @@ namespace ML.Utils
       activation = activation ?? Activation.ReLU;
       var net = new ConvolutionalNetwork(1, 28) { IsTraining=true };
 
-      net.AddLayer(new ConvolutionalLayer(outputDepth: 8, windowSize: 5, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 4, windowSize: 5, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 12, stride: 2));
       net.AddLayer(new ConvolutionalLayer(outputDepth: 18, windowSize: 5, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
       net.AddLayer(new FlattenLayer(outputDim: 10, activation: activation));
@@ -68,11 +68,37 @@ namespace ML.Utils
     }
 
     /// <summary>
+    /// Creates CNN MNIST Demo architecture
+    /// </summary>
+    public static ConvolutionalNetwork CreateMNISTDemo(IActivationFunction activation = null,
+                                                       bool randomizeInitialWeights = true,
+                                                       int randomSeed = 0)
+    {
+      activation = activation ?? Activation.ReLU;
+      var net = new ConvolutionalNetwork(1, 28) { IsTraining=true };
+
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 4, windowSize: 3, activation: activation));
+      net.AddLayer(new ConvolutionalLayer(outputDepth: 12, windowSize: 3, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
+      net.AddLayer(new FlattenLayer(outputDim: 128, activation: activation));
+      net.AddLayer(new DropoutLayer(0.5));
+      net.AddLayer(new FlattenLayer(outputDim: 10, activation: Activation.Logistic(1)));
+
+      net.Build();
+
+      if (randomizeInitialWeights)
+        net.RandomizeParameters(randomSeed);
+
+      return net;
+    }
+
+    /// <summary>
     /// Creates CNN for CIFAR-10 training
     /// </summary>
-    public static ConvolutionalNetwork CreateCIFAR10Net(IActivationFunction activation = null,
-                                                        bool randomizeInitialWeights = true,
-                                                        int randomSeed = 0)
+    public static ConvolutionalNetwork CreateCIFAR10Demo(IActivationFunction activation = null,
+                                                         bool randomizeInitialWeights = true,
+                                                         int randomSeed = 0)
     {
       activation = activation ?? Activation.ReLU;
       var net = new ConvolutionalNetwork(3, 32) { IsTraining=true };

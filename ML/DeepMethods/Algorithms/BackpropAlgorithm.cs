@@ -247,7 +247,7 @@ namespace ML.DeepMethods.Algorithms
       int i=1;
       foreach (var pdata in TrainingSample)
       {
-        if ((i++)%10000==0) Console.WriteLine("{0} - iteration: {1}", DateTime.Now, i);
+        if ((i++)%1000==0) Console.WriteLine("{0} - iteration: {1}", DateTime.Now, i);
         runIteration(net, pdata.Key, pdata.Value);
       }
 
@@ -275,11 +275,13 @@ namespace ML.DeepMethods.Algorithms
         if (layer is ConvolutionalLayer)
           feedBackward(net, (ConvolutionalLayer)layer, i, input);
         else if (layer is MaxPoolingLayer)
-          feedBackward(net, (MaxPoolingLayer)layer, i, input);
+          feedBackward(net, (MaxPoolingLayer)layer, i);
         else if (layer is AvgPoolingLayer)
-          feedBackward(net, (MaxPoolingLayer)layer, i, input);
+          feedBackward(net, (MaxPoolingLayer)layer, i);
         else if (layer is DropoutLayer)
-          feedBackward(net, (DropoutLayer)layer, i, input);
+          feedBackward(net, (DropoutLayer)layer, i);
+        else if (layer is ActivationLayer)
+          feedBackward(net, (ActivationLayer)layer, i);
         else
           throw new MLException("Unknown layer type");
       }
@@ -310,7 +312,7 @@ namespace ML.DeepMethods.Algorithms
       return m_LossFunction.Value(output, expect);
     }
 
-    private void feedBackward(ConvolutionalNetwork net, MaxPoolingLayer layer, int lidx, double[,,] input)
+    private void feedBackward(ConvolutionalNetwork net, MaxPoolingLayer layer, int lidx)
     {
       if (lidx <= 0) return;
 
@@ -334,16 +336,16 @@ namespace ML.DeepMethods.Algorithms
       }
     }
 
-    private void feedBackward(ConvolutionalNetwork net, AvgPoolingLayer layer, int lidx, double[,,] input)
+    private void feedBackward(ConvolutionalNetwork net, AvgPoolingLayer layer, int lidx)
     {
       throw new NotImplementedException(); // TODO
     }
 
-    private void feedBackward(ConvolutionalNetwork net, DropoutLayer layer, int lidx, double[,,] input)
+    private void feedBackward(ConvolutionalNetwork net, DropoutLayer layer, int lidx)
     {
-      var player  = (lidx > 0) ? net[lidx - 1] : null;
-      var depth = layer.OutputDepth; // = pdepth
-      var size  = layer.OutputSize;  // = psize
+      var player = (lidx > 0) ? net[lidx - 1] : null;
+      var depth  = layer.OutputDepth; // = pdepth
+      var size   = layer.OutputSize;  // = psize
 
       // backpropagate "errors" to previous layer for future use
       if (lidx > 0)
@@ -353,6 +355,22 @@ namespace ML.DeepMethods.Algorithms
         {
           var mask = layer.Mask[p, i, j];
           player.Error[p, i, j] = (mask==0) ? 0 : layer.Error[p, i, j] * player.Derivative(p, i, j);
+        }
+    }
+
+    private void feedBackward(ConvolutionalNetwork net, ActivationLayer layer, int lidx)
+    {
+      var player = (lidx > 0) ? net[lidx - 1] : null;
+      var depth  = layer.OutputDepth; // = pdepth
+      var size   = layer.OutputSize;  // = psize
+
+      // backpropagate "errors" to previous layer for future use
+      if (lidx > 0)
+        for (int p=0; p<depth; p++)
+        for (int i=0; i<size;  i++)
+        for (int j=0; j<size;  j++)
+        {
+          player.Error[p, i, j] = layer.Error[p, i, j] * player.Derivative(p, i, j);
         }
     }
 

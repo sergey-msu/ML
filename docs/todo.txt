@@ -1,7 +1,6 @@
 
-- update mnist demo
 - create mnist-cnn demo from keras architecture
-
+- compare Keras and ML calcuations
 
 ***************************** CURRENT *****************************
 

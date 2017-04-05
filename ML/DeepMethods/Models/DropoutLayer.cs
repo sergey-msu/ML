@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ML.Contracts;
 using ML.Core;
-using ML.Core.ComputingNetworks;
 using ML.Core.Mathematics;
 
 namespace ML.DeepMethods.Models
@@ -27,13 +23,12 @@ namespace ML.DeepMethods.Models
     #region .ctor
 
     public DropoutLayer(double rate,
-                        int seed = 0,
-                        IActivationFunction activation = null)
-      : base(1, // to be overridden with input depth on build
+                        int seed = 0)
+      : base(outputDepth: 1, // will be overridden with input depth when building the layer
              windowSize: 1,
              stride : 1,
              padding : 0,
-             activation: activation)
+             activation: null)
     {
       if (rate<=0 || rate>=1)
         throw new MLException("Incorrect dropout rate");
@@ -69,8 +64,7 @@ namespace ML.DeepMethods.Models
           if (retain)
           {
             m_Mask[p, i, j] = 1;
-            var net = input[p, i, j] / m_RetainRate;
-            m_Value[p, i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
+            m_Value[p, i, j] = input[p, i, j] / m_RetainRate;
           }
           else
           {
@@ -81,17 +75,7 @@ namespace ML.DeepMethods.Models
       }
       else
       {
-        if (m_ActivationFunction==null)
-          m_Value = input;
-        else
-        {
-          for (int p=0; p<m_InputDepth; p++)
-          for (int i=0; i<m_InputSize;  i++)
-          for (int j=0; j<m_InputSize;  j++)
-          {
-            m_Value[p, i, j] = m_ActivationFunction.Value(input[p, i, j]);
-          }
-        }
+        Array.Copy(input, m_Value, input.Length);
       }
 
       return m_Value;
@@ -114,17 +98,15 @@ namespace ML.DeepMethods.Models
 
     protected override double DoGetParam(int idx)
     {
-      throw new NotSupportedException();
+      return 0;
     }
 
     protected override void DoSetParam(int idx, double value, bool isDelta)
     {
-      throw new NotSupportedException();
     }
 
     protected override void DoUpdateParams(double[] pars, bool isDelta, int cursor)
     {
-      throw new NotSupportedException();
     }
   }
 }

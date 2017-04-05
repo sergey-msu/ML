@@ -10,7 +10,7 @@ namespace ML.DeepMethods.Models
   {
     public FlattenLayer(int outputDim, IActivationFunction activation = null)
       : base(outputDim,
-             windowSize: 1, // to be overridden with input size on build
+             windowSize: 1, // will be overridden with input size when building the layer
              stride: 1,
              padding: 0,
              activation: activation)

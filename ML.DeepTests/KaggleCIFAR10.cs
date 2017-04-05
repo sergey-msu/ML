@@ -133,7 +133,7 @@ namespace ML.DeepTests
     protected override void Train()
     {
       // create CNN
-      var net = NetworkFactory.CreateCIFAR10Net();
+      var net = NetworkFactory.CreateCIFAR10Demo();
 
       //net[net.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.ReLU;
 

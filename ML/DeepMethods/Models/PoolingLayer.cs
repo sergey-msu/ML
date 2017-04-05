@@ -14,7 +14,7 @@ namespace ML.DeepMethods.Models
                            int stride,
                            int padding=0,
                            IActivationFunction activation = null)
-      : base(1, // to be overridden with input depth on build
+      : base(1, // will be overridden with input depth when building the layer
              windowSize,
              stride,
              padding,
@@ -39,17 +39,15 @@ namespace ML.DeepMethods.Models
 
     protected override double DoGetParam(int idx)
     {
-      throw new NotSupportedException();
+      return 0;
     }
 
     protected override void DoSetParam(int idx, double value, bool isDelta)
     {
-      throw new NotSupportedException();
     }
 
     protected override void DoUpdateParams(double[] pars, bool isDelta, int cursor)
     {
-      throw new NotSupportedException();
     }
   }
 
