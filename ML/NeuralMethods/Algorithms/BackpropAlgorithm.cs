@@ -19,8 +19,7 @@ namespace ML.NeuralMethods.Algorithms
     {
       FullLoop  = 0,
       ErrorFunc = 1,
-      StepMin   = 2,
-      QFunc     = 3
+      StepMin   = 2
     }
 
     #endregion
@@ -28,8 +27,8 @@ namespace ML.NeuralMethods.Algorithms
     #region CONST
 
     public const int    DFT_EPOCH_COUNT = 1;
+    public const int    DFT_BATCH_SIZE = 1;
     public const double DFT_LEARNING_RATE = 0.1D;
-    public const double DFT_Q_LAMBDA = 0.9D;
     public const StopCriteria DTF_STOP_CRITERIA = StopCriteria.FullLoop;
 
     #endregion
@@ -40,8 +39,9 @@ namespace ML.NeuralMethods.Algorithms
     private int m_EpochLength;
 
     private ILossFunction m_LossFunction;
-
     private StopCriteria m_Stop;
+
+    private int    m_BatchSize;
     private int    m_InputDim;
     private int    m_OutputDim;
     private int    m_EpochCount;
@@ -56,14 +56,12 @@ namespace ML.NeuralMethods.Algorithms
     private double m_Step2;
     private double m_StepStopValue;
 
-    private double m_QLambda;
-    private double m_PrevQValue;
-    private double m_QValue;
-    private double m_QDelta;
-    private double m_QStopDelta;
-
     private int m_Epoch;
     private int m_Iteration;
+    private int m_Batch;
+
+    private double[][]  m_Errors;
+    private double[][,] m_Updates;
 
     #endregion
 
@@ -94,8 +92,6 @@ namespace ML.NeuralMethods.Algorithms
     public double ErrorValue     { get { return m_ErrorValue; } }
     public double ErrorDelta     { get { return m_ErrorDelta; } }
     public double Step2          { get { return m_Step2; } }
-    public double QValue         { get { return m_QValue; } }
-    public double QDelta         { get { return m_QDelta; } }
 
     public ILossFunction LossFunction
     {
@@ -111,6 +107,17 @@ namespace ML.NeuralMethods.Algorithms
         if (value <= 0)
           throw new MLException("Epoch count must be positive");
         m_EpochCount = value;
+      }
+    }
+
+    public int BatchSize
+    {
+      get { return m_BatchSize; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("Batch size must be positive");
+        m_BatchSize = value;
       }
     }
 
@@ -153,31 +160,9 @@ namespace ML.NeuralMethods.Algorithms
       }
     }
 
-    public double QLambda
-    {
-      get { return m_QLambda; }
-      set
-      {
-        if (QLambda < 0 || QLambda > 1)
-          throw new MLException("Lambda for Q-stop criteria must be in [0, 1] interval");
-        m_QLambda = value;
-      }
-    }
-
-    public double QStopDelta
-    {
-      get { return m_QStopDelta; }
-      set
-      {
-        if (QStopDelta < 0)
-          throw new MLException("Q Stop Delta must be non-negative");
-        m_QStopDelta = value;
-      }
-    }
-
     public int Epoch { get { return m_Epoch; } }
-
     public int Iteration { get { return m_Iteration; } }
+    public int Batch { get { return m_Batch; } }
 
     #endregion
 
@@ -186,6 +171,14 @@ namespace ML.NeuralMethods.Algorithms
     public void RunEpoch()
     {
       runEpoch(Result);
+    }
+
+    public void RunBatch(int skip, int take)
+    {
+      if (skip<0) throw new MLException("Skip value must be non-negative");
+      if (take<=0) throw new MLException("Take value must be positive");
+
+      runBatch(Result, TrainingSample.Subset(skip, take));
     }
 
     public void RunIteration(double[] data, Class cls)
@@ -209,12 +202,27 @@ namespace ML.NeuralMethods.Algorithms
     private void init()
     {
       m_EpochCount   = DFT_EPOCH_COUNT;
+      m_BatchSize    = DFT_BATCH_SIZE;
       m_LearningRate = DFT_LEARNING_RATE;
       m_Stop         = DTF_STOP_CRITERIA;
-      m_QLambda      = DFT_Q_LAMBDA;
       m_EpochLength  = TrainingSample.Count;
       m_InputDim     = Result.InputDim;
       m_OutputDim    = Result[Result.LayerCount-1].NeuronCount;
+
+      m_Errors = new double[Result.LayerCount][];
+      for (int i=0; i<Result.LayerCount; i++)
+      {
+        var ncount = Result[i].NeuronCount;
+        m_Errors[i] = new double[ncount];
+      }
+
+      m_Updates = new double[Result.LayerCount][,];
+      for (int i=0; i<Result.LayerCount; i++)
+      {
+        var pcount = (i>0) ? Result[i-1].NeuronCount : m_InputDim;
+        var lcount = Result[i].NeuronCount;
+        m_Updates[i] = new double[lcount, pcount+1]; // take bias into account
+      }
 
       m_ExpectedOutputs = new Dictionary<Class, double[]>();
       var count = Classes.Count;
@@ -235,20 +243,46 @@ namespace ML.NeuralMethods.Algorithms
 
     private void runEpoch(NeuralNetwork net)
     {
-      foreach (var pdata in TrainingSample)
+      // loop on batches
+      var i = 0;
+      foreach (var batch in TrainingSample.Batch(m_BatchSize))
+      {
+        runBatch(net, batch);
+        i++;
+      }
+
+      // update epoch stats
+      m_Epoch++;
+      m_Iteration = 0;
+      m_Batch = 0;
+
+      if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
+    }
+
+    private void runBatch(NeuralNetwork net, ClassifiedSample<double[]> sampleBatch)
+    {
+      // loop on batch
+      foreach (var pdata in sampleBatch)
       {
         runIteration(net, pdata.Key, pdata.Value);
       }
 
-      // update epoch stats
+      updateWeights(net);
+
+      // update batch stats
       m_PrevErrorValue = m_ErrorValue;
-      m_ErrorValue = m_IterErrorValue/TrainingSample.Count;
+      m_ErrorValue = m_IterErrorValue/sampleBatch.Count;
       m_ErrorDelta = m_ErrorValue-m_PrevErrorValue;
       m_IterErrorValue = 0.0D;
-      m_Epoch++;
-      m_Iteration = 0;
 
-      if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
+      var len = m_Updates.Length;
+      for (int i=0; i<len; i++)
+      {
+        var updates = m_Updates[i];
+        Array.Clear(updates, 0, updates.Length);
+      }
+
+      m_Batch++;
     }
 
     private void runIteration(NeuralNetwork net, double[] input, Class cls)
@@ -265,9 +299,7 @@ namespace ML.NeuralMethods.Algorithms
 
       // update iter stats
       m_IterErrorValue += serr;
-      m_PrevQValue = m_QValue;
-      m_QValue = (1-m_QLambda)*m_QValue + m_QLambda*serr;
-      m_QDelta = m_QValue-m_PrevQValue;
+      m_Iteration++;
     }
 
     private double feedForward(NeuralNetwork net, double[] input, Class cls)
@@ -275,12 +307,13 @@ namespace ML.NeuralMethods.Algorithms
       var output = net.Calculate(input);
       var expect = m_ExpectedOutputs[cls];
       var llayer = net[net.LayerCount-1];
+      var errors = m_Errors[net.LayerCount-1];
 
       for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = llayer[j];
         var ej = m_LossFunction.Derivative(j, output, expect);
-        neuron.Error = ej * neuron.Derivative;
+        errors[j] = ej * neuron.Derivative;
       }
 
       return m_LossFunction.Value(output, expect);
@@ -288,11 +321,12 @@ namespace ML.NeuralMethods.Algorithms
 
     private void feedBackward(NeuralNetwork net, NeuralLayer layer, int lidx, double[] input)
     {
-      var ncount = layer.NeuronCount;
-      var player = (lidx>0) ? net[lidx-1] : null;
-      var pcount = (lidx>0) ? player.NeuronCount : m_InputDim;
-
-      var sstep2 = 0.0D;
+      var errors  = m_Errors[lidx];
+      var updates = m_Updates[lidx];
+      var ncount  = layer.NeuronCount;
+      var player  = (lidx>0) ? net[lidx-1] : null;
+      var pcount  = (lidx>0) ? player.NeuronCount : m_InputDim;
+      var perrors = (lidx>0) ? m_Errors[lidx-1] : null;
 
       // save "errors" in previous layer for future use
       if (lidx > 0)
@@ -301,7 +335,7 @@ namespace ML.NeuralMethods.Algorithms
           var pneuron = player[h];
           if (!pneuron.LastRetained)
           {
-            pneuron.Error = 0;
+            perrors[h] = 0;
             continue;
           }
 
@@ -311,36 +345,64 @@ namespace ML.NeuralMethods.Algorithms
             var neuron = layer[j];
             if (!neuron.LastRetained) continue;
 
-            eh += neuron.Error * neuron[h];
+            eh += errors[j] * neuron[h];
           }
 
-          pneuron.Error = eh * pneuron.Derivative;
+          perrors[h] = eh * pneuron.Derivative;
         }
 
-      // update weights
+      // accumulate weight updates
       for (int j=0; j<ncount; j++)
       {
         var neuron = layer[j];
         if (!neuron.LastRetained) continue;
 
-        var dj = m_LearningRate * neuron.Error;
+        var gj = errors[j];
 
         for (int h=0; h<pcount; h++)
         {
           if ((lidx != 0) && !player[h].LastRetained) continue;
 
-          var value = (lidx == 0) ? input[h] : player[h].Value;
-          var dwj = dj * value;
-          neuron[h] -= dwj;
-          sstep2 += dwj * dwj;
+          var value = (lidx>0) ? player[h].Value : input[h];
+          var dwj = gj * value;
+          updates[j, h] -= dwj;
         }
 
-        neuron.Bias -= dj;
-        sstep2 += dj * dj;
+        updates[j, pcount] -= gj;
+      }
+    }
+
+    private void updateWeights(NeuralNetwork net)
+    {
+      var lcount = net.LayerCount;
+      var step2 = 0.0D;
+
+      for (int i=lcount-1; i>=0; i--)
+      {
+        var updates = m_Updates[i];
+        var layer  = net[i];
+        var ncount = layer.NeuronCount;
+        var player = (i>0) ? net[i-1] : null;
+        var pcount = (i>0) ? player.NeuronCount : m_InputDim;
+        double dw;
+
+        for (int j=0; j<ncount; j++)
+        {
+          var neuron = layer[j];
+          for (int h=0; h<pcount; h++)
+          {
+            dw = m_LearningRate*updates[j, h];
+            step2 += dw*dw;
+            neuron[h] += dw;
+          }
+
+          dw = m_LearningRate*updates[j, pcount];
+          step2 += dw*dw;
+          neuron.Bias += dw;
+        }
       }
 
-      // update iter stats
-      m_Step2 = sstep2;
+      m_Step2 = step2;
     }
 
     private bool checkStopCriteria()
@@ -349,7 +411,6 @@ namespace ML.NeuralMethods.Algorithms
       {
         case StopCriteria.FullLoop:  return false;
         case StopCriteria.ErrorFunc: return Math.Abs(m_ErrorDelta) < m_ErrorStopDelta;
-        case StopCriteria.QFunc:     return Math.Abs(m_QDelta) < m_QStopDelta;
         case StopCriteria.StepMin:   return m_Step2 < StepStopValue;
         default: throw new MLException("Unknown stop criteria");
       }

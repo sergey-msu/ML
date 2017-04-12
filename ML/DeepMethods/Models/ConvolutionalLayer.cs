@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using ML.Contracts;
-using ML.Core;
-using ML.Core.ComputingNetworks;
 using ML.Core.Mathematics;
 
 namespace ML.DeepMethods.Models

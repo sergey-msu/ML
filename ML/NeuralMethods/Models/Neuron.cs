@@ -105,15 +105,6 @@ namespace ML.NeuralMethods.Models
     }
 
     /// <summary>
-    /// Calculated error
-    /// </summary>
-    public double Error
-    {
-      get { return m_Error; }
-      set { m_Error = value; }
-    }
-
-    /// <summary>
     /// Dimension of input vector
     /// </summary>
     public int InputDim

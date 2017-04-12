@@ -208,12 +208,13 @@ namespace ML.ConsoleTest
     private BackpropAlgorithm createBPAlg()
     {
       var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 2, 15, 3 }, Activation.Logistic(1));
-      net[0].DropoutRate = 0.1D;
+      //net[0].DropoutRate = 0.1D;
       net.IsTraining = true;
 
       var alg = new BackpropAlgorithm(Data.TrainingSample, net);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.1D;
+      alg.BatchSize = 1;
       alg.LossFunction = Loss.Euclidean;
 
       int epoch = 0;
@@ -223,8 +224,6 @@ namespace ML.ConsoleTest
                                Console.WriteLine("----------------Epoch #: {0}", epoch);
                                Console.WriteLine("E:\t{0}",  alg.ErrorValue);
                                Console.WriteLine("DE:\t{0}", alg.ErrorDelta);
-                               Console.WriteLine("Q:\t{0}",  alg.QValue);
-                               Console.WriteLine("DQ:\t{0}", alg.QDelta);
                                Console.WriteLine("DW:\t{0}", alg.Step2);
                              };
 
@@ -251,12 +250,12 @@ namespace ML.ConsoleTest
     private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg_NN_ForTest()
     {
       var cnn = new ConvolutionalNetwork(2, 1) { IsTraining=true };
-      cnn.AddLayer(new DenseLayer(15));
+      cnn.AddLayer(new DenseLayer(15, activation: Activation.Logistic(1)));
       //cnn.AddLayer(new MaxPoolingLayer(1, 1));
-      cnn.AddLayer(new ActivationLayer(Activation.Logistic(1)));
+      //cnn.AddLayer(new ActivationLayer(Activation.Logistic(1)));
       //cnn.AddLayer(new DropoutLayer(0.1));
-      cnn.AddLayer(new DenseLayer(3));
-      cnn.AddLayer(new ActivationLayer(Activation.Logistic(1)));
+      cnn.AddLayer(new DenseLayer(3, activation: Activation.Logistic(1)));
+      //cnn.AddLayer(new ActivationLayer(Activation.Logistic(1)));
       //cnn.AddLayer(new MaxPoolingLayer(1, 1));
 
       cnn.Build();
