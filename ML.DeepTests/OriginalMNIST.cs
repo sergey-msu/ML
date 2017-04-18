@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
 using ML.Core;
 using ML.Utils;
 using ML.DeepMethods.Algorithms;
-using ML.DeepMethods.Models;
 using ML.Core.Registry;
+using ML.DeepMethods;
 
 namespace ML.DeepTests
 {
@@ -18,7 +16,7 @@ namespace ML.DeepTests
     const string MNIST_IMG_FILE   = "img_{0}.png";
     const string MNIST_LABEL_FILE = "labels.csv";
 
-    private ClassifiedSample<double[,,]> m_Test = new ClassifiedSample<double[,,]>();
+    private ClassifiedSample<double[][,]> m_Test = new ClassifiedSample<double[][,]>();
     private Dictionary<int, Class>       m_Classes = new Dictionary<int, Class>()
     {
       { 0, new Class("Zero",  0) },
@@ -156,7 +154,7 @@ namespace ML.DeepTests
       loadSample(objFilePath, labelFilePath, m_Test);
     }
 
-    private void loadSample(string ipath, string lpath, ClassifiedSample<double[,,]> sample)
+    private void loadSample(string ipath, string lpath, ClassifiedSample<double[][,]> sample)
     {
       using (var ifile = File.Open(ipath, FileMode.Open, FileAccess.Read))
       using (var lfile = File.Open(lpath, FileMode.Open, FileAccess.Read))
@@ -174,12 +172,12 @@ namespace ML.DeepTests
 
         for (int q=0; q<count; q++)
         {
-          var data = new double[1, rows, cols];
+          var data = new double[1][,] { new double[rows, cols] };
           for (int i=0; i<rows; i++)
           for (int j=0; j<cols; j++)
           {
             var shade = ifile.ReadByte(); // do not invert 255-* because we want to keep logical format: 0=white, 255=black - not image color format!
-            data[0, i, j] = shade/255.0D;
+            data[0][i, j] = shade/255.0D;
           }
 
           var label = lfile.ReadByte();
@@ -200,8 +198,8 @@ namespace ML.DeepTests
       // create CNN
 
       //var net = NetworkFactory.CreateLeNet1();
-      var net = NetworkFactory.CreateMNISTDemo();
-      //net[net.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.Logistic(1);
+      var net = NetworkFactory.CreateLeNet1();
+      //net[net.LayerCount-1].ActivationFunction = Activation.Logistic(1);
       //ConvolutionalNetwork net;
       //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";
       //using (var stream = File.Open(filePath1, FileMode.Open))
@@ -210,12 +208,13 @@ namespace ML.DeepTests
       //}
 
       // create algorithm
-      var epochs = 30;
+      var epochs = 50;
       Alg = new BackpropAlgorithm(m_Training, net)
       {
-        LossFunction = Loss.CrossEntropySoftMax,
+        LossFunction = Loss.Euclidean,
         EpochCount = epochs,
-        LearningRate = 0.005D
+        LearningRate = 0.001D,
+        BatchSize = 1,
       };
       Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Test, ResultsFolder);
 

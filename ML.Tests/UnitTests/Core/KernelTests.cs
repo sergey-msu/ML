@@ -2,13 +2,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core.Kernels;
 
-namespace ML.Tests.UnitTests
+namespace ML.Tests.UnitTests.Core
 {
   [TestClass]
   public class KernelTests : TestBase
   {
-    public const double EPS = 0.0000001D;
-
     [ClassInitialize]
     public static void ClassInit(TestContext context)
     {

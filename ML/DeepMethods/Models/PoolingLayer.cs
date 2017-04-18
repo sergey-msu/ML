@@ -8,16 +8,36 @@ namespace ML.DeepMethods.Models
   /// </summary>
   public abstract class PoolingLayer : DeepLayerBase
   {
+    protected int m_KernelArea;
+
     #region .ctor
 
     protected PoolingLayer(int windowSize,
-                           int stride,
-                           int padding=0,
-                           IActivationFunction activation = null)
+                            int stride,
+                            int padding=0,
+                            IActivationFunction activation = null)
       : base(1, // will be overridden with input depth when building the layer
              windowSize,
              stride,
              padding,
+             activation)
+    {
+    }
+
+    protected PoolingLayer(int windowHeight,
+                            int windowWidth,
+                            int strideHeight,
+                            int strideWidth,
+                            int paddingHeight=0,
+                            int paddingWidth=0,
+                            IActivationFunction activation = null)
+      : base(1, // will be overridden with input depth when building the layer
+             windowHeight,
+             windowWidth,
+             strideHeight,
+             strideWidth,
+             paddingHeight,
+             paddingWidth,
              activation)
     {
     }
@@ -30,11 +50,12 @@ namespace ML.DeepMethods.Models
 
     #endregion
 
-    public override void DoBuild()
+    protected override void BuildShape()
     {
       m_OutputDepth = m_InputDepth;
+      m_KernelArea = m_WindowHeight*m_WindowWidth;
 
-      base.DoBuild();
+      base.BuildShape();
     }
 
     protected override double DoGetParam(int idx)
@@ -52,18 +73,18 @@ namespace ML.DeepMethods.Models
   }
 
   /// <summary>
-  /// Represents max pooling operation
+  /// Represents max pooling layer
   /// </summary>
   public class MaxPoolingLayer : PoolingLayer
   {
-    private int[,,,] m_MaxIndexPositions;
+    private int[][,,] m_MaxIndexPositions;
 
     #region .ctor
 
     public MaxPoolingLayer(int windowSize,
-                           int stride,
-                           int padding=0,
-                           IActivationFunction activation = null)
+                            int stride,
+                            int padding=0,
+                            IActivationFunction activation = null)
       : base(windowSize,
              stride,
              padding,
@@ -71,32 +92,58 @@ namespace ML.DeepMethods.Models
     {
     }
 
+    public MaxPoolingLayer(int windowHeight,
+                            int windowWidth,
+                            int strideHeight,
+                            int strideWidth,
+                            int paddingHeight=0,
+                            int paddingWidth=0,
+                            IActivationFunction activation = null)
+      : base(windowHeight,
+             windowWidth,
+             strideHeight,
+             strideWidth,
+             paddingHeight,
+             paddingWidth,
+             activation)
+    {
+    }
+
     #endregion
 
-    public int[,,,] MaxIndexPositions { get { return m_MaxIndexPositions; } }
+    public int[][,,] MaxIndexPositions { get { return m_MaxIndexPositions; } }
 
-    protected override double[,,] DoCalculate(double[,,] input)
+    protected override void BuildShape()
+    {
+      base.BuildShape();
+
+      m_MaxIndexPositions = new int[m_OutputDepth][,,];
+      for (int i=0; i<m_OutputDepth; i++)
+        m_MaxIndexPositions[i] = new int[m_OutputHeight, m_OutputWidth, 2];
+    }
+
+    protected override double[][,] DoCalculate(double[][,] input)
     {
       for (int q=0; q<m_OutputDepth; q++)
       {
-        for (int i=0; i<m_OutputSize; i++)
-        for (int j=0; j<m_OutputSize; j++)
+        for (int i=0; i<m_OutputHeight; i++)
+        for (int j=0; j<m_OutputWidth; j++)
         {
           var net = double.MinValue;
           var xmaxIdx = -1;
           var ymaxIdx = -1;
-          var xmin = j*m_Stride-m_Padding;
-          var ymin = i*m_Stride-m_Padding;
+          var xmin = j*m_StrideWidth-m_PaddingWidth;
+          var ymin = i*m_StrideHeight-m_PaddingHeight;
 
           // window
-          for (int y=0; y<m_WindowSize; y++)
-          for (int x=0; x<m_WindowSize; x++)
+          for (int y=0; y<m_WindowHeight; y++)
+          for (int x=0; x<m_WindowWidth; x++)
           {
             var xidx = xmin+x;
             var yidx = ymin+y;
-            if (xidx>=0 && xidx<m_InputSize && yidx>=0 && yidx<m_InputSize)
+            if (xidx>=0 && xidx<m_InputWidth && yidx>=0 && yidx<m_InputHeight)
             {
-              var z = input[q, yidx, xidx];
+              var z = input[q][yidx, xidx];
               if (z > net)
               {
                 net = z;
@@ -106,20 +153,33 @@ namespace ML.DeepMethods.Models
             }
           }
 
-          m_Value[q, i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
-          m_MaxIndexPositions[q, i, j, 0] = xmaxIdx;
-          m_MaxIndexPositions[q, i, j, 1] = ymaxIdx;
+          m_Value[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
+          m_MaxIndexPositions[q][i, j, 0] = xmaxIdx;
+          m_MaxIndexPositions[q][i, j, 1] = ymaxIdx;
         }
       }
 
       return m_Value;
     }
 
-    public override void DoBuild()
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] errors, double[][,] prevError)
     {
-      base.DoBuild();
+      for (int i=0; i<prevError.Length; i++)
+        Array.Clear(prevError[i], 0, prevError[i].Length);
 
-      m_MaxIndexPositions = new int[m_OutputDepth, m_OutputSize, m_OutputSize, 2];
+      // backpropagate "errors" to previous layer for future use
+      for (int q=0; q<m_OutputDepth;  q++)
+      for (int i=0; i<m_OutputHeight; i++)
+      for (int j=0; j<m_OutputWidth;  j++)
+      {
+        var xmaxIdx = m_MaxIndexPositions[q][i, j, 0];
+        var ymaxIdx = m_MaxIndexPositions[q][i, j, 1];
+        prevError[q][ymaxIdx, xmaxIdx] += errors[q][i, j] * prevLayer.Derivative(q, ymaxIdx, xmaxIdx);
+      }
+    }
+
+    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    {
     }
   }
 
@@ -128,12 +188,12 @@ namespace ML.DeepMethods.Models
   /// </summary>
   public class AvgPoolingLayer : PoolingLayer
   {
-    #region .ctor
+        #region .ctor
 
     public AvgPoolingLayer(int windowSize,
-                           int stride,
-                           int padding=0,
-                           IActivationFunction activation = null)
+                            int stride,
+                            int padding=0,
+                            IActivationFunction activation = null)
       : base(windowSize,
              stride,
              padding,
@@ -141,42 +201,66 @@ namespace ML.DeepMethods.Models
     {
     }
 
+    public AvgPoolingLayer(int windowHeight,
+                            int windowWidth,
+                            int strideHeight,
+                            int strideWidth,
+                            int paddingHeight=0,
+                            int paddingWidth=0,
+                            IActivationFunction activation = null)
+      : base(windowHeight,
+             windowWidth,
+             strideHeight,
+             strideWidth,
+             paddingHeight,
+             paddingWidth,
+             activation)
+    {
+    }
+
     #endregion
 
-    protected override double[,,] DoCalculate(double[,,] input)
+    protected override double[][,] DoCalculate(double[][,] input)
     {
-      var l = m_WindowSize*m_WindowSize;
-
       // output fm-s
       for (int q=0; q<m_OutputDepth; q++)
       {
         // fm neurons
-        for (int i=0; i<m_OutputSize; i++)
-        for (int j=0; j<m_OutputSize; j++)
+        for (int i=0; i<m_OutputHeight; i++)
+        for (int j=0; j<m_OutputWidth; j++)
         {
           var net = 0.0D;
-          var xmin = j*m_Stride-m_Padding;
-          var ymin = i*m_Stride-m_Padding;
+          var xmin = j*m_StrideWidth-m_PaddingWidth;
+          var ymin = i*m_StrideHeight-m_PaddingHeight;
 
           // window
-          for (int y=0; y<m_WindowSize; y++)
-          for (int x=0; x<m_WindowSize; x++)
+          for (int y=0; y<m_WindowHeight; y++)
+          for (int x=0; x<m_WindowWidth; x++)
           {
             var xidx = xmin+x;
             var yidx = ymin+y;
-            if (xidx>=0 && xidx<m_InputSize && yidx>=0 && yidx<m_InputSize)
+            if (xidx>=0 && xidx<m_InputWidth && yidx>=0 && yidx<m_InputHeight)
             {
-              net += input[q, yidx, xidx];
+              net += input[q][yidx, xidx];
             }
           }
 
-          net /= l;
+          net /= m_KernelArea;
 
-          m_Value[q, i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
+          m_Value[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
         }
       }
 
       return m_Value;
+    }
+
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] errors, double[][,] prevError)
+    {
+      throw new NotImplementedException(); //TODO
+    }
+
+    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    {
     }
   }
 }

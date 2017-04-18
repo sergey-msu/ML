@@ -15,6 +15,7 @@ namespace ML.NeuralMethods.Models
     private IActivationFunction m_ActivationFunction;
     private bool m_IsTraining;
     private double m_DropoutRate;
+    private int m_DropoutSeed;
     internal int m_InputDim;
 
     #endregion
@@ -61,6 +62,21 @@ namespace ML.NeuralMethods.Models
         m_DropoutRate=value;
         foreach (var neuron in SubNodes)
           neuron.DropoutRate = value;
+      }
+    }
+
+
+    /// <summary>
+    /// Random seed for dropout
+    /// </summary>
+    public int DropoutSeed
+    {
+      get { return m_DropoutSeed; }
+      set
+      {
+        m_DropoutSeed=value;
+        foreach (var neuron in SubNodes)
+          neuron.DropoutSeed = value;
       }
     }
 

@@ -7,55 +7,94 @@ namespace ML.DeepMethods.Models
 {
   /// <summary>
   /// Represents "deep" layer - a building block of deep networks (i.e. CNN)
-  /// that accepts 3D input (a series of 2D channels) and returns 3D output (i.e. series of feature maps in CNN)
+  /// that accepts 3D input (an array of 2D channels) and returns 3D output (e.g. array of feature maps in CNN)
   /// </summary>
-  public abstract class DeepLayerBase : ComputingNode<double[,,], double[,,]>
+  public abstract class DeepLayerBase : ComputingNode<double[][,], double[][,]>
   {
     #region Fields
 
     protected bool m_IsTraining;
     protected IActivationFunction m_ActivationFunction;
 
-    internal  int m_InputSize;
-    internal  int m_InputDepth;
-    protected int m_OutputSize;
-    protected int m_OutputDepth;
-    protected int m_WindowSize;
-    protected int m_Stride;
-    protected int m_Padding;
+    protected int m_InputDepth;
+    protected int m_InputHeight;
+    protected int m_InputWidth;
 
-    protected double[,,] m_Value;
-    protected double[,,] m_Error;
+    protected int m_OutputDepth;
+    protected int m_OutputHeight;
+    protected int m_OutputWidth;
+
+    protected int m_WindowHeight;
+    protected int m_WindowWidth;
+    protected int m_StrideHeight;
+    protected int m_StrideWidth;
+    protected int m_PaddingHeight;
+    protected int m_PaddingWidth;
+
+    protected double[]    m_Weights;
+    protected double[][,] m_Value;
 
     #endregion
 
     #region .ctor
 
     protected DeepLayerBase(int outputDepth,
-                            int windowSize,
-                            int stride,
-                            int padding=0,
-                            IActivationFunction activation = null)
+                             int windowSize,
+                             int stride,
+                             int padding=0,
+                             IActivationFunction activation = null)
+      : this(outputDepth,
+             windowSize,
+             windowSize,
+             stride,
+             stride,
+             padding,
+             padding,
+             activation)
+    {
+    }
+
+    protected DeepLayerBase(int outputDepth,
+                             int windowHeight,
+                             int windowWidth,
+                             int strideHeight,
+                             int strideWidth,
+                             int paddingHeight=0,
+                             int paddingWidth=0,
+                             IActivationFunction activation = null)
     {
       if (outputDepth <= 0)
         throw new MLException("DeepLayerBase.ctor(outputDepth<=0)");
-      if (windowSize <= 0)
-        throw new MLException("DeepLayerBase.ctor(windowSize<=0)");
-      if (stride <= 0)
-        throw new MLException("DeepLayerBase.ctor(stride<=0)");
-      if (padding < 0)
-        throw new MLException("DeepLayerBase.ctor(padding<0)");
+      if (windowHeight <= 0)
+        throw new MLException("DeepLayerBase.ctor(windowHeight<=0)");
+      if (windowWidth <= 0)
+        throw new MLException("DeepLayerBase.ctor(windowWidth<=0)");
+      if (strideHeight <= 0)
+        throw new MLException("DeepLayerBase.ctor(strideHeight<=0)");
+      if (strideWidth <= 0)
+        throw new MLException("DeepLayerBase.ctor(strideWidth<=0)");
+      if (paddingHeight < 0)
+        throw new MLException("DeepLayerBase.ctor(paddingHeight<0)");
+      if (paddingWidth < 0)
+        throw new MLException("DeepLayerBase.ctor(paddingWidth<0)");
 
-      m_WindowSize  = windowSize;
-      m_Stride      = stride;
-      m_Padding     = padding;
-      m_OutputDepth = outputDepth;
+      m_WindowHeight  = windowHeight;
+      m_WindowWidth   = windowWidth;
+      m_StrideHeight  = strideHeight;
+      m_StrideWidth   = strideWidth;
+      m_PaddingHeight = paddingHeight;
+      m_PaddingWidth  = paddingWidth;
+      m_OutputDepth   = outputDepth;
       m_ActivationFunction = activation;
     }
 
     #endregion
 
     #region Properties
+
+    public override int ParamCount { get { return m_Weights.Length; } }
+
+    public double[] Weights { get { return m_Weights; } }
 
     /// <summary>
     /// If true, indicates that layer is in training mode,
@@ -70,22 +109,91 @@ namespace ML.DeepMethods.Models
     /// <summary>
     /// Count of input channels
     /// </summary>
-    public int InputDepth { get { return m_InputDepth; } }
+    public int InputDepth
+    {
+      get { return m_InputDepth; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("Input depth must be positive");
+        m_InputDepth=value;
+      }
+    }
 
     /// <summary>
-    /// Size of squared input channel
+    /// Height of input channel
     /// </summary>
-    public int InputSize { get { return m_InputSize; } }
+    public int InputHeight
+    {
+      get { return m_InputHeight; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("Input height must be positive");
+        m_InputHeight=value;
+      }
+    }
 
     /// <summary>
-    /// Count of output feature map channels
+    /// Width of input channel
+    /// </summary>
+    public int InputWidth
+    {
+      get { return m_InputWidth; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("Input width must be positive");
+        m_InputWidth=value;
+      }
+    }
+
+    /// <summary>
+    /// Count of output channels
     /// </summary>
     public int OutputDepth { get { return m_OutputDepth; } }
 
     /// <summary>
-    /// Size of square output feature map channel
+    /// Height of output channel
     /// </summary>
-    public int OutputSize { get { return m_OutputSize; } }
+    public int OutputHeight { get { return m_OutputHeight; } }
+
+    /// <summary>
+    /// Width of output channel
+    /// </summary>
+    public int OutputWidth { get { return m_OutputWidth; } }
+
+    /// <summary>
+    /// Height of layer's window
+    /// </summary>
+    public int WindowHeight { get { return m_WindowHeight; } }
+
+    /// <summary>
+    /// Width of layer's window
+    /// </summary>
+    public int WindowWidth { get { return m_WindowWidth; } }
+
+    /// <summary>
+    /// An overlapping step in y direction during convolution calculation process.
+    /// 1 leads to maximum overlapping between neighbour kernel windows
+    /// </summary>
+    public int StrideHeight { get { return m_StrideHeight; } }
+
+    /// <summary>
+    /// An overlapping step in x direction during convolution calculation process.
+    /// 1 leads to maximum overlapping between neighbour kernel windows
+    /// </summary>
+    public int StrideWidth { get { return m_StrideWidth; } }
+
+    /// <summary>
+    /// Padding in y direction of the input channel
+    /// </summary>
+    public int PaddingHeight { get { return m_PaddingHeight; } }
+
+    /// <summary>
+    /// Padding in x direction of the input channel
+    /// </summary>
+    public int PaddingWidth { get { return m_PaddingWidth; } }
 
     /// <summary>
     /// Activation function. If null, the layer's activation function will be used
@@ -96,33 +204,15 @@ namespace ML.DeepMethods.Models
       set { m_ActivationFunction = value; }
     }
 
-    /// <summary>
-    /// Size of square convolution window
-    /// </summary>
-    public int WindowSize { get { return m_WindowSize; } }
-
-    /// <summary>
-    /// An overlapping step during convolution calculation process.
-    /// 1 leads to maximum overlapping between neighour kernel windows
-    /// </summary>
-    public int Stride { get { return m_Stride; } }
-
-    /// <summary>
-    /// Padding of the input channel
-    /// </summary>
-    public int Padding { get { return m_Padding; } }
+    #endregion
 
     /// <summary>
     /// Calculated value
     /// </summary>
-    public double[,,] Value { get { return m_Value; } }
-
-    /// <summary>
-    /// Saved error value
-    /// </summary>
-    public double[,,] Error { get { return m_Error; } }
-
-    #endregion
+    public double Value(int p, int i, int j)
+    {
+      return m_Value[p][i,j];
+    }
 
     /// <summary>
     /// Calculates net value's derivative
@@ -130,34 +220,16 @@ namespace ML.DeepMethods.Models
     public double Derivative(int p, int i, int j)
     {
       return (m_ActivationFunction != null) ?
-              m_ActivationFunction.DerivativeFromValue(m_Value[p, i, j]) :
+              m_ActivationFunction.DerivativeFromValue(m_Value[p][i,j]) :
               1;
     }
 
-    public override double[,,] Calculate(double[,,] input)
+    public override double[][,] Calculate(double[][,] input)
     {
       if (m_InputDepth != input.GetLength(0))
         throw new MLException("Incorrect input depth");
-      if (m_InputSize != input.GetLength(1))
-        throw new MLException("Incorrect input size");
-      if (m_InputSize != input.GetLength(2))
-        throw new MLException("Incorrect input size");
 
       return DoCalculate(input);
-    }
-
-    public override void DoBuild()
-    {
-      m_OutputSize = (m_InputSize - m_WindowSize + 2*m_Padding)/m_Stride + 1;
-      if (m_OutputSize <= 0)
-        throw new MLException("Output tensor is empty. Check input shape datas");
-
-      m_Value = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
-
-      if (m_IsTraining)
-      {
-        m_Error = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
-      }
     }
 
     /// <summary>
@@ -167,6 +239,90 @@ namespace ML.DeepMethods.Models
     {
     }
 
-    protected abstract double[,,] DoCalculate(double[,,] input);
+    public virtual void _Build()
+    {
+      BuildShape();
+      BuildParams();
+    }
+
+    protected virtual void BuildShape()
+    {
+      m_OutputHeight = (m_InputHeight - m_WindowHeight + 2*m_PaddingHeight)/m_StrideHeight + 1;
+      m_OutputWidth  = (m_InputWidth  - m_WindowWidth  + 2*m_PaddingWidth)/m_StrideWidth   + 1;
+      if (m_OutputHeight <= 0 || m_OutputWidth <= 0)
+        throw new MLException("Output tensor is empty. Check input shape datas");
+
+      m_Value = new double[m_OutputDepth][,];
+      for (var q=0; q<m_OutputDepth; q++)
+        m_Value[q] = new double[m_OutputHeight, m_OutputWidth];
+    }
+
+    protected virtual void BuildParams()
+    {
+    }
+
+    protected abstract double[][,] DoCalculate(double[][,] input);
+
+    /// <summary>
+    /// Backpropagate "errors" to previous layer for future use
+    /// </summary>
+    /// <param name="prevLayer">Previous layer</param>
+    /// <param name="errors">Current layer gradient "errors"</param>
+    /// <param name="updates">Previous layer gradient "errors"</param>
+    public void Backprop(DeepLayerBase prevLayer, double[][,] errors, double[][,] prevError)
+    {
+      if (!m_IsTraining)
+        throw new MLException("Backpropagation can not run in test mode");
+
+      DoBackprop(prevLayer, errors, prevError);
+    }
+
+    /// <summary>
+    /// Calculate layer parameter updates
+    /// </summary>
+    /// <param name="prevLayer">Previous layer (or input layer)</param>
+    /// <param name="errors">Current layer gradient "errors"</param>
+    /// <param name="updates">Current layer parameter updates to copy into</param>
+    public void SetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    {
+      if (!m_IsTraining)
+        throw new MLException("Backpropagation can not run in test mode");
+
+      DoSetLayerGradient(prevLayer, errors, layerGradient);
+    }
+
+    protected abstract void DoBackprop(DeepLayerBase prevLayer, double[][,] errors, double[][,] prevError);
+
+    protected abstract void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient);
+
+
+
+    // TODO: do we need this?
+
+    protected override double DoGetParam(int idx)
+    {
+      return m_Weights[idx];
+    }
+
+    protected override void DoSetParam(int idx, double value, bool isDelta)
+    {
+      if (isDelta)
+        m_Weights[idx] += value;
+      else
+        m_Weights[idx] = value;
+    }
+
+    protected override void DoUpdateParams(double[] updates, bool isDelta, int cursor)
+    {
+      var len = ParamCount;
+      if (isDelta)
+      {
+        for (int i=0; i<len; i++)
+          m_Weights[i] += updates[i+cursor];
+      }
+      else
+        Array.Copy(updates, cursor, m_Weights, 0, len);
+    }
+
   }
 }

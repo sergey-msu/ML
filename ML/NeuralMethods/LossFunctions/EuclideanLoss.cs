@@ -1,6 +1,6 @@
 ﻿using ML.Contracts;
 
-namespace ML.Core.LossFunctions
+namespace ML.NeuralMethods.LossFunctions
 {
   public class EuclideanLoss : ILossFunction
   {

@@ -4,7 +4,6 @@ using ML.Core.Metric;
 using ML.Core.Logical;
 using ML.Core.ActivationFunctions;
 using ML.Contracts;
-using ML.Core.LossFunctions;
 
 namespace ML.Core.Registry
 {
@@ -64,27 +63,6 @@ namespace ML.Core.Registry
       { Donskoy.ID, Donskoy },
       { Entropy.ID, Entropy }
     };
-  }
-
-  public static class Loss
-  {
-    private static readonly Dictionary<double, LpLoss> m_Lp = new Dictionary<double, LpLoss>();
-
-    public static readonly EuclideanLoss           Euclidean           = new EuclideanLoss();
-    public static readonly CrossEntropyLoss        CrossEntropy        = new CrossEntropyLoss();
-    public static readonly CrossEntropySoftMaxLoss CrossEntropySoftMax = new CrossEntropySoftMaxLoss();
-
-    public static LpLoss Lp(double p)
-    {
-      LpLoss result;
-      if (!m_Lp.TryGetValue(p, out result))
-      {
-        result = new LpLoss(p);
-        m_Lp[p] = result;
-      }
-
-      return result;
-    }
   }
 
   public static class Activation

@@ -1,20 +1,17 @@
-﻿using ML.Core;
-using ML.DeepMethods.Algorithms;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ML.Core;
+using ML.DeepMethods.Algorithms;
 
 namespace ML.DeepTests
 {
   public static class Utils
   {
-    public static void HandleEpochEnded(BackpropAlgorithm alg, ClassifiedSample<double[,,]> test, string outputPath)
+    public static void HandleEpochEnded(BackpropAlgorithm alg, ClassifiedSample<double[][,]> test, string outputPath)
     {
       Console.WriteLine("---------------- Epoch #: {0} ({1})", alg.Epoch, DateTime.Now);
-      Console.WriteLine("E:\t{0}", alg.ErrorValue);
+      Console.WriteLine("L:\t{0}", alg.LossValue);
       Console.WriteLine("DW:\t{0}", alg.Step2);
       Console.WriteLine("Errors:");
 
@@ -24,7 +21,7 @@ namespace ML.DeepTests
       var pct = Math.Round(100.0F * ec / dc, 2);
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
 
-      if (alg.Epoch == 1 || alg.ErrorDelta < 0)
+      if (alg.Epoch == 1 || alg.LossDelta < 0)
       {
         var ofileName = string.Format("cn_e{0}_p{1}.mld", alg.Epoch, Math.Round(pct, 2));
         var ofilePath = Path.Combine(outputPath, ofileName);
@@ -48,5 +45,6 @@ namespace ML.DeepTests
         alg.Result.Serialize(stream);
       }
     }
+
   }
 }

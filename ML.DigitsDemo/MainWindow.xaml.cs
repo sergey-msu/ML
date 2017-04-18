@@ -24,7 +24,7 @@ namespace ML.DigitsDemo
   public partial class MainWindow : Window
   {
     private Point m_CurrentPoint = new Point();
-    private ConvolutionalNetwork m_Network;
+    private ConvNet m_Network;
 
 
     public MainWindow()
@@ -44,7 +44,7 @@ namespace ML.DigitsDemo
       var assembly = Assembly.GetExecutingAssembly();
       using (var stream = assembly.GetManifestResourceStream("ML.DigitsDemo.lenet1.mld"))
       {
-        m_Network = ConvolutionalNetwork.Deserialize(stream);
+        m_Network = ConvNet.Deserialize(stream);
       }
     }
 
@@ -125,7 +125,7 @@ namespace ML.DigitsDemo
       var max = 0.0D;
       var digit = -1;
       var total = 0.0D;
-      for (int i=0; i<10; i++) { total += result[i,0,0]; }
+      for (int i=0; i<10; i++) { total += result[i][0,0]; }
       if (total <= 0)
       {
         m_TbResult.Text = "?";
@@ -134,15 +134,15 @@ namespace ML.DigitsDemo
 
       for (int i=0; i<10; i++)
       {
-        var prob = Math.Round(result[i, 0, 0]/total, 2);
+        var prob = Math.Round(result[i][0, 0]/total, 2);
         var barName = string.Format("m_Bar{0}", i);
         var probName = string.Format("m_Prob{0}", i);
         ((Rectangle)this.FindName(barName)).Width = prob*30;
         ((TextBlock)this.FindName(probName)).Text = prob.ToString();
 
-        if (result[i,0,0] > max)
+        if (result[i][0,0] > max)
         {
-          max=result[i,0,0];
+          max=result[i][0,0];
           digit=i;
         }
       }
@@ -187,7 +187,7 @@ namespace ML.DigitsDemo
       return result;
     }
 
-    private double[,,] normalizeData(double[,] data)
+    private double[][,] normalizeData(double[,] data)
     {
       // extract frame
 
@@ -257,16 +257,16 @@ namespace ML.DigitsDemo
       // scale result
 
       var lambda = (ymax-ymin)/20.0D;
-      var result = new double[1, 28, 28];
+      var result = new double[1][,] { new double[28, 28] };
 
       for (var v=0; v<28; v++)
       for (var u=0; u<28; u++)
       {
         var xidx = (u-13.5D)*lambda + xmean;
-        if (xidx<0 || xidx>=xlen) { result[0, v, u] = 0; continue; }
+        if (xidx<0 || xidx>=xlen) { result[0][v, u] = 0; continue; }
 
         var yidx = (v-13.5D)*lambda + ymean;
-        if (yidx<0 || yidx>=ylen) { result[0, v, u] = 0; continue; }
+        if (yidx<0 || yidx>=ylen) { result[0][v, u] = 0; continue; }
 
         var xm = (int)xidx;
         var xM = (xm < xlen-1) ? xm+1 : xm;
@@ -277,7 +277,7 @@ namespace ML.DigitsDemo
         var d10 = data[yM, xm];
         var d11 = data[yM, xM];
 
-        result[0, v, u] = (d11+d00-d01-d10)*(xidx-xm)*(yidx-ym) +
+        result[0][v, u] = (d11+d00-d01-d10)*(xidx-xm)*(yidx-ym) +
                           (d01-d00)*(xidx-xm) +
                           (d10-d00)*(yidx-ym) +
                           d00;
@@ -288,7 +288,7 @@ namespace ML.DigitsDemo
       for (var v=0; v<28; v++)
       for (var u=0; u<28; u++)
       {
-        var shade = result[0, v, u];
+        var shade = result[0][v, u];
         if (shade == 0) continue;
 
         var color = (byte)(255*(1-shade));

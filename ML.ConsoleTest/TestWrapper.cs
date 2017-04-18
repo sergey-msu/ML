@@ -13,6 +13,7 @@ using ML.NeuralMethods.Models;
 using ML.Utils;
 using ML.DeepMethods.Models;
 using ML.Core.Registry;
+using ML.DeepMethods;
 
 namespace ML.ConsoleTest
 {
@@ -70,8 +71,10 @@ namespace ML.ConsoleTest
         //Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
 
         //start = DateTime.Now;
+
         //doMultilayerNNAlgorithmTest();
         doCNNAlgorithmTest();
+
         var stop = DateTime.Now;
         Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
       }
@@ -205,16 +208,20 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
+    #endregion
+
+    #region NN
+
     private BackpropAlgorithm createBPAlg()
     {
       var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 2, 15, 3 }, Activation.Logistic(1));
-      //net[0].DropoutRate = 0.1D;
+      net[0].DropoutRate = 0.1D;
       net.IsTraining = true;
 
       var alg = new BackpropAlgorithm(Data.TrainingSample, net);
       alg.EpochCount = 6000;
-      alg.LearningRate = 0.1D;
-      alg.BatchSize = 1;
+      alg.LearningRate = 0.01D;
+      alg.BatchSize = 10;
       alg.LossFunction = Loss.Euclidean;
 
       int epoch = 0;
@@ -222,8 +229,8 @@ namespace ML.ConsoleTest
                              {
                                if (epoch++ % 300 != 0) return;
                                Console.WriteLine("----------------Epoch #: {0}", epoch);
-                               Console.WriteLine("E:\t{0}",  alg.ErrorValue);
-                               Console.WriteLine("DE:\t{0}", alg.ErrorDelta);
+                               Console.WriteLine("L:\t{0}",  alg.ErrorValue);
+                               Console.WriteLine("DL:\t{0}", alg.ErrorDelta);
                                Console.WriteLine("DW:\t{0}", alg.Step2);
                              };
 
@@ -239,7 +246,7 @@ namespace ML.ConsoleTest
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
 
-      Console.WriteLine("Error function: " + alg.ErrorValue);
+      Console.WriteLine("Loss function: " + alg.ErrorValue);
       Console.WriteLine("Step: " + alg.Step2);
 
       outputError(alg);
@@ -247,33 +254,42 @@ namespace ML.ConsoleTest
       //Visualizer.Run(alg);
     }
 
+    #endregion
+
+    #region CNN
+
     private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg_NN_ForTest()
     {
-      var cnn = new ConvolutionalNetwork(2, 1) { IsTraining=true };
+      var cnn = new ConvNet(2, 1) { IsTraining=true };
       cnn.AddLayer(new DenseLayer(15, activation: Activation.Logistic(1)));
-      //cnn.AddLayer(new MaxPoolingLayer(1, 1));
-      //cnn.AddLayer(new ActivationLayer(Activation.Logistic(1)));
-      //cnn.AddLayer(new DropoutLayer(0.1));
-      cnn.AddLayer(new DenseLayer(3, activation: Activation.Logistic(1)));
-      //cnn.AddLayer(new ActivationLayer(Activation.Logistic(1)));
-      //cnn.AddLayer(new MaxPoolingLayer(1, 1));
+      cnn.AddLayer(new MaxPoolingLayer(1, 1));
+      //cnn.AddLayer(new _ActivationLayer(Activation.Logistic(1)));
+      cnn.AddLayer(new DropoutLayer(0.1));
+      cnn.AddLayer(new FlattenLayer(3, activation: Activation.Logistic(1)));
+      //cnn.AddLayer(new _ActivationLayer(Activation.Logistic(1)));
+      cnn.AddLayer(new MaxPoolingLayer(1, 1));
 
-      cnn.Build();
+      cnn._Build();
       cnn.RandomizeParameters(0);
 
-      var sample = new ClassifiedSample<double[,,]>();
+      var sample = new ClassifiedSample<double[][,]>();
       foreach (var obj in Data.TrainingSample)
       {
         var data = obj.Key;
-        var key = new double[data.Length, 1, 1];
+
+        var key = new double[data.Length][,];
         for (int i=0; i<data.Length; i++)
-          key[i, 0, 0] = data[i];
+          key[i] = new double[1,1];
+
+        for (int i=0; i<data.Length; i++)
+          key[i][0,0] = data[i];
         sample[key] = obj.Value;
       }
 
       var alg = new ML.DeepMethods.Algorithms.BackpropAlgorithm(sample, cnn);
       alg.EpochCount = 6000;
-      alg.LearningRate = 0.1D;
+      alg.LearningRate = 0.01D;
+      alg.BatchSize = 1;
       alg.LossFunction = Loss.Euclidean;
 
       int epoch = 0;
@@ -281,10 +297,8 @@ namespace ML.ConsoleTest
                              {
                                if (epoch++ % 300 != 0) return;
                                Console.WriteLine("----------------Epoch #: {0}", epoch);
-                               Console.WriteLine("E:\t{0}",  alg.ErrorValue);
-                               Console.WriteLine("DE:\t{0}", alg.ErrorDelta);
-                               Console.WriteLine("Q:\t{0}",  alg.QValue);
-                               Console.WriteLine("DQ:\t{0}", alg.QDelta);
+                               Console.WriteLine("L:\t{0}",  alg.LossValue);
+                               Console.WriteLine("DL:\t{0}", alg.LossDelta);
                                Console.WriteLine("DW:\t{0}", alg.Step2);
                              };
 
@@ -300,13 +314,17 @@ namespace ML.ConsoleTest
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
 
-      Console.WriteLine("Error function: " + alg.ErrorValue);
+      Console.WriteLine("Loss function: " + alg.LossValue);
       Console.WriteLine("Step: " + alg.Step2);
 
       outputError(alg);
 
       //Visualizer.Run(alg);
     }
+
+    #endregion
+
+    #region auxillary
 
     private void outputError(AlgorithmBase<double[]> alg)
     {
@@ -329,6 +347,31 @@ namespace ML.ConsoleTest
         var key = new double[data.Length, 1, 1];
         for (int i=0; i<data.Length; i++)
           key[i, 0, 0] = data[i];
+        sample[key] = obj.Value;
+      }
+
+      var errors = alg.GetErrors(sample);
+      var ec = errors.Count();
+      var dc = Data.Data.Count;
+      var pct = Math.Round(100.0F * ec / dc, 2);
+      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+    }
+
+    private void outputError(AlgorithmBase<double[][,]> alg)
+    {
+      Console.WriteLine("Errors:");
+
+      var sample = new ClassifiedSample<double[][,]>();
+      foreach (var obj in Data.Data)
+      {
+        var data = obj.Key;
+
+        var key = new double[data.Length][,];
+        for (int i=0; i<data.Length; i++)
+          key[i] = new double[1,1];
+
+        for (int i=0; i<data.Length; i++)
+          key[i][0,0] = data[i];
         sample[key] = obj.Value;
       }
 

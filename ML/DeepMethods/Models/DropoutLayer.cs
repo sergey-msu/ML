@@ -12,9 +12,10 @@ namespace ML.DeepMethods.Models
   {
     #region Fields
 
-    private double   m_DropRate;
-    private double   m_RetainRate;
-    private byte[,,] m_Mask;
+    private double    m_DropRate;
+    private double    m_RetainRate;
+    private bool[][,] m_Mask;
+    private bool      m_ApplyCustomMask;
 
     private RandomGenerator m_Generator;
 
@@ -22,8 +23,7 @@ namespace ML.DeepMethods.Models
 
     #region .ctor
 
-    public DropoutLayer(double rate,
-                        int seed = 0)
+    public DropoutLayer(double rate, int seed = 0)
       : base(outputDepth: 1, // will be overridden with input depth when building the layer
              windowSize: 1,
              stride : 1,
@@ -48,28 +48,65 @@ namespace ML.DeepMethods.Models
 
     public double RetainRate { get { return m_RetainRate; } }
 
-    public byte[,,] Mask { get { return m_Mask; } }
+    public bool[][,] Mask
+    {
+      get { return m_Mask; }
+      set
+      {
+        m_Mask=value;
+        m_ApplyCustomMask = true;
+      }
+    }
 
     #endregion
 
-    protected override double[,,] DoCalculate(double[,,] input)
+    public override void _Build()
+    {
+      m_ActivationFunction = null;
+
+      m_OutputDepth  = m_InputDepth;
+      m_OutputHeight = m_InputHeight;
+      m_OutputWidth  = m_InputWidth;
+
+      m_Value = new double[m_OutputDepth][,];
+      for (var q=0; q<m_OutputDepth; q++)
+        m_Value[q] = new double[m_OutputHeight, m_OutputWidth];
+
+      if (m_IsTraining && !m_ApplyCustomMask)
+      {
+        m_Mask = new bool[m_OutputDepth][,];
+        for (int i=0; i<m_OutputDepth; i++)
+          m_Mask[i] = new bool[m_OutputHeight, m_OutputWidth];
+      }
+
+      BuildParams();
+    }
+
+    protected override double[][,] DoCalculate(double[][,] input)
     {
       if (m_IsTraining)
       {
         for (int p=0; p<m_InputDepth; p++)
-        for (int i=0; i<m_InputSize;  i++)
-        for (int j=0; j<m_InputSize;  j++)
+        for (int i=0; i<m_InputHeight;  i++)
+        for (int j=0; j<m_InputWidth;  j++)
         {
-          var retain = m_Generator.Bernoulli(m_RetainRate);
-          if (retain)
+          if (m_ApplyCustomMask) // custom mask applied
           {
-            m_Mask[p, i, j] = 1;
-            m_Value[p, i, j] = input[p, i, j] / m_RetainRate;
+            m_Value[p][i, j] = m_Mask[p][i, j] ? input[p][i, j] / m_RetainRate : 0;
           }
-          else
+          else // generate new random mask
           {
-            m_Mask[p, i, j] = 0;
-            m_Value[p, i, j] = 0;
+            var retain = m_Generator.Bernoulli(m_RetainRate);
+            if (retain)
+            {
+              m_Mask[p][i, j] = true;
+              m_Value[p][i, j] = input[p][i, j] / m_RetainRate;
+            }
+            else
+            {
+              m_Mask[p][i, j] = false;
+              m_Value[p][i, j] = 0;
+            }
           }
         }
       }
@@ -81,18 +118,20 @@ namespace ML.DeepMethods.Models
       return m_Value;
     }
 
-    public override void DoBuild()
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] error, double[][,] prevError)
     {
-      m_OutputDepth = m_InputDepth;
-      m_OutputSize = m_InputSize;
-      m_Mask = new byte[m_OutputDepth, m_OutputSize, m_OutputSize];
-      m_Value = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
-
-      if (m_IsTraining)
+      for (int p=0; p<m_OutputDepth;  p++)
+      for (int i=0; i<m_OutputHeight; i++)
+      for (int j=0; j<m_OutputWidth;  j++)
       {
-        m_Mask = new byte[m_OutputDepth, m_OutputSize, m_OutputSize];
-        m_Error = new double[m_OutputDepth, m_OutputSize, m_OutputSize];
+        prevError[p][i, j] = Mask[p][i, j] ?
+                             error[p][i, j] * prevLayer.Derivative(p, i, j) / m_RetainRate :
+                             0;
       }
+    }
+
+    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    {
     }
 
 

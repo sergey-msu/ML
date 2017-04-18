@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core.Logical;
 using ML.Core;
 
-namespace ML.Tests.UnitTests
+namespace ML.Tests.UnitTests.Core
 {
   [TestClass]
   public class InformativityIndexTests : TestBase
@@ -39,8 +39,6 @@ namespace ML.Tests.UnitTests
       public static Predicate<double[]> SimplePattern(int idx, double a) { return p => p[idx] < a; }
 
     #endregion
-
-    public const double EPS = 0.0000001D;
 
     [ClassInitialize]
     public static void ClassInit(TestContext context)

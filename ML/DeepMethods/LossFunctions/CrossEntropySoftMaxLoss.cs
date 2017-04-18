@@ -1,8 +1,9 @@
 ﻿using System;
 using ML.Contracts;
 using ML.Core.Mathematics;
+using ML.Core;
 
-namespace ML.Core.LossFunctions
+namespace ML.DeepMethods.LossFunctions
 {
   public class CrossEntropySoftMaxLoss : ILossFunction
   {

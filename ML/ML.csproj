@@ -30,6 +30,24 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="NFX">
       <HintPath>..\3rdparties\NFX.dll</HintPath>
@@ -45,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contracts\IInformativityIndex.cs" />
+    <Compile Include="Contracts\IOptimizer.cs" />
     <Compile Include="Core\ActivationFunctions\ArctanActivation.cs" />
     <Compile Include="Core\ActivationFunctions\BinaryStepActivation.cs" />
     <Compile Include="Core\ActivationFunctions\ExpActivation.cs" />
@@ -77,28 +96,31 @@
     <Compile Include="Core\Logical\DonskoyIndex.cs" />
     <Compile Include="Core\Logical\IndexBase.cs" />
     <Compile Include="Core\Logical\GiniIndex.cs" />
-    <Compile Include="Core\LossFunctions\CrossEntropySoftMaxLoss.cs" />
-    <Compile Include="Core\LossFunctions\CrossEntropyLoss.cs" />
-    <Compile Include="Core\LossFunctions\LpLoss.cs" />
-    <Compile Include="Core\LossFunctions\EuclideanLoss.cs" />
+    <Compile Include="DeepMethods\LossFunctions\CrossEntropySoftMaxLoss.cs" />
+    <Compile Include="DeepMethods\LossFunctions\CrossEntropyLoss.cs" />
+    <Compile Include="DeepMethods\LossFunctions\LpLoss.cs" />
+    <Compile Include="DeepMethods\LossFunctions\EuclideanLoss.cs" />
     <Compile Include="Core\Metric\LInftyMetric.cs" />
     <Compile Include="Core\Metric\MetricBase.cs" />
     <Compile Include="Core\Metric\LpMetric.cs" />
     <Compile Include="Core\Metric\EuclideanMetric.cs" />
+    <Compile Include="DeepMethods\Optimizers\NopeOptimizer.cs" />
     <Compile Include="Core\Point.cs" />
     <Compile Include="Core\Registry.cs" />
     <Compile Include="Core\ComputingNetworks\Contracts.cs" />
     <Compile Include="Core\ComputingNetworks\SequenceNode.cs" />
+    <Compile Include="DeepMethods\Algorithms\ConvNetAlgorithmBase.cs" />
     <Compile Include="DeepMethods\Algorithms\BackpropAlgorithm.cs" />
-    <Compile Include="DeepMethods\Algorithms\ConvolutionalNetworkAlgorithmBase.cs" />
     <Compile Include="DeepMethods\Models\ActivationLayer.cs" />
-    <Compile Include="DeepMethods\Models\DropoutLayer.cs" />
+    <Compile Include="DeepMethods\Models\ConvLayer.cs" />
+    <Compile Include="DeepMethods\Models\ConvNet.cs" />
     <Compile Include="DeepMethods\Models\DeepLayerBase.cs" />
     <Compile Include="DeepMethods\Models\DenseLayer.cs" />
+    <Compile Include="DeepMethods\Models\DropoutLayer.cs" />
     <Compile Include="DeepMethods\Models\FlattenLayer.cs" />
+    <Compile Include="DeepMethods\Models\InputLayer.cs" />
     <Compile Include="DeepMethods\Models\PoolingLayer.cs" />
-    <Compile Include="DeepMethods\Models\ConvolutionalLayer.cs" />
-    <Compile Include="DeepMethods\Models\ConvolutionalNetwork.cs" />
+    <Compile Include="DeepMethods\Registry.cs" />
     <Compile Include="LogicalMethods\Algorithms\DecisionTreeID3Algorithm.cs" />
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />
     <Compile Include="LogicalMethods\Models\DecisionNode.cs" />
@@ -112,6 +134,10 @@
     <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\BackpropAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
+    <Compile Include="NeuralMethods\LossFunctions\CrossEntropyLoss.cs" />
+    <Compile Include="NeuralMethods\LossFunctions\CrossEntropySoftMaxLoss.cs" />
+    <Compile Include="NeuralMethods\LossFunctions\EuclideanLoss.cs" />
+    <Compile Include="NeuralMethods\LossFunctions\LpLoss.cs" />
     <Compile Include="NeuralMethods\Models\NeuralLayer.cs" />
     <Compile Include="NeuralMethods\Models\NeuralNetwork.cs" />
     <Compile Include="NeuralMethods\Models\Neuron.cs" />
@@ -120,6 +146,7 @@
     <Compile Include="Utils\NetworkFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="DeepMethods\LearningRateSchedulers\" />
     <Folder Include="MetricalMethods\Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

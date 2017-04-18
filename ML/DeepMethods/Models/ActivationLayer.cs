@@ -18,6 +18,8 @@ namespace ML.DeepMethods.Models
              padding: 0,
              activation: activation)
     {
+      if (m_ActivationFunction==null)
+        throw new MLException("Activation function is null");
     }
 
     #endregion
@@ -25,26 +27,37 @@ namespace ML.DeepMethods.Models
     public override int ParamCount { get { return 0; } }
 
 
-    protected override double[,,] DoCalculate(double[,,] input)
+    protected override double[][,] DoCalculate(double[][,] input)
     {
-      for (int p=0; p<m_InputDepth; p++)
-      for (int i=0; i<m_InputSize;  i++)
-      for (int j=0; j<m_InputSize;  j++)
+      for (int p=0; p<m_InputDepth;  p++)
+      for (int i=0; i<m_InputHeight; i++)
+      for (int j=0; j<m_InputWidth;  j++)
       {
-        m_Value[p, i, j] = m_ActivationFunction.Value(input[p, i, j]);
+        m_Value[p][i, j] = m_ActivationFunction.Value(input[p][i, j]);
       }
 
       return m_Value;
     }
 
-    public override void DoBuild()
+    public override void _Build()
     {
-      if (m_ActivationFunction==null)
-        throw new MLException("Activation function is null");
-
       m_OutputDepth = m_InputDepth;
 
-      base.DoBuild();
+      base._Build();
+    }
+
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] error, double[][,] prevError)
+    {
+      for (int p=0; p<m_OutputDepth;  p++)
+      for (int i=0; i<m_OutputHeight; i++)
+      for (int j=0; j<m_OutputWidth;  j++)
+      {
+        prevError[p][i, j] = error[p][i, j] * prevLayer.Derivative(p, i, j);
+      }
+    }
+
+    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] updates)
+    {
     }
 
     protected override double DoGetParam(int idx)

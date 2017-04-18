@@ -30,10 +30,10 @@ namespace ML.DeepTests
       { 9, new Class("truck",      9) },
     };
 
-    public string Cifar10Path   { get { return Root+@"\data\cifar10"; }}
-    public string Cifar10Src    { get { return Cifar10Path+@"\src\kaggle"; }}
-    public string Cifar10Test   { get { return Cifar10Path+@"\test\kaggle"; }}
-    public string Cifar10Train  { get { return Cifar10Path+@"\train\kaggle"; }}
+    public string Cifar10Path  { get { return Root+@"\data\cifar10"; }}
+    public string Cifar10Src   { get { return Cifar10Path+@"\src\kaggle"; }}
+    public string Cifar10Test  { get { return Cifar10Path+@"\test\kaggle"; }}
+    public string Cifar10Train { get { return Cifar10Path+@"\train\kaggle"; }}
     public override string ResultsFolder { get { return Root+@"\output\cifar10_kaggle"; }}
 
 
@@ -72,7 +72,7 @@ namespace ML.DeepTests
       //loadTest(Cifar10Test, m_Test);
     }
 
-    private void loadTrain(string path, string lpath, ClassifiedSample<double[,,]> sample)
+    private void loadTrain(string path, string lpath, ClassifiedSample<double[][,]> sample)
     {
       sample.Clear();
 
@@ -94,7 +94,7 @@ namespace ML.DeepTests
       Console.WriteLine("Loaded files from: {0}", path);
     }
 
-    private void loadTest(string path, List<double[,,]> sample)
+    private void loadTest(string path, List<double[][,]> sample)
     {
       sample.Clear();
 
@@ -108,19 +108,23 @@ namespace ML.DeepTests
       Console.WriteLine("Loaded files from: {0}", path);
     }
 
-    private double[,,] loadFile(string fpath)
+    private double[][,] loadFile(string fpath)
     {
       var image = (Bitmap)Image.FromFile(fpath);
-      var result = new double[3, image.Height, image.Width];
+      var result = new double[3][,];
+      for (int i=0; i<3; i++)
+      {
+        result[i] = new double[image.Height, image.Width];
+      }
 
       int x,y;
       for (y=0; y<image.Width; y++)
       for (x=0; x<image.Width; x++)
       {
         var pixel = image.GetPixel(x, y);
-        result[0, y, x] = pixel.R/255.0D;
-        result[1, y, x] = pixel.G/255.0D;
-        result[2, y, x] = pixel.B/255.0D;
+        result[0][y, x] = pixel.R/255.0D;
+        result[1][y, x] = pixel.G/255.0D;
+        result[2][y, x] = pixel.B/255.0D;
       }
 
       return result;
@@ -132,29 +136,29 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      // create CNN
-      var net = NetworkFactory.CreateCIFAR10Demo();
-
-      //net[net.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.ReLU;
-
-      // create algorithm
-      var epochs = 100;
-      Alg = new BackpropAlgorithm(m_Training, net)
-      {
-        LossFunction = Loss.CrossEntropySoftMax,
-        EpochCount = epochs,
-        LearningRate = 0.005D
-      };
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training, ResultsFolder); // we do not have public test data in kaggle :(
-
-
-      // run training process
-      var now = DateTime.Now;
-      Console.WriteLine();
-      Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
-
-      Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
+      //// create CNN
+      //var net = NetworkFactory.CreateCIFAR10Demo();
+      //
+      ////net[net.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.ReLU;
+      //
+      //// create algorithm
+      //var epochs = 100;
+      //Alg = new _BackpropAlgorithm(m_Training, net)
+      //{
+      //  LossFunction = Loss.CrossEntropySoftMax,
+      //  EpochCount = epochs,
+      //  LearningRate = 0.005D
+      //};
+      //Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training, ResultsFolder); // we do not have public test data in kaggle :(
+      //
+      //
+      //// run training process
+      //var now = DateTime.Now;
+      //Console.WriteLine();
+      //Console.WriteLine("Training started at {0}", now);
+      //Alg.Train();
+      //
+      //Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }
 
     #endregion

@@ -5,7 +5,7 @@ using ML.Core.ComputingNetworks;
 using ML.DeepMethods.Models;
 using ML.Core.Registry;
 
-namespace ML.Tests.UnitTests
+namespace ML.Tests.UnitTests.CNN
 {
   [TestClass]
   public class ConvolutionalNetworkTests : TestBase
@@ -22,17 +22,18 @@ namespace ML.Tests.UnitTests
       BaseClassInit(context);
     }
 
-    #region ConvolutionalLayer
+    #region ConvLayer
 
     [TestMethod]
-    public void ConvolutionalLayer_Calculate_Simple()
+    public void ConvLayer_Calculate_Simple()
     {
       var layer = getSimpleConvolutionLayer();
       layer.Build();
 
-      var input = new double[2,3,3]
+      var input = new double[2][,]
       {
         // channel #1
+        new double[3,3]
         {
           { 1, 0, 1 },
           { 0, 1, 1 },
@@ -40,6 +41,7 @@ namespace ML.Tests.UnitTests
         },
 
         // channel #2
+        new double[3,3]
         {
           { 1, 0, 0 },
           { 1, 0, 0 },
@@ -50,38 +52,36 @@ namespace ML.Tests.UnitTests
       var result = layer.Calculate(input);
 
       Assert.AreEqual(3, result.GetLength(0));
-      Assert.AreEqual(2, result.GetLength(1));
-      Assert.AreEqual(2, result.GetLength(2));
-      Assert.AreEqual(result, layer.Value);
 
       //fm #1
-      Assert.AreEqual(2, layer.Value[0, 0, 0]);
-      Assert.AreEqual(1, layer.Value[0, 0, 1]);
-      Assert.AreEqual(1, layer.Value[0, 1, 0]);
-      Assert.AreEqual(2, layer.Value[0, 1, 1]);
+      Assert.AreEqual(2, layer.Value(0, 0, 0));
+      Assert.AreEqual(1, layer.Value(0, 0, 1));
+      Assert.AreEqual(1, layer.Value(0, 1, 0));
+      Assert.AreEqual(2, layer.Value(0, 1, 1));
 
       //fm #2
-      Assert.AreEqual(5, layer.Value[1, 0, 0]);
-      Assert.AreEqual(4, layer.Value[1, 0, 1]);
-      Assert.AreEqual(4, layer.Value[1, 1, 0]);
-      Assert.AreEqual(6, layer.Value[1, 1, 1]);
+      Assert.AreEqual(5, layer.Value(1, 0, 0));
+      Assert.AreEqual(4, layer.Value(1, 0, 1));
+      Assert.AreEqual(4, layer.Value(1, 1, 0));
+      Assert.AreEqual(6, layer.Value(1, 1, 1));
 
       //fm #3
-      Assert.AreEqual(0, layer.Value[2, 0, 0]);
-      Assert.AreEqual(0, layer.Value[2, 0, 1]);
-      Assert.AreEqual(2, layer.Value[2, 1, 0]);
-      Assert.AreEqual(0, layer.Value[2, 1, 1]);
+      Assert.AreEqual(0, layer.Value(2, 0, 0));
+      Assert.AreEqual(0, layer.Value(2, 0, 1));
+      Assert.AreEqual(2, layer.Value(2, 1, 0));
+      Assert.AreEqual(0, layer.Value(2, 1, 1));
     }
 
     [TestMethod]
-    public void ConvolutionalLayer_Calculate_Medium()
+    public void ConvLayer_Calculate_Medium()
     {
       var layer = getMediumConvolutionLayer();
       layer.Build();
 
-      var input = new double[2, 4, 4]
+      var input = new double[2][, ]
       {
         // channel #1
+        new double[4,4]
         {
           { 1, 0, 1, 0 },
           { 0, 1, 1, 0 },
@@ -90,6 +90,7 @@ namespace ML.Tests.UnitTests
         },
 
         // channel #2
+        new double[4,4]
         {
           { 1, 0, 0, 0 },
           { 1, 1, 0, 0 },
@@ -101,21 +102,18 @@ namespace ML.Tests.UnitTests
       var result = layer.Calculate(input);
 
       Assert.AreEqual(2, result.GetLength(0));
-      Assert.AreEqual(2, result.GetLength(1));
-      Assert.AreEqual(2, result.GetLength(2));
-      Assert.AreEqual(result, layer.Value);
 
       //fm #1
-      Assert.AreEqual(6, layer.Value[0, 0, 0]);
-      Assert.AreEqual(2, layer.Value[0, 0, 1]);
-      Assert.AreEqual(2, layer.Value[0, 1, 0]);
-      Assert.AreEqual(5, layer.Value[0, 1, 1]);
+      Assert.AreEqual(6, layer.Value(0, 0, 0));
+      Assert.AreEqual(2, layer.Value(0, 0, 1));
+      Assert.AreEqual(2, layer.Value(0, 1, 0));
+      Assert.AreEqual(5, layer.Value(0, 1, 1));
 
       //fm #2
-      Assert.AreEqual(0, layer.Value[1, 0, 0]);
-      Assert.AreEqual(0, layer.Value[1, 0, 1]);
-      Assert.AreEqual(0, layer.Value[1, 1, 0]);
-      Assert.AreEqual(2, layer.Value[1, 1, 1]);
+      Assert.AreEqual(0, layer.Value(1, 0, 0));
+      Assert.AreEqual(0, layer.Value(1, 0, 1));
+      Assert.AreEqual(0, layer.Value(1, 1, 0));
+      Assert.AreEqual(2, layer.Value(1, 1, 1));
     }
 
     #endregion
@@ -127,9 +125,10 @@ namespace ML.Tests.UnitTests
     {
       var layer = getSimplePoolingLayer<MaxPoolingLayer>();
 
-      var input = new double[2,3,3]
+      var input = new double[2][,]
       {
         // channel #1
+        new double[3,3]
         {
           { 2, 0, 1 },
           { 0, 1, 1 },
@@ -137,6 +136,7 @@ namespace ML.Tests.UnitTests
         },
 
         // channel #2
+        new double[3,3]
         {
           { 1, 0, 0 },
           { 1, 0, 0 },
@@ -151,16 +151,16 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(2, result.GetLength(2));
 
       //fm #1
-      Assert.AreEqual(2, result[0, 0, 0]);
-      Assert.AreEqual(1, result[0, 0, 1]);
-      Assert.AreEqual(1, result[0, 1, 0]);
-      Assert.AreEqual(1, result[0, 1, 1]);
+      Assert.AreEqual(2, result[0][0, 0]);
+      Assert.AreEqual(1, result[0][0, 1]);
+      Assert.AreEqual(1, result[0][1, 0]);
+      Assert.AreEqual(1, result[0][1, 1]);
 
       //fm #2
-      Assert.AreEqual(1, result[1, 0, 0]);
-      Assert.AreEqual(0, result[1, 0, 1]);
-      Assert.AreEqual(3, result[1, 1, 0]);
-      Assert.AreEqual(3, result[1, 1, 1]);
+      Assert.AreEqual(1, result[1][0, 0]);
+      Assert.AreEqual(0, result[1][0, 1]);
+      Assert.AreEqual(3, result[1][1, 0]);
+      Assert.AreEqual(3, result[1][1, 1]);
     }
 
     [TestMethod]
@@ -169,9 +169,10 @@ namespace ML.Tests.UnitTests
       var layer = getMediumPoolingLayer<MaxPoolingLayer>();
       layer.Build();
 
-      var input = new double[2, 4, 4]
+      var input = new double[2][,]
       {
         // channel #1
+        new double[4,4]
         {
           { 1, 0, 1, 0 },
           { 0, 3, 1, 0 },
@@ -180,6 +181,7 @@ namespace ML.Tests.UnitTests
         },
 
         // channel #2
+        new double[4,4]
         {
           { 1, 0, 0,-2 },
           { 1, 1, 0, 0 },
@@ -191,20 +193,18 @@ namespace ML.Tests.UnitTests
       var result = layer.Calculate(input);
 
       Assert.AreEqual(2, result.GetLength(0));
-      Assert.AreEqual(2, result.GetLength(1));
-      Assert.AreEqual(2, result.GetLength(2));
 
       //fm #1
-      Assert.AreEqual(3, result[0, 0, 0]);
-      Assert.AreEqual(3, result[0, 0, 1]);
-      Assert.AreEqual(3, result[0, 1, 0]);
-      Assert.AreEqual(5, result[0, 1, 1]);
+      Assert.AreEqual(3, result[0][0, 0]);
+      Assert.AreEqual(3, result[0][0, 1]);
+      Assert.AreEqual(3, result[0][1, 0]);
+      Assert.AreEqual(5, result[0][1, 1]);
 
       //fm #2
-      Assert.AreEqual(1, result[1, 0, 0]);
-      Assert.AreEqual(1, result[1, 0, 1]);
-      Assert.AreEqual(4, result[1, 1, 0]);
-      Assert.AreEqual(3, result[1, 1, 1]);
+      Assert.AreEqual(1, result[1][0, 0]);
+      Assert.AreEqual(1, result[1][0, 1]);
+      Assert.AreEqual(4, result[1][1, 0]);
+      Assert.AreEqual(3, result[1][1, 1]);
     }
 
     #endregion
@@ -216,9 +216,10 @@ namespace ML.Tests.UnitTests
     {
       var layer = getSimplePoolingLayer<AvgPoolingLayer>();
 
-      var input = new double[2,3,3]
+      var input = new double[2][,]
       {
         // channel #1
+        new double[3,3]
         {
           { 2, 0, 1 },
           { 0, 1, 1 },
@@ -226,6 +227,7 @@ namespace ML.Tests.UnitTests
         },
 
         // channel #2
+        new double[3,3]
         {
           { 1, 0, 0 },
           { 1, 0, 0 },
@@ -240,16 +242,16 @@ namespace ML.Tests.UnitTests
       Assert.AreEqual(2, result.GetLength(2));
 
       //fm #1
-      Assert.AreEqual(0.75D, result[0, 0, 0]);
-      Assert.AreEqual(0.75D, result[0, 0, 1]);
-      Assert.AreEqual(0.25D, result[0, 1, 0]);
-      Assert.AreEqual(0.75D, result[0, 1, 1]);
+      Assert.AreEqual(0.75D, result[0][0, 0]);
+      Assert.AreEqual(0.75D, result[0][0, 1]);
+      Assert.AreEqual(0.25D, result[0][1, 0]);
+      Assert.AreEqual(0.75D, result[0][1, 1]);
 
       //fm #2
-      Assert.AreEqual(0.5D, result[1, 0, 0]);
-      Assert.AreEqual(0.0D, result[1, 0, 1]);
-      Assert.AreEqual(1.0D, result[1, 1, 0]);
-      Assert.AreEqual(0.75D, result[1, 1, 1]);
+      Assert.AreEqual(0.5D,  result[1][0, 0]);
+      Assert.AreEqual(0.0D,  result[1][0, 1]);
+      Assert.AreEqual(1.0D,  result[1][1, 0]);
+      Assert.AreEqual(0.75D, result[1][1, 1]);
     }
 
     [TestMethod]
@@ -258,9 +260,10 @@ namespace ML.Tests.UnitTests
       var layer = getMediumPoolingLayer<AvgPoolingLayer>();
       layer.Build();
 
-      var input = new double[2, 4, 4]
+      var input = new double[2][,]
       {
         // channel #1
+        new double[4,4]
         {
           { 1, 0, 1, 0 },
           { 0, 3, 1, 0 },
@@ -269,6 +272,7 @@ namespace ML.Tests.UnitTests
         },
 
         // channel #2
+        new double[4,4]
         {
           { 1, 0, 0,-3 },
           { 1, 1, 0, 0 },
@@ -280,20 +284,18 @@ namespace ML.Tests.UnitTests
       var result = layer.Calculate(input);
 
       Assert.AreEqual(2, result.GetLength(0));
-      Assert.AreEqual(2, result.GetLength(1));
-      Assert.AreEqual(2, result.GetLength(2));
 
       //fm #1
-      Assert.AreEqual(7.0D/16,  result[0, 0, 0], EPS);
-      Assert.AreEqual(6.0D/16,  result[0, 0, 1], EPS);
-      Assert.AreEqual(6.0D/16,  result[0, 1, 0]);
-      Assert.AreEqual(10.0D/16, result[0, 1, 1]);
+      Assert.AreEqual(7.0D/16,  result[0][0, 0], EPS);
+      Assert.AreEqual(6.0D/16,  result[0][0, 1], EPS);
+      Assert.AreEqual(6.0D/16,  result[0][1, 0]);
+      Assert.AreEqual(10.0D/16, result[0][1, 1]);
 
       //fm #2
-      Assert.AreEqual( 3.0D/16, result[1, 0, 0]);
-      Assert.AreEqual(-1.0D/16, result[1, 0, 1]);
-      Assert.AreEqual( 7.0D/16, result[1, 1, 0]);
-      Assert.AreEqual( 6.0D/16, result[1, 1, 1]);
+      Assert.AreEqual( 3.0D/16, result[1][0, 0]);
+      Assert.AreEqual(-1.0D/16, result[1][0, 1]);
+      Assert.AreEqual( 7.0D/16, result[1][1, 0]);
+      Assert.AreEqual( 6.0D/16, result[1][1, 1]);
     }
 
     #endregion
@@ -306,8 +308,9 @@ namespace ML.Tests.UnitTests
       var net = getConvolutionalNetwork();
       net.Build();
 
-      var input = new double[1,8,8]
+      var input = new double[1][,]
       {
+        new double[8,8]
         {
           { 0, 0, 0, 0, 1, 0, 0, 0 },
           { 0, 0, 0, 1, 1, 0, 0, 0 },
@@ -322,56 +325,54 @@ namespace ML.Tests.UnitTests
 
       var result = net.Calculate(input);
 
-      Assert.AreEqual(1, net[0].Value[0, 0, 0]);
-      Assert.AreEqual(2, net[0].Value[0, 1, 1]);
-      Assert.AreEqual(5, net[0].Value[0, 2, 2]);
-      Assert.AreEqual(1, net[0].Value[0, 3, 3]);
-      Assert.AreEqual(0, net[0].Value[1, 0, 0]);
-      Assert.AreEqual(2, net[0].Value[1, 1, 1]);
-      Assert.AreEqual(1, net[0].Value[1, 2, 2]);
-      Assert.AreEqual(0, net[0].Value[1, 3, 3]);
-      Assert.AreEqual(2, net[0].Value[2, 0, 0]);
-      Assert.AreEqual(4, net[0].Value[2, 1, 1]);
-      Assert.AreEqual(3, net[0].Value[2, 2, 2]);
-      Assert.AreEqual(1, net[0].Value[2, 3, 3]);
-      Assert.AreEqual(1, net[0].Value[3, 0, 0]);
-      Assert.AreEqual(3, net[0].Value[3, 1, 1]);
-      Assert.AreEqual(3, net[0].Value[3, 2, 2]);
-      Assert.AreEqual(1, net[0].Value[3, 3, 3]);
+      Assert.AreEqual(1, net[0].Value(0, 0, 0));
+      Assert.AreEqual(2, net[0].Value(0, 1, 1));
+      Assert.AreEqual(5, net[0].Value(0, 2, 2));
+      Assert.AreEqual(1, net[0].Value(0, 3, 3));
+      Assert.AreEqual(0, net[0].Value(1, 0, 0));
+      Assert.AreEqual(2, net[0].Value(1, 1, 1));
+      Assert.AreEqual(1, net[0].Value(1, 2, 2));
+      Assert.AreEqual(0, net[0].Value(1, 3, 3));
+      Assert.AreEqual(2, net[0].Value(2, 0, 0));
+      Assert.AreEqual(4, net[0].Value(2, 1, 1));
+      Assert.AreEqual(3, net[0].Value(2, 2, 2));
+      Assert.AreEqual(1, net[0].Value(2, 3, 3));
+      Assert.AreEqual(1, net[0].Value(3, 0, 0));
+      Assert.AreEqual(3, net[0].Value(3, 1, 1));
+      Assert.AreEqual(3, net[0].Value(3, 2, 2));
+      Assert.AreEqual(1, net[0].Value(3, 3, 3));
 
-      Assert.AreEqual(2, net[1].Value[0, 0, 0]);
-      Assert.AreEqual(5, net[1].Value[0, 1, 1]);
-      Assert.AreEqual(2, net[1].Value[1, 0, 0]);
-      Assert.AreEqual(2, net[1].Value[1, 1, 1]);
-      Assert.AreEqual(4, net[1].Value[2, 0, 0]);
-      Assert.AreEqual(3, net[1].Value[2, 0, 1]);
-      Assert.AreEqual(3, net[1].Value[3, 0, 0]);
-      Assert.AreEqual(3, net[1].Value[3, 1, 1]);
+      Assert.AreEqual(2, net[1].Value(0, 0, 0));
+      Assert.AreEqual(5, net[1].Value(0, 1, 1));
+      Assert.AreEqual(2, net[1].Value(1, 0, 0));
+      Assert.AreEqual(2, net[1].Value(1, 1, 1));
+      Assert.AreEqual(4, net[1].Value(2, 0, 0));
+      Assert.AreEqual(3, net[1].Value(2, 0, 1));
+      Assert.AreEqual(3, net[1].Value(3, 0, 0));
+      Assert.AreEqual(3, net[1].Value(3, 1, 1));
 
-      Assert.AreEqual(0,   net[2].Value[0, 0, 0]);
-      Assert.AreEqual(100, net[2].Value[2, 0, 0]);
-      Assert.AreEqual(200, net[2].Value[4, 0, 0]);
-      Assert.AreEqual(350, net[2].Value[7, 0, 0]);
+      Assert.AreEqual(0,   net[2].Value(0, 0, 0));
+      Assert.AreEqual(100, net[2].Value(2, 0, 0));
+      Assert.AreEqual(200, net[2].Value(4, 0, 0));
+      Assert.AreEqual(350, net[2].Value(7, 0, 0));
 
       Assert.AreEqual(2, result.GetLength(0));
       Assert.AreEqual(2, result.Length);
-      Assert.AreEqual( 1401, result[0,0,0]);
-      Assert.AreEqual(-1401, result[1,0,0]);
+      Assert.AreEqual( 1401, result[0][0,0]);
+      Assert.AreEqual(-1401, result[1][0,0]);
     }
 
     #endregion
 
     #region .pvt
 
-    private ConvolutionalLayer getSimpleConvolutionLayer()
+    private ConvLayer getSimpleConvolutionLayer()
     {
       const int inputDepth  = 2;
       const int outputDepth = 3;
       const int windowSize  = 2;
-      const int stride  = 1;
-      const int padding = 0;
 
-      var layer = new ConvolutionalLayer(outputDepth, windowSize, stride, padding) { IsTraining=true };
+      var layer = new ConvLayer(outputDepth, windowSize, stride:1, padding:1) { IsTraining=true };
       layer.ActivationFunction = Activation.ReLU;
 
       const int plen = (windowSize*windowSize*inputDepth + 1)*outputDepth;
@@ -410,15 +411,13 @@ namespace ML.Tests.UnitTests
       return layer;
     }
 
-    private ConvolutionalLayer getMediumConvolutionLayer()
+    private ConvLayer getMediumConvolutionLayer()
     {
       const int inputDepth  = 2;
       const int outputDepth = 2;
       const int windowSize  = 4;
-      const int stride  = 2;
-      const int padding = 1;
 
-      var layer = new ConvolutionalLayer(outputDepth, windowSize, stride, padding) { IsTraining=true };
+      var layer = new ConvLayer(outputDepth, windowSize, stride:2, padding:1) { IsTraining=true };
       layer.ActivationFunction = Activation.ReLU;
 
       const int plen = (windowSize*windowSize*inputDepth + 1)*outputDepth;
@@ -484,13 +483,13 @@ namespace ML.Tests.UnitTests
       return layer;
     }
 
-    private ConvolutionalNetwork getConvolutionalNetwork()
+    private ConvNet getConvolutionalNetwork()
     {
-      var net = new ConvolutionalNetwork(1, 8);
+      var net = new ConvNet(1, 8);
 
       // First layer: convolutional layer
 
-      var conv = new ConvolutionalLayer(outputDepth: 4,
+      var conv = new ConvLayer(outputDepth: 4,
                                         windowSize: 4,
                                         stride: 2,
                                         padding: 1) { IsTraining=true };
@@ -538,7 +537,7 @@ namespace ML.Tests.UnitTests
       net.AddLayer(mp);
 
       // Third layer: fully-connected layer
-      var fc = new ConvolutionalLayer(outputDepth: 8,
+      var fc = new ConvLayer(outputDepth: 8,
                                       windowSize: 2,
                                       stride: 1) { IsTraining=true };
       fc.ActivationFunction = Activation.Identity;
@@ -552,7 +551,7 @@ namespace ML.Tests.UnitTests
       net.AddLayer(fc);
 
       // Fourth layer: output
-      var output = new ConvolutionalLayer(outputDepth: 2,
+      var output = new ConvLayer(outputDepth: 2,
                                           windowSize: 1,
                                           stride: 1) { IsTraining=true };
       output.ActivationFunction = Activation.Identity;

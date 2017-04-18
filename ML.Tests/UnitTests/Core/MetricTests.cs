@@ -3,13 +3,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core.Metric;
 using ML.Core;
 
-namespace ML.Tests.UnitTests
+namespace ML.Tests.UnitTests.Core
 {
   [TestClass]
   public class MetricTests : TestBase
   {
-    public const double EPS = 0.0000001D;
-
     [ClassInitialize]
     public static void ClassInit(TestContext context)
     {

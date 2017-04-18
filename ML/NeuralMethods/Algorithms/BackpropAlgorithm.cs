@@ -61,7 +61,7 @@ namespace ML.NeuralMethods.Algorithms
     private int m_Batch;
 
     private double[][]  m_Errors;
-    private double[][,] m_Updates;
+    private double[][,] m_Gradient;
 
     #endregion
 
@@ -126,7 +126,7 @@ namespace ML.NeuralMethods.Algorithms
       get { return m_LearningRate; }
       set
       {
-        if (LearningRate <= 0)
+        if (value <= 0)
           throw new MLException("Learning rate must be positive");
         m_LearningRate = value;
       }
@@ -160,6 +160,9 @@ namespace ML.NeuralMethods.Algorithms
       }
     }
 
+    public double[][]  Errors   { get { return m_Errors;  } }
+    public double[][,] Gradient { get { return m_Gradient; } }
+
     public int Epoch { get { return m_Epoch; } }
     public int Iteration { get { return m_Iteration; } }
     public int Batch { get { return m_Batch; } }
@@ -184,6 +187,11 @@ namespace ML.NeuralMethods.Algorithms
     public void RunIteration(double[] data, Class cls)
     {
       runIteration(Result, data, cls);
+    }
+
+    public void FlushGradient()
+    {
+      updateWeights(Result);
     }
 
     #endregion
@@ -216,12 +224,12 @@ namespace ML.NeuralMethods.Algorithms
         m_Errors[i] = new double[ncount];
       }
 
-      m_Updates = new double[Result.LayerCount][,];
+      m_Gradient = new double[Result.LayerCount][,];
       for (int i=0; i<Result.LayerCount; i++)
       {
         var pcount = (i>0) ? Result[i-1].NeuronCount : m_InputDim;
         var lcount = Result[i].NeuronCount;
-        m_Updates[i] = new double[lcount, pcount+1]; // take bias into account
+        m_Gradient[i] = new double[lcount, pcount+1]; // take bias into account
       }
 
       m_ExpectedOutputs = new Dictionary<Class, double[]>();
@@ -244,11 +252,9 @@ namespace ML.NeuralMethods.Algorithms
     private void runEpoch(NeuralNetwork net)
     {
       // loop on batches
-      var i = 0;
       foreach (var batch in TrainingSample.Batch(m_BatchSize))
       {
         runBatch(net, batch);
-        i++;
       }
 
       // update epoch stats
@@ -274,13 +280,6 @@ namespace ML.NeuralMethods.Algorithms
       m_ErrorValue = m_IterErrorValue/sampleBatch.Count;
       m_ErrorDelta = m_ErrorValue-m_PrevErrorValue;
       m_IterErrorValue = 0.0D;
-
-      var len = m_Updates.Length;
-      for (int i=0; i<len; i++)
-      {
-        var updates = m_Updates[i];
-        Array.Clear(updates, 0, updates.Length);
-      }
 
       m_Batch++;
     }
@@ -322,7 +321,7 @@ namespace ML.NeuralMethods.Algorithms
     private void feedBackward(NeuralNetwork net, NeuralLayer layer, int lidx, double[] input)
     {
       var errors  = m_Errors[lidx];
-      var updates = m_Updates[lidx];
+      var lgrad   = m_Gradient[lidx];
       var ncount  = layer.NeuronCount;
       var player  = (lidx>0) ? net[lidx-1] : null;
       var pcount  = (lidx>0) ? player.NeuronCount : m_InputDim;
@@ -351,7 +350,7 @@ namespace ML.NeuralMethods.Algorithms
           perrors[h] = eh * pneuron.Derivative;
         }
 
-      // accumulate weight updates
+      // accumulate gradient
       for (int j=0; j<ncount; j++)
       {
         var neuron = layer[j];
@@ -365,10 +364,10 @@ namespace ML.NeuralMethods.Algorithms
 
           var value = (lidx>0) ? player[h].Value : input[h];
           var dwj = gj * value;
-          updates[j, h] -= dwj;
+          lgrad[j, h] += dwj;
         }
 
-        updates[j, pcount] -= gj;
+        lgrad[j, pcount] += gj;
       }
     }
 
@@ -379,7 +378,7 @@ namespace ML.NeuralMethods.Algorithms
 
       for (int i=lcount-1; i>=0; i--)
       {
-        var updates = m_Updates[i];
+        var lgrad  = m_Gradient[i];
         var layer  = net[i];
         var ncount = layer.NeuronCount;
         var player = (i>0) ? net[i-1] : null;
@@ -391,15 +390,17 @@ namespace ML.NeuralMethods.Algorithms
           var neuron = layer[j];
           for (int h=0; h<pcount; h++)
           {
-            dw = m_LearningRate*updates[j, h];
+            dw = -m_LearningRate*lgrad[j, h];
             step2 += dw*dw;
             neuron[h] += dw;
           }
 
-          dw = m_LearningRate*updates[j, pcount];
+          dw = -m_LearningRate*lgrad[j, pcount];
           step2 += dw*dw;
           neuron.Bias += dw;
         }
+
+        Array.Clear(lgrad, 0, lgrad.Length);
       }
 
       m_Step2 = step2;

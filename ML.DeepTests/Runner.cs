@@ -9,7 +9,7 @@ namespace ML.DeepTests
   {
     public const string DFT_ROOT = @"C:\Users\User\Desktop\science\Machine learning";
 
-    public ClassifiedSample<double[,,]> m_Training = new ClassifiedSample<double[,,]>();
+    public ClassifiedSample<double[][,]> m_Training = new ClassifiedSample<double[][,]>();
 
     public string Root
     {

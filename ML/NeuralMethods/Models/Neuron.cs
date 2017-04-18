@@ -20,10 +20,12 @@ namespace ML.NeuralMethods.Models
     private bool   m_IsTraining;
     internal int   m_InputDim;
     private double m_Value;
-    private double m_Error;
+    private double m_Derivative;
     private double m_DropoutRate;
+    private int    m_DropoutSeed;
     private double m_RetainRate;
     private bool   m_LastRetained;
+    private bool   m_ApplyCustomMask;
 
     private double   m_Bias;
     private double[] m_Weights;
@@ -72,6 +74,15 @@ namespace ML.NeuralMethods.Models
     }
 
     /// <summary>
+    /// Random seed for dropout
+    /// </summary>
+    public int DropoutSeed
+    {
+      get { return m_DropoutSeed; }
+      set { m_DropoutSeed=value; }
+    }
+
+    /// <summary>
     /// Probability on the neuron to survive dropout
     /// </summary>
     public double RetainRate { get { return m_RetainRate; } }
@@ -85,7 +96,15 @@ namespace ML.NeuralMethods.Models
       set { m_Bias = value; }
     }
 
-    public bool LastRetained { get { return m_LastRetained; } }
+    public bool LastRetained
+    {
+      get { return m_LastRetained; }
+      set
+      {
+        m_LastRetained = value;
+        m_ApplyCustomMask = true;
+      }
+    }
 
     /// <summary>
     /// Calculated value (after applying activation function)
@@ -99,10 +118,7 @@ namespace ML.NeuralMethods.Models
     /// <summary>
     /// Calculates derivative
     /// </summary>
-    public double Derivative
-    {
-      get { return ActivationFunction.DerivativeFromValue(m_Value); }
-    }
+    public double Derivative { get { return m_Derivative; } }
 
     /// <summary>
     /// Dimension of input vector
@@ -127,8 +143,17 @@ namespace ML.NeuralMethods.Models
 
     public double this[int idx]
     {
-      get { return m_Weights[idx]; }
-      set { m_Weights[idx] = value; }
+      get
+      {
+        return (idx==m_InputDim) ? m_Bias : m_Weights[idx];
+      }
+      set
+      {
+        if (idx==m_InputDim)
+          m_Bias = value;
+        else
+          m_Weights[idx] = value;
+      }
     }
 
     #endregion
@@ -143,9 +168,9 @@ namespace ML.NeuralMethods.Models
       var random = RandomGenerator.Get(seed);
 
       for (int i=0; i<m_InputDim; i++)
-        m_Weights[i] = 2 * random.GenerateUniform(0, 1) / m_InputDim;
+        m_Weights[i] = 2 * random.GenerateUniform(0, 1) / (m_InputDim+1);
 
-      m_Bias = 2 * random.GenerateUniform(0, 1) / m_InputDim;
+      m_Bias = 2 * random.GenerateUniform(0, 1) / (m_InputDim+1);
     }
 
     /// <summary>
@@ -161,17 +186,23 @@ namespace ML.NeuralMethods.Models
 
       if (m_IsTraining)
       {
-        m_LastRetained = (m_RetainRate<1) ? RandomGenerator.Get(0).Bernoulli(m_RetainRate) : true;
+        if (!m_ApplyCustomMask)
+          m_LastRetained = (m_RetainRate<1) ? RandomGenerator.Get(m_DropoutSeed).Bernoulli(m_RetainRate) : true;
+
         if (m_LastRetained)
         {
           for (int i=0; i<InputDim; i++)
             net += m_Weights[i] * input[i];
 
-          net /= m_RetainRate;
-          m_Value = ActivationFunction.Value(net);
+          var value = ActivationFunction.Value(net);
+          m_Value = value / m_RetainRate;
+          m_Derivative = ActivationFunction.DerivativeFromValue(value) / m_RetainRate;
         }
         else
+        {
           m_Value = 0;
+          m_Derivative = 0;
+        }
       }
       else
       {
@@ -179,6 +210,7 @@ namespace ML.NeuralMethods.Models
           net += m_Weights[i] * input[i];
 
         m_Value = ActivationFunction.Value(net);
+        m_Derivative = ActivationFunction.DerivativeFromValue(m_Value);
       }
 
       return m_Value;

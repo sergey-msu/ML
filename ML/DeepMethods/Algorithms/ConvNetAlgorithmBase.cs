@@ -10,11 +10,11 @@ namespace ML.DeepMethods.Algorithms
   /// <summary>
   /// Feedforward Convolutional Neural Network machine learning algorithm
   /// </summary>
-  public abstract class ConvolutionalNetworkAlgorithmBase: AlgorithmBase<double[,,]>
+  public abstract class ConvNetAlgorithmBase: AlgorithmBase<double[][,]>
   {
-    private ConvolutionalNetwork m_Result;
+    private ConvNet m_Result;
 
-    protected ConvolutionalNetworkAlgorithmBase(ClassifiedSample<double[,,]> trainingSample, ConvolutionalNetwork net)
+    protected ConvNetAlgorithmBase(ClassifiedSample<double[][,]> trainingSample, ConvNet net)
       : base(trainingSample)
     {
       if (net==null)
@@ -26,29 +26,21 @@ namespace ML.DeepMethods.Algorithms
     /// <summary>
     /// The result of the algorithm
     /// </summary>
-    public ConvolutionalNetwork Result { get { return m_Result; } }
+    public ConvNet Result { get { return m_Result; } }
 
     /// <summary>
     /// Maps object to corresponding class
     /// </summary>
-    public override Class Classify(double[,,] input)
+    public override Class Classify(double[][,] input)
     {
       var result = m_Result.Calculate(input);
-      var len = result.GetLength(0);
-      Class cls;
-
-      int iidx;
-      int jidx;
-      int kidx;
-      double max;
-      MathUtils.CalcMax(result, out iidx, out jidx, out kidx, out max);
-
-      cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == iidx).Value  ?? Class.None;
+      var res = MathUtils.ArgMax<double>(result);
+      var cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == res).Value  ?? Class.None;
 
       return cls;
     }
 
-    public override IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<double[,,]> classifiedSample)
+    public override IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<double[][,]> classifiedSample)
     {
       var isTraining = m_Result.IsTraining;
       m_Result.IsTraining = false;
@@ -60,7 +52,6 @@ namespace ML.DeepMethods.Algorithms
       {
         m_Result.IsTraining = isTraining;
       }
-
     }
 
     /// <summary>
@@ -71,6 +62,7 @@ namespace ML.DeepMethods.Algorithms
       m_Result.IsTraining = true;
       try
       {
+        Build();
         DoTrain();
       }
       finally
@@ -78,6 +70,8 @@ namespace ML.DeepMethods.Algorithms
         m_Result.IsTraining = false;
       }
     }
+
+    public abstract void Build();
 
     protected abstract void DoTrain();
   }

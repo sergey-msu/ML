@@ -23,54 +23,55 @@ namespace ML.Core.Mathematics
     /// Calculates maximum value within array alog with its index
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void CalcMax(double[] array, out int idx, out double max)
+    public static int ArgMax<T>(Array array)
+      where T : IComparable<T>
     {
-      idx = -1;
-      max = double.MinValue;
+      var idx = -1;
+      var max = default(T);
 
-      if (array==null) return;
+      if (array==null) return -1;
 
-      for (int i=0; i<array.Length; i++)
+      var i=0;
+      foreach (T val in array)
       {
-        var val = array[i];
-        if (idx<0 || val > max)
+        if (i==0 || val.CompareTo(max)>0)
         {
           idx = i;
           max = val;
         }
+
+        i++;
       }
+
+      return idx;
     }
 
     /// <summary>
-    /// Calculates maximum value within array alog with its indices
+    /// Calculates maximum value within array alog with its index
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void CalcMax(double[,,] array, out int iidx, out int jidx, out int kidx, out double max)
+    public static int ArgMax<T>(Array[] array)
+      where T : IComparable<T>
     {
-      iidx = -1;
-      jidx = -1;
-      kidx = -1;
-      max = double.MinValue;
+      var idx = -1;
+      var max = default(T);
 
-      if (array==null) return;
+      if (array==null) return -1;
 
-      int imax = array.GetLength(0);
-      int jmax = array.GetLength(1);
-      int kmax = array.GetLength(2);
-
-      for (int i=0; i<imax; i++)
-      for (int j=0; j<jmax; j++)
-      for (int k=0; k<kmax; k++)
+      var j=0;
+      foreach (var elem in array)
+      foreach (T val in elem)
       {
-        var val = array[i,j,k];
-        if (iidx<0 || jidx<0 || kidx<0 || val > max)
+        if (j==0 || val.CompareTo(max)>0)
         {
-          iidx = i;
-          jidx = j;
-          kidx = k;
+          idx = j;
           max = val;
         }
+
+        j++;
       }
+
+      return idx;
     }
 
     /// <summary>

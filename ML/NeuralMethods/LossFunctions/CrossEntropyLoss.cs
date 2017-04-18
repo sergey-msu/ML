@@ -2,9 +2,9 @@
 using ML.Contracts;
 using ML.Core.Mathematics;
 
-namespace ML.Core.LossFunctions
+namespace ML.DeepMethods.LossFunctions
 {
-  public class CrossEntropyLoss : ILossFunction
+  public class NeuralMethods : ILossFunction
   {
     public double Value(double[] actual, double[] expected)
     {

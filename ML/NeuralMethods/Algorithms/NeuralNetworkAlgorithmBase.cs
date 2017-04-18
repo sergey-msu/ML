@@ -35,14 +35,8 @@ namespace ML.NeuralMethods.Algorithms
     public override Class Classify(double[] x)
     {
       var result = m_Result.Calculate(x);
-      var len = result.Length;
-      Class cls;
-
-      int idx;
-      double max;
-      MathUtils.CalcMax(result, out idx, out max);
-
-      cls = Classes.FirstOrDefault(c => (int)c.Value.Value == idx).Value  ?? Class.None;
+      var res = MathUtils.ArgMax<double>(result);
+      var cls = Classes.FirstOrDefault(c => (int)c.Value.Value == res).Value  ?? Class.None;
 
       return cls;
     }
