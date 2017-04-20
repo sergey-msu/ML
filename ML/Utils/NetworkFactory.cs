@@ -53,10 +53,10 @@ namespace ML.Utils
       activation = activation ?? Activation.ReLU;
       var net = new ConvNet(1, 28) { IsTraining=true };
 
-      net.AddLayer(new ConvLayer(outputDepth: 4, windowSize: 5, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
-      net.AddLayer(new ConvLayer(outputDepth: 12, windowSize: 5, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new ConvLayer(outputDepth: 4, windowSize: 5));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 12, windowSize: 5));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
       net.AddLayer(new FlattenLayer(outputDim: 10, activation: activation));
 
       net._Build();
@@ -77,8 +77,8 @@ namespace ML.Utils
       activation = activation ?? Activation.ReLU;
       var net = new ConvNet(1, 28) { IsTraining=true };
 
-      net.AddLayer(new ConvLayer(outputDepth: 4, windowSize: 3, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 12, windowSize: 3, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
       net.AddLayer(new DropoutLayer(0.25));
       net.AddLayer(new FlattenLayer(outputDim: 128, activation: activation));

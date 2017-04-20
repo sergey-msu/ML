@@ -8,6 +8,7 @@ using ML.Utils;
 using ML.DeepMethods.Algorithms;
 using ML.Core.Registry;
 using ML.DeepMethods;
+using ML.DeepMethods.Registry;
 
 namespace ML.DeepTests
 {
@@ -197,9 +198,8 @@ namespace ML.DeepTests
     {
       // create CNN
 
-      //var net = NetworkFactory.CreateLeNet1();
       var net = NetworkFactory.CreateLeNet1();
-      //net[net.LayerCount-1].ActivationFunction = Activation.Logistic(1);
+      net[net.LayerCount-1].ActivationFunction = Activation.Logistic(1);
       //ConvolutionalNetwork net;
       //var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";
       //using (var stream = File.Open(filePath1, FileMode.Open))
@@ -208,13 +208,14 @@ namespace ML.DeepTests
       //}
 
       // create algorithm
-      var epochs = 50;
+      var lrate = 0.005D;
       Alg = new BackpropAlgorithm(m_Training, net)
       {
-        LossFunction = Loss.Euclidean,
-        EpochCount = epochs,
-        LearningRate = 0.001D,
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 50,
+        LearningRate = lrate,
         BatchSize = 1,
+        LearningRateScheduler = LearningRateScheduler.TimeBased(lrate, 1.0D)
       };
       Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Test, ResultsFolder);
 

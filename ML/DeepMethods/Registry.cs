@@ -1,7 +1,9 @@
-﻿using ML.DeepMethods.LossFunctions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using ML.DeepMethods.LossFunctions;
+using ML.DeepMethods.LearningRateSchedulers;
+using ML.DeepMethods.Optimizers;
 
-namespace ML.DeepMethods
+namespace ML.DeepMethods.Registry
 {
   public static class Loss
   {
@@ -22,6 +24,29 @@ namespace ML.DeepMethods
 
       return result;
     }
+  }
+
+  public static class Optimizer
+  {
+    public static readonly NopeOptimizer Nope = new NopeOptimizer();
+  }
+
+  public static class LearningRateScheduler
+  {
+     public static NopeScheduler Nope(double initLearningRate)
+     {
+       return new NopeScheduler(initLearningRate);
+     }
+
+     public static TimeBasedScheduler TimeBased(double initLearningRate, double decay)
+     {
+       return new TimeBasedScheduler(initLearningRate, decay);
+     }
+
+     public static DropBasedScheduler DropBased(double initLearningRate, double epochStep, double dropRate)
+     {
+       return new DropBasedScheduler(initLearningRate, epochStep, dropRate);
+     }
   }
 }
 

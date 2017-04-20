@@ -12,16 +12,11 @@ namespace ML.DeepMethods.Optimizers
   public class NopeOptimizer : IOptimizer
   {
     private double[][] m_Weights;
-    private double m_LearningRate;
     private double m_Step2;
 
 
-    public NopeOptimizer(double learningRate)
+    public NopeOptimizer()
     {
-      if (learningRate <= 0)
-        throw new MLException("Learning rate must be positive");
-
-      m_LearningRate = learningRate;
     }
 
     /// <summary>
@@ -43,12 +38,12 @@ namespace ML.DeepMethods.Optimizers
     /// <summary>
     /// Push current gradient vector to optimizer
     /// </summary>
-    public void Push(double[][] gradient)
+    public void Push(double[][] gradient, double learningRate)
     {
       var len = m_Weights.Length;
       var step2 = 0.0D;
 
-      for (int i=0; i<len; i++)
+      for (int i=len-1; i>=0; i--)
       {
         var layerWeights  = m_Weights[i];
         if (layerWeights==null) continue;
@@ -57,7 +52,7 @@ namespace ML.DeepMethods.Optimizers
         var wlen = layerWeights.Length;
         for (int j=0; j<wlen; j++)
         {
-          var dw = -m_LearningRate * layerGradient[j];
+          var dw = -learningRate * layerGradient[j];
           layerWeights[j] += dw;
           step2 += dw*dw;
         }

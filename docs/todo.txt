@@ -3,24 +3,24 @@
 
 - CNN:
   - stochastic gradient training
-  - batch learning
+  - [DONE] batch learning
   - batch normalization https://arxiv.org/pdf/1502.03167.pdf
   - [DONE] dropout
   - [DONE] add activation layer
   - GPU parallelization
   - Read training set from hard drive not in-memory!
   - extract stop criteria from backpropalgorithm
-  - split 'size' into 'height' and 'width' in all layers
+  - [DONE] split 'size' into 'height' and 'width' in all layers
   - serialization/deserialization
   - compare Keras and ML calcuations
 
 - COMMIT A WILLFUL DECISION: do we need ComputingLayer architecture? Does Build/DoBuild implenter in a proper way?
 
 - NN and CNN:
-  - possibility to train - add nodex/layers - train etc...
+  - possibility to train - add nodes/layers - train etc...
   - possibility to remove layer/node from network
 
-- implement more NN algorithms (https://habrahabr.ru/post/318970/)
+- implement more NN optimizatiors (https://habrahabr.ru/post/318970/)
   - Nesterov
   - Adagrad
   - RMSProp
@@ -45,7 +45,7 @@
   - [DONE] add start weight randomization
   - [DONE] add events to NN algorithms
   - add stochastic gradient descent
-  - add batching (+stochastic)
+  - [DONE] add batching
 
 - [DONE] add neuron NN + unit tests
 
@@ -57,13 +57,13 @@
 
 - demos project (+data samples)
 
-- implement  RBF algorith (https://en.wikipedia.org/wiki/Radial_basis_function_network, http://mccormickml.com/2013/08/15/radial-basis-function-network-rbfn-tutorial/)
+- implement RBF algorith (https://en.wikipedia.org/wiki/Radial_basis_function_network, http://mccormickml.com/2013/08/15/radial-basis-function-network-rbfn-tutorial/)
 
 
 - [INPROG] Play with ACCORD Framework
   - [INPROG] compare with ML (write benchmarks in .Tests assembly)
 
-- add ability to update paraters in a batch from some start index (extend TryUpdateParams)
+- add ability to update parameters in a batch from some start index (extend TryUpdateParams)
 
 - General NN architecture
   - Read https://tproger.ru/translations/neural-network-zoo-1/ - NN zoo

@@ -13,6 +13,7 @@ namespace ML.DeepTests
       Console.WriteLine("---------------- Epoch #: {0} ({1})", alg.Epoch, DateTime.Now);
       Console.WriteLine("L:\t{0}", alg.LossValue);
       Console.WriteLine("DW:\t{0}", alg.Step2);
+      Console.WriteLine("LR:\t{0}", alg.LearningRate);
       Console.WriteLine("Errors:");
 
       var errors = alg.GetErrors(test);
@@ -21,18 +22,11 @@ namespace ML.DeepTests
       var pct = Math.Round(100.0F * ec / dc, 2);
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
 
-      if (alg.Epoch == 1 || alg.LossDelta < 0)
+      var ofileName = string.Format("cn_e{0}_p{1}.mld", alg.Epoch, Math.Round(pct, 2));
+      var ofilePath = Path.Combine(outputPath, ofileName);
+      using (var stream = File.Open(ofilePath, FileMode.Create))
       {
-        var ofileName = string.Format("cn_e{0}_p{1}.mld", alg.Epoch, Math.Round(pct, 2));
-        var ofilePath = Path.Combine(outputPath, ofileName);
-        using (var stream = File.Open(ofilePath, FileMode.Create))
-        {
-          alg.Result.Serialize(stream);
-        }
-      }
-      else
-      {
-        alg.LearningRate /= 4;
+        alg.Result.Serialize(stream);
       }
     }
 

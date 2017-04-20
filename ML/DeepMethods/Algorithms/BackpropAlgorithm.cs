@@ -63,6 +63,7 @@ namespace ML.DeepMethods.Algorithms
     private int m_Batch;
     private int m_Iteration;
 
+    private ILearningRateScheduler m_LearningRateScheduler;
     private IOptimizer    m_Optimizer;
     private double[][][,] m_Errors;
     private double[][]    m_Gradient;
@@ -120,6 +121,12 @@ namespace ML.DeepMethods.Algorithms
     {
       get { return m_Optimizer; }
       set { m_Optimizer = value; }
+    }
+
+    public ILearningRateScheduler LearningRateScheduler
+    {
+      get { return m_LearningRateScheduler; }
+      set { m_LearningRateScheduler = value; }
     }
 
     public int EpochCount
@@ -208,7 +215,7 @@ namespace ML.DeepMethods.Algorithms
 
     public void FlushGradient()
     {
-      m_Optimizer.Push(m_Gradient);
+      m_Optimizer.Push(m_Gradient, m_LearningRate);
     }
 
     public override void Build()
@@ -221,7 +228,7 @@ namespace ML.DeepMethods.Algorithms
       m_InputWidth  = Result.InputWidth;
       m_OutputDepth = Result[Result.LayerCount - 1].OutputDepth;
 
-      m_Errors  = new double[Result.LayerCount][][,];
+      m_Errors   = new double[Result.LayerCount][][,];
       m_Gradient = new double[Result.LayerCount][];
 
       for (int l=0; l<Result.LayerCount; l++)
@@ -256,8 +263,13 @@ namespace ML.DeepMethods.Algorithms
       // init optimizer
 
       if (m_Optimizer==null)
-        m_Optimizer = new NopeOptimizer(m_LearningRate);
+        m_Optimizer = Registry.Optimizer.Nope;
       m_Optimizer.Init(Result.Weights);
+
+      // init scheduler
+
+      if (m_LearningRateScheduler==null)
+        m_LearningRateScheduler = Registry.LearningRateScheduler.Nope(m_LearningRate);
     }
 
     #endregion
@@ -290,6 +302,7 @@ namespace ML.DeepMethods.Algorithms
       m_Epoch++;
       m_Iteration = 0;
       m_Batch = 0;
+      m_LearningRate = m_LearningRateScheduler.GetRate(m_Epoch);
 
       if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
     }
@@ -303,7 +316,7 @@ namespace ML.DeepMethods.Algorithms
       }
 
       // optimize and apply updates
-      m_Optimizer.Push(m_Gradient);
+      m_Optimizer.Push(m_Gradient, m_LearningRate);
 
       // update batch stats
       m_Batch++;

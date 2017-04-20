@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contracts\IInformativityIndex.cs" />
+    <Compile Include="Contracts\ILearningRateScheduler.cs" />
     <Compile Include="Contracts\IOptimizer.cs" />
     <Compile Include="Core\ActivationFunctions\ArctanActivation.cs" />
     <Compile Include="Core\ActivationFunctions\BinaryStepActivation.cs" />
@@ -96,6 +97,9 @@
     <Compile Include="Core\Logical\DonskoyIndex.cs" />
     <Compile Include="Core\Logical\IndexBase.cs" />
     <Compile Include="Core\Logical\GiniIndex.cs" />
+    <Compile Include="DeepMethods\LearningRateSchedulers\DropBasedScheduler.cs" />
+    <Compile Include="DeepMethods\LearningRateSchedulers\NopeScheduler.cs" />
+    <Compile Include="DeepMethods\LearningRateSchedulers\TimeBasedScheduler.cs" />
     <Compile Include="DeepMethods\LossFunctions\CrossEntropySoftMaxLoss.cs" />
     <Compile Include="DeepMethods\LossFunctions\CrossEntropyLoss.cs" />
     <Compile Include="DeepMethods\LossFunctions\LpLoss.cs" />
@@ -146,7 +150,6 @@
     <Compile Include="Utils\NetworkFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DeepMethods\LearningRateSchedulers\" />
     <Folder Include="MetricalMethods\Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

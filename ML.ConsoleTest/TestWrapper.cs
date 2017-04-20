@@ -14,6 +14,7 @@ using ML.Utils;
 using ML.DeepMethods.Models;
 using ML.Core.Registry;
 using ML.DeepMethods;
+using ML.DeepMethods.Registry;
 
 namespace ML.ConsoleTest
 {

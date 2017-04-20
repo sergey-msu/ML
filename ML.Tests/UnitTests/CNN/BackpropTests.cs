@@ -4,6 +4,7 @@ using ML.Core;
 using ML.Core.Registry;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods;
+using ML.DeepMethods.Registry;
 
 namespace ML.Tests.UnitTests.CNN
 {
