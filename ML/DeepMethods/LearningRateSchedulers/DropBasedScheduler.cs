@@ -20,8 +20,8 @@ namespace ML.DeepMethods.LearningRateSchedulers
         throw new MLException("Initial earning rate value must be positive");
       if (epochStep<0)
         throw new MLException("Epoch step value must be positive");
-      if (dropRate<1)
-        throw new MLException("Drop ratevalue must be greater then 1");
+      if (dropRate<=0 || dropRate>=1)
+        throw new MLException("Drop rate value must be in (0,1)");
 
       m_CurrentLearningRate = initLearningRate;
       m_EpochStep = epochStep;
@@ -31,7 +31,7 @@ namespace ML.DeepMethods.LearningRateSchedulers
     public double GetRate(int epoch)
     {
       if (epoch % m_EpochStep == 0)
-        m_CurrentLearningRate /= m_DropRate;
+        m_CurrentLearningRate *= m_DropRate;
 
       return m_CurrentLearningRate;
     }

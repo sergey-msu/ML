@@ -8,7 +8,6 @@ using ML.Core;
 using ML.Utils;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Models;
-using ML.Core.Registry;
 
 namespace ML.DeepTests
 {
@@ -17,7 +16,7 @@ namespace ML.DeepTests
     const int IMG_SIZE = 28;
     const string MNIST_IMG_FILE = "kaggle_img_{0}.png";
 
-    private List<double[,,]>       m_Test = new List<double[,,]>();
+    private List<double[][,]>       m_Test = new List<double[][,]>();
     private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
     {
       { 0, new Class("Zero",  0) },
@@ -165,7 +164,7 @@ namespace ML.DeepTests
       }
     }
 
-    private void loadTest(string ipath, List<double[,,]> sample)
+    private void loadTest(string ipath, List<double[][,]> sample)
     {
       sample.Clear();
 
@@ -183,13 +182,13 @@ namespace ML.DeepTests
                        .Select(d => int.Parse(d))
                        .ToArray();
 
-          var data = new double[1, IMG_SIZE, IMG_SIZE];
+          var data = new double[1][,] { new double[IMG_SIZE, IMG_SIZE] };
           for (int i=0; i<IMG_SIZE*IMG_SIZE; i++)
           {
             var shade = raw[i]; // do not invert 255-* because we want to keep logical format: 0=white, 255=black - not image color format!
             var x = i%IMG_SIZE;
             var y = i/IMG_SIZE;
-            data[0, y, x] = shade/255.0D;
+            data[0][y, x] = shade/255.0D;
           }
           sample.Add(data);
         }
@@ -204,33 +203,15 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      // create CNN
-      //var lenet1 = NetworkFactory.CreateLeNet1();
-      //lenet1[lenet1.LayerCount-1].ActivationFunction = Activation.Logistic(1);
-      ////ConvolutionalNetwork lenet1;
-      ////var filePath1 = @"F:\Work\git\ML\solution\ML.DeepTests\bin\Release\results\cnn-lenet1_1\cn_e50-0321-123745.mld";
-      ////using (var stream = File.Open(filePath1, FileMode.Open))
-      ////{
-      ////  lenet1 = ConvolutionalNetwork.Deserialize(stream);
-      ////}
-      //
-      //// create algorithm
-      //var epochs = 30;
-      //Alg = new _BackpropAlgorithm(m_Training, lenet1)
-      //{
-      //  LossFunction = Loss.CrossEntropySoftMax,
-      //  EpochCount = epochs,
-      //  LearningRate = 0.005D
-      //};
-      //Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training, ResultsFolder); // we do not have public test data in kaggle :(
-      //
-      //// run training process
-      //var now = DateTime.Now;
-      //Console.WriteLine();
-      //Console.WriteLine("Training started at {0}", now);
-      //Alg.Train();
-      //
-      //Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
+      Alg = Examples.CreateMNISTSimpleDemo(m_Training);
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training.Subset(0, 10000), ResultsFolder); // we do not have public test data in kaggle :(
+
+      var now = DateTime.Now;
+      Console.WriteLine();
+      Console.WriteLine("Training started at {0}", now);
+      Alg.Train();
+
+      Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }
 
     #endregion
@@ -239,31 +220,31 @@ namespace ML.DeepTests
 
     protected override void Test()
     {
-      //ConvolutionalNetwork lenet1;
-      //var fpath = Path.Combine(ResultsFolder, "cn_e26_p0.06.mld");
-      ////var fpath = @"F:\Work\git\ML\solution\ML.DigitsDemo\lenet1.mld";
-      //
-      //using (var stream = File.Open(fpath, FileMode.Open))
-      //{
-      //  lenet1 = ConvolutionalNetwork.Deserialize(stream);
-      //}
-      //var alg = new BackpropAlgorithm(m_Training, lenet1);
-      //
-      //var fout = Path.Combine(MnistSrc, "result1.csv");
-      //using (var file = File.Open(fout, FileMode.Create, FileAccess.Write))
-      //using (var writer = new StreamWriter(file))
-      //{
-      //  writer.WriteLine("ImageId,Label");
-      //
-      //  int num = 1;
-      //  foreach (var data in m_Test)
-      //  {
-      //    var cls = alg.Classify(data);
-      //    writer.WriteLine("{0},{1}", num++, (int)cls.Value);
-      //  }
-      //
-      //  writer.Flush();
-      //}
+      ConvNet lenet1;
+      var fpath = Path.Combine(ResultsFolder, "cn_e26_p0.06.mld");
+      //var fpath = @"F:\Work\git\ML\solution\ML.DigitsDemo\lenet1.mld";
+
+      using (var stream = File.Open(fpath, FileMode.Open))
+      {
+        lenet1 = ConvNet.Deserialize(stream);
+      }
+      var alg = new BackpropAlgorithm(m_Training, lenet1);
+
+      var fout = Path.Combine(MnistSrc, "result1.csv");
+      using (var file = File.Open(fout, FileMode.Create, FileAccess.Write))
+      using (var writer = new StreamWriter(file))
+      {
+        writer.WriteLine("ImageId,Label");
+
+        int num = 1;
+        foreach (var data in m_Test)
+        {
+          var cls = alg.Classify(data);
+          writer.WriteLine("{0},{1}", num++, (int)cls.Value);
+        }
+
+        writer.Flush();
+      }
     }
 
     #endregion

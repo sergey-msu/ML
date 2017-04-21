@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ML.NeuralMethods.Models;
 using ML.DeepMethods.Models;
 using ML.Contracts;
 using ML.Core;
-using ML.Core.Registry;
 
 namespace ML.Utils
 {
@@ -34,88 +30,6 @@ namespace ML.Utils
         var layer = new NeuralLayer(neuronCount);
         net.AddLayer(layer);
       }
-
-      net.Build();
-
-      if (randomizeInitialWeights)
-        net.RandomizeParameters(randomSeed);
-
-      return net;
-    }
-
-    /// <summary>
-    /// Creates CNN with original LeNet-1 architecture (see http://yann.lecun.com/exdb/publis/pdf/lecun-95b.pdf)
-    /// </summary>
-    public static ConvNet CreateLeNet1(IActivationFunction activation = null,
-                                       bool randomizeInitialWeights = true,
-                                       int randomSeed = 0)
-    {
-      activation = activation ?? Activation.ReLU;
-      var net = new ConvNet(1, 28) { IsTraining=true };
-
-      net.AddLayer(new ConvLayer(outputDepth: 4, windowSize: 5));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 12, windowSize: 5));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
-      net.AddLayer(new FlattenLayer(outputDim: 10, activation: activation));
-
-      net._Build();
-
-      if (randomizeInitialWeights)
-        net.RandomizeParameters(randomSeed);
-
-      return net;
-    }
-
-    /// <summary>
-    /// Creates CNN MNIST Demo architecture
-    /// </summary>
-    public static ConvNet CreateMNISTDemo(IActivationFunction activation = null,
-                                          bool randomizeInitialWeights = true,
-                                          int randomSeed = 0)
-    {
-      activation = activation ?? Activation.ReLU;
-      var net = new ConvNet(1, 28) { IsTraining=true };
-
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
-      net.AddLayer(new DropoutLayer(0.25));
-      net.AddLayer(new FlattenLayer(outputDim: 128, activation: activation));
-      net.AddLayer(new DropoutLayer(0.5));
-      net.AddLayer(new FlattenLayer(outputDim: 10, activation: Activation.Logistic(1)));
-
-      net._Build();
-
-      if (randomizeInitialWeights)
-        net.RandomizeParameters(randomSeed);
-
-      return net;
-    }
-
-    /// <summary>
-    /// Creates CNN for CIFAR-10 training
-    /// </summary>
-    public static ConvNet CreateCIFAR10Demo(IActivationFunction activation = null,
-                                            bool randomizeInitialWeights = true,
-                                            int randomSeed = 0)
-    {
-      activation = activation ?? Activation.ReLU;
-      var net = new ConvNet(3, 32) { IsTraining=true };
-
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
-      net.AddLayer(new DropoutLayer(0.25));
-
-      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
-      net.AddLayer(new DropoutLayer(0.25));
-
-      net.AddLayer(new FlattenLayer(outputDim: 512, activation: Activation.ReLU));
-      net.AddLayer(new DropoutLayer(0.5));
-      net.AddLayer(new DenseLayer(outputDim: 10, activation: Activation.Logistic(1)));
 
       net.Build();
 

@@ -42,7 +42,7 @@ namespace ML.DigitsDemo
     private void initNet()
     {
       var assembly = Assembly.GetExecutingAssembly();
-      using (var stream = assembly.GetManifestResourceStream("ML.DigitsDemo.lenet1.mld"))
+      using (var stream = assembly.GetManifestResourceStream("ML.DigitsDemo.mnist.mld"))
       {
         m_Network = ConvNet.Deserialize(stream);
       }

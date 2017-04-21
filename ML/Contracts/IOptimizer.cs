@@ -18,6 +18,6 @@
     /// <summary>
     /// Optimize current updates and apply it to source weight vector
     /// </summary>
-    void Push(double[][] update, double learningRate);
+    void Push(double[][] gradient, double learningRate);
   }
 }

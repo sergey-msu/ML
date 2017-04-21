@@ -108,6 +108,8 @@
     <Compile Include="Core\Metric\MetricBase.cs" />
     <Compile Include="Core\Metric\LpMetric.cs" />
     <Compile Include="Core\Metric\EuclideanMetric.cs" />
+    <Compile Include="DeepMethods\Optimizers\MomentumOptimizer.cs" />
+    <Compile Include="DeepMethods\Optimizers\OptimizerBase.cs" />
     <Compile Include="DeepMethods\Optimizers\NopeOptimizer.cs" />
     <Compile Include="Core\Point.cs" />
     <Compile Include="Core\Registry.cs" />
@@ -147,6 +149,7 @@
     <Compile Include="NeuralMethods\Models\Neuron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Mathematics\MathUtils.cs" />
+    <Compile Include="Utils\Examples.cs" />
     <Compile Include="Utils\NetworkFactory.cs" />
   </ItemGroup>
   <ItemGroup>

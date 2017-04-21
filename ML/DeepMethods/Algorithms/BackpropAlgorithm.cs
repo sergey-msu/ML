@@ -4,7 +4,6 @@ using System.Linq;
 using ML.Core;
 using ML.DeepMethods.Models;
 using ML.Contracts;
-using ML.DeepMethods.Optimizers;
 
 namespace ML.DeepMethods.Algorithms
 {

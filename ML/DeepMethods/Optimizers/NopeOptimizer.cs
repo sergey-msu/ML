@@ -9,43 +9,24 @@ namespace ML.DeepMethods.Optimizers
   /// dw = - l*dL/dw
   /// w := w + dw
   /// </summary>
-  public class NopeOptimizer : IOptimizer
+  public class NopeOptimizer : OptimizerBase
   {
-    private double[][] m_Weights;
-    private double m_Step2;
-
-
     public NopeOptimizer()
     {
     }
 
-    /// <summary>
-    /// Last weight vector step value (squared)
-    /// </summary>
-    public double Step2 { get { return m_Step2; } }
-
-    /// <summary>
-    /// Set source weight vector
-    /// </summary>
-    public void Init(double[][] weights)
-    {
-      if (weights==null)
-        throw new MLException("Weights can not be null");
-
-      m_Weights = weights;
-    }
 
     /// <summary>
     /// Push current gradient vector to optimizer
     /// </summary>
-    public void Push(double[][] gradient, double learningRate)
+    public override void Push(double[][] gradient, double learningRate)
     {
       var len = m_Weights.Length;
       var step2 = 0.0D;
 
-      for (int i=len-1; i>=0; i--)
+      for (int i=0; i<len; i++)
       {
-        var layerWeights  = m_Weights[i];
+        var layerWeights = m_Weights[i];
         if (layerWeights==null) continue;
 
         var layerGradient = gradient[i];

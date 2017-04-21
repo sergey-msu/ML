@@ -28,7 +28,22 @@ namespace ML.DeepMethods.Registry
 
   public static class Optimizer
   {
+    private static readonly Dictionary<double, MomentumOptimizer> m_Momentum = new Dictionary<double, MomentumOptimizer>();
+
     public static readonly NopeOptimizer Nope = new NopeOptimizer();
+
+
+    public static MomentumOptimizer Momentum(double mu)
+    {
+      MomentumOptimizer result;
+      if (!m_Momentum.TryGetValue(mu, out result))
+      {
+        result = new MomentumOptimizer(mu);
+        m_Momentum[mu] = result;
+      }
+
+      return result;
+    }
   }
 
   public static class LearningRateScheduler

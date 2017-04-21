@@ -15,7 +15,7 @@ namespace ML.DeepTests
     const int IMG_SIZE = 32;
     const string Cifar10_IMG_FILE = "{0}.png";
 
-    private List<double[,,]> m_Test = new List<double[,,]>();
+    private List<double[][,]> m_Test = new List<double[][,]>();
     private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
     {
       { 0, new Class("airplane",   0) },
@@ -136,29 +136,15 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      //// create CNN
-      //var net = NetworkFactory.CreateCIFAR10Demo();
-      //
-      ////net[net.LayerCount-1].ActivationFunction = Registry.ActivationFunctions.ReLU;
-      //
-      //// create algorithm
-      //var epochs = 100;
-      //Alg = new _BackpropAlgorithm(m_Training, net)
-      //{
-      //  LossFunction = Loss.CrossEntropySoftMax,
-      //  EpochCount = epochs,
-      //  LearningRate = 0.005D
-      //};
-      //Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training, ResultsFolder); // we do not have public test data in kaggle :(
-      //
-      //
-      //// run training process
-      //var now = DateTime.Now;
-      //Console.WriteLine();
-      //Console.WriteLine("Training started at {0}", now);
-      //Alg.Train();
-      //
-      //Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
+      Alg = Examples.CreateCIFAR10Demo(m_Training);
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training.Subset(0, 50000), ResultsFolder); // we do not have public test data in kaggle :(
+
+      var now = DateTime.Now;
+      Console.WriteLine();
+      Console.WriteLine("Training started at {0}", now);
+      Alg.Train();
+
+      Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }
 
     #endregion

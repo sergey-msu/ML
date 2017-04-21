@@ -1,4 +1,7 @@
 
+- move m_Value from layers to alg   - for Batch CPU parallelization
+
+
 ***************************** CURRENT *****************************
 
 - CNN:
@@ -21,6 +24,7 @@
   - possibility to remove layer/node from network
 
 - implement more NN optimizatiors (https://habrahabr.ru/post/318970/)
+  - [DONE] Momentum
   - Nesterov
   - Adagrad
   - RMSProp
