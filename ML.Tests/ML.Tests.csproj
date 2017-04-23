@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="UnitTests\CNN\BackpropTests.cs" />
     <Compile Include="UnitTests\CNN\Mocks.cs" />
+    <Compile Include="UnitTests\CNN\OptimizerTests.cs" />
     <Compile Include="UnitTests\Core\ComputingNodeTests.cs" />
     <Compile Include="UnitTests\Core\InformativityIndexTests.cs" />
     <Compile Include="UnitTests\Core\KernelTests.cs" />

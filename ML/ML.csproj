@@ -98,7 +98,7 @@
     <Compile Include="Core\Logical\IndexBase.cs" />
     <Compile Include="Core\Logical\GiniIndex.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\DropBasedScheduler.cs" />
-    <Compile Include="DeepMethods\LearningRateSchedulers\NopeScheduler.cs" />
+    <Compile Include="DeepMethods\LearningRateSchedulers\ConstantScheduler.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\TimeBasedScheduler.cs" />
     <Compile Include="DeepMethods\LossFunctions\CrossEntropySoftMaxLoss.cs" />
     <Compile Include="DeepMethods\LossFunctions\CrossEntropyLoss.cs" />
@@ -108,9 +108,12 @@
     <Compile Include="Core\Metric\MetricBase.cs" />
     <Compile Include="Core\Metric\LpMetric.cs" />
     <Compile Include="Core\Metric\EuclideanMetric.cs" />
+    <Compile Include="DeepMethods\Optimizers\AdadeltaOptimizer.cs" />
+    <Compile Include="DeepMethods\Optimizers\RMSPropOptimizer.cs" />
+    <Compile Include="DeepMethods\Optimizers\AdagradOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\MomentumOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\OptimizerBase.cs" />
-    <Compile Include="DeepMethods\Optimizers\NopeOptimizer.cs" />
+    <Compile Include="DeepMethods\Optimizers\SGDOptimizer.cs" />
     <Compile Include="Core\Point.cs" />
     <Compile Include="Core\Registry.cs" />
     <Compile Include="Core\ComputingNetworks\Contracts.cs" />

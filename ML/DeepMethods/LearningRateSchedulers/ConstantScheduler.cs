@@ -8,11 +8,11 @@ namespace ML.DeepMethods.LearningRateSchedulers
   /// Trivial learning rate scheduler.
   /// Always returns initial learning rate
   /// </summary>
-  public class NopeScheduler : ILearningRateScheduler
+  public class ConstantScheduler : ILearningRateScheduler
   {
     private readonly double m_InitLearningRate;
 
-    public NopeScheduler(double initLearningRate)
+    public ConstantScheduler(double initLearningRate)
     {
       if (initLearningRate<=0)
         throw new MLException("Initial learning rate value must be positive");

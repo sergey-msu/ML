@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core;
-using ML.Core.ComputingNetworks;
 using ML.DeepMethods.Models;
 using ML.Core.Registry;
 
@@ -10,12 +9,6 @@ namespace ML.Tests.UnitTests.CNN
   [TestClass]
   public class ConvolutionalNetworkTests : TestBase
   {
-    public const double EPS = 0.0000001D;
-
-    #region Inner
-
-    #endregion
-
     [ClassInitialize]
     public static void ClassInit(TestContext context)
     {

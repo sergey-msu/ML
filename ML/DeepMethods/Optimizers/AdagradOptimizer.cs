@@ -1,30 +1,29 @@
 ﻿using System;
-using ML.Contracts;
 using ML.Core;
 
 namespace ML.DeepMethods.Optimizers
 {
   /// <summary>
-  /// Momentum optimizer:
+  /// Adaptive gradient (Adagrad) optimizer:
   ///
-  /// dw[t+1] = mu[t]w[t] − lr[t]DL(w[t])
-  ///  w[t+1] = w[t] + dw[t+1]
+  /// G[t+1] = G[t] + DL(w[t])*DL(w[t])
+  /// w[t+1] = w[t] + lr/sqrt(G[t] + eps) * DL(w[t])
   ///
   /// </summary>
-  public class MomentumOptimizer : OptimizerBase
+  public class AdagradOptimizer : OptimizerBase
   {
-    private double m_Mu;
-    private double[][] m_UpdateHistory;
+    private double m_Epsilon;
+    private double[][] m_G;
 
-    public MomentumOptimizer(double mu)
+    public AdagradOptimizer(double epsilon)
     {
-      if (mu<0 || mu>1)
-        throw new MLException("Mu parameter must be in [0,1] interval");
+      if (epsilon<=0)
+        throw new MLException("Epsilon must be positive");
 
-      m_Mu = mu;
+      m_Epsilon = epsilon;
     }
 
-    public double Mu { get { return m_Mu; } }
+    public double Epsilon { get { return m_Epsilon; } }
 
 
     public override void Push(double[][] gradient, double learningRate)
@@ -32,15 +31,15 @@ namespace ML.DeepMethods.Optimizers
       var len = m_Weights.Length;
       var step2 = 0.0D;
 
-      if (m_UpdateHistory==null)
+      if (m_G==null)
       {
-        m_UpdateHistory = new double[len][];
+        m_G = new double[len][];
         for (int i=0; i<len; i++)
         {
           var layerWeights = m_Weights[i];
           if (layerWeights==null) continue;
 
-          m_UpdateHistory[i] = new double[layerWeights.Length];
+          m_G[i] = new double[layerWeights.Length];
         }
       }
 
@@ -51,12 +50,15 @@ namespace ML.DeepMethods.Optimizers
 
         var wlen = layerWeights.Length;
         var layerGradient = gradient[i];
-        var history = m_UpdateHistory[i];
+        var gi = m_G[i];
 
         for (int j=0; j<wlen; j++)
         {
-          var dw = m_Mu*history[j] - learningRate*layerGradient[j];
-          history[j] = dw;
+          var g  = layerGradient[j];
+          var g2 = g*g;
+          gi[j] += g2;
+
+          var dw = -learningRate*layerGradient[j] / Math.Sqrt(gi[j] + m_Epsilon);
           layerWeights[j] += dw;
           step2 += dw*dw;
         }
@@ -66,6 +68,5 @@ namespace ML.DeepMethods.Optimizers
 
       m_Step2 = step2;
     }
-
   }
 }

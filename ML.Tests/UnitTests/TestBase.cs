@@ -7,6 +7,7 @@ namespace ML.Tests.UnitTests
   public class TestBase
   {
     public const double EPS = 0.0000001D;
+    public const double EPS_ROUGH = 0.00001D;
     public const double GRAD_EPS = 0.000001D;
     public const double GRAD_STEP = 0.00000001D;
 

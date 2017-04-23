@@ -32,10 +32,11 @@ namespace ML.Utils
       var lrate = 0.005D;
       var alg = new BackpropAlgorithm(training, net)
       {
-        LossFunction = Loss.Euclidean,
         EpochCount = 15,
         LearningRate = lrate,
         BatchSize = 1,
+        LossFunction = Loss.Euclidean,
+        Optimizer = Optimizer.SGD,
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 
@@ -43,7 +44,7 @@ namespace ML.Utils
     }
 
     /// <summary>
-    /// Error = 0.92
+    ///
     /// </summary>
     public static BackpropAlgorithm _CreateMNISTSimpleDemo(ClassifiedSample<double[][,]> training)
     {
@@ -63,11 +64,11 @@ namespace ML.Utils
       var lrate = 0.001D;
       var alg = new BackpropAlgorithm(training, net)
       {
-        LossFunction = Loss.Euclidean,
         EpochCount = 15,
         LearningRate = lrate,
-        BatchSize = 1,
-        Optimizer = Optimizer.Momentum(0.2D),
+        BatchSize = 25,
+        LossFunction = Loss.Euclidean,
+        Optimizer = Optimizer.RMSProp(0.1D, 0.8D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 
@@ -98,7 +99,7 @@ namespace ML.Utils
         EpochCount = 50,
         LearningRate = lrate,
         BatchSize = 1,
-        LearningRateScheduler = LearningRateScheduler.Nope(lrate)
+        LearningRateScheduler = LearningRateScheduler.Constant(lrate)
       };
 
       return alg;
@@ -137,7 +138,7 @@ namespace ML.Utils
         EpochCount = 50,
         LearningRate = lrate,
         BatchSize = 1,
-        LearningRateScheduler = LearningRateScheduler.Nope(lrate)
+        LearningRateScheduler = LearningRateScheduler.Constant(lrate)
       };
 
       return alg;

@@ -5,16 +5,15 @@ using ML.Core;
 namespace ML.DeepMethods.Optimizers
 {
   /// <summary>
-  /// Trivial optimizer - does no actual optimization, simply applies update vector as is:
+  /// Standart SGD optimizer - does no actual optimization, simply applies update vector as is:
   /// dw = - l*dL/dw
   /// w := w + dw
   /// </summary>
-  public class NopeOptimizer : OptimizerBase
+  public class SGDOptimizer : OptimizerBase
   {
-    public NopeOptimizer()
+    public SGDOptimizer()
     {
     }
-
 
     /// <summary>
     /// Push current gradient vector to optimizer
@@ -31,6 +30,7 @@ namespace ML.DeepMethods.Optimizers
 
         var layerGradient = gradient[i];
         var wlen = layerWeights.Length;
+
         for (int j=0; j<wlen; j++)
         {
           var dw = -learningRate * layerGradient[j];

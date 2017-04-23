@@ -262,13 +262,13 @@ namespace ML.DeepMethods.Algorithms
       // init optimizer
 
       if (m_Optimizer==null)
-        m_Optimizer = Registry.Optimizer.Nope;
+        m_Optimizer = Registry.Optimizer.SGD;
       m_Optimizer.Init(Result.Weights);
 
       // init scheduler
 
       if (m_LearningRateScheduler==null)
-        m_LearningRateScheduler = Registry.LearningRateScheduler.Nope(m_LearningRate);
+        m_LearningRateScheduler = Registry.LearningRateScheduler.Constant(m_LearningRate);
     }
 
     #endregion
