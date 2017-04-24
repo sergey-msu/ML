@@ -97,6 +97,7 @@
     <Compile Include="Core\Logical\DonskoyIndex.cs" />
     <Compile Include="Core\Logical\IndexBase.cs" />
     <Compile Include="Core\Logical\GiniIndex.cs" />
+    <Compile Include="Core\Utils.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\DropBasedScheduler.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\ConstantScheduler.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\TimeBasedScheduler.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Core\Metric\LpMetric.cs" />
     <Compile Include="Core\Metric\EuclideanMetric.cs" />
     <Compile Include="DeepMethods\Optimizers\AdadeltaOptimizer.cs" />
+    <Compile Include="DeepMethods\Optimizers\AdamOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\RMSPropOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\AdagradOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\MomentumOptimizer.cs" />

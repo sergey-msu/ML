@@ -40,14 +40,7 @@ namespace ML.Core.Registry
 
     public static LpMetric Lp(double p)
     {
-      LpMetric result;
-      if (!m_Lp.TryGetValue(p, out result))
-      {
-        result = new LpMetric(p);
-        m_Lp[p] = result;
-      }
-
-      return result;
+      return Core.Utils.GetThroughMap(p, m_Lp);
     }
   }
 
@@ -92,38 +85,17 @@ namespace ML.Core.Registry
 
     public static ShiftedStepActivation ShiftedStep(double p)
     {
-      ShiftedStepActivation result;
-      if (!m_ShiftedSteps.TryGetValue(p, out result))
-      {
-        result = new ShiftedStepActivation(p);
-        m_ShiftedSteps[p] = result;
-      }
-
-      return result;
+      return Core.Utils.GetThroughMap(p, m_ShiftedSteps);
     }
 
     public static RationalActivation Rational(double p)
     {
-      RationalActivation result;
-      if (!m_Rationals.TryGetValue(p, out result))
-      {
-        result = new RationalActivation(p);
-        m_Rationals[p] = result;
-      }
-
-      return result;
+      return Core.Utils.GetThroughMap(p, m_Rationals);
     }
 
     public static LogisticActivation Logistic(double a)
     {
-      LogisticActivation result;
-      if (!m_Logistics.TryGetValue(a, out result))
-      {
-        result = new LogisticActivation(a);
-        m_Logistics[a] = result;
-      }
-
-      return result;
+      return Core.Utils.GetThroughMap(a, m_Logistics);
     }
   }
 }

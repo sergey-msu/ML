@@ -57,10 +57,10 @@ namespace ML.DeepMethods.Optimizers
           var g  = layerGradient[j];
           var g2 = g*g;
           gi[j] += g2;
-
-          var dw = -learningRate*layerGradient[j] / Math.Sqrt(gi[j] + m_Epsilon);
-          layerWeights[j] += dw;
+          var dw = -learningRate/Math.Sqrt(gi[j] + m_Epsilon) * g;
           step2 += dw*dw;
+
+          layerWeights[j] += dw;
         }
 
         Array.Clear(layerGradient, 0, layerGradient.Length);

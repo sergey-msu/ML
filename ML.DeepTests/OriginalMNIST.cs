@@ -196,7 +196,7 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg = Examples._CreateMNISTSimpleDemo(m_Training);
+      Alg = Examples.____CreateMNISTSimpleDemo(m_Training);
       Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Test, ResultsFolder);
 
       var now = DateTime.Now;

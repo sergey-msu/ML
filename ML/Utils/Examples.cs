@@ -46,7 +46,7 @@ namespace ML.Utils
     /// <summary>
     ///
     /// </summary>
-    public static BackpropAlgorithm _CreateMNISTSimpleDemo(ClassifiedSample<double[][,]> training)
+    public static BackpropAlgorithm ____CreateMNISTSimpleDemo(ClassifiedSample<double[][,]> training)
     {
       var activation = Activation.ReLU;
       var net = new ConvNet(1, 28) { IsTraining=true };
@@ -68,7 +68,7 @@ namespace ML.Utils
         LearningRate = lrate,
         BatchSize = 25,
         LossFunction = Loss.Euclidean,
-        Optimizer = Optimizer.RMSProp(0.1D, 0.8D),
+        Optimizer = Optimizer.Adadelta(0.0001D, 0.8D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 

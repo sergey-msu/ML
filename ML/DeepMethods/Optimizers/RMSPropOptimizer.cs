@@ -28,6 +28,7 @@ namespace ML.DeepMethods.Optimizers
     }
 
     public double Epsilon { get { return m_Epsilon; } }
+    public double Gamma { get { return m_Gamma; } }
 
 
     public override void Push(double[][] gradient, double learningRate)
@@ -61,10 +62,10 @@ namespace ML.DeepMethods.Optimizers
           var g  = layerGradient[j];
           var g2 = g*g;
           ei[j] = m_Gamma*ei[j] + (1-m_Gamma)*g2;
-
-          var dw = -learningRate*layerGradient[j] / Math.Sqrt(ei[j] + m_Epsilon);
-          layerWeights[j] += dw;
+          var dw = -learningRate/Math.Sqrt(ei[j] + m_Epsilon) * g;
           step2 += dw*dw;
+
+          layerWeights[j] += dw;
         }
 
         Array.Clear(layerGradient, 0, layerGradient.Length);
