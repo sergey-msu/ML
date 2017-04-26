@@ -13,10 +13,12 @@ namespace ML.DeepMethods.Optimizers
   /// </summary>
   public class MomentumOptimizer : OptimizerBase
   {
+    public const double DFT_MU = 0.9D;
+
     private double m_Mu;
     private double[][] m_UpdateHistory;
 
-    public MomentumOptimizer(double mu)
+    public MomentumOptimizer(double mu = DFT_MU)
     {
       if (mu<0 || mu>1)
         throw new MLException("Mu parameter must be in [0,1] interval");

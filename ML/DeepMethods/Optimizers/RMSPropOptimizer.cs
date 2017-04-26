@@ -12,11 +12,14 @@ namespace ML.DeepMethods.Optimizers
   /// </summary>
   public class RMSPropOptimizer : OptimizerBase
   {
+    public const double DFT_GAMMA   = 0.99D;
+    public const double DFT_EPSILON = 1.0E-8D;
+
     private double m_Epsilon;
     private double m_Gamma;
     private double[][] m_E;
 
-    public RMSPropOptimizer(double gamma, double epsilon)
+    public RMSPropOptimizer(double gamma = DFT_GAMMA, double epsilon = DFT_EPSILON)
     {
       if (epsilon<=0)
         throw new MLException("Epsilon must be positive");

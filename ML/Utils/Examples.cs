@@ -61,14 +61,14 @@ namespace ML.Utils
 
       net.RandomizeParameters(seed: 0);
 
-      var lrate = 0.001D;
+      var lrate = 0.0001D;
       var alg = new BackpropAlgorithm(training, net)
       {
-        EpochCount = 15,
+        EpochCount = 50,
         LearningRate = lrate,
-        BatchSize = 25,
+        BatchSize = 1,
         LossFunction = Loss.Euclidean,
-        Optimizer = Optimizer.Adam(0.9D, 0.7D, 0.001D),
+        Optimizer = Optimizer.Adam,
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 

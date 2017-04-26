@@ -12,10 +12,12 @@ namespace ML.DeepMethods.Optimizers
   /// </summary>
   public class AdagradOptimizer : OptimizerBase
   {
+    public const double DFT_EPSILON = 1.0E-8D;
+
     private double m_Epsilon;
     private double[][] m_G;
 
-    public AdagradOptimizer(double epsilon)
+    public AdagradOptimizer(double epsilon = DFT_EPSILON)
     {
       if (epsilon<=0)
         throw new MLException("Epsilon must be positive");

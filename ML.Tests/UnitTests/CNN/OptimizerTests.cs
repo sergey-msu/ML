@@ -158,7 +158,7 @@ namespace ML.Tests.UnitTests.CNN
       var eps   = 0.2D;
       var gamma = 0.4D;
       var w     = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
-      var optimizer = new RMSPropOptimizer(eps, gamma);
+      var optimizer = new RMSPropOptimizer(gamma, eps);
 
       // act & assert
 
@@ -206,7 +206,7 @@ namespace ML.Tests.UnitTests.CNN
       var eps   = 0.01D;
       var gamma = 0.9D;
       var w     = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
-      var optimizer = new AdadeltaOptimizer(eps, gamma, true);
+      var optimizer = new AdadeltaOptimizer(gamma, eps, true);
 
       // act & assert
 
@@ -292,6 +292,53 @@ namespace ML.Tests.UnitTests.CNN
 
     #endregion
 
-    //   Adamax
+    #region Adamax
+
+    [TestMethod]
+    public void AdamaxOptimizer_SimpleMultivar()
+    {
+      // arrange
+      var func  = new Mocks.SimpleMultivar();
+      var lr    = 0.1D;
+      var eps   = 0.01D;
+      var beta1 = 0.9D;
+      var beta2 = 0.7D;
+      var w     = new double[2][] { new[] { 1.0D, -1.0D }, new[] { 1.0D } };
+      var optimizer = new AdamaxOptimizer(beta1, beta2, eps);
+
+      // act & assert
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual( 0.90007138, w[0][0], EPS);
+      Assert.AreEqual(-0.90009990, w[0][1], EPS);
+      Assert.AreEqual( 0.90007138, w[1][0], EPS);
+      Assert.AreEqual( 0.02995149, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual( 0.79489610, w[0][0], EPS);
+      Assert.AreEqual(-0.79495873, w[0][1], EPS);
+      Assert.AreEqual( 0.79489610, w[1][0], EPS);
+      Assert.AreEqual( 0.03317835, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual( 0.68289103, w[0][0], EPS);
+      Assert.AreEqual(-0.68299603, w[0][1], EPS);
+      Assert.AreEqual( 0.68289103, w[1][0], EPS);
+      Assert.AreEqual( 0.03762591, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual( 0.56139304, w[0][0], EPS);
+      Assert.AreEqual(-0.56155373, w[0][1], EPS);
+      Assert.AreEqual( 0.56139304, w[1][0], EPS);
+      Assert.AreEqual( 0.04427176, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual( 0.42532931, w[0][0], EPS);
+      Assert.AreEqual(-0.42557040, w[0][1], EPS);
+      Assert.AreEqual( 0.42532931, w[1][0], EPS);
+      Assert.AreEqual( 0.05551815, optimizer.Step2, EPS);
+    }
+
+    #endregion
   }
 }

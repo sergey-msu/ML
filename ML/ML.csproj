@@ -110,6 +110,7 @@
     <Compile Include="Core\Metric\LpMetric.cs" />
     <Compile Include="Core\Metric\EuclideanMetric.cs" />
     <Compile Include="DeepMethods\Optimizers\AdadeltaOptimizer.cs" />
+    <Compile Include="DeepMethods\Optimizers\AdamaxOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\AdamOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\RMSPropOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\AdagradOptimizer.cs" />

@@ -23,39 +23,13 @@ namespace ML.DeepMethods.Registry
 
   public static class Optimizer
   {
-    private static readonly Dictionary<double, MomentumOptimizer> m_Momentum = new Dictionary<double, MomentumOptimizer>();
-    private static readonly Dictionary<double, AdagradOptimizer>  m_Adagrad  = new Dictionary<double, AdagradOptimizer>();
-    private static readonly Dictionary<double, AdadeltaOptimizer> m_Adadelta = new Dictionary<double, AdadeltaOptimizer>();
-    private static readonly Dictionary<double, RMSPropOptimizer>  m_RMSProp  = new Dictionary<double, RMSPropOptimizer>();
-    private static readonly Dictionary<double, AdamOptimizer>     m_Adam     = new Dictionary<double, AdamOptimizer>();
-
-    public static readonly SGDOptimizer SGD = new SGDOptimizer();
-
-
-    public static MomentumOptimizer Momentum(double mu)
-    {
-      return Core.Utils.GetThroughMap(mu, m_Momentum);
-    }
-
-    public static AdagradOptimizer Adagrad(double epsilon)
-    {
-      return Core.Utils.GetThroughMap(epsilon, m_Adagrad);
-    }
-
-    public static AdadeltaOptimizer Adadelta(double gamma, double epsilon, bool useLearningRate)
-    {
-      return new AdadeltaOptimizer(gamma, epsilon, useLearningRate);
-    }
-
-    public static RMSPropOptimizer RMSProp(double gamma, double epsilon)
-    {
-      return new RMSPropOptimizer(gamma, epsilon);
-    }
-
-    public static AdamOptimizer Adam(double beta1, double beta2, double epsilon)
-    {
-      return new AdamOptimizer(beta1, beta2, epsilon);
-    }
+    public static readonly SGDOptimizer      SGD      = new SGDOptimizer();
+    public static readonly AdadeltaOptimizer Adadelta = new AdadeltaOptimizer();
+    public static readonly AdagradOptimizer  Adagrad  = new AdagradOptimizer();
+    public static readonly AdamaxOptimizer   Adamax   = new AdamaxOptimizer();
+    public static readonly AdamOptimizer     Adam     = new AdamOptimizer();
+    public static readonly MomentumOptimizer Momentum = new MomentumOptimizer();
+    public static readonly RMSPropOptimizer  RMSProp  = new RMSPropOptimizer();
   }
 
   public static class LearningRateScheduler

@@ -9,13 +9,17 @@ namespace ML.DeepMethods.Optimizers
   /// </summary>
   public class AdadeltaOptimizer : OptimizerBase
   {
+    public const double DFT_GAMMA     = 0.9D;
+    public const double DFT_EPSILON   = 1.0E-9D;
+    public const bool   DFT_USE_LRATE = false;
+
     private double m_Epsilon;
     private double m_Gamma;
     private bool   m_UseLearningRate;
     private double[][] m_E;
     private double[][] m_ED;
 
-    public AdadeltaOptimizer(double gamma, double epsilon, bool useLearningRate)
+    public AdadeltaOptimizer(double gamma = DFT_GAMMA, double epsilon = DFT_EPSILON, bool useLearningRate = DFT_USE_LRATE)
     {
       if (epsilon<=0)
         throw new MLException("Epsilon must be positive");

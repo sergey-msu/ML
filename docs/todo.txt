@@ -1,14 +1,8 @@
 
-- implementation + UT:
-// Adamax
-- use default param values from http://caffe.berkeleyvision.org/tutorial/solver.html
-
-- move m_Value from layers to alg   - for Batch CPU parallelization
-
-
 ***************************** CURRENT *****************************
 
 - CNN:
+  - for Batch CPU parallelization
   - stochastic gradient training
   - [DONE] batch learning
   - batch normalization https://arxiv.org/pdf/1502.03167.pdf
@@ -28,13 +22,7 @@
   - possibility to remove layer/node from network
 
 - implement more NN optimizatiors (https://habrahabr.ru/post/318970/)
-  - [DONE] Momentum
   - Nesterov
-  - [DONE] Adagrad
-  - [DONE] RMSProp
-  - [DONE] Adadelta
-  - [DONE] Adam
-  - Adamax
 
 - Unit tests
   - fix NN tests
@@ -91,6 +79,14 @@
    - implement C4.5 algorithm for decision trees
 
 ***************************** DONE *****************************
+
+- implement more NN optimizatiors (https://habrahabr.ru/post/318970/)
+  - Momentum
+  - Adagrad
+  - RMSProp
+  - Adadelta
+  - Adam
+  - Adamax
 
 - implement Convolution NN based on CN architecture
   - read more about Convolution NN

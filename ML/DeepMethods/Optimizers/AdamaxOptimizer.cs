@@ -4,25 +4,24 @@ using ML.Core;
 namespace ML.DeepMethods.Optimizers
 {
   /// <summary>
-  /// Adaptive moment estimation (Adam) optimizer.
+  /// Adaptive moment estimation with l_infty norm (Adamax) optimizer.
   /// (see https://arxiv.org/pdf/1412.6980.pdf)
   /// </summary>
-  public class AdamOptimizer : OptimizerBase
+  public class AdamaxOptimizer : OptimizerBase
   {
     public const double DFT_BETA1   = 0.9D;
     public const double DFT_BETA2   = 0.999D;
     public const double DFT_EPSILON = 1.0E-8D;
 
     private double[][] m_M;
-    private double[][] m_V;
+    private double[][] m_U;
     private double m_Beta1t;
-    private double m_Beta2t;
 
     private double m_Beta1;
     private double m_Beta2;
     private double m_Epsilon;
 
-    public AdamOptimizer(double beta1 = DFT_BETA1, double beta2 = DFT_BETA2, double epsilon = DFT_EPSILON)
+    public AdamaxOptimizer(double beta1 = DFT_BETA1, double beta2 = DFT_BETA2, double epsilon = DFT_EPSILON)
     {
       if (beta1<0 || beta1>=1)
         throw new MLException("Beta_1 must be within [0,1) interval");
@@ -32,9 +31,8 @@ namespace ML.DeepMethods.Optimizers
         throw new MLException("Epsilon must be positive");
 
       m_Beta1   = beta1;
-      m_Beta2   = beta2;
       m_Beta1t  = beta1;
-      m_Beta2t  = beta2;
+      m_Beta2   = beta2;
       m_Epsilon = epsilon;
     }
 
@@ -51,7 +49,7 @@ namespace ML.DeepMethods.Optimizers
       if (m_M==null)
       {
         m_M = new double[len][];
-        m_V = new double[len][];
+        m_U = new double[len][];
 
         for (int i=0; i<len; i++)
         {
@@ -59,7 +57,7 @@ namespace ML.DeepMethods.Optimizers
           if (layerWeights==null) continue;
 
           m_M[i] = new double[layerWeights.Length];
-          m_V[i] = new double[layerWeights.Length];
+          m_U[i] = new double[layerWeights.Length];
         }
       }
 
@@ -71,17 +69,16 @@ namespace ML.DeepMethods.Optimizers
         var wlen = layerWeights.Length;
         var layerGradient = gradient[i];
         var mi = m_M[i];
-        var vi = m_V[i];
+        var ui = m_U[i];
 
         for (int j=0; j<wlen; j++)
         {
           var g  = layerGradient[j];
           mi[j] = m_Beta1*mi[j] + (1-m_Beta1)*g;
-          vi[j] = m_Beta2*vi[j] + (1-m_Beta2)*g*g;
+          ui[j] = Math.Max(m_Beta2*ui[j], Math.Abs(g));
           var mih = mi[j]/(1 - m_Beta1t);
-          var vih = vi[j]/(1 - m_Beta2t);
 
-          var dw = -learningRate * mih / (Math.Sqrt(vih)+m_Epsilon);
+          var dw = -learningRate * mih/(ui[j]+m_Epsilon);
           step2 += dw*dw;
 
           layerWeights[j] += dw;
@@ -91,7 +88,6 @@ namespace ML.DeepMethods.Optimizers
       }
 
       m_Beta1t *= m_Beta1;
-      m_Beta2t *= m_Beta2;
       m_Step2 = step2;
     }
   }
