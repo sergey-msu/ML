@@ -7,306 +7,291 @@ namespace ML.Tests.UnitTests.CNN
   [TestClass]
   public class OptimizerTests : TestBase
   {
+    #region SGD
+
     [TestMethod]
-    public void NopeOptimizer_Push()
+    public void SGDOptimizer_SimpleMultivar()
     {
       // arrange
-      var weights = new double[3][]
-      {
-        new[] { 1.0D, 2.0D, -1.0D },
-        null,
-        new[] { 0.0D, 1.0D }
-      };
-      var gradient = new double[3][]
-      {
-        new[] { 1.5D, -1.0D, -2.5D },
-        null,
-        new[] { 1.0D, 0.5D }
-      };
-      var lr = 2.0D;
+      var func = new Mocks.SimpleMultivar();
+      var lr = 0.1D;
+      var w = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
       var optimizer = new SGDOptimizer();
 
-      // act
-      optimizer.Init(weights);
-      optimizer.Push(gradient, lr);
+      // act & assert
 
-      // assert
-      Assert.AreEqual(-2, weights[0][0]);
-      Assert.AreEqual( 4, weights[0][1]);
-      Assert.AreEqual( 4, weights[0][2]);
-      Assert.AreEqual(-2, weights[2][0]);
-      Assert.AreEqual( 0, weights[2][1]);
-      Assert.AreEqual(43, optimizer.Step2);
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0,   w[0][0]);
+      Assert.AreEqual(0.8, w[0][1]);
+      Assert.AreEqual(0,   w[1][0]);
+      Assert.AreEqual(2.04, optimizer.Step2);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.16, w[0][0], EPS);
+      Assert.AreEqual(0.32, w[0][1], EPS);
+      Assert.AreEqual(0.16, w[1][0], EPS);
+      Assert.AreEqual(0.2816, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.032, w[0][0], EPS);
+      Assert.AreEqual(0.192, w[0][1], EPS);
+      Assert.AreEqual(0.032, w[1][0], EPS);
+      Assert.AreEqual(0.049152, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.032,  w[0][0], EPS);
+      Assert.AreEqual(0.0896, w[0][1], EPS);
+      Assert.AreEqual(0.032,  w[1][0], EPS);
+      Assert.AreEqual(0.01048576, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.01152, w[0][0], EPS);
+      Assert.AreEqual(0.04864, w[0][1], EPS);
+      Assert.AreEqual(0.01152, w[1][0], EPS);
+      Assert.AreEqual(0.00251658, optimizer.Step2, EPS);
     }
 
-    [TestMethod]
-    public void NopeOptimizer_2Push()
-    {
-      // arrange
-      var weights = new double[3][]
-      {
-        new[] { 1.0D, 2.0D, -1.0D },
-        null,
-        new[] { 0.0D, 1.0D }
-      };
-      var gradient1 = new double[3][]
-      {
-        new[] { 1.5D, -1.0D, -2.5D },
-        null,
-        new[] { 1.0D, 0.5D }
-      };
-      var gradient2 = new double[3][]
-      {
-        new[] { 0.5D, -1.5D, -2.0D },
-        null,
-        new[] { 0.0D, -0.5D }
-      };
-      var lr = 2.0D;
-      var optimizer = new SGDOptimizer();
+    #endregion
 
-      // act
-      optimizer.Init(weights);
-      optimizer.Push(gradient1, lr);
-      optimizer.Push(gradient2, lr);
-
-      // assert
-      Assert.AreEqual(-3, weights[0][0]);
-      Assert.AreEqual( 7, weights[0][1]);
-      Assert.AreEqual( 8, weights[0][2]);
-      Assert.AreEqual(-2, weights[2][0]);
-      Assert.AreEqual( 1, weights[2][1]);
-      Assert.AreEqual(27, optimizer.Step2);
-    }
+    #region Momentum
 
     [TestMethod]
-    public void MomentumOptimizer_Push()
+    public void MomentumOptimizer_SimpleMultivar()
     {
       // arrange
-      var weights = new double[3][]
-      {
-        new[] { 1.0D, 2.0D, -1.0D },
-        null,
-        new[] { 0.0D, 1.0D }
-      };
-      var gradient = new double[3][]
-      {
-        new[] { 1.5D, -1.0D, -2.5D },
-        null,
-        new[] { 1.0D, 0.5D }
-      };
-      var lr = 2.0D;
-      var mu = 0.5D;
+      var func = new Mocks.SimpleMultivar();
+      var lr = 0.1D;
+      var mu = 0.9D;
+      var w  = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
       var optimizer = new MomentumOptimizer(mu);
 
-      // act
-      optimizer.Init(weights);
-      optimizer.Push(gradient, lr);
+      // act & assert
 
-      // assert
-      Assert.AreEqual(-2, weights[0][0]);
-      Assert.AreEqual( 4, weights[0][1]);
-      Assert.AreEqual( 4, weights[0][2]);
-      Assert.AreEqual(-2, weights[2][0]);
-      Assert.AreEqual( 0, weights[2][1]);
-      Assert.AreEqual(43, optimizer.Step2);
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0,   w[0][0]);
+      Assert.AreEqual(0.8, w[0][1]);
+      Assert.AreEqual(0,   w[1][0]);
+      Assert.AreEqual(2.04, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(-0.74, w[0][0], EPS);
+      Assert.AreEqual( 0.14, w[0][1], EPS);
+      Assert.AreEqual(-0.74, w[1][0], EPS);
+      Assert.AreEqual(1.5308, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(-0.490, w[0][0], EPS);
+      Assert.AreEqual(-0.834, w[0][1], EPS);
+      Assert.AreEqual(-0.490, w[1][0], EPS);
+      Assert.AreEqual(1.073676, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual( 0.1562, w[0][0], EPS);
+      Assert.AreEqual(-1.4062, w[0][1], EPS);
+      Assert.AreEqual( 0.1562, w[1][0], EPS);
+      Assert.AreEqual(1.16256172, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual( 0.2691,  w[0][0], EPS);
+      Assert.AreEqual(-1.01498, w[0][1], EPS);
+      Assert.AreEqual( 0.2691,  w[1][0], EPS);
+      Assert.AreEqual(0.17854591, optimizer.Step2, EPS);
     }
 
-    [TestMethod]
-    public void MomentumOptimizer_2Push()
-    {
-      // arrange
-      var weights = new double[3][]
-      {
-        new[] { 1.0D, 2.0D, -1.0D },
-        null,
-        new[] { 0.0D, 1.0D }
-      };
-      var gradient1 = new double[3][]
-      {
-        new[] { 1.5D, -1.0D, -2.5D },
-        null,
-        new[] { 1.0D, 0.5D }
-      };
-      var gradient2 = new double[3][]
-      {
-        new[] { 0.5D, -1.5D, -2.0D },
-        null,
-        new[] { 0.0D, -0.5D }
-      };
-      var lr = 2.0D;
-      var mu = 0.5D;
-      var optimizer = new MomentumOptimizer(mu);
+    #endregion
 
-      // act
-      optimizer.Init(weights);
-      optimizer.Push(gradient1, lr);
-      optimizer.Push(gradient2, lr);
-
-      // assert
-      Assert.AreEqual(-4.5,  weights[0][0]);
-      Assert.AreEqual( 8,    weights[0][1]);
-      Assert.AreEqual(10.5,  weights[0][2]);
-      Assert.AreEqual(-3,    weights[2][0]);
-      Assert.AreEqual( 0.5,  weights[2][1]);
-      Assert.AreEqual(65.75, optimizer.Step2);
-    }
+    #region Adagrad
 
     [TestMethod]
-    public void MomentumOptimizer_3Push()
+    public void AdagradOptimizer_SimpleMultivar()
     {
       // arrange
-      var weights = new double[3][]
-      {
-        new[] { 1.0D, 2.0D, -1.0D },
-        null,
-        new[] { 0.0D, 1.0D }
-      };
-      var gradient1 = new double[3][]
-      {
-        new[] { 1.5D, -1.0D, -2.5D },
-        null,
-        new[] { 1.0D, 0.5D }
-      };
-      var gradient2 = new double[3][]
-      {
-        new[] { 0.5D, -1.5D, -2.0D },
-        null,
-        new[] { 0.0D, -0.5D }
-      };
-      var gradient3 = new double[3][]
-      {
-        new[] { 0.5D, -0.5D, 0.0D },
-        null,
-        new[] { 0.5D, -0.5D }
-      };
-      var lr = 2.0D;
-      var mu = 0.5D;
-      var optimizer = new MomentumOptimizer(mu);
-
-      // act
-      optimizer.Init(weights);
-      optimizer.Push(gradient1, lr);
-      optimizer.Push(gradient2, lr);
-      optimizer.Push(gradient3, lr);
-
-      // assert
-      Assert.AreEqual(-6.75,   weights[0][0]);
-      Assert.AreEqual( 11,     weights[0][1]);
-      Assert.AreEqual( 13.75,  weights[0][2]);
-      Assert.AreEqual( -4.5,   weights[2][0]);
-      Assert.AreEqual(  1.75,  weights[2][1]);
-      Assert.AreEqual(28.4375, optimizer.Step2);
-    }
-
-    [TestMethod]
-    public void AdagradOptimizer_Push()
-    {
-      // arrange
-      var weights = new double[3][]
-      {
-        new[] { 1.0D, 2.0D, -1.0D },
-        null,
-        new[] { 0.0D, 1.0D }
-      };
-      var gradient = new double[3][]
-      {
-        new[] { 1.5D, -1.0D, -2.5D },
-        null,
-        new[] { 1.0D, 0.5D }
-      };
-      var lr = 2.0D;
-      var eps = 1.0D;
+      var func = new Mocks.SimpleMultivar();
+      var lr  = 0.1D;
+      var eps = 0.2D;
+      var w   = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
       var optimizer = new AdagradOptimizer(eps);
 
-      // act
-      optimizer.Init(weights);
-      optimizer.Push(gradient, lr);
+      // act & assert
 
-      // assert
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.90009985, w[0][0], EPS);
+      Assert.AreEqual(0.90240999, w[0][1], EPS);
+      Assert.AreEqual(0.90009985, w[1][0], EPS);
+      Assert.AreEqual(0.02948389, optimizer.Step2, EPS);
 
-      var adaLr = new double[3][]  // 1/sqrt(G + eps)
-      {
-        new[] { 0.554700196D, 0.70710678D, 0.37139067D },
-        null,
-        new[] { 0.707106781D, 0.89442719D }
-      };
-      var dw = new double[3][]  // -lr*adaLr*DL
-      {
-        new[] { -1.664100588D, 1.41421356D, 1.85695335D },
-        null,
-        new[] { -1.41421356D, -0.89442719D }
-      };
-      var step2 = dw[0][0]*dw[0][0] + dw[0][1]*dw[0][1] + dw[0][2]*dw[0][2] + dw[2][0]*dw[2][0] + dw[2][1]*dw[2][1];
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.83325519, w[0][0], EPS);
+      Assert.AreEqual(0.83612927, w[0][1], EPS);
+      Assert.AreEqual(0.83325519, w[1][0], EPS);
+      Assert.AreEqual(0.01332955, optimizer.Step2, EPS);
 
-      Assert.AreEqual( 1.0D+dw[0][0], weights[0][0], EPS_ROUGH);
-      Assert.AreEqual( 2.0D+dw[0][1], weights[0][1], EPS_ROUGH);
-      Assert.AreEqual(-1.0D+dw[0][2], weights[0][2], EPS_ROUGH);
-      Assert.AreEqual( 0.0D+dw[2][0], weights[2][0], EPS_ROUGH);
-      Assert.AreEqual( 1.0D+dw[2][1], weights[2][1], EPS_ROUGH);
-      Assert.AreEqual(step2, optimizer.Step2, EPS_ROUGH);
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.78064134, w[0][0], EPS);
+      Assert.AreEqual(0.78373111, w[0][1], EPS);
+      Assert.AreEqual(0.78064134, w[1][0], EPS);
+      Assert.AreEqual(0.008282, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.73643259, w[0][0], EPS);
+      Assert.AreEqual(0.73961111, w[0][1], EPS);
+      Assert.AreEqual(0.73643259, w[1][0], EPS);
+      Assert.AreEqual(0.0058554, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.69794315, w[0][0], EPS);
+      Assert.AreEqual(0.70115040, w[0][1], EPS);
+      Assert.AreEqual(0.69794315, w[1][0], EPS);
+      Assert.AreEqual(0.0044421, optimizer.Step2, EPS);
     }
+
+    #endregion
+
+    #region RMSprop
 
     [TestMethod]
-    public void AdagradOptimizer_2Push()
+    public void RMSPropOptimizer_SimpleMultivar()
     {
       // arrange
-      var weights = new double[3][]
-      {
-        new[] { 1.0D, 2.0D, -1.0D },
-        null,
-        new[] { 0.0D, 1.0D }
-      };
-      var gradient1 = new double[3][]
-      {
-        new[] { 1.5D, -1.0D, -2.5D },
-        null,
-        new[] { 1.0D, 0.5D }
-      };
-      var gradient2 = new double[3][]
-      {
-        new[] { 1.0D, -1.0D, 0.0D },
-        null,
-        new[] { 0.0D, 1.0D }
-      };
-      var lr = 2.0D;
-      var eps = 1.0D;
-      var optimizer = new AdagradOptimizer(eps);
+      var func  = new Mocks.SimpleMultivar();
+      var lr    = 0.1D;
+      var eps   = 0.2D;
+      var gamma = 0.4D;
+      var w     = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
+      var optimizer = new RMSPropOptimizer(eps, gamma);
 
-      // act
-      optimizer.Init(weights);
-      optimizer.Push(gradient1, lr);
-      optimizer.Push(gradient2, lr);
+      // act & assert
 
-      // assert
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.87111518, w[0][0], EPS);
+      Assert.AreEqual(0.87596527, w[0][1], EPS);
+      Assert.AreEqual(0.87111518, w[1][0], EPS);
+      Assert.AreEqual(0.04860721, optimizer.Step2, EPS);
 
-      var newWeights =  new double[3][]
-      {
-        new[] { -0.66410058867D, 3.414213562373D, 0.85695338177D },
-        null,
-        new[] { -1.41421356237D, 0.105572809000D }
-      };
-      var adaLr = new double[3][]  // 1/sqrt(G + eps)
-      {
-        new[] { 0.485071250072666D, 0.577350269189626D, 0.371390676354104D },
-        null,
-        new[] { 0.707106781186547D, 0.666666666666667D }
-      };
-      var dw = new double[3][]  // -lr*adaLr*DL
-      {
-        new[] { -0.9701425001453D, 1.1547005383793D, 0.0D },
-        null,
-        new[] { 0.0D, -1.3333333333333D }
-      };
-      var step2 = dw[0][0]*dw[0][0] + dw[0][1]*dw[0][1] + dw[0][2]*dw[0][2] + dw[2][0]*dw[2][0] + dw[2][1]*dw[2][1];
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.76683636, w[0][0], EPS);
+      Assert.AreEqual(0.77441535, w[0][1], EPS);
+      Assert.AreEqual(0.76683636, w[1][0], EPS);
+      Assert.AreEqual(0.03206053, optimizer.Step2, EPS);
 
-      Assert.AreEqual(newWeights[0][0]+dw[0][0], weights[0][0], EPS_ROUGH);
-      Assert.AreEqual(newWeights[0][1]+dw[0][1], weights[0][1], EPS_ROUGH);
-      Assert.AreEqual(newWeights[0][2]+dw[0][2], weights[0][2], EPS_ROUGH);
-      Assert.AreEqual(newWeights[2][0]+dw[2][0], weights[2][0], EPS_ROUGH);
-      Assert.AreEqual(newWeights[2][1]+dw[2][1], weights[2][1], EPS_ROUGH);
-      Assert.AreEqual(step2, optimizer.Step2, EPS_ROUGH);
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.67050260, w[0][0], EPS);
+      Assert.AreEqual(0.68059867, w[0][1], EPS);
+      Assert.AreEqual(0.67050260, w[1][0], EPS);
+      Assert.AreEqual(0.02736195, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.57795893, w[0][0], EPS);
+      Assert.AreEqual(0.59072338, w[0][1], EPS);
+      Assert.AreEqual(0.57795893, w[1][0], EPS);
+      Assert.AreEqual(0.02520623, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.48793820, w[0][0], EPS);
+      Assert.AreEqual(0.50366403, w[0][1], EPS);
+      Assert.AreEqual(0.48793820, w[1][0], EPS);
+      Assert.AreEqual(0.02378680, optimizer.Step2, EPS);
     }
 
+    #endregion
 
+    #region Adadelta
+
+    [TestMethod]
+    public void AdadeltaOptimizer_SimpleMultivar()
+    {
+      // arrange
+      var func  = new Mocks.SimpleMultivar();
+      var lr    = 1.0D;
+      var eps   = 0.01D;
+      var gamma = 0.9D;
+      var w     = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
+      var optimizer = new AdadeltaOptimizer(eps, gamma, true);
+
+      // act & assert
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.68393023, w[0][0], EPS);
+      Assert.AreEqual(0.68765248, w[0][1], EPS);
+      Assert.AreEqual(0.68393023, w[1][0], EPS);
+      Assert.AreEqual(0.29736118, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.42274831, w[0][0], EPS);
+      Assert.AreEqual(0.42729503, w[0][1], EPS);
+      Assert.AreEqual(0.42274831, w[1][0], EPS);
+      Assert.AreEqual(0.20421799, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.24219537, w[0][0], EPS);
+      Assert.AreEqual(0.24472560, w[0][1], EPS);
+      Assert.AreEqual(0.24219537, w[1][0], EPS);
+      Assert.AreEqual(0.09853033, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.13217318, w[0][0], EPS);
+      Assert.AreEqual(0.13351822, w[0][1], EPS);
+      Assert.AreEqual(0.13217318, w[1][0], EPS);
+      Assert.AreEqual(0.03657684, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.06995692, w[0][0], EPS);
+      Assert.AreEqual(0.07071067, w[0][1], EPS);
+      Assert.AreEqual(0.06995692, w[1][0], EPS);
+      Assert.AreEqual(0.01168651, optimizer.Step2, EPS);
+    }
+
+    #endregion
+
+    #region Adam
+
+    [TestMethod]
+    public void AdamOptimizer_SimpleMultivar()
+    {
+      // arrange
+      var func  = new Mocks.SimpleMultivar();
+      var lr    = 0.1D;
+      var eps   = 0.2D;
+      var beta1 = 0.9D;
+      var beta2 = 0.7D;
+      var w     = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
+      var optimizer = new AdamOptimizer(beta1, beta2, eps);
+
+      // act & assert
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.90196078, w[0][0], EPS);
+      Assert.AreEqual(0.90909091, w[0][1], EPS);
+      Assert.AreEqual(0.90196078, w[1][0], EPS);
+      Assert.AreEqual(0.02748784, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.80353053, w[0][0], EPS);
+      Assert.AreEqual(0.81818465, w[0][1], EPS);
+      Assert.AreEqual(0.80353053, w[1][0], EPS);
+      Assert.AreEqual(0.02764098, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.70434233, w[0][0], EPS);
+      Assert.AreEqual(0.72707454, w[0][1], EPS);
+      Assert.AreEqual(0.70434233, w[1][0], EPS);
+      Assert.AreEqual(0.02797765, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.60398299, w[0][0], EPS);
+      Assert.AreEqual(0.63554944, w[0][1], EPS);
+      Assert.AreEqual(0.60398299, w[1][0], EPS);
+      Assert.AreEqual(0.02852083, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.50198181, w[0][0], EPS);
+      Assert.AreEqual(0.54339582, w[0][1], EPS);
+      Assert.AreEqual(0.50198181, w[1][0], EPS);
+      Assert.AreEqual(0.02930077, optimizer.Step2, EPS);
+    }
+
+    #endregion
+
+    //   Adamax
   }
 }

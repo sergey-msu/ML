@@ -27,9 +27,9 @@ namespace ML.DeepMethods.Optimizers
     public double Mu { get { return m_Mu; } }
 
 
-    public override void Push(double[][] gradient, double learningRate)
+    protected override void DoPush(double[][] weights, double[][] gradient, double learningRate)
     {
-      var len = m_Weights.Length;
+      var len = weights.Length;
       var step2 = 0.0D;
 
       if (m_UpdateHistory==null)
@@ -37,7 +37,7 @@ namespace ML.DeepMethods.Optimizers
         m_UpdateHistory = new double[len][];
         for (int i=0; i<len; i++)
         {
-          var layerWeights = m_Weights[i];
+          var layerWeights = weights[i];
           if (layerWeights==null) continue;
 
           m_UpdateHistory[i] = new double[layerWeights.Length];
@@ -46,7 +46,7 @@ namespace ML.DeepMethods.Optimizers
 
       for (int i=0; i<len; i++)
       {
-        var layerWeights = m_Weights[i];
+        var layerWeights = weights[i];
         if (layerWeights==null) continue;
 
         var wlen = layerWeights.Length;

@@ -26,9 +26,9 @@ namespace ML.DeepMethods.Optimizers
     public double Epsilon { get { return m_Epsilon; } }
 
 
-    public override void Push(double[][] gradient, double learningRate)
+    protected override void DoPush(double[][] weights, double[][] gradient, double learningRate)
     {
-      var len = m_Weights.Length;
+      var len = weights.Length;
       var step2 = 0.0D;
 
       if (m_G==null)
@@ -36,7 +36,7 @@ namespace ML.DeepMethods.Optimizers
         m_G = new double[len][];
         for (int i=0; i<len; i++)
         {
-          var layerWeights = m_Weights[i];
+          var layerWeights = weights[i];
           if (layerWeights==null) continue;
 
           m_G[i] = new double[layerWeights.Length];
@@ -45,7 +45,7 @@ namespace ML.DeepMethods.Optimizers
 
       for (int i=0; i<len; i++)
       {
-        var layerWeights = m_Weights[i];
+        var layerWeights = weights[i];
         if (layerWeights==null) continue;
 
         var wlen = layerWeights.Length;
@@ -55,8 +55,7 @@ namespace ML.DeepMethods.Optimizers
         for (int j=0; j<wlen; j++)
         {
           var g  = layerGradient[j];
-          var g2 = g*g;
-          gi[j] += g2;
+          gi[j] += g*g;
           var dw = -learningRate/Math.Sqrt(gi[j] + m_Epsilon) * g;
           step2 += dw*dw;
 

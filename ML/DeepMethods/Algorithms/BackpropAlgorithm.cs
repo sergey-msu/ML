@@ -214,7 +214,7 @@ namespace ML.DeepMethods.Algorithms
 
     public void FlushGradient()
     {
-      m_Optimizer.Push(m_Gradient, m_LearningRate);
+      m_Optimizer.Push(Result.Weights, m_Gradient, m_LearningRate);
     }
 
     public override void Build()
@@ -263,7 +263,6 @@ namespace ML.DeepMethods.Algorithms
 
       if (m_Optimizer==null)
         m_Optimizer = Registry.Optimizer.SGD;
-      m_Optimizer.Init(Result.Weights);
 
       // init scheduler
 
@@ -315,7 +314,7 @@ namespace ML.DeepMethods.Algorithms
       }
 
       // optimize and apply updates
-      m_Optimizer.Push(m_Gradient, m_LearningRate);
+      m_Optimizer.Push(Result.Weights, m_Gradient, m_LearningRate);
 
       // update batch stats
       m_Batch++;

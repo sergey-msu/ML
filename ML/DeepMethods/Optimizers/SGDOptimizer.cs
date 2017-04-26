@@ -18,14 +18,14 @@ namespace ML.DeepMethods.Optimizers
     /// <summary>
     /// Push current gradient vector to optimizer
     /// </summary>
-    public override void Push(double[][] gradient, double learningRate)
+    protected override void DoPush(double[][] weights, double[][] gradient, double learningRate)
     {
-      var len = m_Weights.Length;
+      var len = weights.Length;
       var step2 = 0.0D;
 
       for (int i=0; i<len; i++)
       {
-        var layerWeights = m_Weights[i];
+        var layerWeights = weights[i];
         if (layerWeights==null) continue;
 
         var layerGradient = gradient[i];

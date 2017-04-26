@@ -11,13 +11,8 @@
     double Step2 { get; }
 
     /// <summary>
-    /// Set source weight vector
-    /// </summary>
-    void Init(double[][] weights);
-
-    /// <summary>
     /// Optimize current updates and apply it to source weight vector
     /// </summary>
-    void Push(double[][] gradient, double learningRate);
+    void Push(double[][] weights, double[][] gradient, double learningRate);
   }
 }

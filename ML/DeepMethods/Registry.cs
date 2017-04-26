@@ -24,9 +24,10 @@ namespace ML.DeepMethods.Registry
   public static class Optimizer
   {
     private static readonly Dictionary<double, MomentumOptimizer> m_Momentum = new Dictionary<double, MomentumOptimizer>();
-    private static readonly Dictionary<double, AdagradOptimizer> m_Adagrad   = new Dictionary<double, AdagradOptimizer>();
-    private static readonly Dictionary<double, AdadeltaOptimizer> m_Adadelta  = new Dictionary<double, AdadeltaOptimizer>();
-    private static readonly Dictionary<double, RMSPropOptimizer> m_RMSProp  = new Dictionary<double, RMSPropOptimizer>();
+    private static readonly Dictionary<double, AdagradOptimizer>  m_Adagrad  = new Dictionary<double, AdagradOptimizer>();
+    private static readonly Dictionary<double, AdadeltaOptimizer> m_Adadelta = new Dictionary<double, AdadeltaOptimizer>();
+    private static readonly Dictionary<double, RMSPropOptimizer>  m_RMSProp  = new Dictionary<double, RMSPropOptimizer>();
+    private static readonly Dictionary<double, AdamOptimizer>     m_Adam     = new Dictionary<double, AdamOptimizer>();
 
     public static readonly SGDOptimizer SGD = new SGDOptimizer();
 
@@ -36,19 +37,24 @@ namespace ML.DeepMethods.Registry
       return Core.Utils.GetThroughMap(mu, m_Momentum);
     }
 
-    public static AdagradOptimizer Adagrad(double eps)
+    public static AdagradOptimizer Adagrad(double epsilon)
     {
-      return Core.Utils.GetThroughMap(eps, m_Adagrad);
+      return Core.Utils.GetThroughMap(epsilon, m_Adagrad);
     }
 
-    public static AdadeltaOptimizer Adadelta(double eps, double gamma)
+    public static AdadeltaOptimizer Adadelta(double gamma, double epsilon, bool useLearningRate)
     {
-      return new AdadeltaOptimizer(eps, gamma);
+      return new AdadeltaOptimizer(gamma, epsilon, useLearningRate);
     }
 
-    public static RMSPropOptimizer RMSProp(double epsilon, double gamma)
+    public static RMSPropOptimizer RMSProp(double gamma, double epsilon)
     {
-      return new RMSPropOptimizer(epsilon, gamma);
+      return new RMSPropOptimizer(gamma, epsilon);
+    }
+
+    public static AdamOptimizer Adam(double beta1, double beta2, double epsilon)
+    {
+      return new AdamOptimizer(beta1, beta2, epsilon);
     }
   }
 

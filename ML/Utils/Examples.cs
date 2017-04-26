@@ -68,7 +68,7 @@ namespace ML.Utils
         LearningRate = lrate,
         BatchSize = 25,
         LossFunction = Loss.Euclidean,
-        Optimizer = Optimizer.Adadelta(0.0001D, 0.8D),
+        Optimizer = Optimizer.Adam(0.9D, 0.7D, 0.001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 

@@ -5,11 +5,11 @@ using ML.Core;
 namespace ML.DeepMethods.Optimizers
 {
   /// <summary>
-  /// Base class for all optimizers
+  /// Base class for all optimizers.
+  /// (see http://caffe.berkeleyvision.org/tutorial/solver.html for standart optimizers description)
   /// </summary>
   public abstract class OptimizerBase : IOptimizer
   {
-    protected double[][] m_Weights;
     protected double m_Step2;
 
     protected OptimizerBase()
@@ -24,19 +24,19 @@ namespace ML.DeepMethods.Optimizers
 
 
     /// <summary>
-    /// Set source weight vector
-    /// </summary>
-    public virtual void Init(double[][] weights)
-    {
-      if (weights==null)
-        throw new MLException("Weights can not be null");
-
-      m_Weights = weights;
-    }
-
-    /// <summary>
     /// Push current gradient vector to optimizer
     /// </summary>
-    public abstract void Push(double[][] gradient, double learningRate);
+    public void Push(double[][] weights, double[][] gradient, double learningRate)
+    {
+      if (weights==null)
+        throw new MLException("Weights is null");
+      if (gradient==null)
+        throw new MLException("Gradient in null");
+
+      DoPush(weights, gradient, learningRate);
+    }
+
+
+    protected abstract void DoPush(double[][] weights, double[][] gradient, double learningRate);
   }
 }

@@ -15,7 +15,7 @@ namespace ML.DeepMethods.Optimizers
     private double[][] m_E;
     private double[][] m_ED;
 
-    public AdadeltaOptimizer(double epsilon, double gamma, double useLearningRate)
+    public AdadeltaOptimizer(double gamma, double epsilon, bool useLearningRate)
     {
       if (epsilon<=0)
         throw new MLException("Epsilon must be positive");
@@ -24,16 +24,17 @@ namespace ML.DeepMethods.Optimizers
 
       m_Epsilon = epsilon;
       m_Gamma = gamma;
+      m_UseLearningRate = useLearningRate;
     }
 
     public double Epsilon { get { return m_Epsilon; } }
-    public double Gamma { get { return m_Gamma; } }
-    public bool UseLearningRate { get { return m_UseLearningRate; } }
+    public double Gamma   { get { return m_Gamma; } }
+    public bool   UseLearningRate { get { return m_UseLearningRate; } }
 
 
-    public override void Push(double[][] gradient, double learningRate)
+    protected override void DoPush(double[][] weights, double[][] gradient, double learningRate)
     {
-      var len = m_Weights.Length;
+      var len = weights.Length;
       var step2 = 0.0D;
 
       if (m_E==null)
@@ -43,7 +44,7 @@ namespace ML.DeepMethods.Optimizers
 
         for (int i=0; i<len; i++)
         {
-          var layerWeights = m_Weights[i];
+          var layerWeights = weights[i];
           if (layerWeights==null) continue;
 
           m_E[i] = new double[layerWeights.Length];
@@ -53,7 +54,7 @@ namespace ML.DeepMethods.Optimizers
 
       for (int i=0; i<len; i++)
       {
-        var layerWeights = m_Weights[i];
+        var layerWeights = weights[i];
         if (layerWeights==null) continue;
 
         var wlen = layerWeights.Length;
@@ -64,8 +65,7 @@ namespace ML.DeepMethods.Optimizers
         for (int j=0; j<wlen; j++)
         {
           var g   = layerGradient[j];
-          var g2  = g*g;
-          ei[j]   = m_Gamma*ei[j] + (1-m_Gamma)*g2;
+          ei[j]   = m_Gamma*ei[j] + (1-m_Gamma)*g*g;
           var dw  = -Math.Sqrt((edi[j]+m_Epsilon)/(ei[j]+m_Epsilon)) * g;
           var dw2 = dw*dw;
           edi[j]  = m_Gamma*edi[j] + (1-m_Gamma)*dw2;

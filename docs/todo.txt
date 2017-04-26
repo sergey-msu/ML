@@ -1,4 +1,8 @@
 
+- implementation + UT:
+// Adamax
+- use default param values from http://caffe.berkeleyvision.org/tutorial/solver.html
+
 - move m_Value from layers to alg   - for Batch CPU parallelization
 
 
@@ -20,16 +24,16 @@
 - COMMIT A WILLFUL DECISION: do we need ComputingLayer architecture? Does Build/DoBuild implenter in a proper way?
 
 - NN and CNN:
-  - possibility to train - add nodes/layers - train etc...
+  - possibility of: train -> add nodes/layers -> train etc...
   - possibility to remove layer/node from network
 
 - implement more NN optimizatiors (https://habrahabr.ru/post/318970/)
   - [DONE] Momentum
   - Nesterov
-  - Adagrad
-  - RMSProp
-  - Adadelta
-  - Adam
+  - [DONE] Adagrad
+  - [DONE] RMSProp
+  - [DONE] Adadelta
+  - [DONE] Adam
   - Adamax
 
 - Unit tests
