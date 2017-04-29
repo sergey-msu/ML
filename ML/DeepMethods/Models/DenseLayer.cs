@@ -66,6 +66,7 @@ namespace ML.DeepMethods.Models
     protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
     {
       var plen = m_InputDepth + 1;
+      int idx;
 
       // weight updates
       for (int q=0; q<m_OutputDepth; q++)
@@ -74,11 +75,13 @@ namespace ML.DeepMethods.Models
         for (int y=0; y<m_WindowHeight; y++)
         for (int x=0; x<m_WindowWidth;  x++)
         {
-          layerGradient[p + q*plen] += errors[q][0, 0] * prevLayer.Value(p, y, x); // Gradient(q, p, i, j)
+          idx = p + q*plen;
+          layerGradient[idx] += errors[q][0, 0] * prevLayer.Value(p, y, x); // Gradient(q, p, i, j)
         }
 
         // bias updates
-        layerGradient[(q+1)*m_FeatureMapParamCount-1] += errors[q][0, 0];  // BiasGrad(q)
+        idx = (q+1)*m_FeatureMapParamCount-1;
+        layerGradient[idx] += errors[q][0, 0];  // BiasGrad(q)
       }
     }
 

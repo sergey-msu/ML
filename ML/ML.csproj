@@ -76,7 +76,7 @@
     <Compile Include="Core\ActivationFunctions\TanhActivation.cs" />
     <Compile Include="Core\AlgorithmBase.cs" />
     <Compile Include="Core\ClassifiedSample.cs" />
-    <Compile Include="Contracts\IAuxiliary.cs" />
+    <Compile Include="Contracts\INamed.cs" />
     <Compile Include="Core\ComputingNetworks\CompositeNode.cs" />
     <Compile Include="Core\ComputingNetworks\AggregateNode.cs" />
     <Compile Include="Core\ComputingNetworks\ComputingNode.cs" />

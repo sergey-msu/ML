@@ -12,7 +12,7 @@ namespace ML.DeepMethods.Optimizers
   /// </summary>
   public class RMSPropOptimizer : OptimizerBase
   {
-    public const double DFT_GAMMA   = 0.99D;
+    public const double DFT_GAMMA   = 0.9D;
     public const double DFT_EPSILON = 1.0E-8D;
 
     private double m_Epsilon;

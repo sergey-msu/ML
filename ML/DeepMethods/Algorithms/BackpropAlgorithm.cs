@@ -291,9 +291,13 @@ namespace ML.DeepMethods.Algorithms
     private void runEpoch(ConvNet net)
     {
       // loop on batches
+      int b = 0;
       foreach (var batch in TrainingSample.Batch(m_BatchSize))
       {
         runBatch(net, batch);
+
+        b++;
+        if (b % 10000 == 0) Console.WriteLine("Batch: {0} ({1} iters)", b, b*BatchSize);
       }
 
       // update epoch stats

@@ -115,7 +115,7 @@ namespace ML.DeepMethods.Models
 
           // window
           for (int y=0; y<m_WindowHeight; y++)
-          for (int x=0; x<m_WindowWidth; x++)
+          for (int x=0; x<m_WindowWidth;  x++)
           {
             var xidx = xmin+x;
             var yidx = ymin+y;
@@ -124,7 +124,8 @@ namespace ML.DeepMethods.Models
               // inner product in p-depth (over input channel's neuron at fixed position)
               for (int p=0; p<m_InputDepth; p++)
               {
-                var w = m_Weights[x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount]; // Kernel(q, p, y, x)
+                var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
+                var w = m_Weights[idx]; // Kernel(q, p, y, x)
                 net += w * input[p][yidx, xidx];
               }
             }
@@ -164,8 +165,8 @@ namespace ML.DeepMethods.Models
             if (x >= m_WindowWidth) continue;
             if (x < 0) break;
 
-            g += error[q][k, m] *
-                 m_Weights[x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount]; // Kernel(q, p, y, x)
+            var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
+            g += error[q][k, m] * m_Weights[idx]; // Kernel(q, p, y, x)
           }
         }
 
@@ -175,6 +176,8 @@ namespace ML.DeepMethods.Models
 
     protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
     {
+      int idx;
+
       // weight updates
       for (int q=0; q<m_OutputDepth; q++)
       {
@@ -200,7 +203,8 @@ namespace ML.DeepMethods.Models
             }
           }
 
-          layerGradient[j + i*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount] += dw; // Gradient(q, p, i, j)
+          idx = j + i*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
+          layerGradient[idx] += dw; // Gradient(q, p, i, j)
         }
 
         // bias updates
@@ -211,7 +215,8 @@ namespace ML.DeepMethods.Models
           db += errors[q][k, m];
         }
 
-        layerGradient[(q+1)*m_FeatureMapParamCount-1] += db;  // BiasGrad(q)
+        idx = (q+1)*m_FeatureMapParamCount-1;
+        layerGradient[idx] += db;  // BiasGrad(q)
       }
     }
 

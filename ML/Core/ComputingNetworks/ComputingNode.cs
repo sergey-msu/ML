@@ -36,7 +36,7 @@ namespace ML.Core.ComputingNetworks
     }
 
     /// <summary>
-    /// Returns number of layer parameters
+    /// Returns number of node parameters
     /// </summary>
     public abstract int ParamCount { get; }
 
@@ -82,24 +82,6 @@ namespace ML.Core.ComputingNetworks
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
     public virtual bool TryGetParam(int idx, out double value)
     {
-      //if (!m_ParIdx.CheckEnd(idx))
-      //{
-      //  value = 0;
-      //  return false;
-      //}
-      //
-      //ComputingNode subnode;
-      //int subidx;
-      //var res = TryGetSubnodeByParamIndex(idx, out subnode, out subidx);
-      //if (res)
-      //{
-      //  value = subnode.DoGetParam(subidx);
-      //  return true;
-      //}
-      //
-      //value = 0;
-      //return false;
-
       if (!m_ParIdx.CheckEnd(idx))
       {
         value = 0;
@@ -122,20 +104,6 @@ namespace ML.Core.ComputingNetworks
     /// <returns>True is operation succeeded, false otherwise (unexisted index etc.)</returns>
     public virtual bool TrySetParam(int idx, double value, bool isDelta)
     {
-      //if (!m_ParIdx.CheckEnd(idx))
-      //  return false;
-      //
-      //ComputingNode subnode;
-      //int subidx;
-      //var res = TryGetSubnodeByParamIndex(idx, out subnode, out subidx);
-      //if (res)
-      //{
-      //  subnode.DoSetParam(subidx, value, isDelta);
-      //  return true;
-      //}
-      //
-      //return false;
-
       if (!m_ParIdx.CheckEnd(idx))
         return false;
 

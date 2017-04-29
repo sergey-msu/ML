@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using ML.Core;
 using ML.Utils;
-using ML.DeepMethods.Algorithms;
-using ML.Core.Registry;
 
 namespace ML.DeepTests
 {
@@ -137,7 +135,7 @@ namespace ML.DeepTests
     protected override void Train()
     {
       Alg = Examples.CreateCIFAR10Demo(m_Training);
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training.Subset(0, 50000), ResultsFolder); // we do not have public test data in kaggle :(
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training.Subset(0, 10000), ResultsFolder); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;
       Console.WriteLine();

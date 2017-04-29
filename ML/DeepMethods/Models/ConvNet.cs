@@ -25,16 +25,16 @@ namespace ML.DeepMethods.Models
     #endregion
 
     public ConvNet(int inputDepth,
-                                 int inputSize,
-                                 IActivationFunction activation = null)
+                   int inputSize,
+                   IActivationFunction activation = null)
       : this(inputDepth, inputSize, inputSize, activation)
     {
     }
 
     public ConvNet(int inputDepth,
-                                 int inputHeight,
-                                 int inputWidth,
-                                 IActivationFunction activation = null)
+                   int inputHeight,
+                   int inputWidth,
+                   IActivationFunction activation = null)
     {
       if (inputDepth <= 0)
         throw new MLException("ConvolutionalNetwork.ctor(inputDepth<=0)");

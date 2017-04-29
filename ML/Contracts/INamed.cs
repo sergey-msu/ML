@@ -1,7 +1,7 @@
 ﻿namespace ML.Contracts
 {
   /// <summary>
-  /// COntract for named entities
+  /// Contract for named entities
   /// </summary>
   public interface INamed
   {

@@ -39,8 +39,8 @@ namespace ML.DeepMethods.Models
         for (int x=0; x<m_WindowWidth;  x++)
         for (int p=0; p<m_InputDepth;   p++) // inner product in p-depth (over input channel's neuron at fixed position)
         {
-          net += input[p][y, x] *
-                 m_Weights[x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount]; // Kernel(q, p, y, x)
+          var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
+          net += input[p][y, x] * m_Weights[idx]; // Kernel(q, p, y, x)
         }
 
         m_Value[q][0, 0] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
@@ -65,8 +65,8 @@ namespace ML.DeepMethods.Models
 
         for (int q=0; q<m_OutputDepth; q++)
         {
-          g += error[q][0, 0] *
-               m_Weights[x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount]; // Kernel(q, p, y, x)
+          var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
+          g += error[q][0, 0] * m_Weights[idx]; // Kernel(q, p, y, x)
         }
 
         prevError[p][y, x] = g * prevLayer.Derivative(p, y, x);
@@ -82,7 +82,8 @@ namespace ML.DeepMethods.Models
         for (int y=0; y<m_WindowHeight; y++)
         for (int x=0; x<m_WindowWidth;  x++)
         {
-          layerGradient[x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount] += errors[q][0, 0] * prevLayer.Value(p, y, x); // Gradient(q, p, y, x)
+          var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
+          layerGradient[idx] += errors[q][0, 0] * prevLayer.Value(p, y, x); // Gradient(q, p, y, x)
         }
 
         // bias updates

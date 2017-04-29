@@ -5,10 +5,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using ML.Core;
 using ML.Utils;
-using ML.DeepMethods.Algorithms;
-using ML.Core.Registry;
-using ML.DeepMethods;
-using ML.DeepMethods.Registry;
 
 namespace ML.DeepTests
 {

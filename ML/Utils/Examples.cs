@@ -66,9 +66,9 @@ namespace ML.Utils
       {
         EpochCount = 50,
         LearningRate = lrate,
-        BatchSize = 1,
+        BatchSize = 20,
         LossFunction = Loss.Euclidean,
-        Optimizer = Optimizer.Adam,
+        Optimizer = Optimizer.RMSProp,
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 
@@ -127,18 +127,19 @@ namespace ML.Utils
       net.AddLayer(new DropoutLayer(0.5));
       net.AddLayer(new DenseLayer(outputDim: 10, activation: Activation.Logistic(1)));
 
-      net.Build();
+      net._Build();
 
       net.RandomizeParameters(seed: 0);
 
-      var lrate = 0.005D;
+      var lrate = 0.00001D;
       var alg = new BackpropAlgorithm(training, net)
       {
         LossFunction = Loss.CrossEntropySoftMax,
         EpochCount = 50,
         LearningRate = lrate,
-        BatchSize = 1,
-        LearningRateScheduler = LearningRateScheduler.Constant(lrate)
+        BatchSize = 32,
+        Optimizer = Optimizer.RMSProp,
+        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 
       return alg;
