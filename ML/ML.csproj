@@ -98,6 +98,7 @@
     <Compile Include="Core\Logical\IndexBase.cs" />
     <Compile Include="Core\Logical\GiniIndex.cs" />
     <Compile Include="Core\Utils.cs" />
+    <Compile Include="DeepMethods\Algorithms\BackpropAlgorithm.Batching.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\DropBasedScheduler.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\ConstantScheduler.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\TimeBasedScheduler.cs" />

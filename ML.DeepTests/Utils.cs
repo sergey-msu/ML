@@ -26,7 +26,7 @@ namespace ML.DeepTests
       var ofilePath = Path.Combine(outputPath, ofileName);
       using (var stream = File.Open(ofilePath, FileMode.Create))
       {
-        alg.Result.Serialize(stream);
+        alg.Net.Serialize(stream);
       }
     }
 
@@ -36,7 +36,7 @@ namespace ML.DeepTests
       var ofilePath = Path.Combine(outputPath, ofileName);
       using (var stream = File.Open(ofilePath, FileMode.Create))
       {
-        alg.Result.Serialize(stream);
+        alg.Net.Serialize(stream);
       }
     }
 

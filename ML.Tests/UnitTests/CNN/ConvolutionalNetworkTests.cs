@@ -47,22 +47,22 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual(3, result.GetLength(0));
 
       //fm #1
-      Assert.AreEqual(2, layer.Value(0, 0, 0));
-      Assert.AreEqual(1, layer.Value(0, 0, 1));
-      Assert.AreEqual(1, layer.Value(0, 1, 0));
-      Assert.AreEqual(2, layer.Value(0, 1, 1));
+      Assert.AreEqual(2, result[0][0, 0]);
+      Assert.AreEqual(1, result[0][0, 1]);
+      Assert.AreEqual(1, result[0][1, 0]);
+      Assert.AreEqual(2, result[0][1, 1]);
 
       //fm #2
-      Assert.AreEqual(5, layer.Value(1, 0, 0));
-      Assert.AreEqual(4, layer.Value(1, 0, 1));
-      Assert.AreEqual(4, layer.Value(1, 1, 0));
-      Assert.AreEqual(6, layer.Value(1, 1, 1));
+      Assert.AreEqual(5, result[1][0, 0]);
+      Assert.AreEqual(4, result[1][0, 1]);
+      Assert.AreEqual(4, result[1][1, 0]);
+      Assert.AreEqual(6, result[1][1, 1]);
 
       //fm #3
-      Assert.AreEqual(0, layer.Value(2, 0, 0));
-      Assert.AreEqual(0, layer.Value(2, 0, 1));
-      Assert.AreEqual(2, layer.Value(2, 1, 0));
-      Assert.AreEqual(0, layer.Value(2, 1, 1));
+      Assert.AreEqual(0, result[2][0, 0]);
+      Assert.AreEqual(0, result[2][0, 1]);
+      Assert.AreEqual(2, result[2][1, 0]);
+      Assert.AreEqual(0, result[2][1, 1]);
     }
 
     [TestMethod]
@@ -97,16 +97,16 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual(2, result.GetLength(0));
 
       //fm #1
-      Assert.AreEqual(6, layer.Value(0, 0, 0));
-      Assert.AreEqual(2, layer.Value(0, 0, 1));
-      Assert.AreEqual(2, layer.Value(0, 1, 0));
-      Assert.AreEqual(5, layer.Value(0, 1, 1));
+      Assert.AreEqual(6, result[0][0, 0]);
+      Assert.AreEqual(2, result[0][0, 1]);
+      Assert.AreEqual(2, result[0][1, 0]);
+      Assert.AreEqual(5, result[0][1, 1]);
 
       //fm #2
-      Assert.AreEqual(0, layer.Value(1, 0, 0));
-      Assert.AreEqual(0, layer.Value(1, 0, 1));
-      Assert.AreEqual(0, layer.Value(1, 1, 0));
-      Assert.AreEqual(2, layer.Value(1, 1, 1));
+      Assert.AreEqual(0, result[1][0, 0]);
+      Assert.AreEqual(0, result[1][0, 1]);
+      Assert.AreEqual(0, result[1][1, 0]);
+      Assert.AreEqual(2, result[1][1, 1]);
     }
 
     #endregion
@@ -316,43 +316,52 @@ namespace ML.Tests.UnitTests.CNN
         }
       };
 
-      var result = net.Calculate(input);
+      var values = new double[net.LayerCount][][,];
+      for (int i=0; i<net.LayerCount; i++)
+      {
+        var layer = net[i];
+        values[i] = new double[layer.OutputDepth][,];
+        for (int q=0; q<layer.OutputDepth; q++)
+          values[i][q] = new double[layer.OutputHeight, layer.OutputWidth];
+      }
 
-      Assert.AreEqual(1, net[0].Value(0, 0, 0));
-      Assert.AreEqual(2, net[0].Value(0, 1, 1));
-      Assert.AreEqual(5, net[0].Value(0, 2, 2));
-      Assert.AreEqual(1, net[0].Value(0, 3, 3));
-      Assert.AreEqual(0, net[0].Value(1, 0, 0));
-      Assert.AreEqual(2, net[0].Value(1, 1, 1));
-      Assert.AreEqual(1, net[0].Value(1, 2, 2));
-      Assert.AreEqual(0, net[0].Value(1, 3, 3));
-      Assert.AreEqual(2, net[0].Value(2, 0, 0));
-      Assert.AreEqual(4, net[0].Value(2, 1, 1));
-      Assert.AreEqual(3, net[0].Value(2, 2, 2));
-      Assert.AreEqual(1, net[0].Value(2, 3, 3));
-      Assert.AreEqual(1, net[0].Value(3, 0, 0));
-      Assert.AreEqual(3, net[0].Value(3, 1, 1));
-      Assert.AreEqual(3, net[0].Value(3, 2, 2));
-      Assert.AreEqual(1, net[0].Value(3, 3, 3));
+      net.Calculate(input, values);
 
-      Assert.AreEqual(2, net[1].Value(0, 0, 0));
-      Assert.AreEqual(5, net[1].Value(0, 1, 1));
-      Assert.AreEqual(2, net[1].Value(1, 0, 0));
-      Assert.AreEqual(2, net[1].Value(1, 1, 1));
-      Assert.AreEqual(4, net[1].Value(2, 0, 0));
-      Assert.AreEqual(3, net[1].Value(2, 0, 1));
-      Assert.AreEqual(3, net[1].Value(3, 0, 0));
-      Assert.AreEqual(3, net[1].Value(3, 1, 1));
+      Assert.AreEqual(1, values[0][0][0, 0]);
+      Assert.AreEqual(2, values[0][0][1, 1]);
+      Assert.AreEqual(5, values[0][0][2, 2]);
+      Assert.AreEqual(1, values[0][0][3, 3]);
+      Assert.AreEqual(0, values[0][1][0, 0]);
+      Assert.AreEqual(2, values[0][1][1, 1]);
+      Assert.AreEqual(1, values[0][1][2, 2]);
+      Assert.AreEqual(0, values[0][1][3, 3]);
+      Assert.AreEqual(2, values[0][2][0, 0]);
+      Assert.AreEqual(4, values[0][2][1, 1]);
+      Assert.AreEqual(3, values[0][2][2, 2]);
+      Assert.AreEqual(1, values[0][2][3, 3]);
+      Assert.AreEqual(1, values[0][3][0, 0]);
+      Assert.AreEqual(3, values[0][3][1, 1]);
+      Assert.AreEqual(3, values[0][3][2, 2]);
+      Assert.AreEqual(1, values[0][3][3, 3]);
 
-      Assert.AreEqual(0,   net[2].Value(0, 0, 0));
-      Assert.AreEqual(100, net[2].Value(2, 0, 0));
-      Assert.AreEqual(200, net[2].Value(4, 0, 0));
-      Assert.AreEqual(350, net[2].Value(7, 0, 0));
+      Assert.AreEqual(2, values[1][0][0, 0]);
+      Assert.AreEqual(5, values[1][0][1, 1]);
+      Assert.AreEqual(2, values[1][1][0, 0]);
+      Assert.AreEqual(2, values[1][1][1, 1]);
+      Assert.AreEqual(4, values[1][2][0, 0]);
+      Assert.AreEqual(3, values[1][2][0, 1]);
+      Assert.AreEqual(3, values[1][3][0, 0]);
+      Assert.AreEqual(3, values[1][3][1, 1]);
 
-      Assert.AreEqual(2, result.GetLength(0));
-      Assert.AreEqual(2, result.Length);
-      Assert.AreEqual( 1401, result[0][0,0]);
-      Assert.AreEqual(-1401, result[1][0,0]);
+      Assert.AreEqual(0,   values[2][0][0, 0]);
+      Assert.AreEqual(100, values[2][2][0, 0]);
+      Assert.AreEqual(200, values[2][4][0, 0]);
+      Assert.AreEqual(350, values[2][7][0, 0]);
+
+      Assert.AreEqual(2, values[2].GetLength(0));
+      Assert.AreEqual(2, values[2].Length);
+      Assert.AreEqual( 1401, values[2][0][0,0]);
+      Assert.AreEqual(-1401, values[2][1][0,0]);
     }
 
     #endregion
@@ -483,9 +492,9 @@ namespace ML.Tests.UnitTests.CNN
       // First layer: convolutional layer
 
       var conv = new ConvLayer(outputDepth: 4,
-                                        windowSize: 4,
-                                        stride: 2,
-                                        padding: 1) { IsTraining=true };
+                               windowSize: 4,
+                               stride: 2,
+                               padding: 1) { IsTraining=true };
       conv.ActivationFunction = Activation.ReLU;
       var kernel = new double[(4*4*1+1)*4]
                    {

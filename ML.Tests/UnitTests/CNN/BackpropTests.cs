@@ -33,13 +33,13 @@ namespace ML.Tests.UnitTests.CNN
 
       // assert
 
-      Assert.AreEqual( 12, net[0].Value(0,0,0));
-      Assert.AreEqual( 33, net[1].Value(0,0,0));
-      Assert.AreEqual(-62, net[2].Value(0,0,0));
+      Assert.AreEqual( 12, alg.Values[0][0][0,0]);
+      Assert.AreEqual( 33, alg.Values[1][0][0,0]);
+      Assert.AreEqual(-62, alg.Values[2][0][0,0]);
 
-      Assert.AreEqual(3, net[0].Derivative(0,0,0));
-      Assert.AreEqual(3, net[1].Derivative(0,0,0));
-      Assert.AreEqual(2, net[2].Derivative(0,0,0));
+      Assert.AreEqual(3, net[0].ActivationFunction.DerivativeFromValue(alg.Values[0][0][0,0]));
+      Assert.AreEqual(3, net[1].ActivationFunction.DerivativeFromValue(alg.Values[1][0][0,0]));
+      Assert.AreEqual(2, net[2].ActivationFunction.DerivativeFromValue(alg.Values[2][0][0,0]));
 
       Assert.AreEqual(-126, alg.Errors[2][0][0,0]);
       Assert.AreEqual( 378, alg.Errors[1][0][0,0]);
@@ -97,15 +97,14 @@ namespace ML.Tests.UnitTests.CNN
 
       // assert
 
-      Assert.AreEqual(  12, net[0].Value(0,0,0));
-      Assert.AreEqual(  33, net[1].Value(0,0,0));
-      Assert.AreEqual(  66, net[2].Value(0,0,0));
-      Assert.AreEqual(-128, net[3].Value(0,0,0));
+      Assert.AreEqual(  12, alg.Values[0][0][0,0]);
+      Assert.AreEqual(  33, alg.Values[1][0][0,0]);
+      Assert.AreEqual(  66, alg.Values[2][0][0,0]);
+      Assert.AreEqual(-128, alg.Values[3][0][0,0]);
 
-      Assert.AreEqual(3, net[0].Derivative(0,0,0));
-      Assert.AreEqual(3, net[1].Derivative(0,0,0));
-      Assert.AreEqual(1, net[2].Derivative(0,0,0));
-      Assert.AreEqual(2, net[3].Derivative(0,0,0));
+      Assert.AreEqual(3, net[0].ActivationFunction.DerivativeFromValue(alg.Values[0][0][0,0]));
+      Assert.AreEqual(3, net[1].ActivationFunction.DerivativeFromValue(alg.Values[1][0][0,0]));
+      Assert.AreEqual(2, net[3].ActivationFunction.DerivativeFromValue(alg.Values[3][0][0,0]));
 
       Assert.AreEqual(-129*2,      alg.Errors[3][0][0,0]);
       Assert.AreEqual(-258*(-1),   alg.Errors[2][0][0,0]);
@@ -140,8 +139,6 @@ namespace ML.Tests.UnitTests.CNN
 
       Assert.AreEqual( 2 + 2*258,        net[3].Weights[1]);
       Assert.AreEqual(-1 + 2*258*66,     net[3].Weights[0]);
-      Assert.AreEqual(             0,    net[2].Weights.Length);
-      Assert.AreEqual(             0,    net[2].Weights.Length);
       Assert.AreEqual(-1 + 2*(-1548),    net[1].Weights[1]);
       Assert.AreEqual( 1 + 2*(-1548*12), net[1].Weights[0]);
       Assert.AreEqual( 1 + 2*(-4644),    net[0].Weights[1]);
@@ -152,7 +149,7 @@ namespace ML.Tests.UnitTests.CNN
 
     private void AssertNetGradient(BackpropAlgorithm alg, double[][,] point, int lidx, int widx)
     {
-      var net  = alg.Result;
+      var net  = alg.Net;
       var loss = alg.LossFunction;
       var prev = net.Weights[lidx][widx];
       var grad = alg.Gradient[lidx][widx];

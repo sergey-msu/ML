@@ -76,7 +76,7 @@ namespace ML.DeepMethods.Models
     /// </summary>
     public double Bias(int q)
     {
-      return m_Weights[(q + 1)*m_FeatureMapParamCount - 1];
+      return m_Weights[(q+1)*m_FeatureMapParamCount - 1];
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ namespace ML.DeepMethods.Models
       base.BuildParams();
     }
 
-    protected override double[][,] DoCalculate(double[][,] input)
+    protected override void DoCalculate(double[][,] input, double[][,] result)
     {
       // output fm-s
       for (int q=0; q<m_OutputDepth; q++)
@@ -131,17 +131,15 @@ namespace ML.DeepMethods.Models
             }
           }
 
-          m_Value[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
+          result[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
         }
       }
-
-      return m_Value;
     }
 
     /// <summary>
     /// Backpropagate "errors" to previous layer for future use
     /// </summary>
-    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] error, double[][,] prevError)
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevErrors, double[][,] errors)
     {
       if (prevLayer==null)
         throw new MLException("Prev layer is null");
@@ -152,8 +150,8 @@ namespace ML.DeepMethods.Models
       {
         var g = 0.0D;
 
-        for (int q=0; q<m_OutputDepth; q++)
-        for (int k=0; k<m_OutputHeight;  k++)
+        for (int q=0; q<m_OutputDepth;  q++)
+        for (int k=0; k<m_OutputHeight; k++)
         {
           var y = i+m_PaddingHeight-k*m_StrideHeight;
           if (y >= m_WindowHeight) continue;
@@ -166,23 +164,25 @@ namespace ML.DeepMethods.Models
             if (x < 0) break;
 
             var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
-            g += error[q][k, m] * m_Weights[idx]; // Kernel(q, p, y, x)
+            g += errors[q][k, m] * m_Weights[idx]; // Kernel(q, p, y, x)
           }
         }
 
-        prevError[p][i, j] = g * prevLayer.Derivative(p, i, j);
+        var value = prevValues[p][i,j];
+        var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;
+        prevErrors[p][i, j] = g * deriv;
       }
     }
 
-    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    protected override void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
       int idx;
 
       // weight updates
       for (int q=0; q<m_OutputDepth; q++)
       {
-        for (int p=0; p<m_InputDepth; p++)
-        for (int i=0; i<m_WindowHeight;  i++)
+        for (int p=0; p<m_InputDepth;   p++)
+        for (int i=0; i<m_WindowHeight; i++)
         for (int j=0; j<m_WindowWidth;  j++)
         {
           var dw = 0.0D;
@@ -199,12 +199,13 @@ namespace ML.DeepMethods.Models
               if (x<0) continue;
               if (x>=m_InputWidth) break;
 
-              dw += errors[q][k, m] * prevLayer.Value(p, y, x);
+              dw += errors[q][k, m] * prevValues[p][y, x];
             }
           }
 
           idx = j + i*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
-          layerGradient[idx] += dw; // Gradient(q, p, i, j)
+          if (isDelta) gradient[idx] += dw; // Gradient(q, p, i, j)
+          else gradient[idx] = dw;
         }
 
         // bias updates
@@ -216,7 +217,8 @@ namespace ML.DeepMethods.Models
         }
 
         idx = (q+1)*m_FeatureMapParamCount-1;
-        layerGradient[idx] += db;  // BiasGrad(q)
+        if (isDelta) gradient[idx] += db; // BiasGrad(q)
+        else gradient[idx] = db;
       }
     }
 

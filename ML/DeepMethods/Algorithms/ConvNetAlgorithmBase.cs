@@ -12,7 +12,7 @@ namespace ML.DeepMethods.Algorithms
   /// </summary>
   public abstract class ConvNetAlgorithmBase: AlgorithmBase<double[][,]>
   {
-    private ConvNet m_Result;
+    private ConvNet m_Net;
 
     protected ConvNetAlgorithmBase(ClassifiedSample<double[][,]> trainingSample, ConvNet net)
       : base(trainingSample)
@@ -20,20 +20,20 @@ namespace ML.DeepMethods.Algorithms
       if (net==null)
         throw new MLException("Network can not be null");
 
-      m_Result = net;
+      m_Net = net;
     }
 
     /// <summary>
     /// The result of the algorithm
     /// </summary>
-    public ConvNet Result { get { return m_Result; } }
+    public ConvNet Net { get { return m_Net; } }
 
     /// <summary>
     /// Maps object to corresponding class
     /// </summary>
     public override Class Classify(double[][,] input)
     {
-      var result = m_Result.Calculate(input);
+      var result = m_Net.Calculate(input);
       var res = MathUtils.ArgMax<double>(result);
       var cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == res).Value  ?? Class.None;
 
@@ -42,15 +42,15 @@ namespace ML.DeepMethods.Algorithms
 
     public override IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<double[][,]> classifiedSample)
     {
-      var isTraining = m_Result.IsTraining;
-      m_Result.IsTraining = false;
+      var isTraining = m_Net.IsTraining;
+      m_Net.IsTraining = false;
       try
       {
         return base.GetErrors(classifiedSample);
       }
       finally
       {
-        m_Result.IsTraining = isTraining;
+        m_Net.IsTraining = isTraining;
       }
     }
 
@@ -59,7 +59,7 @@ namespace ML.DeepMethods.Algorithms
     /// </summary>
     public void Train()
     {
-      m_Result.IsTraining = true;
+      m_Net.IsTraining = true;
       try
       {
         Build();
@@ -67,7 +67,7 @@ namespace ML.DeepMethods.Algorithms
       }
       finally
       {
-        m_Result.IsTraining = false;
+        m_Net.IsTraining = false;
       }
     }
 

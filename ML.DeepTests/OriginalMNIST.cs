@@ -192,13 +192,13 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg = Examples.____CreateMNISTSimpleDemo(m_Training);
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Test, ResultsFolder);
+      var alg = Examples.____CreateMNISTSimpleDemo(m_Training);
+      alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(alg, m_Test, ResultsFolder);
 
       var now = DateTime.Now;
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
+      alg.Train();
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }

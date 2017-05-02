@@ -133,11 +133,11 @@ namespace ML.Tests.UnitTests.CNN
       net.AddLayer(layer4);
       net._Build();
 
-      layer1.Weights[1] = 1;
-      layer1.Weights[0] = 3;
+      layer1.Weights[1] =  1;
+      layer1.Weights[0] =  3;
       layer2.Weights[1] = -1;
-      layer2.Weights[0] = 1;
-      layer4.Weights[1] = 2;
+      layer2.Weights[0] =  1;
+      layer4.Weights[1] =  2;
       layer4.Weights[0] = -1;
 
       return net;

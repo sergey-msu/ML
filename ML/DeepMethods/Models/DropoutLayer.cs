@@ -68,10 +68,6 @@ namespace ML.DeepMethods.Models
       m_OutputHeight = m_InputHeight;
       m_OutputWidth  = m_InputWidth;
 
-      m_Value = new double[m_OutputDepth][,];
-      for (var q=0; q<m_OutputDepth; q++)
-        m_Value[q] = new double[m_OutputHeight, m_OutputWidth];
-
       if (m_IsTraining && !m_ApplyCustomMask)
       {
         m_Mask = new bool[m_OutputDepth][,];
@@ -82,55 +78,58 @@ namespace ML.DeepMethods.Models
       BuildParams();
     }
 
-    protected override double[][,] DoCalculate(double[][,] input)
+    protected override void DoCalculate(double[][,] input, double[][,] result)
     {
-      if (m_IsTraining)
+      if (!m_IsTraining)
       {
-        for (int p=0; p<m_InputDepth; p++)
-        for (int i=0; i<m_InputHeight;  i++)
-        for (int j=0; j<m_InputWidth;  j++)
+        for (int i=0; i<input.Length; i++)
+          Array.Copy(input[i], result[i], input[i].Length);
+        return;
+      }
+
+      for (int p=0; p<m_InputDepth;  p++)
+      for (int i=0; i<m_InputHeight; i++)
+      for (int j=0; j<m_InputWidth;  j++)
+      {
+        if (m_ApplyCustomMask) // custom mask applied
         {
-          if (m_ApplyCustomMask) // custom mask applied
+          result[p][i, j] = m_Mask[p][i, j] ? input[p][i, j] / m_RetainRate : 0;
+        }
+        else // generate new random mask
+        {
+          var retain = m_Generator.Bernoulli(m_RetainRate);
+          if (retain)
           {
-            m_Value[p][i, j] = m_Mask[p][i, j] ? input[p][i, j] / m_RetainRate : 0;
+            m_Mask[p][i, j] = true;
+            result[p][i, j] = input[p][i, j] / m_RetainRate;
           }
-          else // generate new random mask
+          else
           {
-            var retain = m_Generator.Bernoulli(m_RetainRate);
-            if (retain)
-            {
-              m_Mask[p][i, j] = true;
-              m_Value[p][i, j] = input[p][i, j] / m_RetainRate;
-            }
-            else
-            {
-              m_Mask[p][i, j] = false;
-              m_Value[p][i, j] = 0;
-            }
+            m_Mask[p][i, j] = false;
+            result[p][i, j] = 0;
           }
         }
       }
-      else
-      {
-        Array.Copy(input, m_Value, input.Length);
-      }
-
-      return m_Value;
     }
 
-    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] error, double[][,] prevError)
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevErrors, double[][,] errors)
     {
       for (int p=0; p<m_OutputDepth;  p++)
       for (int i=0; i<m_OutputHeight; i++)
       for (int j=0; j<m_OutputWidth;  j++)
       {
-        prevError[p][i, j] = Mask[p][i, j] ?
-                             error[p][i, j] * prevLayer.Derivative(p, i, j) / m_RetainRate :
-                             0;
+        if (Mask[p][i, j])
+        {
+          var value = prevValues[p][i, j];
+          var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;
+          prevErrors[p][i, j] = errors[p][i, j] * deriv / m_RetainRate;
+        }
+        else
+          prevErrors[p][i, j] = 0;
       }
     }
 
-    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    protected override void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
     }
 

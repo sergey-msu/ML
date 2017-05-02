@@ -43,7 +43,7 @@ namespace ML.DeepMethods.Optimizers
 
       if (m_E==null)
       {
-        m_E = new double[len][];
+        m_E  = new double[len][];
         m_ED = new double[len][];
 
         for (int i=0; i<len; i++)
@@ -51,7 +51,7 @@ namespace ML.DeepMethods.Optimizers
           var layerWeights = weights[i];
           if (layerWeights==null) continue;
 
-          m_E[i] = new double[layerWeights.Length];
+          m_E[i]  = new double[layerWeights.Length];
           m_ED[i] = new double[layerWeights.Length];
         }
       }

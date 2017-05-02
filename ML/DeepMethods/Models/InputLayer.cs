@@ -27,23 +27,17 @@ namespace ML.DeepMethods.Models
       m_OutputWidth  = m_InputWidth;
     }
 
-    public override double[][,] Calculate(double[][,] input)
+    protected override void DoCalculate(double[][,] input, double[][,] result)
     {
-      m_Value = input;
-      return input;
+      result = input;
     }
 
-    protected override double[][,] DoCalculate(double[][,] input)
-    {
-      throw new NotSupportedException();
-    }
-
-    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] error, double[][,] prevError)
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevError, double[][,] errors)
     {
       throw new NotSupportedException();
     }
 
-    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] updates)
+    protected override void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
     }
 

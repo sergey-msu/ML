@@ -13,9 +13,9 @@ namespace ML.DeepMethods.Models
     #region .ctor
 
     protected PoolingLayer(int windowSize,
-                            int stride,
-                            int padding=0,
-                            IActivationFunction activation = null)
+                           int stride,
+                           int padding=0,
+                           IActivationFunction activation = null)
       : base(1, // will be overridden with input depth when building the layer
              windowSize,
              stride,
@@ -25,12 +25,12 @@ namespace ML.DeepMethods.Models
     }
 
     protected PoolingLayer(int windowHeight,
-                            int windowWidth,
-                            int strideHeight,
-                            int strideWidth,
-                            int paddingHeight=0,
-                            int paddingWidth=0,
-                            IActivationFunction activation = null)
+                           int windowWidth,
+                           int strideHeight,
+                           int strideWidth,
+                           int paddingHeight=0,
+                           int paddingWidth=0,
+                           IActivationFunction activation = null)
       : base(1, // will be overridden with input depth when building the layer
              windowHeight,
              windowWidth,
@@ -82,9 +82,9 @@ namespace ML.DeepMethods.Models
     #region .ctor
 
     public MaxPoolingLayer(int windowSize,
-                            int stride,
-                            int padding=0,
-                            IActivationFunction activation = null)
+                           int stride,
+                           int padding=0,
+                           IActivationFunction activation = null)
       : base(windowSize,
              stride,
              padding,
@@ -93,12 +93,12 @@ namespace ML.DeepMethods.Models
     }
 
     public MaxPoolingLayer(int windowHeight,
-                            int windowWidth,
-                            int strideHeight,
-                            int strideWidth,
-                            int paddingHeight=0,
-                            int paddingWidth=0,
-                            IActivationFunction activation = null)
+                           int windowWidth,
+                           int strideHeight,
+                           int strideWidth,
+                           int paddingHeight=0,
+                           int paddingWidth=0,
+                           IActivationFunction activation = null)
       : base(windowHeight,
              windowWidth,
              strideHeight,
@@ -122,7 +122,7 @@ namespace ML.DeepMethods.Models
         m_MaxIndexPositions[i] = new int[m_OutputHeight, m_OutputWidth, 2];
     }
 
-    protected override double[][,] DoCalculate(double[][,] input)
+    protected override void DoCalculate(double[][,] input, double[][,] result)
     {
       for (int q=0; q<m_OutputDepth; q++)
       {
@@ -153,19 +153,17 @@ namespace ML.DeepMethods.Models
             }
           }
 
-          m_Value[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
+          result[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
           m_MaxIndexPositions[q][i, j, 0] = xmaxIdx;
           m_MaxIndexPositions[q][i, j, 1] = ymaxIdx;
         }
       }
-
-      return m_Value;
     }
 
-    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] errors, double[][,] prevError)
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevErrors, double[][,] errors)
     {
-      for (int i=0; i<prevError.Length; i++)
-        Array.Clear(prevError[i], 0, prevError[i].Length);
+      for (int i=0; i<prevErrors.Length; i++)
+        Array.Clear(prevErrors[i], 0, prevErrors[i].Length);
 
       // backpropagate "errors" to previous layer for future use
       for (int q=0; q<m_OutputDepth;  q++)
@@ -174,11 +172,13 @@ namespace ML.DeepMethods.Models
       {
         var xmaxIdx = m_MaxIndexPositions[q][i, j, 0];
         var ymaxIdx = m_MaxIndexPositions[q][i, j, 1];
-        prevError[q][ymaxIdx, xmaxIdx] += errors[q][i, j] * prevLayer.Derivative(q, ymaxIdx, xmaxIdx);
+        var value = prevValues[q][ymaxIdx, xmaxIdx];
+        var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;
+        prevErrors[q][ymaxIdx, xmaxIdx] += errors[q][i, j] * deriv;
       }
     }
 
-    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    protected override void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
     }
   }
@@ -188,12 +188,12 @@ namespace ML.DeepMethods.Models
   /// </summary>
   public class AvgPoolingLayer : PoolingLayer
   {
-        #region .ctor
+    #region .ctor
 
     public AvgPoolingLayer(int windowSize,
-                            int stride,
-                            int padding=0,
-                            IActivationFunction activation = null)
+                           int stride,
+                           int padding=0,
+                           IActivationFunction activation = null)
       : base(windowSize,
              stride,
              padding,
@@ -202,12 +202,12 @@ namespace ML.DeepMethods.Models
     }
 
     public AvgPoolingLayer(int windowHeight,
-                            int windowWidth,
-                            int strideHeight,
-                            int strideWidth,
-                            int paddingHeight=0,
-                            int paddingWidth=0,
-                            IActivationFunction activation = null)
+                           int windowWidth,
+                           int strideHeight,
+                           int strideWidth,
+                           int paddingHeight=0,
+                           int paddingWidth=0,
+                           IActivationFunction activation = null)
       : base(windowHeight,
              windowWidth,
              strideHeight,
@@ -220,7 +220,7 @@ namespace ML.DeepMethods.Models
 
     #endregion
 
-    protected override double[][,] DoCalculate(double[][,] input)
+    protected override void DoCalculate(double[][,] input, double[][,] result)
     {
       // output fm-s
       for (int q=0; q<m_OutputDepth; q++)
@@ -247,19 +247,17 @@ namespace ML.DeepMethods.Models
 
           net /= m_KernelArea;
 
-          m_Value[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
+          result[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
         }
       }
-
-      return m_Value;
     }
 
-    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] errors, double[][,] prevError)
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevErrors, double[][,] errors)
     {
       throw new NotImplementedException(); //TODO
     }
 
-    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    protected override void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
     }
   }

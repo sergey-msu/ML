@@ -27,16 +27,14 @@ namespace ML.DeepMethods.Models
     public override int ParamCount { get { return 0; } }
 
 
-    protected override double[][,] DoCalculate(double[][,] input)
+    protected override void DoCalculate(double[][,] input, double[][,] result)
     {
       for (int p=0; p<m_InputDepth;  p++)
       for (int i=0; i<m_InputHeight; i++)
       for (int j=0; j<m_InputWidth;  j++)
       {
-        m_Value[p][i, j] = m_ActivationFunction.Value(input[p][i, j]);
+        result[p][i, j] = m_ActivationFunction.Value(input[p][i, j]);
       }
-
-      return m_Value;
     }
 
     public override void _Build()
@@ -46,17 +44,19 @@ namespace ML.DeepMethods.Models
       base._Build();
     }
 
-    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] error, double[][,] prevError)
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevError, double[][,] errors)
     {
       for (int p=0; p<m_OutputDepth;  p++)
       for (int i=0; i<m_OutputHeight; i++)
       for (int j=0; j<m_OutputWidth;  j++)
       {
-        prevError[p][i, j] = error[p][i, j] * prevLayer.Derivative(p, i, j);
+        var value = prevValues[p][i,j];
+        var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;
+        prevError[p][i, j] = errors[p][i, j] * deriv;
       }
     }
 
-    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] updates)
+    protected override void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
     }
 

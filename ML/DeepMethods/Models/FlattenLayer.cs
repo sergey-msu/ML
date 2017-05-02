@@ -27,7 +27,7 @@ namespace ML.DeepMethods.Models
       base.BuildShape();
     }
 
-    protected override double[][,] DoCalculate(double[][,] input)
+    protected override void DoCalculate(double[][,] input, double[][,] result)
     {
       // output fm-s
       for (int q=0; q<m_OutputDepth; q++)
@@ -43,16 +43,14 @@ namespace ML.DeepMethods.Models
           net += input[p][y, x] * m_Weights[idx]; // Kernel(q, p, y, x)
         }
 
-        m_Value[q][0, 0] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
+        result[q][0, 0] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
       }
-
-      return m_Value;
     }
 
     /// <summary>
     /// Backpropagate "errors" to previous layer for future use
     /// </summary>
-    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] error, double[][,] prevError)
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevErrors, double[][,] errors)
     {
       if (prevLayer==null)
         throw new MLException("Prev layer is null");
@@ -66,15 +64,19 @@ namespace ML.DeepMethods.Models
         for (int q=0; q<m_OutputDepth; q++)
         {
           var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
-          g += error[q][0, 0] * m_Weights[idx]; // Kernel(q, p, y, x)
+          g += errors[q][0, 0] * m_Weights[idx]; // Kernel(q, p, y, x)
         }
 
-        prevError[p][y, x] = g * prevLayer.Derivative(p, y, x);
+        var value = prevValues[p][y, x];
+        var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;
+        prevErrors[p][y, x] = g * deriv;
       }
     }
 
-    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    protected override void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
+      int idx;
+
       // weight updates
       for (int q=0; q<m_OutputDepth; q++)
       {
@@ -82,13 +84,17 @@ namespace ML.DeepMethods.Models
         for (int y=0; y<m_WindowHeight; y++)
         for (int x=0; x<m_WindowWidth;  x++)
         {
-          var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
-          layerGradient[idx] += errors[q][0, 0] * prevLayer.Value(p, y, x); // Gradient(q, p, y, x)
+          idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
+          var dw = errors[q][0, 0] * prevValues[p][y, x];
+          if (isDelta) gradient[idx] += dw; // Gradient(q, p, y, x)
+          else gradient[idx] = dw;
         }
 
         // bias updates
+        idx = (q+1)*m_FeatureMapParamCount-1;
         var db = errors[q][0, 0];
-        layerGradient[(q+1)*m_FeatureMapParamCount-1] += db;  // BiasGrad(q)
+        if (isDelta) gradient[idx] += db; // BiasGrad(q)
+        else gradient[idx] = db;
       }
     }
 

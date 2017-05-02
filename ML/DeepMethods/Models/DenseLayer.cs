@@ -27,7 +27,7 @@ namespace ML.DeepMethods.Models
       base.BuildShape();
     }
 
-    protected override double[][,] DoCalculate(double[][,] input)
+    protected override void DoCalculate(double[][,] input, double[][,] result)
     {
       var plen = m_InputDepth + 1;
 
@@ -37,16 +37,14 @@ namespace ML.DeepMethods.Models
         for (int p=0; p<m_InputDepth; p++)
           net += input[p][0, 0] * m_Weights[p + q*plen]; // Kernel(q, p, 0, 0)
 
-        m_Value[q][0, 0] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
+        result[q][0, 0] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
       }
-
-      return m_Value;
     }
 
     /// <summary>
     /// Backpropagate "errors" to previous layer for future use
     /// </summary>
-    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] error, double[][,] prevError)
+    protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevError, double[][,] errors)
     {
       if (prevLayer==null)
         throw new MLException("Prev layer is null");
@@ -57,13 +55,15 @@ namespace ML.DeepMethods.Models
       {
         var g = 0.0D;
         for (int q=0; q<m_OutputDepth; q++)
-          g += error[q][0, 0] * m_Weights[p + q*plen]; // Kernel(q, p, 0, 0)
+          g += errors[q][0, 0] * m_Weights[p + q*plen]; // Kernel(q, p, 0, 0)
 
-        prevError[p][0, 0] = g * prevLayer.Derivative(p, 0, 0);
+        var value = prevValues[p][0, 0];
+        var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;
+        prevError[p][0, 0] = g * deriv;
       }
     }
 
-    protected override void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    protected override void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
       var plen = m_InputDepth + 1;
       int idx;
@@ -76,12 +76,16 @@ namespace ML.DeepMethods.Models
         for (int x=0; x<m_WindowWidth;  x++)
         {
           idx = p + q*plen;
-          layerGradient[idx] += errors[q][0, 0] * prevLayer.Value(p, y, x); // Gradient(q, p, i, j)
+          var dw = errors[q][0, 0] * prevValues[p][y, x];
+          if (isDelta) gradient[idx] += dw; // Gradient(q, p, i, j)
+          else gradient[idx] = dw;
         }
 
         // bias updates
         idx = (q+1)*m_FeatureMapParamCount-1;
-        layerGradient[idx] += errors[q][0, 0];  // BiasGrad(q)
+        var db = errors[q][0, 0];
+        if (isDelta) gradient[idx] += db;  // BiasGrad(q)
+        else gradient[idx] = db;
       }
     }
 

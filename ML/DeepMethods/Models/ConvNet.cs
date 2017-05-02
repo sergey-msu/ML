@@ -177,6 +177,15 @@ namespace ML.DeepMethods.Models
         layer.RandomizeParameters(seed);
     }
 
+    public void Calculate(double[][,] input, double[][][,] result)
+    {
+      for (int i=0; i<SubNodes.Length; i++)
+      {
+        var prev = (i>0) ? result[i-1] : input;
+        SubNodes[i].Calculate(prev, result[i]);
+      }
+    }
+
     public override double[][,] Calculate(double[][,] input)
     {
       m_InputLayer.Calculate(input);

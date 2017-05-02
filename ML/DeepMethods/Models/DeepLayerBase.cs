@@ -31,18 +31,17 @@ namespace ML.DeepMethods.Models
     protected int m_PaddingHeight;
     protected int m_PaddingWidth;
 
-    protected double[]    m_Weights;
-    protected double[][,] m_Value;
+    protected double[] m_Weights;
 
     #endregion
 
     #region .ctor
 
     protected DeepLayerBase(int outputDepth,
-                             int windowSize,
-                             int stride,
-                             int padding=0,
-                             IActivationFunction activation = null)
+                            int windowSize,
+                            int stride,
+                            int padding=0,
+                            IActivationFunction activation = null)
       : this(outputDepth,
              windowSize,
              windowSize,
@@ -55,13 +54,13 @@ namespace ML.DeepMethods.Models
     }
 
     protected DeepLayerBase(int outputDepth,
-                             int windowHeight,
-                             int windowWidth,
-                             int strideHeight,
-                             int strideWidth,
-                             int paddingHeight=0,
-                             int paddingWidth=0,
-                             IActivationFunction activation = null)
+                            int windowHeight,
+                            int windowWidth,
+                            int strideHeight,
+                            int strideWidth,
+                            int paddingHeight=0,
+                            int paddingWidth=0,
+                            IActivationFunction activation = null)
     {
       if (outputDepth <= 0)
         throw new MLException("DeepLayerBase.ctor(outputDepth<=0)");
@@ -206,30 +205,23 @@ namespace ML.DeepMethods.Models
 
     #endregion
 
-    /// <summary>
-    /// Calculated value
-    /// </summary>
-    public double Value(int p, int i, int j)
-    {
-      return m_Value[p][i,j];
-    }
-
-    /// <summary>
-    /// Calculates net value's derivative
-    /// </summary>
-    public double Derivative(int p, int i, int j)
-    {
-      return (m_ActivationFunction != null) ?
-              m_ActivationFunction.DerivativeFromValue(m_Value[p][i,j]) :
-              1;
-    }
-
     public override double[][,] Calculate(double[][,] input)
+    {
+      var result = new double[m_OutputDepth][,];
+      for (var q=0; q<m_OutputDepth; q++)
+        result[q] = new double[m_OutputHeight, m_OutputWidth];
+
+      Calculate(input, result);
+
+      return result;
+    }
+
+    public void Calculate(double[][,] input, double[][,] result)
     {
       if (m_InputDepth != input.GetLength(0))
         throw new MLException("Incorrect input depth");
 
-      return DoCalculate(input);
+      DoCalculate(input, result);
     }
 
     /// <summary>
@@ -249,19 +241,16 @@ namespace ML.DeepMethods.Models
     {
       m_OutputHeight = (m_InputHeight - m_WindowHeight + 2*m_PaddingHeight)/m_StrideHeight + 1;
       m_OutputWidth  = (m_InputWidth  - m_WindowWidth  + 2*m_PaddingWidth)/m_StrideWidth   + 1;
+
       if (m_OutputHeight <= 0 || m_OutputWidth <= 0)
         throw new MLException("Output tensor is empty. Check input shape datas");
-
-      m_Value = new double[m_OutputDepth][,];
-      for (var q=0; q<m_OutputDepth; q++)
-        m_Value[q] = new double[m_OutputHeight, m_OutputWidth];
     }
 
     protected virtual void BuildParams()
     {
     }
 
-    protected abstract double[][,] DoCalculate(double[][,] input);
+    protected abstract void DoCalculate(double[][,] input, double[][,] result);
 
     /// <summary>
     /// Backpropagate "errors" to previous layer for future use
@@ -269,12 +258,12 @@ namespace ML.DeepMethods.Models
     /// <param name="prevLayer">Previous layer</param>
     /// <param name="errors">Current layer gradient "errors"</param>
     /// <param name="updates">Previous layer gradient "errors"</param>
-    public void Backprop(DeepLayerBase prevLayer, double[][,] errors, double[][,] prevError)
+    public void Backprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevErrors, double[][,] errors)
     {
       if (!m_IsTraining)
         throw new MLException("Backpropagation can not run in test mode");
 
-      DoBackprop(prevLayer, errors, prevError);
+      DoBackprop(prevLayer, prevValues, prevErrors, errors);
     }
 
     /// <summary>
@@ -282,22 +271,19 @@ namespace ML.DeepMethods.Models
     /// </summary>
     /// <param name="prevLayer">Previous layer (or input layer)</param>
     /// <param name="errors">Current layer gradient "errors"</param>
-    /// <param name="updates">Current layer parameter updates to copy into</param>
-    public void SetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient)
+    /// <param name="gradient">Current layer parameter gradient to copy into</param>
+    /// <param name="isDelta">if true adds gradient values to existing ones, overwrites it otherwise</param>
+    public void SetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta)
     {
       if (!m_IsTraining)
         throw new MLException("Backpropagation can not run in test mode");
 
-      DoSetLayerGradient(prevLayer, errors, layerGradient);
+      DoSetLayerGradient(prevValues, errors, gradient, isDelta);
     }
 
-    protected abstract void DoBackprop(DeepLayerBase prevLayer, double[][,] errors, double[][,] prevError);
+    protected abstract void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevError, double[][,] errors);
 
-    protected abstract void DoSetLayerGradient(DeepLayerBase prevLayer, double[][,] errors, double[] layerGradient);
-
-
-
-    // TODO: do we need this?
+    protected abstract void DoSetLayerGradient(double[][,] prevValues, double[][,] errors, double[] gradient, bool isDelta);
 
     protected override double DoGetParam(int idx)
     {
@@ -323,6 +309,5 @@ namespace ML.DeepMethods.Models
       else
         Array.Copy(updates, cursor, m_Weights, 0, len);
     }
-
   }
 }
