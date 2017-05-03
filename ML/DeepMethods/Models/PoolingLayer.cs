@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using ML.Contracts;
 
 namespace ML.DeepMethods.Models
@@ -77,7 +78,7 @@ namespace ML.DeepMethods.Models
   /// </summary>
   public class MaxPoolingLayer : PoolingLayer
   {
-    private int[][,,] m_MaxIndexPositions;
+    private ThreadLocal<int[][,,]> m_MaxIndexPositions;
 
     #region .ctor
 
@@ -90,6 +91,13 @@ namespace ML.DeepMethods.Models
              padding,
              activation)
     {
+      m_MaxIndexPositions = new ThreadLocal<int[][,,]>(() =>
+      {
+        var maxPos = new int[m_OutputDepth][,,];
+        for (int i=0; i<m_OutputDepth; i++)
+          maxPos[i] = new int[m_OutputHeight, m_OutputWidth, 2];
+        return maxPos;
+      });
     }
 
     public MaxPoolingLayer(int windowHeight,
@@ -110,17 +118,6 @@ namespace ML.DeepMethods.Models
     }
 
     #endregion
-
-    public int[][,,] MaxIndexPositions { get { return m_MaxIndexPositions; } }
-
-    protected override void BuildShape()
-    {
-      base.BuildShape();
-
-      m_MaxIndexPositions = new int[m_OutputDepth][,,];
-      for (int i=0; i<m_OutputDepth; i++)
-        m_MaxIndexPositions[i] = new int[m_OutputHeight, m_OutputWidth, 2];
-    }
 
     protected override void DoCalculate(double[][,] input, double[][,] result)
     {
@@ -154,8 +151,8 @@ namespace ML.DeepMethods.Models
           }
 
           result[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
-          m_MaxIndexPositions[q][i, j, 0] = xmaxIdx;
-          m_MaxIndexPositions[q][i, j, 1] = ymaxIdx;
+          m_MaxIndexPositions.Value[q][i, j, 0] = xmaxIdx;
+          m_MaxIndexPositions.Value[q][i, j, 1] = ymaxIdx;
         }
       }
     }
@@ -170,8 +167,8 @@ namespace ML.DeepMethods.Models
       for (int i=0; i<m_OutputHeight; i++)
       for (int j=0; j<m_OutputWidth;  j++)
       {
-        var xmaxIdx = m_MaxIndexPositions[q][i, j, 0];
-        var ymaxIdx = m_MaxIndexPositions[q][i, j, 1];
+        var xmaxIdx = m_MaxIndexPositions.Value[q][i, j, 0];
+        var ymaxIdx = m_MaxIndexPositions.Value[q][i, j, 1];
         var value = prevValues[q][ymaxIdx, xmaxIdx];
         var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;
         prevErrors[q][ymaxIdx, xmaxIdx] += errors[q][i, j] * deriv;

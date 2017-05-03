@@ -58,24 +58,28 @@ namespace ML.DeepMethods.Algorithms
             {
               if (m_IsBusy) return false;
               m_IsBusy = true;
-
-              try
-              {
-                m_Algorithm.runIteration(m_Values, m_Errors, m_GradientPortion, input, cls);
-              }
-              finally { m_IsBusy = false; }
             }
 
+            try
+            {
+               //lock (m_Algorithm) System.Threading.Thread.Sleep(3000);
+
+               m_Algorithm.runIteration(m_Values, m_Errors, m_GradientPortion, input, cls);
+            }
+            finally
+            {
+              m_IsBusy = false;
+            }
             return true;
           }
-        }
+      }
 
       #endregion
 
       private BackpropAlgorithm m_Algorithm;
       private BatchItem[] m_Items;
       private int         m_Threads;
-      private object      m_Sync = new object();
+      private object      m_BatchItemSync = new object();
 
       public BatchContext(BackpropAlgorithm alg, int maxDegreesOfParallelism)
       {
@@ -94,15 +98,13 @@ namespace ML.DeepMethods.Algorithms
           var item = m_Items[j];
           if (item == null)
           {
-            lock (m_Sync)
+            lock (m_BatchItemSync)
             {
               item = m_Items[j];
               if (item == null)
               {
                 item = new BatchItem(m_Algorithm);
                 m_Items[j] = item;
-                if (!item.DoIter(data, cls)) continue;
-                return;
               }
             }
           }
@@ -115,11 +117,9 @@ namespace ML.DeepMethods.Algorithms
 
     #endregion
 
-    private object m_BatchSynk = new object();
-
     #region .pvt
 
-    private void runIteration(double[][][,] values, double[][][,] errors, double[][] gradients,
+    private void runIteration(double[][][,] values, double[][][,] errors, double[][] gradientPortions,
                               double[][,] input, Class cls)
     {
       // feed forward
@@ -134,24 +134,23 @@ namespace ML.DeepMethods.Algorithms
         var player = Net[i-1];
         var pvalue = (i>0) ? values[i-1] : input;
         var perror = (i>0) ? errors[i-1] : null;
-        var gradient = gradients[i];
+        var gradientPortion = gradientPortions[i];
 
         // error backpropagation
         if (i>0)
           layer.Backprop(player, pvalue, perror, error);
 
         // prepare gradient updates
-        layer.SetLayerGradient(pvalue, error, gradient, false);
+        layer.SetLayerGradient(pvalue, error, gradientPortion, false);
       }
 
       // update gradient with iteration portion
-      lock (m_BatchSynk)
+      lock (m_Gradient)
       {
-        var len = m_Gradient.Length;
-        for (int i=0; i<len; i++)
+        for (int i=lcount-1; i>=0; i--)
         {
           var gradient = m_Gradient[i];
-          var gradientPortion = gradients[i];
+          var gradientPortion = gradientPortions[i];
           var glen = gradient.Length;
           for (int j=0; j<glen; j++)
             gradient[j] += gradientPortion[j];
@@ -179,10 +178,10 @@ namespace ML.DeepMethods.Algorithms
         var ej = m_LossFunction.Derivative(p, output, expect);
         var value = result[p][0, 0];
         var deriv = (llayer.ActivationFunction != null) ? llayer.ActivationFunction.DerivativeFromValue(value) : 1;
-        errors[lidx][p][0, 0] = ej * deriv;
+        errors[lidx][p][0, 0] = ej * deriv / m_BatchSize;
       }
 
-      return m_LossFunction.Value(output, expect);
+      return m_LossFunction.Value(output, expect) / m_BatchSize;
     }
 
     #endregion

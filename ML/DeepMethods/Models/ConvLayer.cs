@@ -211,7 +211,7 @@ namespace ML.DeepMethods.Models
         // bias updates
         var db = 0.0D;
         for (int k=0; k<m_OutputHeight; k++)
-        for (int m=0; m<m_OutputWidth; m++)
+        for (int m=0; m<m_OutputWidth;  m++)
         {
           db += errors[q][k, m];
         }

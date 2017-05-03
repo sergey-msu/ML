@@ -359,7 +359,7 @@ namespace ML.DeepMethods.Algorithms
       m_Batch++;
       m_Step2 = m_Optimizer.Step2;
       m_PrevLossValue = m_LossValue;
-      m_LossValue = m_IterLossValue / sampleBatch.Count;
+      m_LossValue = m_IterLossValue;
       m_LossDelta = m_LossValue - m_PrevLossValue;
       m_IterLossValue = 0.0D;
 
@@ -391,7 +391,6 @@ namespace ML.DeepMethods.Algorithms
       }
 
       // update iter stats
-      m_Iteration++;
       m_IterLossValue += iterLoss;
     }
 
@@ -414,10 +413,10 @@ namespace ML.DeepMethods.Algorithms
         var ej = m_LossFunction.Derivative(p, output, expect);
         var value = result[p][0, 0];
         var deriv = (llayer.ActivationFunction != null) ? llayer.ActivationFunction.DerivativeFromValue(value) : 1;
-        errors[p][0, 0] = ej * deriv;
+        errors[p][0, 0] = ej * deriv / m_BatchSize;
       }
 
-      return m_LossFunction.Value(output, expect);
+      return m_LossFunction.Value(output, expect) / m_BatchSize;
     }
 
     private bool checkStopCriteria()

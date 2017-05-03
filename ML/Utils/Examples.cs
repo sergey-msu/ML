@@ -66,9 +66,9 @@ namespace ML.Utils
       {
         EpochCount = 50,
         LearningRate = lrate,
-        BatchSize = 20,
+        BatchSize = 8,
         UseBatchParallelization = true,
-        MaxBatchThreadCount = 2,
+        MaxBatchThreadCount = 8,
         LossFunction = Loss.Euclidean,
         Optimizer = Optimizer.RMSProp,
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
