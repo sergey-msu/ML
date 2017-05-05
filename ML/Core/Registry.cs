@@ -63,24 +63,26 @@ namespace ML.Core.Registry
     private static readonly Dictionary<double, RationalActivation>    m_Rationals    = new Dictionary<double, RationalActivation>();
     private static readonly Dictionary<double, ShiftedStepActivation> m_ShiftedSteps = new Dictionary<double, ShiftedStepActivation>();
     private static readonly Dictionary<double, LogisticActivation>    m_Logistics    = new Dictionary<double, LogisticActivation>();
+    private static readonly Dictionary<double, LeakyReLUActivation>   m_LeakyReLUs   = new Dictionary<double, LeakyReLUActivation>();
 
-    public static readonly ArctanActivation   Atan       = new ArctanActivation();
-    public static readonly StepActivation     Step       = new StepActivation();
-    public static readonly IdentityActivation Identity   = new IdentityActivation();
-    public static readonly ReLUActivation     ReLU       = new ReLUActivation();
-    public static readonly TanhActivation     Tanh       = new TanhActivation();
-    public static readonly ExpActivation      Exp        = new ExpActivation();
-    public static readonly SignActivation     Sign       = new SignActivation();
+    public static readonly ArctanActivation    Atan      = new ArctanActivation();
+    public static readonly StepActivation      Step      = new StepActivation();
+    public static readonly IdentityActivation  Identity  = new IdentityActivation();
+    public static readonly ReLUActivation      ReLU      = new ReLUActivation();
+    public static readonly TanhActivation      Tanh      = new TanhActivation();
+    public static readonly ExpActivation       Exp       = new ExpActivation();
+    public static readonly SignActivation      Sign      = new SignActivation();
 
     public static readonly Dictionary<string, IFunction> ByID = new Dictionary<string, IFunction>
     {
-      { Atan.ID,     Atan },
-      { Step.ID,     Step },
-      { Identity.ID, Identity },
-      { ReLU.ID,     ReLU },
-      { Tanh.ID,     Tanh },
-      { Exp.ID,      Exp },
-      { Sign.ID,     Sign }
+      { Atan.ID,        Atan },
+      { Step.ID,        Step },
+      { Identity.ID,    Identity },
+      { ReLU.ID,        ReLU },
+      { LeakyReLU().ID, LeakyReLU() },
+      { Tanh.ID,        Tanh },
+      { Exp.ID,         Exp },
+      { Sign.ID,        Sign }
     };
 
     public static ShiftedStepActivation ShiftedStep(double p)
@@ -96,6 +98,11 @@ namespace ML.Core.Registry
     public static LogisticActivation Logistic(double a)
     {
       return Core.Utils.GetThroughMap(a, m_Logistics);
+    }
+
+    public static LeakyReLUActivation LeakyReLU(double leak = LeakyReLUActivation.DFT_LEAK)
+    {
+      return Core.Utils.GetThroughMap(leak, m_LeakyReLUs);
     }
   }
 }

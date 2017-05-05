@@ -199,7 +199,7 @@ namespace ML.DeepTests
 
     #endregion
 
-    #region Learning
+    #region Train
 
     protected override void Train()
     {

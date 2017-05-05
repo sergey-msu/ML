@@ -130,11 +130,11 @@ namespace ML.DeepTests
 
     #endregion
 
-    #region Learning
+    #region Train
 
     protected override void Train()
     {
-      Alg = Examples.CreateCIFAR10Demo(m_Training);
+      Alg = Examples.CreateCIFAR10Demo1(m_Training);
       Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training.Subset(0, 10000), ResultsFolder); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;

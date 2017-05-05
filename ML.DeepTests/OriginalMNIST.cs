@@ -188,17 +188,17 @@ namespace ML.DeepTests
 
     #endregion
 
-    #region Learning
+    #region Train
 
     protected override void Train()
     {
-      var alg = Examples.____CreateMNISTSimpleDemo(m_Training);
-      alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(alg, m_Test, ResultsFolder);
+      Alg = Examples.CreateMNISTSimpleDemoWithBatching(m_Training);
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Test, ResultsFolder);
 
       var now = DateTime.Now;
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      alg.Train();
+      Alg.Train();
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }

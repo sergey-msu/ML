@@ -7,7 +7,7 @@ using ML.Core.Registry;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Registry;
 
-namespace ML.Utils
+namespace ML.DeepTests
 {
   public static class Examples
   {
@@ -46,7 +46,7 @@ namespace ML.Utils
     /// <summary>
     ///
     /// </summary>
-    public static BackpropAlgorithm ____CreateMNISTSimpleDemo(ClassifiedSample<double[][,]> training)
+    public static BackpropAlgorithm CreateMNISTSimpleDemoWithBatching(ClassifiedSample<double[][,]> training)
     {
       var activation = Activation.ReLU;
       var net = new ConvNet(1, 28) { IsTraining=true };
@@ -108,9 +108,9 @@ namespace ML.Utils
     }
 
     /// <summary>
-    /// Creates CNN for CIFAR-10 training
+    /// Creates CNN for CIFAR-10 training (from keras)
     /// </summary>
-    public static BackpropAlgorithm CreateCIFAR10Demo(ClassifiedSample<double[][,]> training)
+    public static BackpropAlgorithm CreateCIFAR10Demo1(ClassifiedSample<double[][,]> training)
     {
       var activation = Activation.ReLU;
       var net = new ConvNet(3, 32) { IsTraining=true };
@@ -133,19 +133,102 @@ namespace ML.Utils
 
       net.RandomizeParameters(seed: 0);
 
-      var lrate = 0.00001D;
+      var lrate = 0.000005D;
       var alg = new BackpropAlgorithm(training, net)
       {
         LossFunction = Loss.CrossEntropySoftMax,
         EpochCount = 50,
         LearningRate = lrate,
-        BatchSize = 32,
-        Optimizer = Optimizer.RMSProp,
+        BatchSize = 8,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Adadelta,
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 
       return alg;
     }
+
+    /// <summary>
+    /// Creates CNN for CIFAR-10 training (from https://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html)
+    /// </summary>
+    public static BackpropAlgorithm CreateCIFAR10Demo2(ClassifiedSample<double[][,]> training)
+    {
+      var activation = Activation.LeakyReLU();
+      var net = new ConvNet(3, 32) { IsTraining=true };
+
+      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 5, padding: 2, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new ConvLayer(outputDepth: 20, windowSize: 5, padding: 2, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new ConvLayer(outputDepth: 20, windowSize: 5, padding: 2, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new FlattenLayer(outputDim: 256, activation: activation));
+      net.AddLayer(new DenseLayer(outputDim: 10, activation: Activation.Logistic(1)));
+
+      net._Build();
+
+      net.RandomizeParameters(seed: 0);
+
+      //ConvNet net;
+      //using (var stream = System.IO.File.Open(@"C:\Users\User\Desktop\science\Machine learning\data\_inspect\cn_e0_p90.1.mld", System.IO.FileMode.Open))
+      //{
+      //  net = ConvNet.Deserialize(stream);
+      //}
+
+      var lrate = 0.01D;
+      var alg = new BackpropAlgorithm(training, net)
+      {
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 50,
+        LearningRate = lrate,
+        BatchSize = 8,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Adadelta,
+        LearningRateScheduler = LearningRateScheduler.TimeBased(lrate, 0.0005D)
+      };
+
+      return alg;
+    }
+
+    /// <summary>
+    /// Creates CNN for CIFAR-10 training
+    /// (from http://machinelearningmastery.com/object-recognition-convolutional-neural-networks-keras-deep-learning-library/)
+    /// </summary>
+    public static BackpropAlgorithm CreateCIFAR10Demo3(ClassifiedSample<double[][,]> training)
+    {
+      var activation = Activation.ReLU;
+      var net = new ConvNet(3, 32) { IsTraining=true };
+
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new DropoutLayer(0.2D));
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new FlattenLayer(outputDim: 512, activation: Activation.ReLU));
+      net.AddLayer(new DropoutLayer(0.5));
+      net.AddLayer(new DenseLayer(outputDim: 10, activation: Activation.Logistic(1)));
+
+      net._Build();
+
+      net.RandomizeParameters(seed: 0);
+
+      var lrate = 0.01D;
+      var alg = new BackpropAlgorithm(training, net)
+      {
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 50,
+        LearningRate = lrate,
+        BatchSize = 8,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Momentum,
+        LearningRateScheduler = LearningRateScheduler.TimeBased(lrate, 0.0005D)
+      };
+
+      return alg;
+    }
+
 
   }
 }

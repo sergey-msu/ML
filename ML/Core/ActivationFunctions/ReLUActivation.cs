@@ -23,6 +23,9 @@ namespace ML.Core.ActivationFunctions
 
     public double DerivativeFromValue(double y)
     {
+      if (y<0)
+        throw new MLException("ReLU value must be non negative");
+
       return (y==0) ? 0 : 1;
     }
   }

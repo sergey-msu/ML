@@ -69,6 +69,7 @@
     <Compile Include="Core\ActivationFunctions\BinaryStepActivation.cs" />
     <Compile Include="Core\ActivationFunctions\ExpActivation.cs" />
     <Compile Include="Core\ActivationFunctions\IdentityActivation.cs" />
+    <Compile Include="Core\ActivationFunctions\LeakyReLUActivation.cs" />
     <Compile Include="Core\ActivationFunctions\LogisticActivation.cs" />
     <Compile Include="Core\ActivationFunctions\RationalActivation.cs" />
     <Compile Include="Core\ActivationFunctions\ReLUActivation.cs" />
@@ -156,7 +157,6 @@
     <Compile Include="NeuralMethods\Models\Neuron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Mathematics\MathUtils.cs" />
-    <Compile Include="Utils\Examples.cs" />
     <Compile Include="Utils\NetworkFactory.cs" />
   </ItemGroup>
   <ItemGroup>

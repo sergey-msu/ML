@@ -1,8 +1,18 @@
 
+
+- unit tests over CIFAR-10 (layers, activations, softmax, batching etc.)
+- CNN: ser/deser
+- use only horses and frogs
+- inspect convnet.js
+- add kernel_constraint to layers
+
+- refactor CNN layers to use Input and Output
+- refactor masking in AlgorithmBase
+
 ***************************** CURRENT *****************************
 
 - CNN:
-  - for Batch CPU parallelization
+  - [DONE] Batch CPU parallelization
   - stochastic gradient training
   - [DONE] batch learning
   - batch normalization https://arxiv.org/pdf/1502.03167.pdf

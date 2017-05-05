@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ML.Contracts;
 
 namespace ML.Core
@@ -146,14 +147,15 @@ namespace ML.Core
     public virtual IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<TObj> classifiedSample)
     {
       var errors = new List<ErrorInfo>();
-      int c = 0;
-      foreach (var pData in classifiedSample)
+      Parallel.ForEach(classifiedSample, pdata =>
       {
-        c++;
-        var res = this.Classify(pData.Key);
-        if (res != pData.Value)
-          errors.Add(new ErrorInfo(pData.Key, pData.Value, res));
-      }
+        var res = this.Classify(pdata.Key);
+        if (res != pdata.Value)
+          lock (errors)
+          {
+            errors.Add(new ErrorInfo(pdata.Key, pdata.Value, res));
+          }
+      });
 
       return errors;
     }
