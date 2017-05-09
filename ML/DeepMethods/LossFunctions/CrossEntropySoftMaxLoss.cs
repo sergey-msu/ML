@@ -36,7 +36,7 @@ namespace ML.DeepMethods.LossFunctions
 
       var result = (se/sa - expected[idx]/actual[idx]) * MathUtils.ENTROPY_COEFF;
       if (double.IsNaN(result))
-        throw new MLException("Argument of entropy is out of range. Make sure that activation function's output is (0, 1)");
+        throw new MLException(string.Format("Argument of entropy is out of range. Make sure that activation function's output is (0, 1). Values: idx={0}, actual={1}, expected={2}, se={3}, sa={4}", idx, actual[idx], expected[idx], se, sa));
 
       return result;
     }

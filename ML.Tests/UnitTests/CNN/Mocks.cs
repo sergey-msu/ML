@@ -96,9 +96,36 @@ namespace ML.Tests.UnitTests.CNN
       }
     }
 
-    public static ConvNet SimpleLinearNetwork()
+    public static ConvNet SimpleLinearNetwork2(IActivationFunction activation = null)
     {
-      var net = new ConvNet(1, 1, activation: new Mocks.LinearActivation());
+      activation = activation ?? new Mocks.LinearActivation();
+
+      var net = new ConvNet(1, 1, activation: activation);
+      net.IsTraining = true;
+      var layer1 = new DenseLayer(1);
+      net.AddLayer(layer1);
+      var layer2 = new DenseLayer(1);
+      net.AddLayer(layer2);
+      var layer3 = new DenseLayer(2);
+      net.AddLayer(layer3);
+      net._Build();
+
+      layer1.Weights[1] = 1;
+      layer1.Weights[0] = 3;
+      layer2.Weights[1] = -1;
+      layer2.Weights[0] = 1;
+      layer3.Weights[2] = -2;
+      layer3.Weights[1] = -3;
+      layer3.Weights[0] = -1;
+
+      return net;
+    }
+
+    public static ConvNet SimpleLinearNetwork(IActivationFunction activation = null)
+    {
+      activation = activation ?? new Mocks.LinearActivation();
+
+      var net = new ConvNet(1, 1, activation: activation);
       net.IsTraining = true;
       var layer1 = new DenseLayer(1);
       net.AddLayer(layer1);

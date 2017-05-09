@@ -61,6 +61,8 @@ namespace ML.ConsoleTest
       {
         var start = DateTime.Now;
 
+        //testSerDeser();
+
         //doNearestNeighbourAlgorithmTest();
         //doNearestKNeighboursAlgorithmTest();
         //doParzenFixedAlgorithmTest();
@@ -82,6 +84,31 @@ namespace ML.ConsoleTest
     }
 
     #region .pvt
+
+    private void testSerDeser()
+    {
+      var activation = Activation.ReLU;
+      var net = new ConvNet(1, 28) { IsTraining=true };
+
+      net.AddLayer(new ConvLayer(outputDepth: 8, windowSize: 5));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 18, windowSize: 5));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+      net.AddLayer(new FlattenLayer(outputDim: 10, activation: activation));
+
+      net._Build();
+
+      net.RandomizeParameters(seed: 0);
+
+      var path = @"F:\Work\AgniCore\_testftp\cn_e5_p53.88.mld";
+      //using (var file = System.IO.File.Open(path, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+      //  net.Serialize(file);
+      using (var file = System.IO.File.Open(path, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+      {
+        var res = ConvNet.Deserialize(file);
+      }
+    }
+
 
     private void doNearestNeighbourAlgorithmTest()
     {

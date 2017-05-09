@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Examples.cs" />
+    <Compile Include="OriginalCIFAR10Trunc.cs" />
     <Compile Include="OriginalCIFAR10.cs" />
     <Compile Include="Runner.cs" />
     <Compile Include="KaggleCIFAR10.cs" />

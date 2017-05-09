@@ -23,7 +23,7 @@ namespace ML.DeepTests
   ///Each file contains 10000 such 3073-byte "rows" of images, although there is nothing delimiting the rows.
   ///Therefore each file should be exactly 30730000 bytes long.
   /// </summary>
-  public class OriginalCIFAR10 : Runner
+  public class OriginalCIFAR10Trunc : Runner
   {
     const string CIFAR10_IMG_FILE   = "img_{0}.png";
     const string CIFAR10_LABEL_FILE = "labels.csv";
@@ -31,23 +31,23 @@ namespace ML.DeepTests
     private ClassifiedSample<double[][,]> m_Test = new ClassifiedSample<double[][,]>();
     private Dictionary<int, Class>        m_Classes = new Dictionary<int, Class>()
     {
-      { 0, new Class("airplane",   0) },
-      { 1, new Class("automobile", 1) },
-      { 2, new Class("bird",       2) },
-      { 3, new Class("cat",        3) },
-      { 4, new Class("deer",       4) },
-      { 5, new Class("dog",        5) },
-      { 6, new Class("frog",       6) },
-      { 7, new Class("horse",      7) },
-      { 8, new Class("ship",       8) },
-      { 9, new Class("truck",      9) },
+      //{ 0, new Class("airplane",   ) },
+      //{ 1, new Class("automobile", ) },
+      //{ 2, new Class("bird",       ) },
+        { 3, new Class("cat",        0) },
+      //{ 4, new Class("deer",       ) },
+        { 5, new Class("dog",        1) },
+      //{ 6, new Class("frog",       ) },
+        { 7, new Class("horse",      2) },
+      //{ 8, new Class("ship",       ) },
+      //{ 9, new Class("truck",      ) },
     };
 
-    public string Cifar10Path  { get { return Root+@"\data\cifar10"; }}
+    public string Cifar10Path  { get { return Root+@"\data\cifar10trunc"; }}
     public string Cifar10Src   { get { return Cifar10Path+@"\src\original"; }}
     public string Cifar10Test  { get { return Cifar10Path+@"\test\original"; }}
     public string Cifar10Train { get { return Cifar10Path+@"\train\original"; }}
-    public override string ResultsFolder { get { return Root+@"\output\cifar10_original"; }}
+    public override string ResultsFolder { get { return Root+@"\output\cifar10_original_trunc"; }}
 
 
     protected override void Init()
@@ -101,7 +101,12 @@ namespace ML.DeepTests
               var label = file.ReadByte();
               if (label<0) break;
 
-              var cls = m_Classes[label];
+              Class cls;
+              if (!m_Classes.TryGetValue(label, out cls))
+              {
+                file.Seek(3*32*32, SeekOrigin.Current);
+                continue;
+              }
 
               var data = new byte[3, 32, 32];
 
@@ -186,7 +191,12 @@ namespace ML.DeepTests
             var label = file.ReadByte();
             if (label<0) break;
 
-            var cls = m_Classes[label];
+            Class cls;
+            if (!m_Classes.TryGetValue(label, out cls))
+            {
+              file.Seek(3*32*32, SeekOrigin.Current);
+              continue;
+            }
 
             var data = new double[3][,];
             data[0] = new double[32, 32];
@@ -216,20 +226,20 @@ namespace ML.DeepTests
       var tstart = DateTime.Now;
       var now = DateTime.Now;
 
-      Alg = Examples.CreateCIFAR10Demo2(m_Training);
+      Alg = Examples.CreateCIFAR10TruncDemo2(m_Training);
       Alg.EpochEndedEvent += (o, e) =>
                              {
                                Utils.HandleEpochEnded(Alg, m_Test, ResultsFolder);
                                tstart = DateTime.Now;
                              };
-      //Alg.BatchEndedEvent += (o, e) =>
-      //                       {
-      //                         now = DateTime.Now;
-      //                         var iter = Alg.Iteration;
-      //                         var pct = 100*iter/(float)tcnt;
-      //                         var elapsed = TimeSpan.FromMinutes((now-tstart).TotalMinutes * (tcnt-iter)/iter);
-      //                         Console.Write("\rCurrent epoch progress: {0:0.00}%. Left {1:0}m {2:0}s         ", pct, elapsed.Minutes, elapsed.Seconds);
-      //                       };
+      Alg.BatchEndedEvent += (o, e) =>
+                             {
+                               now = DateTime.Now;
+                               var iter = Alg.Iteration;
+                               var pct = 100*iter/(float)tcnt;
+                               var elapsed = TimeSpan.FromMinutes((now-tstart).TotalMinutes * (tcnt-iter)/iter);
+                               Console.Write("\rCurrent epoch progress: {0:0.00}%. Left {1:0}m {2:0}s         ", pct, elapsed.Minutes, elapsed.Seconds);
+                             };
 
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);

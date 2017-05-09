@@ -12,7 +12,7 @@ namespace ML.Tests.UnitTests.CNN
   public class BackpropTests : TestBase
   {
     [TestMethod]
-    public void SimpleNet_OneIter()
+    public void SimpleNet_Euclidean_OneIter()
     {
       // arrange
 
@@ -71,6 +71,39 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual(-1 + 2*(-378),    net[1].Weights[1]);
       Assert.AreEqual( 3 + 2*(-1134*1), net[0].Weights[0]);
       Assert.AreEqual( 1 + 2*(-1134),   net[0].Weights[1]);
+    }
+
+
+    [TestMethod]
+    public void SimpleNet_CrossEntropySoftMax_OneIter()
+    {
+      // arrange
+
+      var net = Mocks.SimpleLinearNetwork2(Activation.ReLU);
+      net[2].ActivationFunction = Activation.Logistic(1);
+
+      var sample = new ClassifiedSample<double[][,]>();
+      var point1 = new double[1][,] { new[,] { { 1.0D } } };
+      var point2 = new double[1][,] { new[,] { { -1.0D } } };
+      var cls1 = new Class("a", 0);
+      var cls2 = new Class("b", 1);
+      sample[point1] = cls1;
+      sample[point2] = cls2;
+
+      var alg = new BackpropAlgorithm(sample, net);
+      alg.LearningRate = 2.0D;
+      alg.LossFunction = Loss.CrossEntropySoftMax;
+      alg.Build();
+
+      // act
+      alg.RunIteration(point1, cls1);
+
+      // assert
+      AssertNetGradient(alg, point1, 2, 1);
+      AssertNetGradient(alg, point1, 1, 0);
+      AssertNetGradient(alg, point1, 1, 1);
+      AssertNetGradient(alg, point1, 0, 0);
+      AssertNetGradient(alg, point1, 0, 1);
     }
 
     [TestMethod]

@@ -78,6 +78,7 @@ namespace ML.DeepMethods.Models
   /// </summary>
   public class MaxPoolingLayer : PoolingLayer
   {
+    [NonSerialized]
     private ThreadLocal<int[][,,]> m_MaxIndexPositions;
 
     #region .ctor

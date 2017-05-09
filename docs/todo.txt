@@ -1,10 +1,11 @@
 
 
 - unit tests over CIFAR-10 (layers, activations, softmax, batching etc.)
-- CNN: ser/deser
 - use only horses and frogs
 - inspect convnet.js
 - add kernel_constraint to layers
+
+- logistic softmax: check + gradient unittests
 
 - refactor CNN layers to use Input and Output
 - refactor masking in AlgorithmBase
@@ -25,13 +26,13 @@
   - serialization/deserialization
   - compare Keras and ML calcuations
 
-- COMMIT A WILLFUL DECISION: do we need ComputingLayer architecture? Does Build/DoBuild implenter in a proper way?
+- COMMIT A WILLFUL DECISION: do we need ComputingLayer architecture? Does Build/DoBuild implement in a proper way?
 
 - NN and CNN:
   - possibility of: train -> add nodes/layers -> train etc...
   - possibility to remove layer/node from network
 
-- implement more NN optimizatiors (https://habrahabr.ru/post/318970/)
+- implement more NN optimizators (https://habrahabr.ru/post/318970/)
   - Nesterov
 
 - Unit tests

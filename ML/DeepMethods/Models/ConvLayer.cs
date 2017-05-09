@@ -80,7 +80,7 @@ namespace ML.DeepMethods.Models
     }
 
     /// <summary>
-    /// Kernal wieght value
+    /// Kernal weight value
     /// </summary>
     public double Kernel(int q, int p, int y, int x)
     {
@@ -151,20 +151,24 @@ namespace ML.DeepMethods.Models
         var g = 0.0D;
 
         for (int q=0; q<m_OutputDepth;  q++)
-        for (int k=0; k<m_OutputHeight; k++)
         {
-          var y = i+m_PaddingHeight-k*m_StrideHeight;
-          if (y >= m_WindowHeight) continue;
-          if (y < 0) break;
-
-          for (int m=0; m<m_OutputWidth; m++)
+          var y = i+m_PaddingHeight+m_StrideHeight;
+          for (int k=0; k<m_OutputHeight; k++)
           {
-            var x = j+m_PaddingWidth-m*m_StrideWidth;
-            if (x >= m_WindowWidth) continue;
-            if (x < 0) break;
+            y -= m_StrideHeight;
+            if (y >= m_WindowHeight) continue;
+            if (y < 0) break;
 
-            var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
-            g += errors[q][k, m] * m_Weights[idx]; // Kernel(q, p, y, x)
+            var x = j+m_PaddingWidth+m_StrideWidth;
+            for (int m=0; m<m_OutputWidth; m++)
+            {
+              x -= m_StrideWidth;
+              if (x >= m_WindowWidth) continue;
+              if (x < 0) break;
+
+              var idx = x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount;
+              g += errors[q][k, m] * m_Weights[idx]; // Kernel(q, p, y, x)
+            }
           }
         }
 
@@ -187,15 +191,17 @@ namespace ML.DeepMethods.Models
         {
           var dw = 0.0D;
 
+          var y = i-m_PaddingHeight-m_StrideHeight;
           for (int k=0; k<m_OutputHeight; k++)
           {
-            var y = i-m_PaddingHeight+m_StrideHeight*k;
+            y += m_StrideHeight;
             if (y<0) continue;
             if (y>=m_InputHeight) break;
 
+            var x = j-m_PaddingWidth-m_StrideWidth;
             for (int m=0; m<m_OutputWidth; m++)
             {
-              var x = j-m_PaddingWidth+m_StrideWidth*m;
+              x += m_StrideWidth;
               if (x<0) continue;
               if (x>=m_InputWidth) break;
 
