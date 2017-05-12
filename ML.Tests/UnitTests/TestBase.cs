@@ -21,10 +21,14 @@ namespace ML.Tests.UnitTests
       m_Context = context;
     }
 
-    public static void AssertGradient(Func<double, double> f, double x, double actual)
+    public static void AssertDerivative(Func<double, double> f, double x, double actual)
     {
       var expected = (f(x+GRAD_STEP) - f(x-GRAD_STEP)) / (2*GRAD_STEP);
-      Assert.IsTrue(Math.Abs(actual-expected)/expected < GRAD_EPS);
+
+      if (Math.Abs(expected) <= double.Epsilon)
+        Assert.IsTrue(Math.Abs(actual) <= double.Epsilon);
+      else
+        Assert.IsTrue(Math.Abs(actual-expected)/expected < GRAD_EPS);
     }
   }
 }

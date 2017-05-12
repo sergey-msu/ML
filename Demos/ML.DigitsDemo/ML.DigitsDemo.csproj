@@ -116,7 +116,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ML\ML.csproj">
+    <ProjectReference Include="..\..\ML\ML.csproj">
       <Project>{4d82fff2-3ca0-44ed-94ee-ced63dc7e106}</Project>
       <Name>ML</Name>
     </ProjectReference>

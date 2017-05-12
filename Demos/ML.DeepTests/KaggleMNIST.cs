@@ -5,7 +5,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using ML.Core;
-using ML.Utils;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Models;
 
@@ -16,7 +15,7 @@ namespace ML.DeepTests
     const int IMG_SIZE = 28;
     const string MNIST_IMG_FILE = "kaggle_img_{0}.png";
 
-    private List<double[][,]>       m_Test = new List<double[][,]>();
+    private List<double[][,]> m_Test = new List<double[][,]>();
     private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
     {
       { 0, new Class("Zero",  0) },
@@ -31,18 +30,15 @@ namespace ML.DeepTests
       { 9, new Class("Nine",  9) },
     };
 
-    public string MnistPath  { get { return Root+@"\data\mnist"; }}
-    public string MnistSrc   { get { return MnistPath+@"\src\kaggle"; }}
-    public string MnistTest  { get { return MnistPath+@"\test\kaggle"; }}
-    public string MnistTrain { get { return MnistPath+@"\train\kaggle"; }}
-    public override string ResultsFolder { get { return Root+@"\output\mnist_kaggle"; }}
+    public override string DataPath   { get { return RootPath+@"\data\mnist"; }}
+    public override string OutputPath { get { return RootPath+@"\output\mnist_kaggle"; }}
 
 
     protected override void Init()
     {
       base.Init();
 
-      var paths = new []{ Root, MnistPath, MnistSrc, MnistTest, MnistTrain, ResultsFolder };
+      var paths = new []{ RootPath, DataPath, SrcPath, TestPath, TrainPath, OutputPath };
       foreach (var path in paths)
       {
         if (!Directory.Exists(path))
@@ -55,12 +51,12 @@ namespace ML.DeepTests
     protected override void Export()
     {
       // train
-      var objFilePath = Path.Combine(MnistSrc, "train.csv");
-      exportObjects(objFilePath, MnistTrain, true);
+      var objFilePath = Path.Combine(SrcPath, "train.csv");
+      exportObjects(objFilePath, TrainPath, true);
 
       // test
-      objFilePath = Path.Combine(MnistSrc, "test.csv");
-      exportObjects(objFilePath, MnistTrain, false);
+      objFilePath = Path.Combine(SrcPath, "test.csv");
+      exportObjects(objFilePath, TrainPath, false);
     }
 
     private void exportObjects(string fpath, string opath, bool isTrain)
@@ -120,12 +116,12 @@ namespace ML.DeepTests
     {
       // train
       Console.WriteLine("load train data...");
-      var objFilePath = Path.Combine(MnistSrc, "train.csv");
-      loadSample(objFilePath, m_Training);
+      var objFilePath = Path.Combine(SrcPath, "train.csv");
+      loadSample(objFilePath, m_TrainingSet);
 
       // test
       Console.WriteLine("load test data...");
-      objFilePath = Path.Combine(MnistSrc, "test.csv");
+      objFilePath = Path.Combine(SrcPath, "test.csv");
       loadTest(objFilePath, m_Test);
     }
 
@@ -203,8 +199,8 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg = Examples.CreateMNISTSimpleDemo(m_Training);
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training.Subset(0, 10000), ResultsFolder); // we do not have public test data in kaggle :(
+      Alg = Examples.CreateMNISTSimpleDemo(m_TrainingSet);
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, OutputPath); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;
       Console.WriteLine();
@@ -221,16 +217,16 @@ namespace ML.DeepTests
     protected override void Test()
     {
       ConvNet lenet1;
-      var fpath = Path.Combine(ResultsFolder, "cn_e26_p0.06.mld");
+      var fpath = Path.Combine(OutputPath, "cn_e26_p0.06.mld");
       //var fpath = @"F:\Work\git\ML\solution\ML.DigitsDemo\lenet1.mld";
 
       using (var stream = File.Open(fpath, FileMode.Open))
       {
         lenet1 = ConvNet.Deserialize(stream);
       }
-      var alg = new BackpropAlgorithm(m_Training, lenet1);
+      var alg = new BackpropAlgorithm(m_TrainingSet, lenet1);
 
-      var fout = Path.Combine(MnistSrc, "result1.csv");
+      var fout = Path.Combine(SrcPath, "result1.csv");
       using (var file = File.Open(fout, FileMode.Create, FileAccess.Write))
       using (var writer = new StreamWriter(file))
       {

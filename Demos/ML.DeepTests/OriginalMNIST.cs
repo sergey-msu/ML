@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using ML.Core;
-using ML.Utils;
 
 namespace ML.DeepTests
 {
@@ -13,8 +12,7 @@ namespace ML.DeepTests
     const string MNIST_IMG_FILE   = "img_{0}.png";
     const string MNIST_LABEL_FILE = "labels.csv";
 
-    private ClassifiedSample<double[][,]> m_Test = new ClassifiedSample<double[][,]>();
-    private Dictionary<int, Class>       m_Classes = new Dictionary<int, Class>()
+    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>()
     {
       { 0, new Class("Zero",  0) },
       { 1, new Class("One",   1) },
@@ -28,40 +26,24 @@ namespace ML.DeepTests
       { 9, new Class("Nine",  9) },
     };
 
-    public string MnistPath  { get { return Root+@"\data\mnist"; }}
-    public string MnistSrc   { get { return MnistPath+@"\src\original"; }}
-    public string MnistTest  { get { return MnistPath+@"\test\original"; }}
-    public string MnistTrain { get { return MnistPath+@"\train\original"; }}
-    public override string ResultsFolder { get { return Root+@"\output\mnist_original"; }}
-
-
-    protected override void Init()
-    {
-      base.Init();
-
-      var paths = new []{ Root, MnistPath, MnistSrc, MnistTest, MnistTrain, ResultsFolder };
-      foreach (var path in paths)
-      {
-        if (!Directory.Exists(path))
-          Directory.CreateDirectory(path);
-      }
-    }
+    public override string DataPath   { get { return RootPath+@"\data\mnist"; }}
+    public override string OutputPath { get { return RootPath+@"\output\mnist_original"; }}
 
     #region Export
 
     protected override void Export()
     {
       // train
-      var objFilePath   = Path.Combine(MnistSrc, "train-images.idx3-ubyte");
-      var labelFilePath = Path.Combine(MnistSrc, "train-labels.idx1-ubyte");
-      exportObjects(objFilePath,  MnistTrain);
-      exportLabels(labelFilePath, MnistTrain);
+      var objFilePath   = Path.Combine(SrcPath, "train-images.idx3-ubyte");
+      var labelFilePath = Path.Combine(SrcPath, "train-labels.idx1-ubyte");
+      exportObjects(objFilePath,  TrainPath);
+      exportLabels(labelFilePath, TrainPath);
 
       // test
-      objFilePath   = Path.Combine(MnistSrc, "test-images.idx3-ubyte");
-      labelFilePath = Path.Combine(MnistSrc, "test-labels.idx1-ubyte");
-      exportObjects(objFilePath,  MnistTest);
-      exportLabels(labelFilePath, MnistTest);
+      objFilePath   = Path.Combine(SrcPath, "test-images.idx3-ubyte");
+      labelFilePath = Path.Combine(SrcPath, "test-labels.idx1-ubyte");
+      exportObjects(objFilePath,  TestPath);
+      exportLabels(labelFilePath, TestPath);
     }
 
     private void exportObjects(string fpath, string opath)
@@ -107,7 +89,7 @@ namespace ML.DeepTests
 
     private void exportLabels(string fname, string opath)
     {
-      var fpath = Path.Combine(MnistPath, fname);
+      var fpath = Path.Combine(DataPath, fname);
 
       using (var ifile = File.Open(fpath, FileMode.Open, FileAccess.Read))
       {
@@ -140,15 +122,15 @@ namespace ML.DeepTests
     {
       // train
       Console.WriteLine("load train data...");
-      var objFilePath   = Path.Combine(MnistSrc, "train-images.idx3-ubyte");
-      var labelFilePath = Path.Combine(MnistSrc, "train-labels.idx1-ubyte");
-      loadSample(objFilePath, labelFilePath, m_Training);
+      var objFilePath   = Path.Combine(SrcPath, "train-images.idx3-ubyte");
+      var labelFilePath = Path.Combine(SrcPath, "train-labels.idx1-ubyte");
+      loadSample(objFilePath, labelFilePath, m_TrainingSet);
 
       // test
       Console.WriteLine("load test data...");
-      objFilePath   = Path.Combine(MnistSrc, "test-images.idx3-ubyte");
-      labelFilePath = Path.Combine(MnistSrc, "test-labels.idx1-ubyte");
-      loadSample(objFilePath, labelFilePath, m_Test);
+      objFilePath   = Path.Combine(SrcPath, "test-images.idx3-ubyte");
+      labelFilePath = Path.Combine(SrcPath, "test-labels.idx1-ubyte");
+      loadSample(objFilePath, labelFilePath, m_TestingSet);
     }
 
     private void loadSample(string ipath, string lpath, ClassifiedSample<double[][,]> sample)
@@ -192,15 +174,25 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg = Examples.CreateMNISTSimpleDemoWithBatching(m_Training);
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Test, ResultsFolder);
-
+      var tstart = DateTime.Now;
       var now = DateTime.Now;
+
+      Alg = Examples.CreateMNISTSimpleDemoWithBatching(m_TrainingSet);
+      Alg.EpochEndedEvent += (o, e) =>
+                             {
+                               Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);
+                               tstart = DateTime.Now;
+                             };
+      Alg.BatchEndedEvent += (o, e) =>
+                             {
+                               Utils.HandleBatchEnded(Alg, m_TrainingSet.Count, tstart);
+                             };
+
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
       Alg.Train();
 
-      Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
+      Console.WriteLine("\n--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }
 
     #endregion

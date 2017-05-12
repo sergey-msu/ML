@@ -62,9 +62,7 @@ namespace ML.DeepMethods.Algorithms
 
             try
             {
-               //lock (m_Algorithm) System.Threading.Thread.Sleep(3000);
-
-               m_Algorithm.runIteration(m_Values, m_Errors, m_GradientPortion, input, cls);
+              m_Algorithm.runIteration(m_Values, m_Errors, m_GradientPortion, input, cls);
             }
             finally
             {

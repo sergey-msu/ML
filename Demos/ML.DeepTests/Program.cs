@@ -7,9 +7,9 @@ namespace ML.DeepTests
     static void Main(string[] args)
     {
       var runner =
-        //new OriginalMNIST();
+        new OriginalMNIST();
         //new OriginalCIFAR10();
-        new OriginalCIFAR10Trunc();
+        //new OriginalCIFAR10Trunc();
         //new KaggleMNIST();
         //new KaggleCIFAR10();
 
@@ -24,7 +24,7 @@ namespace ML.DeepTests
         Console.WriteLine("ERROR:");
         Console.WriteLine(ex);
 
-        Utils.SaveAlgCrushResults(runner.Alg, runner.ResultsFolder);
+        Utils.SaveAlgCrushResults(runner.Alg, runner.OutputPath);
       }
 
       Console.ReadLine();

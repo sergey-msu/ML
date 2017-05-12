@@ -153,7 +153,7 @@ namespace ML.Tests.UnitTests.NN
       var prev = net[lidx][nidx][widx];
       var grad = alg.Gradient[lidx][nidx, widx];
 
-      AssertGradient(x =>
+      AssertDerivative(x =>
       {
         net[lidx][nidx][widx] = x;
         var res = net.Calculate(point)[0];

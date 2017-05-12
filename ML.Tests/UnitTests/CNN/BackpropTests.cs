@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core;
-using ML.Core.Registry;
 using ML.DeepMethods.Algorithms;
-using ML.DeepMethods;
 using ML.DeepMethods.Registry;
 
 namespace ML.Tests.UnitTests.CNN
@@ -75,35 +74,55 @@ namespace ML.Tests.UnitTests.CNN
 
 
     [TestMethod]
-    public void SimpleNet_CrossEntropySoftMax_OneIter()
+    public void Euclidean_Gradient_OneIter()
     {
       // arrange
 
-      var net = Mocks.SimpleLinearNetwork2(Activation.ReLU);
-      net[2].ActivationFunction = Activation.Logistic(1);
+      var net = Mocks.TestNetwork1();
 
       var sample = new ClassifiedSample<double[][,]>();
-      var point1 = new double[1][,] { new[,] { { 1.0D } } };
-      var point2 = new double[1][,] { new[,] { { -1.0D } } };
+      var point1 = new double[1][,] { new double[2,2] { {  1.0D, 0.5D }, { -1.0D, 0.3D } } };
+      var point2 = new double[1][,] { new double[2,2] { { -1.0D, 0.1D }, {  1.2D, 0.9D } } };
       var cls1 = new Class("a", 0);
       var cls2 = new Class("b", 1);
       sample[point1] = cls1;
       sample[point2] = cls2;
 
       var alg = new BackpropAlgorithm(sample, net);
-      alg.LearningRate = 2.0D;
-      alg.LossFunction = Loss.CrossEntropySoftMax;
+      alg.LearningRate = 0.1D;
+      alg.LossFunction = Loss.Euclidean;
       alg.Build();
 
-      // act
-      alg.RunIteration(point1, cls1);
+      foreach (var data in sample)
+      {
+        // act
+        alg.RunIteration(data.Key, data.Value);
 
-      // assert
-      AssertNetGradient(alg, point1, 2, 1);
-      AssertNetGradient(alg, point1, 1, 0);
-      AssertNetGradient(alg, point1, 1, 1);
-      AssertNetGradient(alg, point1, 0, 0);
-      AssertNetGradient(alg, point1, 0, 1);
+        // assert
+        AssertNetGradient(alg, data.Key, 0, 0);
+        AssertNetGradient(alg, data.Key, 0, 1);
+        AssertNetGradient(alg, data.Key, 0, 2);
+        AssertNetGradient(alg, data.Key, 0, 3);
+        AssertNetGradient(alg, data.Key, 0, 4);
+        AssertNetGradient(alg, data.Key, 0, 5);
+        AssertNetGradient(alg, data.Key, 0, 6);
+        AssertNetGradient(alg, data.Key, 0, 7);
+        AssertNetGradient(alg, data.Key, 0, 8);
+        AssertNetGradient(alg, data.Key, 0, 9);
+        AssertNetGradient(alg, data.Key, 2, 0);
+        AssertNetGradient(alg, data.Key, 2, 1);
+        AssertNetGradient(alg, data.Key, 2, 2);
+        AssertNetGradient(alg, data.Key, 2, 3);
+        AssertNetGradient(alg, data.Key, 2, 4);
+        AssertNetGradient(alg, data.Key, 2, 5);
+        AssertNetGradient(alg, data.Key, 3, 0);
+        AssertNetGradient(alg, data.Key, 3, 1);
+        AssertNetGradient(alg, data.Key, 3, 2);
+        AssertNetGradient(alg, data.Key, 4, 0);
+        AssertNetGradient(alg, data.Key, 4, 1);
+        AssertNetGradient(alg, data.Key, 4, 2);
+        AssertNetGradient(alg, data.Key, 4, 3);
+      }
     }
 
     [TestMethod]
@@ -182,17 +201,17 @@ namespace ML.Tests.UnitTests.CNN
 
     private void AssertNetGradient(BackpropAlgorithm alg, double[][,] point, int lidx, int widx)
     {
-      var net  = alg.Net;
-      var loss = alg.LossFunction;
-      var prev = net.Weights[lidx][widx];
+      var weights = alg.Net.Weights;
+      var prev = weights[lidx][widx];
       var grad = alg.Gradient[lidx][widx];
 
-      AssertGradient(x =>
+      AssertDerivative(x =>
       {
-        net.Weights[lidx][widx] = x;
-        var res = net.Calculate(point)[0][0,0];
-        net.Weights[lidx][widx] = prev;
-        return loss.Value(new[] { res }, new[] { 1.0D });
+        weights[lidx][widx] = x;
+        var actual = alg.Net.Calculate(point).Select(p => p[0,0]).ToArray();
+        var expected = new double[actual.Length];
+        weights[lidx][widx] = prev;
+        return alg.LossFunction.Value(actual, expected);
       }, prev, grad);
     }
 

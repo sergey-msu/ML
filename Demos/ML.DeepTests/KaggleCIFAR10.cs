@@ -28,18 +28,15 @@ namespace ML.DeepTests
       { 9, new Class("truck",      9) },
     };
 
-    public string Cifar10Path  { get { return Root+@"\data\cifar10"; }}
-    public string Cifar10Src   { get { return Cifar10Path+@"\src\kaggle"; }}
-    public string Cifar10Test  { get { return Cifar10Path+@"\test\kaggle"; }}
-    public string Cifar10Train { get { return Cifar10Path+@"\train\kaggle"; }}
-    public override string ResultsFolder { get { return Root+@"\output\cifar10_kaggle"; }}
+    public override string DataPath   { get { return RootPath+@"\data\cifar10"; }}
+    public override string OutputPath { get { return RootPath+@"\output\cifar10_kaggle"; }}
 
 
     protected override void Init()
     {
       base.Init();
 
-      var paths = new []{ Root, Cifar10Path, Cifar10Src, Cifar10Test, Cifar10Train, ResultsFolder };
+      var paths = new []{ RootPath, DataPath, SrcPath, TestPath, TrainPath, OutputPath };
       foreach (var path in paths)
       {
         if (!Directory.Exists(path))
@@ -62,8 +59,8 @@ namespace ML.DeepTests
     {
       // train
       Console.WriteLine("load train data...");
-      var labFilePath = Path.Combine(Cifar10Src, "train.csv");
-      loadTrain(Cifar10Train, labFilePath, m_Training);
+      var labFilePath = Path.Combine(SrcPath, "train.csv");
+      loadTrain(TrainPath, labFilePath, m_TrainingSet);
 
       // test
       //Console.WriteLine("load test data...");
@@ -134,8 +131,8 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg = Examples.CreateCIFAR10Demo1(m_Training);
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_Training.Subset(0, 10000), ResultsFolder); // we do not have public test data in kaggle :(
+      Alg = Examples.CreateCIFAR10Demo1(m_TrainingSet);
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, OutputPath); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;
       Console.WriteLine();

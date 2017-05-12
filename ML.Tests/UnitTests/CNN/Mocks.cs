@@ -1,6 +1,7 @@
 ﻿using System;
 using ML.Contracts;
 using ML.DeepMethods.Models;
+using ML.Core.Registry;
 
 namespace ML.Tests.UnitTests.CNN
 {
@@ -96,31 +97,6 @@ namespace ML.Tests.UnitTests.CNN
       }
     }
 
-    public static ConvNet SimpleLinearNetwork2(IActivationFunction activation = null)
-    {
-      activation = activation ?? new Mocks.LinearActivation();
-
-      var net = new ConvNet(1, 1, activation: activation);
-      net.IsTraining = true;
-      var layer1 = new DenseLayer(1);
-      net.AddLayer(layer1);
-      var layer2 = new DenseLayer(1);
-      net.AddLayer(layer2);
-      var layer3 = new DenseLayer(2);
-      net.AddLayer(layer3);
-      net._Build();
-
-      layer1.Weights[1] = 1;
-      layer1.Weights[0] = 3;
-      layer2.Weights[1] = -1;
-      layer2.Weights[0] = 1;
-      layer3.Weights[2] = -2;
-      layer3.Weights[1] = -3;
-      layer3.Weights[0] = -1;
-
-      return net;
-    }
-
     public static ConvNet SimpleLinearNetwork(IActivationFunction activation = null)
     {
       activation = activation ?? new Mocks.LinearActivation();
@@ -144,6 +120,25 @@ namespace ML.Tests.UnitTests.CNN
 
       return net;
     }
+
+    public static ConvNet TestNetwork1()
+    {
+      var activation = Activation.Atan;
+      var net = new ConvNet(1, 2, 2) { IsTraining=true };
+
+      net.AddLayer(new ConvLayer(outputDepth: 2, windowSize: 2, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new ConvLayer(outputDepth: 2, windowSize: 1, activation: activation));
+      net.AddLayer(new FlattenLayer(outputDim: 3, activation: activation));
+      net.AddLayer(new DenseLayer(outputDim: 2, activation: activation));
+
+      net._Build();
+
+      net.RandomizeParameters(seed: 0);
+
+      return net;
+    }
+
 
     public static ConvNet SimpleLinearNetworkWithDropout(double drate, int dseed)
     {
