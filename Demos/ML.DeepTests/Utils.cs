@@ -8,7 +8,7 @@ namespace ML.DeepTests
 {
   public static class Utils
   {
-    public static void HandleEpochEnded(BackpropAlgorithm alg, ClassifiedSample<double[][,]> test, ClassifiedSample<double[][,]> validation, string outputPath)
+    public static void HandleEpochEnded(BackpropAlgorithm alg, ClassifiedSample<double[][,]> test, ClassifiedSample<double[][,]> train, string outputPath)
     {
       Console.WriteLine("---------------- Epoch #: {0} ({1})", alg.Epoch, DateTime.Now);
       Console.WriteLine("L:\t{0}", alg.LossValue);
@@ -21,11 +21,11 @@ namespace ML.DeepTests
       var tpct = Math.Round(100.0F * tec / tdc, 2);
       Console.WriteLine("Test: {0} of {1} ({2}%)", tec, tdc, tpct);
 
-      var verrors = alg.GetErrors(validation);
+      var verrors = alg.GetErrors(train);
       var vec = verrors.Count();
-      var vdc = validation.Count;
+      var vdc = train.Count;
       var vpct = Math.Round(100.0F * vec / vdc, 2);
-      Console.WriteLine("Validation: {0} of {1} ({2}%)", vec, vdc, vpct);
+      Console.WriteLine("Train: {0} of {1} ({2}%)", vec, vdc, vpct);
 
       var ofileName = string.Format("cn_e{0}_p{1}.mld", alg.Epoch, Math.Round(tpct, 2));
       var ofilePath = Path.Combine(outputPath, ofileName);

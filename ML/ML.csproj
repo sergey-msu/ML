@@ -136,6 +136,8 @@
     <Compile Include="DeepMethods\Models\InputLayer.cs" />
     <Compile Include="DeepMethods\Models\PoolingLayer.cs" />
     <Compile Include="DeepMethods\Registry.cs" />
+    <Compile Include="DeepMethods\Regularization\L1Regularizator.cs" />
+    <Compile Include="DeepMethods\Regularization\CompositeRegularizator.cs" />
     <Compile Include="DeepMethods\Regularization\L2Regularizator.cs" />
     <Compile Include="LogicalMethods\Algorithms\DecisionTreeID3Algorithm.cs" />
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />

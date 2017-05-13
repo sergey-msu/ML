@@ -5,6 +5,7 @@ using ML.DeepMethods.LossFunctions;
 using ML.DeepMethods.LearningRateSchedulers;
 using ML.DeepMethods.Optimizers;
 using ML.DeepMethods.Regularization;
+using ML.Contracts;
 
 namespace ML.DeepMethods.Registry
 {
@@ -25,10 +26,21 @@ namespace ML.DeepMethods.Registry
   public static class Regularizator
   {
     private static readonly Dictionary<double, L2Regularizator> m_L2 = new Dictionary<double, L2Regularizator>();
+    private static readonly Dictionary<double, L1Regularizator> m_L1 = new Dictionary<double, L1Regularizator>();
 
     public static L2Regularizator L2(double coeff)
     {
       return Core.Utils.GetThroughMap(coeff, m_L2);
+    }
+
+    public static L1Regularizator L1(double coeff)
+    {
+      return Core.Utils.GetThroughMap(coeff, m_L1);
+    }
+
+    public static CompositeRegularizator Composite(params IRegularizator[] regularizators)
+    {
+      return new CompositeRegularizator(regularizators);
     }
   }
 

@@ -12,7 +12,7 @@ namespace ML.DeepTests
 
     protected ClassifiedSample<double[][,]> m_TrainingSet = new ClassifiedSample<double[][,]>();
     protected ClassifiedSample<double[][,]> m_TestingSet  = new ClassifiedSample<double[][,]>();
-    protected ClassifiedSample<double[][,]> m_ValidationSet;
+    protected ClassifiedSample<double[][,]> m_ValidationSet; // part of a training set
 
     public string RootPath
     {

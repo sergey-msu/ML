@@ -378,35 +378,34 @@ namespace ML.DeepTests
       var activation = Activation.ReLU;
       var net = new ConvNet(3, 32) { IsTraining=true };
 
-      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
-      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
-      //net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
-      //net.AddLayer(new DropoutLayer(0.25));
-      //
-      //net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
-      //net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
-      //net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
-      //net.AddLayer(new DropoutLayer(0.25));
-      //
-      //net.AddLayer(new FlattenLayer(outputDim: 512, activation: activation));
-      //net.AddLayer(new DropoutLayer(0.5));
-      //net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
-
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 5, padding: 2, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize:2, stride: 2));
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 5, padding: 2, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
       net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
 
-      net.AddLayer(new FlattenLayer(outputDim: 128, activation: activation));
-      //net.AddLayer(new DropoutLayer(0.5));
-      net.AddLayer(new FlattenLayer(outputDim: 2, activation: Activation.Exp));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
+
+      net.AddLayer(new FlattenLayer(outputDim: 256, activation: activation));
+      net.AddLayer(new DropoutLayer(0.5));
+      net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
+
+      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 5, padding: 2, activation: activation));
+      //net.AddLayer(new MaxPoolingLayer(windowSize:2, stride: 2));
+      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 5, padding: 2, activation: activation));
+      //net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      //net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
+      //
+      //net.AddLayer(new FlattenLayer(outputDim: 128, activation: activation));
+      //net.AddLayer(new FlattenLayer(outputDim: 2, activation: Activation.Exp));
 
       net._Build();
 
       net.RandomizeParameters(seed: 0);
 
-      var lrate = 0.02D;
+      var lrate = 0.01D;
       var alg = new BackpropAlgorithm(training, net)
       {
         LossFunction = Loss.CrossEntropySoftMax,
@@ -416,7 +415,7 @@ namespace ML.DeepTests
         UseBatchParallelization = true,
         MaxBatchThreadCount = 8,
         Optimizer = Optimizer.Adadelta,
-        Regularizator = Regularizator.L2(0.01D),
+        Regularizator = Regularizator.L2(0.0001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 

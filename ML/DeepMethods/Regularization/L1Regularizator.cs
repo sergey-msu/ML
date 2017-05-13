@@ -3,11 +3,11 @@ using ML.Contracts;
 
 namespace ML.DeepMethods.Regularization
 {
-  public class L2Regularizator : IRegularizator
+  public class L1Regularizator : IRegularizator
   {
     private double m_Coeff;
 
-    public L2Regularizator(double coeff)
+    public L1Regularizator(double coeff)
     {
       m_Coeff = coeff;
     }
@@ -25,7 +25,7 @@ namespace ML.DeepMethods.Regularization
         var w = weights[i];
         if (w==null) continue;
         for (int j=0; j<w.Length; j++)
-          result += (w[j]*w[j]/2);
+          result += Math.Abs(w[j]);
       }
 
       return m_Coeff*result;
@@ -40,7 +40,7 @@ namespace ML.DeepMethods.Regularization
         if (w==null) continue;
         var g = gradients[i];
         for (int j=0; j<w.Length; j++)
-          g[j] += (m_Coeff*w[j]);
+          g[j] += m_Coeff*(w[j]>0 ? 1 : -1);
       }
     }
   }
