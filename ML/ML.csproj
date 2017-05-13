@@ -65,6 +65,7 @@
     <Compile Include="Contracts\IInformativityIndex.cs" />
     <Compile Include="Contracts\ILearningRateScheduler.cs" />
     <Compile Include="Contracts\IOptimizer.cs" />
+    <Compile Include="Contracts\IRegularizator.cs" />
     <Compile Include="Core\ActivationFunctions\ArctanActivation.cs" />
     <Compile Include="Core\ActivationFunctions\BinaryStepActivation.cs" />
     <Compile Include="Core\ActivationFunctions\ExpActivation.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="DeepMethods\Models\InputLayer.cs" />
     <Compile Include="DeepMethods\Models\PoolingLayer.cs" />
     <Compile Include="DeepMethods\Registry.cs" />
+    <Compile Include="DeepMethods\Regularization\L2Regularizator.cs" />
     <Compile Include="LogicalMethods\Algorithms\DecisionTreeID3Algorithm.cs" />
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />
     <Compile Include="LogicalMethods\Models\DecisionNode.cs" />

@@ -209,7 +209,7 @@ namespace ML.DeepTests
       var tstart = DateTime.Now;
       var now = DateTime.Now;
 
-      Alg = Examples.CreateCIFAR10Trunc2ClassesDemo1(m_TrainingSet);
+      Alg = Examples.CreateCIFAR10Trunc2ClassesDemo2(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) =>
                              {
                                Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);

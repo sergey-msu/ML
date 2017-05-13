@@ -4,6 +4,7 @@ using ML.Core;
 using ML.DeepMethods.LossFunctions;
 using ML.DeepMethods.LearningRateSchedulers;
 using ML.DeepMethods.Optimizers;
+using ML.DeepMethods.Regularization;
 
 namespace ML.DeepMethods.Registry
 {
@@ -18,6 +19,16 @@ namespace ML.DeepMethods.Registry
     public static LpLoss Lp(double p)
     {
       return Core.Utils.GetThroughMap(p, m_Lp);
+    }
+  }
+
+  public static class Regularizator
+  {
+    private static readonly Dictionary<double, L2Regularizator> m_L2 = new Dictionary<double, L2Regularizator>();
+
+    public static L2Regularizator L2(double coeff)
+    {
+      return Core.Utils.GetThroughMap(coeff, m_L2);
     }
   }
 

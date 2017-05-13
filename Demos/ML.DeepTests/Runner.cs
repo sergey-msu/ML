@@ -1,8 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using ML.Core;
 using ML.DeepMethods.Algorithms;
-using System.IO;
 
 namespace ML.DeepTests
 {

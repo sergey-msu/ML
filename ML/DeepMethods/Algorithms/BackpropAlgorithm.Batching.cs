@@ -179,7 +179,11 @@ namespace ML.DeepMethods.Algorithms
         errors[lidx][p][0, 0] = ej * deriv / m_BatchSize;
       }
 
-      return m_LossFunction.Value(output, expect) / m_BatchSize;
+      var loss = m_LossFunction.Value(output, expect) / m_BatchSize;
+      if (m_Regularizator != null)
+        loss += (m_Regularizator.Value(Net.Weights) / m_BatchSize);
+
+      return loss;
     }
 
     #endregion

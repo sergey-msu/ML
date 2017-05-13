@@ -44,9 +44,10 @@ namespace ML.DeepMethods.Algorithms
     private double m_LearningRate;
     private double m_LossStopDelta;
     private double m_StepStopValue;
-    private ILossFunction m_LossFunction;
-    private StopCriteria  m_Stop;
-    private IOptimizer    m_Optimizer;
+    private ILossFunction  m_LossFunction;
+    private StopCriteria   m_Stop;
+    private IOptimizer     m_Optimizer;
+    private IRegularizator m_Regularizator;
     private ILearningRateScheduler m_LearningRateScheduler;
 
     private int m_EpochLength;
@@ -68,7 +69,7 @@ namespace ML.DeepMethods.Algorithms
     private int m_Iteration;
 
     private Dictionary<Class, double[]> m_ExpectedOutputs;
-    private double[][] m_Gradient;
+    private double[][]    m_Gradient;
     private double[][][,] m_Values;
     private double[][][,] m_Errors;
 
@@ -144,6 +145,12 @@ namespace ML.DeepMethods.Algorithms
     {
       get { return m_Optimizer; }
       set { m_Optimizer = value; }
+    }
+
+    public IRegularizator Regularizator
+    {
+      get { return m_Regularizator; }
+      set { m_Regularizator = value; }
     }
 
     public ILearningRateScheduler LearningRateScheduler
@@ -351,6 +358,10 @@ namespace ML.DeepMethods.Algorithms
           runIteration(pdata.Key, pdata.Value);
       }
 
+      // regularization
+      if (m_Regularizator != null)
+        m_Regularizator.Apply(m_Gradient, Net.Weights);
+
       // optimize and apply updates
       m_Optimizer.Push(Net.Weights, m_Gradient, m_LearningRate);
 
@@ -416,7 +427,11 @@ namespace ML.DeepMethods.Algorithms
         errors[p][0, 0] = ej * deriv / m_BatchSize;
       }
 
-      return m_LossFunction.Value(output, expect) / m_BatchSize;
+      var loss = m_LossFunction.Value(output, expect) / m_BatchSize;
+      if (m_Regularizator != null)
+        loss += (m_Regularizator.Value(Net.Weights) / m_BatchSize);
+
+      return loss;
     }
 
     private bool checkStopCriteria()
