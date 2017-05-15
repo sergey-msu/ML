@@ -13,6 +13,9 @@ namespace ML.DeepMethods.Models
   {
     #region Fields
 
+    private object m_Sync = new object();
+
+    private int    m_Seed;
     private double m_DropRate;
     private double m_RetainRate;
     private bool   m_ApplyCustomMask;
@@ -37,34 +40,73 @@ namespace ML.DeepMethods.Models
       if (rate<=0 || rate>=1)
         throw new MLException("Incorrect dropout rate");
 
+      m_Seed = seed;
       m_DropRate = rate;
       m_RetainRate = 1-rate;
-
-      m_Generator = new ThreadLocal<RandomGenerator>(() =>
-      {
-        return RandomGenerator.Get(seed, false);
-        // WARNING:
-        // RandomGenerator.Get(seed, false) used to make randomness more deterministic :)
-        // "false" means that every thread will get the same instance of RandomGenerator
-        // "true" or empty means that different threads will share the same RandomGenerator instance, therefore output will vary from run to run
-        // WARNING #2:
-        // setting value to "false" still dont makes the process fully deterministic because of undeterministic nature of threads allocation :(
-      });
-
-      m_Mask = new ThreadLocal<bool[][,]>(() =>
-      {
-        if (m_IsTraining && !m_ApplyCustomMask)
-        {
-          var mask = new bool[m_OutputDepth][,];
-          for (int i=0; i<m_OutputDepth; i++)
-            mask[i] = new bool[m_OutputHeight, m_OutputWidth];
-          return mask;
-        }
-        return null;
-      });
     }
 
     #endregion
+
+    private ThreadLocal<RandomGenerator> Generator
+    {
+      get
+      {
+        if (m_Generator==null)
+        {
+          lock (m_Sync)
+          {
+            if (m_Generator==null)
+            {
+              m_Generator = new ThreadLocal<RandomGenerator>(() =>
+              {
+                return RandomGenerator.Get(m_Seed, false);
+                // WARNING:
+                // RandomGenerator.Get(seed, false) used to make randomness more deterministic :)
+                // "false" means that every thread will get the same instance of RandomGenerator
+                // "true" or empty means that different threads will share the same RandomGenerator instance, therefore output will vary from run to run
+                // WARNING #2:
+                // setting value to "false" still dont makes the process fully deterministic because of undeterministic nature of threads allocation :(
+              });
+            }
+          }
+        }
+
+        return m_Generator;
+      }
+    }
+
+    private ThreadLocal<bool[][,]> ThreadMask
+    {
+      get
+      {
+        if (m_Generator==null)
+        {
+          lock (m_Sync)
+          {
+            if (m_Mask==null)
+            {
+              m_Mask = new ThreadLocal<bool[][,]>(() =>
+              {
+                if (m_IsTraining && !m_ApplyCustomMask)
+                {
+                  var mask = new bool[m_OutputDepth][,];
+                  for (int i=0; i<m_OutputDepth; i++)
+                    mask[i] = new bool[m_OutputHeight, m_OutputWidth];
+                  return mask;
+                }
+                return null;
+              });
+            }
+          }
+        }
+
+        return m_Mask;
+      }
+      set
+      {
+
+      }
+    }
 
     #region Properties
 
@@ -76,10 +118,10 @@ namespace ML.DeepMethods.Models
 
     public bool[][,] Mask
     {
-      get { return m_Mask.Value; }
+      get { return ThreadMask.Value; }
       set
       {
-        m_Mask.Value=value;
+        ThreadMask.Value=value;
         m_ApplyCustomMask = true;
       }
     }
@@ -112,17 +154,20 @@ namespace ML.DeepMethods.Models
         return;
       }
 
+      var mask = ThreadMask.Value;
+      var generator = Generator;
+
       for (int p=0; p<m_InputDepth;  p++)
       for (int i=0; i<m_InputHeight; i++)
       for (int j=0; j<m_InputWidth;  j++)
       {
         if (m_ApplyCustomMask) // custom mask applied
         {
-          result[p][i, j] = m_Mask.Value[p][i, j] ? input[p][i, j] / m_RetainRate : 0;
+          result[p][i, j] = mask[p][i, j] ? input[p][i, j] / m_RetainRate : 0;
         }
         else // generate new random mask
         {
-          var retain = m_Generator.Value.Bernoulli(m_RetainRate);
+          var retain = generator.Value.Bernoulli(m_RetainRate);
           if (retain)
           {
             m_Mask.Value[p][i, j] = true;

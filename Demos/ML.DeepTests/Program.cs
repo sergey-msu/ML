@@ -9,9 +9,11 @@ namespace ML.DeepTests
       var runner =
         //new OriginalMNIST();
         //new OriginalCIFAR10();
-        new OriginalCIFAR10Trunc();
+        //new OriginalCIFAR10Trunc();
         //new KaggleMNIST();
         //new KaggleCIFAR10();
+        //new KaggleCatDog();
+        new KaggleCatDogTrunk();
 
       try
       {

@@ -78,6 +78,8 @@ namespace ML.DeepMethods.Models
   /// </summary>
   public class MaxPoolingLayer : PoolingLayer
   {
+    private object m_Sync = new object();
+
     [NonSerialized]
     private ThreadLocal<int[][,,]> m_MaxIndexPositions;
 
@@ -92,13 +94,6 @@ namespace ML.DeepMethods.Models
              padding,
              activation)
     {
-      m_MaxIndexPositions = new ThreadLocal<int[][,,]>(() =>
-      {
-        var maxPos = new int[m_OutputDepth][,,];
-        for (int i=0; i<m_OutputDepth; i++)
-          maxPos[i] = new int[m_OutputHeight, m_OutputWidth, 2];
-        return maxPos;
-      });
     }
 
     public MaxPoolingLayer(int windowHeight,
@@ -120,8 +115,36 @@ namespace ML.DeepMethods.Models
 
     #endregion
 
+    private ThreadLocal<int[][,,]> MaxIndexPositions
+    {
+      get
+      {
+        if (m_MaxIndexPositions==null)
+        {
+          lock (m_Sync)
+          {
+            if (m_MaxIndexPositions==null)
+            {
+              m_MaxIndexPositions = new ThreadLocal<int[][,,]>(() =>
+              {
+                var maxPos = new int[m_OutputDepth][,,];
+                for (int i=0; i<m_OutputDepth; i++)
+                  maxPos[i] = new int[m_OutputHeight, m_OutputWidth, 2];
+                return maxPos;
+              });
+            }
+          }
+        }
+
+        return m_MaxIndexPositions;
+      }
+    }
+
+
     protected override void DoCalculate(double[][,] input, double[][,] result)
     {
+      var maxPos = MaxIndexPositions;
+
       for (int q=0; q<m_OutputDepth; q++)
       {
         for (int i=0; i<m_OutputHeight; i++)
@@ -160,8 +183,8 @@ namespace ML.DeepMethods.Models
 
           if (m_IsTraining)
           {
-            m_MaxIndexPositions.Value[q][i, j, 0] = xmaxIdx;
-            m_MaxIndexPositions.Value[q][i, j, 1] = ymaxIdx;
+            maxPos.Value[q][i, j, 0] = xmaxIdx;
+            maxPos.Value[q][i, j, 1] = ymaxIdx;
           }
         }
       }
@@ -172,13 +195,15 @@ namespace ML.DeepMethods.Models
       for (int i=0; i<prevErrors.Length; i++)
         Array.Clear(prevErrors[i], 0, prevErrors[i].Length);
 
+      var maxPos = MaxIndexPositions;
+
       // backpropagate "errors" to previous layer for future use
       for (int q=0; q<m_OutputDepth;  q++)
       for (int i=0; i<m_OutputHeight; i++)
       for (int j=0; j<m_OutputWidth;  j++)
       {
-        var xmaxIdx = m_MaxIndexPositions.Value[q][i, j, 0];
-        var ymaxIdx = m_MaxIndexPositions.Value[q][i, j, 1];
+        var xmaxIdx = maxPos.Value[q][i, j, 0];
+        var ymaxIdx = maxPos.Value[q][i, j, 1];
         var value = prevValues[q][ymaxIdx, xmaxIdx];
         var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;
         prevErrors[q][ymaxIdx, xmaxIdx] += errors[q][i, j] * deriv;

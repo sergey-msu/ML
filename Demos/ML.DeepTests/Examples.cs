@@ -4,6 +4,7 @@ using ML.Core;
 using ML.Core.Registry;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Registry;
+using System.Reflection;
 
 namespace ML.DeepTests
 {
@@ -324,6 +325,142 @@ namespace ML.DeepTests
         MaxBatchThreadCount = 8,
         Optimizer = Optimizer.Adadelta,
         Regularizator = Regularizator.L2(0.001D),
+        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
+      };
+
+      return alg;
+    }
+
+    #endregion
+
+    #region KAGGLE Cat or Dog
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static BackpropAlgorithm CreateKaggleCatOrDogDemo_Pretrained(ClassifiedSample<double[][,]> training)
+    {
+      Console.WriteLine("init CreateKaggleCatOrDogDemo_Pretrained");
+
+      ConvNet net;
+      var assembly = Assembly.GetExecutingAssembly();
+      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-21.65.mld"))
+      {
+        net = ConvNet.Deserialize(stream);
+        net.IsTraining = true;
+      }
+
+      var lrate = 0.01D;
+      var alg = new BackpropAlgorithm(training, net)
+      {
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 500,
+        LearningRate = lrate,
+        BatchSize = 4,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Adadelta,
+        Regularizator = Regularizator.L2(0.001D),
+        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
+      };
+
+      return alg;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static BackpropAlgorithm CreateKaggleCatOrDogDemo1(ClassifiedSample<double[][,]> training)
+    {
+      Console.WriteLine("init CreateKaggleCatOrDogDemo1");
+
+      var activation = Activation.ReLU;
+      var net = new ConvNet(3, 32) { IsTraining=true };
+
+      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
+
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
+
+      net.AddLayer(new FlattenLayer(outputDim: 256, activation: activation));
+      net.AddLayer(new DropoutLayer(0.5));
+      net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
+
+      net._Build();
+
+      net.RandomizeParameters(seed: 0);
+
+      var lrate = 0.1D;
+      var alg = new BackpropAlgorithm(training, net)
+      {
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 500,
+        LearningRate = lrate,
+        BatchSize = 4,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Adadelta,
+        Regularizator = Regularizator.L2(0.001D),
+        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
+      };
+
+      return alg;
+    }
+
+    /// <summary>
+    /// From http://www.subsubroutine.com/sub-subroutine/2016/9/30/cats-and-dogs-and-convolutional-neural-networks
+    /// </summary>
+    public static BackpropAlgorithm CreateKaggleCatOrDogDemo2(ClassifiedSample<double[][,]> training)
+    {
+      Console.WriteLine("init CreateKaggleCatOrDogDemo2");
+
+      var activation = Activation.ReLU;
+      var net = new ConvNet(3, 32) { IsTraining=true };
+
+      //conv_1 = conv_2d(network, 32, 3, activation='relu', name='conv_1')
+      //network = max_pool_2d(conv_1, 2)
+      //conv_2 = conv_2d(network, 64, 3, activation='relu', name='conv_2')
+      //conv_3 = conv_2d(conv_2, 64, 3, activation='relu', name='conv_3')
+      //network = max_pool_2d(conv_3, 2)
+      //network = fully_connected(network, 512, activation='relu')
+      //network = dropout(network, 0.5)
+      //network = fully_connected(network, 2, activation='softmax')
+      //
+      //network = regression(network, optimizer='adam',
+      //                     loss='categorical_crossentropy',
+      //                     learning_rate=0.0005, metric=acc)
+
+
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
+
+      net.AddLayer(new FlattenLayer(outputDim: 512, activation: activation));
+      net.AddLayer(new DropoutLayer(0.5));
+      net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
+
+      net._Build();
+
+      net.RandomizeParameters(seed: 0);
+
+      var lrate = 0.0005D;
+      var alg = new BackpropAlgorithm(training, net)
+      {
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 500,
+        LearningRate = lrate,
+        BatchSize = 8,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Adadelta,
+        //Regularizator = Regularizator.L2(0.001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 

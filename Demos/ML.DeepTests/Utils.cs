@@ -15,19 +15,35 @@ namespace ML.DeepTests
       Console.WriteLine("DW:\t{0}", alg.Step2);
       Console.WriteLine("LR:\t{0}", alg.LearningRate);
 
-      var terrors = alg.GetErrors(test);
-      var tec = terrors.Count();
-      var tdc = test.Count;
-      var tpct = Math.Round(100.0F * tec / tdc, 2);
-      Console.WriteLine("Test: {0} of {1} ({2}%)", tec, tdc, tpct);
+      double? pct = null;
 
-      var verrors = alg.GetErrors(train);
-      var vec = verrors.Count();
-      var vdc = train.Count;
-      var vpct = Math.Round(100.0F * vec / vdc, 2);
-      Console.WriteLine("Train: {0} of {1} ({2}%)", vec, vdc, vpct);
+      if (test==null || !test.Any())
+        Console.WriteLine("Test: none");
+      else
+      {
+        var terrors = alg.GetErrors(test);
+        var tec = terrors.Count();
+        var tdc = test.Count;
+        var tpct = Math.Round(100.0F * tec / tdc, 2);
+        Console.WriteLine("Test: {0} of {1} ({2}%)", tec, tdc, tpct);
 
-      var ofileName = string.Format("cn_e{0}_p{1}.mld", alg.Epoch, Math.Round(tpct, 2));
+        pct = tpct;
+      }
+
+      if (train==null || !train.Any())
+        Console.WriteLine("Train: none");
+      else
+      {
+        var verrors = alg.GetErrors(train);
+        var vec = verrors.Count();
+        var vdc = train.Count;
+        var vpct = Math.Round(100.0F * vec / vdc, 2);
+        Console.WriteLine("Train: {0} of {1} ({2}%)", vec, vdc, vpct);
+
+        if (!pct.HasValue) pct=vpct;
+      }
+
+      var ofileName = string.Format("cn_e{0}_p{1}.mld", alg.Epoch, Math.Round(pct.Value, 2));
       var ofilePath = Path.Combine(outputPath, ofileName);
       using (var stream = File.Open(ofilePath, FileMode.Create))
       {

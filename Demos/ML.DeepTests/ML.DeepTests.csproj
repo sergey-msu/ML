@@ -68,6 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Examples.cs" />
+    <Compile Include="KaggleCatDogTrunk.cs" />
+    <Compile Include="KaggleCatDog.cs" />
     <Compile Include="OriginalCIFAR10Trunc.cs" />
     <Compile Include="OriginalCIFAR10.cs" />
     <Compile Include="Runner.cs" />
@@ -80,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="Pretrained\cat-dog-21.65.mld" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ML\ML.csproj">
@@ -87,6 +90,7 @@
       <Name>ML</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

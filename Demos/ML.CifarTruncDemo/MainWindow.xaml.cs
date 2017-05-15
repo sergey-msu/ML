@@ -62,7 +62,6 @@ namespace PicturePrimitive
     }
 
     #region Load Image
-
     private void onUploadButtonClick(object sender, RoutedEventArgs e)
     {
       try
@@ -219,12 +218,12 @@ namespace PicturePrimitive
 
     #region Recognition
 
-    private void doRecognition()
+    private Class doRecognition()
     {
       if (m_NormalizedBitmap == null)
       {
         MessageBox.Show("Upload image first");
-        return;
+        return Class.None;
       }
 
       m_ResultsPanel.Visibility = Visibility.Visible;
@@ -261,7 +260,7 @@ namespace PicturePrimitive
       if (total <= 0)
       {
         m_TxtResult.Text = "?";
-        return;
+        return Class.None;
       }
 
       for (int i = 0; i < m_Classes.Count; i++)
@@ -282,6 +281,8 @@ namespace PicturePrimitive
       var cls = m_Classes.First(c => c.Value.Value == idx);
 
       m_TxtResult.Text = cls.Value.Name;
+
+      return cls.Value;
     }
 
     #endregion

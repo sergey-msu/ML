@@ -28,21 +28,9 @@ namespace ML.DeepTests
       { 9, new Class("truck",      9) },
     };
 
+    public override string SrcMark    { get { return "kaggle"; } }
     public override string DataPath   { get { return RootPath+@"\data\cifar10"; }}
     public override string OutputPath { get { return RootPath+@"\output\cifar10_kaggle"; }}
-
-
-    protected override void Init()
-    {
-      base.Init();
-
-      var paths = new []{ RootPath, DataPath, SrcPath, TestPath, TrainPath, OutputPath };
-      foreach (var path in paths)
-      {
-        if (!Directory.Exists(path))
-          Directory.CreateDirectory(path);
-      }
-    }
 
     #region Export
 

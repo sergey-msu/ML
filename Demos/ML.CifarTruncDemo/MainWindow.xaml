@@ -1,7 +1,7 @@
 ﻿<Window x:Class="PicturePrimitive.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Animal Recognition v1.0"
+        Title="Animal Recognition v1.0 (truncated, only CAT or DOG)"
         AllowDrop="True"
         Drop="onImageDrop"
         SizeToContent="WidthAndHeight"
@@ -24,7 +24,10 @@
              Height="320"
              Margin="10"
              FontSize="20">
-        <TextBlock>Drop or Upload</TextBlock>
+        <StackPanel HorizontalAlignment="Center">
+          <TextBlock>Drop or Upload</TextBlock>
+          <TextBlock FontSize="13" HorizontalAlignment="Center">Cat or Dog image</TextBlock>
+        </StackPanel>
       </Label>
       <Image x:Name="m_ImgInitial"
              Visibility="Collapsed"

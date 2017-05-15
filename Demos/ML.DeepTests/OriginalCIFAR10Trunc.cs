@@ -44,6 +44,7 @@ namespace ML.DeepTests
       //{ 9, new Class("truck",      ) },
     };
 
+    public override string SrcMark    { get { return "original"; } }
     public override string DataPath   { get { return RootPath+@"\data\cifar10trunc"; }}
     public override string OutputPath { get { return RootPath+@"\output\cifar10_original_trunc"; }}
 
@@ -166,28 +167,28 @@ namespace ML.DeepTests
       loadSample(filePaths, m_TestingSet);
 
 
-      var path = @"C:\Users\User\Desktop\net.mld";
-      DeepMethods.Models.ConvNet net;
-      using (var file = File.Open(path, FileMode.Open, FileAccess.Read))
-        net = DeepMethods.Models.ConvNet.Deserialize(file);
-      var alg = new BackpropAlgorithm(m_TrainingSet, net);
-      net.IsTraining = false;
-
-      var terrors = alg.GetErrors(m_TestingSet);
-      var tec = terrors.Count();
-      var tdc = m_TestingSet.Count;
-      var tpct = Math.Round(100.0F * tec / tdc, 2);
-      Console.WriteLine("Test: {0} of {1} ({2}%)", tec, tdc, tpct);
-
-      var vcnt = m_TrainingSet.Count / 20;
-      m_ValidationSet = m_TrainingSet.Subset(0, vcnt);
-      var verrors = alg.GetErrors(m_ValidationSet);
-      var vec = verrors.Count();
-      var vdc = m_ValidationSet.Count;
-      var vpct = Math.Round(100.0F * vec / vdc, 2);
-      Console.WriteLine("Train: {0} of {1} ({2}%)", vec, vdc, vpct);
-
-      Console.ReadLine();
+      //var path = @"C:\Users\User\Desktop\net.mld";
+      //DeepMethods.Models.ConvNet net;
+      //using (var file = File.Open(path, FileMode.Open, FileAccess.Read))
+      //  net = DeepMethods.Models.ConvNet.Deserialize(file);
+      //var alg = new BackpropAlgorithm(m_TrainingSet, net);
+      //net.IsTraining = false;
+      //
+      //var terrors = alg.GetErrors(m_TestingSet);
+      //var tec = terrors.Count();
+      //var tdc = m_TestingSet.Count;
+      //var tpct = Math.Round(100.0F * tec / tdc, 2);
+      //Console.WriteLine("Test: {0} of {1} ({2}%)", tec, tdc, tpct);
+      //
+      //var vcnt = m_TrainingSet.Count / 20;
+      //m_ValidationSet = m_TrainingSet.Subset(0, vcnt);
+      //var verrors = alg.GetErrors(m_ValidationSet);
+      //var vec = verrors.Count();
+      //var vdc = m_ValidationSet.Count;
+      //var vpct = Math.Round(100.0F * vec / vdc, 2);
+      //Console.WriteLine("Train: {0} of {1} ({2}%)", vec, vdc, vpct);
+      //
+      //Console.ReadLine();
     }
 
     private void loadSample(string[] fpaths, ClassifiedSample<double[][,]> sample)
