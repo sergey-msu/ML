@@ -115,12 +115,17 @@ namespace ML.DeepMethods.Models
 
           // window
           for (int y=0; y<m_WindowHeight; y++)
-          for (int x=0; x<m_WindowWidth;  x++)
           {
-            var xidx = xmin+x;
             var yidx = ymin+y;
-            if (xidx>=0 && xidx<m_InputWidth && yidx>=0 && yidx<m_InputHeight)
+            if (yidx<0) continue;
+            if (yidx>=m_InputHeight) break;
+
+            for (int x=0; x<m_WindowWidth;  x++)
             {
+              var xidx = xmin+x;
+              if (xidx<0) continue;
+              if (xidx>=m_InputWidth) break;
+
               // inner product in p-depth (over input channel's neuron at fixed position)
               for (int p=0; p<m_InputDepth; p++)
               {

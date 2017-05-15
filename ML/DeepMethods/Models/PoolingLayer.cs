@@ -135,12 +135,17 @@ namespace ML.DeepMethods.Models
 
           // window
           for (int y=0; y<m_WindowHeight; y++)
-          for (int x=0; x<m_WindowWidth; x++)
           {
-            var xidx = xmin+x;
             var yidx = ymin+y;
-            if (xidx>=0 && xidx<m_InputWidth && yidx>=0 && yidx<m_InputHeight)
+            if (yidx<0) continue;
+            if (yidx>=m_InputHeight) break;
+
+            for (int x=0; x<m_WindowWidth; x++)
             {
+              var xidx = xmin+x;
+              if (xidx<0) continue;
+              if (xidx>=m_InputWidth) break;
+
               var z = input[q][yidx, xidx];
               if (z > net)
               {
@@ -152,8 +157,12 @@ namespace ML.DeepMethods.Models
           }
 
           result[q][i, j] = (m_ActivationFunction != null) ? m_ActivationFunction.Value(net) : net;
-          m_MaxIndexPositions.Value[q][i, j, 0] = xmaxIdx;
-          m_MaxIndexPositions.Value[q][i, j, 1] = ymaxIdx;
+
+          if (m_IsTraining)
+          {
+            m_MaxIndexPositions.Value[q][i, j, 0] = xmaxIdx;
+            m_MaxIndexPositions.Value[q][i, j, 1] = ymaxIdx;
+          }
         }
       }
     }

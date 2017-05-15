@@ -245,6 +245,11 @@ namespace ML.DeepMethods.Algorithms
       runIteration(data, cls);
     }
 
+    public double FeedForward(double[][,] data, Class cls)
+    {
+      return feedForward(data, cls);
+    }
+
     public void FlushGradient()
     {
       m_Optimizer.Push(Net.Weights, m_Gradient, m_LearningRate);
@@ -329,11 +334,9 @@ namespace ML.DeepMethods.Algorithms
     private void runEpoch()
     {
       // loop on batches
-      //int b = 0;
       foreach (var batch in TrainingSample.Batch(m_BatchSize))
       {
         runBatch(batch);
-        //if ((++b) % 10000 == 0) Console.WriteLine("Batch: {0} ({1} iters)", b, b*BatchSize);
       }
 
       // update epoch stats

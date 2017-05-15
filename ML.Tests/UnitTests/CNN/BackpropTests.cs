@@ -45,22 +45,11 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual(1134, alg.Errors[0][0][0,0]);
 
       Assert.AreEqual(-126*33, alg.Gradient[2][0]);
-      AssertNetGradient(alg, point, 2, 0);
-
-      Assert.AreEqual(-126, alg.Gradient[2][1]);
-      AssertNetGradient(alg, point, 2, 1);
-
-      Assert.AreEqual(378*12, alg.Gradient[1][0]);
-      AssertNetGradient(alg, point, 1, 0);
-
-      Assert.AreEqual(378, alg.Gradient[1][1]);
-      AssertNetGradient(alg, point, 1, 1);
-
-      Assert.AreEqual(1134*1, alg.Gradient[0][0]);
-      AssertNetGradient(alg, point, 0, 0);
-
-      Assert.AreEqual(1134, alg.Gradient[0][1]);
-      AssertNetGradient(alg, point, 0, 1);
+      Assert.AreEqual(-126,    alg.Gradient[2][1]);
+      Assert.AreEqual(378*12,  alg.Gradient[1][0]);
+      Assert.AreEqual(378,     alg.Gradient[1][1]);
+      Assert.AreEqual(1134*1,  alg.Gradient[0][0]);
+      Assert.AreEqual(1134,    alg.Gradient[0][1]);
 
       alg.FlushGradient();
 
@@ -70,59 +59,6 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual(-1 + 2*(-378),    net[1].Weights[1]);
       Assert.AreEqual( 3 + 2*(-1134*1), net[0].Weights[0]);
       Assert.AreEqual( 1 + 2*(-1134),   net[0].Weights[1]);
-    }
-
-
-    [TestMethod]
-    public void Euclidean_Gradient_OneIter()
-    {
-      // arrange
-
-      var net = Mocks.TestNetwork1();
-
-      var sample = new ClassifiedSample<double[][,]>();
-      var point1 = new double[1][,] { new double[2,2] { {  1.0D, 0.5D }, { -1.0D, 0.3D } } };
-      var point2 = new double[1][,] { new double[2,2] { { -1.0D, 0.1D }, {  1.2D, 0.9D } } };
-      var cls1 = new Class("a", 0);
-      var cls2 = new Class("b", 1);
-      sample[point1] = cls1;
-      sample[point2] = cls2;
-
-      var alg = new BackpropAlgorithm(sample, net);
-      alg.LearningRate = 0.1D;
-      alg.LossFunction = Loss.Euclidean;
-      alg.Build();
-
-      foreach (var data in sample)
-      {
-        // act
-        alg.RunIteration(data.Key, data.Value);
-
-        // assert
-        AssertNetGradient(alg, data.Key, 0, 0);
-        AssertNetGradient(alg, data.Key, 0, 1);
-        AssertNetGradient(alg, data.Key, 0, 2);
-        AssertNetGradient(alg, data.Key, 0, 3);
-        AssertNetGradient(alg, data.Key, 0, 4);
-        AssertNetGradient(alg, data.Key, 0, 5);
-        AssertNetGradient(alg, data.Key, 0, 6);
-        AssertNetGradient(alg, data.Key, 0, 7);
-        AssertNetGradient(alg, data.Key, 0, 8);
-        AssertNetGradient(alg, data.Key, 0, 9);
-        AssertNetGradient(alg, data.Key, 2, 0);
-        AssertNetGradient(alg, data.Key, 2, 1);
-        AssertNetGradient(alg, data.Key, 2, 2);
-        AssertNetGradient(alg, data.Key, 2, 3);
-        AssertNetGradient(alg, data.Key, 2, 4);
-        AssertNetGradient(alg, data.Key, 2, 5);
-        AssertNetGradient(alg, data.Key, 3, 0);
-        AssertNetGradient(alg, data.Key, 3, 1);
-        AssertNetGradient(alg, data.Key, 3, 2);
-        AssertNetGradient(alg, data.Key, 4, 0);
-        AssertNetGradient(alg, data.Key, 4, 1);
-        AssertNetGradient(alg, data.Key, 4, 2);
-        AssertNetGradient(alg, data.Key, 4, 3);
-      }
     }
 
     [TestMethod]
@@ -164,25 +100,13 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual(1548*3,      alg.Errors[0][0][0,0]);
 
       Assert.AreEqual(-258*66, alg.Gradient[3][0]);
-      AssertNetGradient(alg, point, 3, 0);
-
-      Assert.AreEqual(-258, alg.Gradient[3][1]);
-      AssertNetGradient(alg, point, 3, 1);
-
-      Assert.AreEqual(0, alg.Gradient[2].Length);
-      Assert.AreEqual(0, alg.Gradient[2].Length);
-
+      Assert.AreEqual(-258,    alg.Gradient[3][1]);
+      Assert.AreEqual(0,       alg.Gradient[2].Length);
+      Assert.AreEqual(0,       alg.Gradient[2].Length);
       Assert.AreEqual(1548*12, alg.Gradient[1][0]);
-      AssertNetGradient(alg, point, 1, 0);
-
-      Assert.AreEqual(1548, alg.Gradient[1][1]);
-      AssertNetGradient(alg, point, 1, 1);
-
-      Assert.AreEqual(4644*1, alg.Gradient[0][0]);
-      AssertNetGradient(alg, point, 0, 0);
-
-      Assert.AreEqual(4644, alg.Gradient[0][1]);
-      AssertNetGradient(alg, point, 0, 1);
+      Assert.AreEqual(1548,    alg.Gradient[1][1]);
+      Assert.AreEqual(4644*1,  alg.Gradient[0][0]);
+      Assert.AreEqual(4644,    alg.Gradient[0][1]);
 
       // act
       alg.FlushGradient();
@@ -196,25 +120,5 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual( 1 + 2*(-4644),    net[0].Weights[1]);
       Assert.AreEqual( 3 + 2*(-4644*1),  net[0].Weights[0]);
     }
-
-    #region .pvt
-
-    private void AssertNetGradient(BackpropAlgorithm alg, double[][,] point, int lidx, int widx)
-    {
-      var weights = alg.Net.Weights;
-      var prev = weights[lidx][widx];
-      var grad = alg.Gradient[lidx][widx];
-
-      AssertDerivative(x =>
-      {
-        weights[lidx][widx] = x;
-        var actual = alg.Net.Calculate(point).Select(p => p[0,0]).ToArray();
-        var expected = new double[actual.Length];
-        weights[lidx][widx] = prev;
-        return alg.LossFunction.Value(actual, expected);
-      }, prev, grad);
-    }
-
-    #endregion
   }
 }

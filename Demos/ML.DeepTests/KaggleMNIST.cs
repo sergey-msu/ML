@@ -199,7 +199,7 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg = Examples.CreateMNISTSimpleDemo(m_TrainingSet);
+      Alg = Examples.CreateMNISTSimpleDemo_SEALED(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, OutputPath); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;

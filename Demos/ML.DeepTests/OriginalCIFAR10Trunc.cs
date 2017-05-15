@@ -5,6 +5,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using ML.Core;
 using ML.Utils;
+using System.Linq;
+using ML.DeepMethods.Algorithms;
 
 namespace ML.DeepTests
 {
@@ -162,6 +164,30 @@ namespace ML.DeepTests
         Path.Combine(SrcPath, "test_batch.bin")
       };
       loadSample(filePaths, m_TestingSet);
+
+
+      var path = @"C:\Users\User\Desktop\net.mld";
+      DeepMethods.Models.ConvNet net;
+      using (var file = File.Open(path, FileMode.Open, FileAccess.Read))
+        net = DeepMethods.Models.ConvNet.Deserialize(file);
+      var alg = new BackpropAlgorithm(m_TrainingSet, net);
+      net.IsTraining = false;
+
+      var terrors = alg.GetErrors(m_TestingSet);
+      var tec = terrors.Count();
+      var tdc = m_TestingSet.Count;
+      var tpct = Math.Round(100.0F * tec / tdc, 2);
+      Console.WriteLine("Test: {0} of {1} ({2}%)", tec, tdc, tpct);
+
+      var vcnt = m_TrainingSet.Count / 20;
+      m_ValidationSet = m_TrainingSet.Subset(0, vcnt);
+      var verrors = alg.GetErrors(m_ValidationSet);
+      var vec = verrors.Count();
+      var vdc = m_ValidationSet.Count;
+      var vpct = Math.Round(100.0F * vec / vdc, 2);
+      Console.WriteLine("Train: {0} of {1} ({2}%)", vec, vdc, vpct);
+
+      Console.ReadLine();
     }
 
     private void loadSample(string[] fpaths, ClassifiedSample<double[][,]> sample)
@@ -209,7 +235,7 @@ namespace ML.DeepTests
       var tstart = DateTime.Now;
       var now = DateTime.Now;
 
-      Alg = Examples.CreateCIFAR10Trunc2ClassesDemo2(m_TrainingSet);
+      Alg = Examples.CreateCIFAR10Trunc2ClassesDemo2_SEALED(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) =>
                              {
                                Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);

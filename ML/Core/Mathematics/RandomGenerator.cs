@@ -12,8 +12,11 @@ namespace ML.Core.Mathematics
 
     private static Dictionary<int, RandomGenerator> m_Instances = new Dictionary<int, RandomGenerator>();
 
-    public static RandomGenerator Get(int seed)
+    public static RandomGenerator Get(int seed, bool cache = true)
     {
+      if (!cache)
+        return new RandomGenerator(seed);
+
       RandomGenerator result;
       if (!m_Instances.TryGetValue(seed, out result))
       {

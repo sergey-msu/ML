@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using ML.Core;
 using ML.Core.Mathematics;
 
@@ -12,12 +13,15 @@ namespace ML.DeepMethods.Models
   {
     #region Fields
 
-    private double    m_DropRate;
-    private double    m_RetainRate;
-    private bool[][,] m_Mask;
-    private bool      m_ApplyCustomMask;
+    private double m_DropRate;
+    private double m_RetainRate;
+    private bool   m_ApplyCustomMask;
 
-    private RandomGenerator m_Generator;
+    [NonSerialized]
+    private ThreadLocal<bool[][,]> m_Mask;
+
+    [NonSerialized]
+    private ThreadLocal<RandomGenerator> m_Generator;
 
     #endregion
 
@@ -35,7 +39,29 @@ namespace ML.DeepMethods.Models
 
       m_DropRate = rate;
       m_RetainRate = 1-rate;
-      m_Generator = RandomGenerator.Get(seed);
+
+      m_Generator = new ThreadLocal<RandomGenerator>(() =>
+      {
+        return RandomGenerator.Get(seed, false);
+        // WARNING:
+        // RandomGenerator.Get(seed, false) used to make randomness more deterministic :)
+        // "false" means that every thread will get the same instance of RandomGenerator
+        // "true" or empty means that different threads will share the same RandomGenerator instance, therefore output will vary from run to run
+        // WARNING #2:
+        // setting value to "false" still dont makes the process fully deterministic because of undeterministic nature of threads allocation :(
+      });
+
+      m_Mask = new ThreadLocal<bool[][,]>(() =>
+      {
+        if (m_IsTraining && !m_ApplyCustomMask)
+        {
+          var mask = new bool[m_OutputDepth][,];
+          for (int i=0; i<m_OutputDepth; i++)
+            mask[i] = new bool[m_OutputHeight, m_OutputWidth];
+          return mask;
+        }
+        return null;
+      });
     }
 
     #endregion
@@ -50,12 +76,18 @@ namespace ML.DeepMethods.Models
 
     public bool[][,] Mask
     {
-      get { return m_Mask; }
+      get { return m_Mask.Value; }
       set
       {
-        m_Mask=value;
+        m_Mask.Value=value;
         m_ApplyCustomMask = true;
       }
+    }
+
+    public bool ApplyCustomMask
+    {
+      get { return m_ApplyCustomMask; }
+      set { m_ApplyCustomMask=value; }
     }
 
     #endregion
@@ -67,13 +99,6 @@ namespace ML.DeepMethods.Models
       m_OutputDepth  = m_InputDepth;
       m_OutputHeight = m_InputHeight;
       m_OutputWidth  = m_InputWidth;
-
-      if (m_IsTraining && !m_ApplyCustomMask)
-      {
-        m_Mask = new bool[m_OutputDepth][,];
-        for (int i=0; i<m_OutputDepth; i++)
-          m_Mask[i] = new bool[m_OutputHeight, m_OutputWidth];
-      }
 
       BuildParams();
     }
@@ -93,19 +118,19 @@ namespace ML.DeepMethods.Models
       {
         if (m_ApplyCustomMask) // custom mask applied
         {
-          result[p][i, j] = m_Mask[p][i, j] ? input[p][i, j] / m_RetainRate : 0;
+          result[p][i, j] = m_Mask.Value[p][i, j] ? input[p][i, j] / m_RetainRate : 0;
         }
         else // generate new random mask
         {
-          var retain = m_Generator.Bernoulli(m_RetainRate);
+          var retain = m_Generator.Value.Bernoulli(m_RetainRate);
           if (retain)
           {
-            m_Mask[p][i, j] = true;
+            m_Mask.Value[p][i, j] = true;
             result[p][i, j] = input[p][i, j] / m_RetainRate;
           }
           else
           {
-            m_Mask[p][i, j] = false;
+            m_Mask.Value[p][i, j] = false;
             result[p][i, j] = 0;
           }
         }
@@ -118,7 +143,7 @@ namespace ML.DeepMethods.Models
       for (int i=0; i<m_OutputHeight; i++)
       for (int j=0; j<m_OutputWidth;  j++)
       {
-        if (Mask[p][i, j])
+        if (m_Mask.Value[p][i, j])
         {
           var value = prevValues[p][i, j];
           var deriv = (prevLayer.ActivationFunction != null) ? prevLayer.ActivationFunction.DerivativeFromValue(value) : 1;

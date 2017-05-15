@@ -69,6 +69,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="UnitTests\CNN\GradientTests.cs" />
     <Compile Include="UnitTests\CNN\BackpropTests.cs" />
     <Compile Include="UnitTests\CNN\Mocks.cs" />
     <Compile Include="UnitTests\CNN\OptimizerTests.cs" />

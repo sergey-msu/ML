@@ -147,7 +147,17 @@ namespace ML.Core
     public virtual IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<TObj> classifiedSample)
     {
       var errors = new List<ErrorInfo>();
-      Parallel.ForEach(classifiedSample, pdata =>
+      //Parallel.ForEach(classifiedSample, pdata =>
+      //{
+      //  var res = this.Classify(pdata.Key);
+      //  if (res != pdata.Value)
+      //    lock (errors)
+      //    {
+      //      errors.Add(new ErrorInfo(pdata.Key, pdata.Value, res));
+      //    }
+      //});
+
+      foreach (var pdata in classifiedSample)
       {
         var res = this.Classify(pdata.Key);
         if (res != pdata.Value)
@@ -155,7 +165,7 @@ namespace ML.Core
           {
             errors.Add(new ErrorInfo(pdata.Key, pdata.Value, res));
           }
-      });
+      };
 
       return errors;
     }
