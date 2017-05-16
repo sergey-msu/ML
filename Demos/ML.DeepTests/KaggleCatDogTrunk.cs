@@ -1,21 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using ML.Core;
 using System.Threading.Tasks;
+using ML.Core;
+using ML.DeepMethods.Algorithms;
+using ML.DeepMethods.Models;
+using System.Reflection;
 
 namespace ML.DeepTests
 {
+  public class KaggleCatDog64Trunk : KaggleCatDogTrunk
+  {
+    public override int NormImgSize { get { return 64; } }
+
+    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    {
+      return Examples.CreateKaggleCatOrDogDemo_Pretrained_LiftTo64Size(sample);
+    }
+  }
+
   public class KaggleCatDogTrunk : Runner
   {
-    public const int    TRAIN_COUNT = 10000;
-    public const int    TEST_COUNT  = 2000;
-    public const int    NORM_IMG_SIZE = 32;
+    public const int    TRAIN_COUNT  = 10000;
+    public const int    TEST_COUNT   = 2000;
     public const string SRC_IMG_FILE = "{0}.{1}.jpg";
-    public const string CAT_PREFIX = "cat.";
-    public const string DOG_PREFIX = "dog.";
+    public const string CAT_PREFIX   = "cat.";
+    public const string DOG_PREFIX   = "dog.";
 
     private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
     {
@@ -26,6 +39,13 @@ namespace ML.DeepTests
     public override string SrcMark    { get { return "kaggle"; } }
     public override string DataPath   { get { return RootPath+@"\data\cat-dog"; }}
     public override string OutputPath { get { return RootPath+@"\output\cat-dog"; }}
+
+    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    {
+      return Examples.CreateKaggleCatOrDogDemo_Pretrained(sample);
+    }
+
+    public virtual int NormImgSize { get { return 32; } }
 
     #region Export
 
@@ -40,10 +60,24 @@ namespace ML.DeepTests
 
     protected override void Load()
     {
+      var path = @"C:\Users\User\Desktop\science\Machine learning\data\cat-dog\train\kaggle";
+      var tezt = new ClassifiedSample<double[][,]>();
+      loadData(path, tezt);
+      var alg = CreateAlgorithm(tezt);
+      var errs = alg.GetErrors(tezt.Subset(0, 10000));
+
+      Console.ReadLine();
+
+
+
       // preload all
       Console.WriteLine("preload all data...");
       var dataset = new ClassifiedSample<double[][,]>();
       loadData(TrainPath, dataset);
+
+      //var cnt = 0;
+      //foreach (var data in dataset)
+      //  exportImageData(data.Key, cnt++);
 
       Console.WriteLine("shuffling data...");
       shuffle(ref dataset);
@@ -99,11 +133,15 @@ namespace ML.DeepTests
       // crop image to center square size
       // and normalize image to NORM_IMG_SIZE x NORM_IMG_SIZE
 
-      var normImage = new Bitmap(NORM_IMG_SIZE, NORM_IMG_SIZE);
+      var normImage = new Bitmap(NormImgSize, NormImgSize);
       using (var gr = Graphics.FromImage(normImage))
       {
+        gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        gr.CompositingQuality = CompositingQuality.HighQuality;
+        gr.SmoothingMode = SmoothingMode.AntiAlias;
+
         gr.DrawImage(image,
-                     new Rectangle(0, 0, NORM_IMG_SIZE, NORM_IMG_SIZE),
+                     new Rectangle(0, 0, NormImgSize, NormImgSize),
                      new Rectangle((w-s)/2, (h-s)/2, s, s),
                      GraphicsUnit.Pixel);
       }
@@ -112,11 +150,11 @@ namespace ML.DeepTests
 
       var result = new double[3][,];
       for (int i=0; i<3; i++)
-        result[i] = new double[NORM_IMG_SIZE, NORM_IMG_SIZE];
+        result[i] = new double[NormImgSize, NormImgSize];
 
       int x,y;
-      for (y=0; y<NORM_IMG_SIZE; y++)
-      for (x=0; x<NORM_IMG_SIZE; x++)
+      for (y=0; y<NormImgSize; y++)
+      for (x=0; x<NormImgSize; x++)
       {
         var pixel = normImage.GetPixel(x, y);
         result[0][y, x] = pixel.R/255.0D;
@@ -154,6 +192,24 @@ namespace ML.DeepTests
       m_TrainingSet = dataset.Subset(0, TRAIN_COUNT);
     }
 
+    private void exportImageData(double[][,] data, int cnt)
+    {
+      using (var ofile = File.Open(string.Format(@"C:\Users\User\Desktop\science\Machine learning\data\cat-dog\train\file_{0}.png", cnt), FileMode.Create, FileAccess.Write))
+      {
+        var image = new Bitmap(NormImgSize, NormImgSize);
+
+        for (int y = 0; y < NormImgSize; y++)
+        for (int x = 0; x < NormImgSize; x++)
+        {
+          image.SetPixel(x, y, Color.FromArgb((int)(data[0][y, x]*255), (int)(data[1][y, x]*255), (int)(data[2][y, x]*255)));
+        }
+
+        image.Save(ofile, System.Drawing.Imaging.ImageFormat.Png);
+
+        ofile.Flush();
+      }
+    }
+
     private void loadTest(ClassifiedSample<double[][,]> dataset)
     {
       m_TestingSet = dataset.Subset(TRAIN_COUNT, TEST_COUNT);
@@ -168,7 +224,6 @@ namespace ML.DeepTests
       var tstart = DateTime.Now;
       var now = DateTime.Now;
 
-      Alg = Examples.CreateKaggleCatOrDogDemo_Pretrained(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) =>
                              {
                                Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);

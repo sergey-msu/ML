@@ -74,17 +74,33 @@ namespace ML.DeepMethods.Models
     /// <summary>
     /// Tied bias value
     /// </summary>
-    public double Bias(int q)
+    public double GetBias(int q)
     {
       return m_Weights[(q+1)*m_FeatureMapParamCount - 1];
     }
 
     /// <summary>
+    /// Tied bias value
+    /// </summary>
+    public void SetBias(int q, double value)
+    {
+      m_Weights[(q+1)*m_FeatureMapParamCount - 1] = value;
+    }
+
+    /// <summary>
     /// Kernal weight value
     /// </summary>
-    public double Kernel(int q, int p, int y, int x)
+    public double GetKernel(int q, int p, int y, int x)
     {
       return m_Weights[x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount];
+    }
+
+    /// <summary>
+    /// Kernal weight value
+    /// </summary>
+    public void SetKernel(int q, int p, int y, int x, double value)
+    {
+      m_Weights[x + y*m_WindowWidth + p*m_KernelParamCount + q*m_FeatureMapParamCount] = value;
     }
 
     #endregion

@@ -29,7 +29,16 @@ namespace ML.DeepTests
     public string TrainPath { get { return DataPath+@"\train\"+SrcMark; }}
     public abstract string OutputPath { get; }
 
-    public BackpropAlgorithm Alg { get; protected set; }
+    private BackpropAlgorithm m_Alg;
+    public  BackpropAlgorithm Alg
+    {
+      get
+      {
+        if (m_Alg==null)
+          m_Alg = CreateAlgorithm(m_TrainingSet);
+        return m_Alg;
+      }
+    }
 
 
     public void Run()
@@ -45,6 +54,8 @@ namespace ML.DeepTests
       Train();
       //Test();
     }
+
+    protected abstract BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample);
 
     protected virtual void Init()
     {

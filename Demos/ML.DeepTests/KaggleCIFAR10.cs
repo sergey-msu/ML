@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using ML.Core;
 using ML.Utils;
+using ML.DeepMethods.Algorithms;
 
 namespace ML.DeepTests
 {
@@ -31,6 +32,11 @@ namespace ML.DeepTests
     public override string SrcMark    { get { return "kaggle"; } }
     public override string DataPath   { get { return RootPath+@"\data\cifar10"; }}
     public override string OutputPath { get { return RootPath+@"\output\cifar10_kaggle"; }}
+
+    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    {
+      return Examples.CreateCIFAR10Demo1(sample);
+    }
 
     #region Export
 
@@ -119,7 +125,6 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg = Examples.CreateCIFAR10Demo1(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, OutputPath); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;

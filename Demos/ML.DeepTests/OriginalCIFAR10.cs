@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using ML.Core;
 using ML.Utils;
+using ML.DeepMethods.Algorithms;
 
 namespace ML.DeepTests
 {
@@ -46,6 +47,10 @@ namespace ML.DeepTests
     public override string DataPath   { get { return RootPath+@"\data\cifar10"; }}
     public override string OutputPath { get { return RootPath+@"\output\cifar10_original"; }}
 
+    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    {
+      return Examples.CreateCIFAR10Demo2(sample);
+    }
 
     protected override void Init()
     {
@@ -212,7 +217,6 @@ namespace ML.DeepTests
       var tstart = DateTime.Now;
       var now = DateTime.Now;
 
-      Alg = Examples.CreateCIFAR10Demo2(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) =>
                              {
                                Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);

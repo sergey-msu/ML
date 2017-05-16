@@ -62,33 +62,33 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual(26, layer.ParamCount);
       Assert.AreEqual(26, layer.Weights.Length);
 
-      Assert.AreEqual( 1, layer.Kernel(0, 0, 0, 0));
-      Assert.AreEqual( 0, layer.Kernel(0, 0, 0, 1));
-      Assert.AreEqual( 1, layer.Kernel(0, 0, 1, 0));
-      Assert.AreEqual(-1, layer.Kernel(0, 0, 1, 1));
-      Assert.AreEqual( 0, layer.Kernel(0, 0, 2, 0));
-      Assert.AreEqual( 1, layer.Kernel(0, 0, 2, 1));
-      Assert.AreEqual( 0, layer.Kernel(0, 1, 0, 0));
-      Assert.AreEqual( 1, layer.Kernel(0, 1, 0, 1));
-      Assert.AreEqual(-1, layer.Kernel(0, 1, 1, 0));
-      Assert.AreEqual( 2, layer.Kernel(0, 1, 1, 1));
-      Assert.AreEqual( 1, layer.Kernel(0, 1, 2, 0));
-      Assert.AreEqual(-1, layer.Kernel(0, 1, 2, 1));
-      Assert.AreEqual( 1, layer.Bias(0));
+      Assert.AreEqual( 1, layer.GetKernel(0, 0, 0, 0));
+      Assert.AreEqual( 0, layer.GetKernel(0, 0, 0, 1));
+      Assert.AreEqual( 1, layer.GetKernel(0, 0, 1, 0));
+      Assert.AreEqual(-1, layer.GetKernel(0, 0, 1, 1));
+      Assert.AreEqual( 0, layer.GetKernel(0, 0, 2, 0));
+      Assert.AreEqual( 1, layer.GetKernel(0, 0, 2, 1));
+      Assert.AreEqual( 0, layer.GetKernel(0, 1, 0, 0));
+      Assert.AreEqual( 1, layer.GetKernel(0, 1, 0, 1));
+      Assert.AreEqual(-1, layer.GetKernel(0, 1, 1, 0));
+      Assert.AreEqual( 2, layer.GetKernel(0, 1, 1, 1));
+      Assert.AreEqual( 1, layer.GetKernel(0, 1, 2, 0));
+      Assert.AreEqual(-1, layer.GetKernel(0, 1, 2, 1));
+      Assert.AreEqual( 1, layer.GetBias(0));
 
-      Assert.AreEqual(-1, layer.Kernel(1, 0, 0, 0));
-      Assert.AreEqual( 0, layer.Kernel(1, 0, 0, 1));
-      Assert.AreEqual(-1, layer.Kernel(1, 0, 1, 0));
-      Assert.AreEqual( 1, layer.Kernel(1, 0, 1, 1));
-      Assert.AreEqual(-0, layer.Kernel(1, 0, 2, 0));
-      Assert.AreEqual(-1, layer.Kernel(1, 0, 2, 1));
-      Assert.AreEqual( 0, layer.Kernel(1, 1, 0, 0));
-      Assert.AreEqual(-1, layer.Kernel(1, 1, 0, 1));
-      Assert.AreEqual( 1, layer.Kernel(1, 1, 1, 0));
-      Assert.AreEqual(-2, layer.Kernel(1, 1, 1, 1));
-      Assert.AreEqual(-1, layer.Kernel(1, 1, 2, 0));
-      Assert.AreEqual( 1, layer.Kernel(1, 1, 2, 1));
-      Assert.AreEqual(-1, layer.Bias(1));
+      Assert.AreEqual(-1, layer.GetKernel(1, 0, 0, 0));
+      Assert.AreEqual( 0, layer.GetKernel(1, 0, 0, 1));
+      Assert.AreEqual(-1, layer.GetKernel(1, 0, 1, 0));
+      Assert.AreEqual( 1, layer.GetKernel(1, 0, 1, 1));
+      Assert.AreEqual(-0, layer.GetKernel(1, 0, 2, 0));
+      Assert.AreEqual(-1, layer.GetKernel(1, 0, 2, 1));
+      Assert.AreEqual( 0, layer.GetKernel(1, 1, 0, 0));
+      Assert.AreEqual(-1, layer.GetKernel(1, 1, 0, 1));
+      Assert.AreEqual( 1, layer.GetKernel(1, 1, 1, 0));
+      Assert.AreEqual(-2, layer.GetKernel(1, 1, 1, 1));
+      Assert.AreEqual(-1, layer.GetKernel(1, 1, 2, 0));
+      Assert.AreEqual( 1, layer.GetKernel(1, 1, 2, 1));
+      Assert.AreEqual(-1, layer.GetBias(1));
     }
 
     [TestMethod]

@@ -338,38 +338,6 @@ namespace ML.DeepTests
     /// <summary>
     ///
     /// </summary>
-    public static BackpropAlgorithm CreateKaggleCatOrDogDemo_Pretrained(ClassifiedSample<double[][,]> training)
-    {
-      Console.WriteLine("init CreateKaggleCatOrDogDemo_Pretrained");
-
-      ConvNet net;
-      var assembly = Assembly.GetExecutingAssembly();
-      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-21.65.mld"))
-      {
-        net = ConvNet.Deserialize(stream);
-        net.IsTraining = true;
-      }
-
-      var lrate = 0.01D;
-      var alg = new BackpropAlgorithm(training, net)
-      {
-        LossFunction = Loss.CrossEntropySoftMax,
-        EpochCount = 500,
-        LearningRate = lrate,
-        BatchSize = 4,
-        UseBatchParallelization = true,
-        MaxBatchThreadCount = 8,
-        Optimizer = Optimizer.Adadelta,
-        Regularizator = Regularizator.L2(0.001D),
-        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
-      };
-
-      return alg;
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
     public static BackpropAlgorithm CreateKaggleCatOrDogDemo1(ClassifiedSample<double[][,]> training)
     {
       Console.WriteLine("init CreateKaggleCatOrDogDemo1");
@@ -413,44 +381,147 @@ namespace ML.DeepTests
     }
 
     /// <summary>
-    /// From http://www.subsubroutine.com/sub-subroutine/2016/9/30/cats-and-dogs-and-convolutional-neural-networks
+    /// Error: 19.35
     /// </summary>
-    public static BackpropAlgorithm CreateKaggleCatOrDogDemo2(ClassifiedSample<double[][,]> training)
+    public static BackpropAlgorithm CreateKaggleCatOrDogDemo_Pretrained(ClassifiedSample<double[][,]> training)
     {
-      Console.WriteLine("init CreateKaggleCatOrDogDemo2");
+      Console.WriteLine("init CreateKaggleCatOrDogDemo_Pretrained");
 
+      ConvNet net;
+      var assembly = Assembly.GetExecutingAssembly();
+      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-19.35.mld"))
+      {
+        net = ConvNet.Deserialize(stream);
+        net.IsTraining = true;
+      }
+
+      var lrate = 0.01D;
+      var alg = new BackpropAlgorithm(training, net)
+      {
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 500,
+        LearningRate = lrate,
+        BatchSize = 4,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Adadelta,
+        Regularizator = Regularizator.L2(0.001D),
+        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
+      };
+
+      return alg;
+    }
+
+    /// <summary>
+    /// Error: from 19.35 to
+    /// </summary>
+    public static BackpropAlgorithm CreateKaggleCatOrDogDemo_Pretrained_LiftTo64Size(ClassifiedSample<double[][,]> training)
+    {
+      Console.WriteLine("init CreateKaggleCatOrDogDemo_Pretrained_LiftTo64Size");
+
+      // pretrained
+      ConvNet pnet;
+      var assembly = Assembly.GetExecutingAssembly();
+      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-19.35.mld"))
+      {
+        pnet = ConvNet.Deserialize(stream);
+        pnet.IsTraining = true;
+      }
+
+      // larger net
       var activation = Activation.ReLU;
-      var net = new ConvNet(3, 32) { IsTraining=true };
+      var net = new ConvNet(3, 64) { IsTraining=true };
 
-      //conv_1 = conv_2d(network, 32, 3, activation='relu', name='conv_1')
-      //network = max_pool_2d(conv_1, 2)
-      //conv_2 = conv_2d(network, 64, 3, activation='relu', name='conv_2')
-      //conv_3 = conv_2d(conv_2, 64, 3, activation='relu', name='conv_3')
-      //network = max_pool_2d(conv_3, 2)
-      //network = fully_connected(network, 512, activation='relu')
-      //network = dropout(network, 0.5)
-      //network = fully_connected(network, 2, activation='softmax')
-      //
-      //network = regression(network, optimizer='adam',
-      //                     loss='categorical_crossentropy',
-      //                     learning_rate=0.0005, metric=acc)
+      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 5, padding: 2, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 5, padding: 2, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
 
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 5, padding: 2, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 5, padding: 2, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
 
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
-      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
-
-      net.AddLayer(new FlattenLayer(outputDim: 512, activation: activation));
+      net.AddLayer(new FlattenLayer(outputDim: 256, activation: activation));
       net.AddLayer(new DropoutLayer(0.5));
       net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
 
       net._Build();
 
-      net.RandomizeParameters(seed: 0);
+      // convert weights
 
-      var lrate = 0.0005D;
+      var pl1 = (ConvLayer)pnet[0];
+      var l1  = (ConvLayer)net[0];
+      for (int q=0; q<l1.OutputDepth; q++)
+      {
+        l1.SetBias(q, pl1.GetBias(q));
+        for (int p=0; p<l1.InputDepth; p++)
+        for (int x=0; x<5; x++)
+        for (int y=0; y<5; y++)
+        {
+          var pw = pl1.GetKernel(q, p, y/2, x/2);
+          l1.SetKernel(q, p, y, x, pw);
+        }
+      }
+
+      var pl2 = (ConvLayer)pnet[1];
+      var l2  = (ConvLayer)net[1];
+      for (int q=0; q<l2.OutputDepth; q++)
+      {
+        l2.SetBias(q, pl2.GetBias(q));
+        for (int p=0; p<l2.InputDepth; p++)
+        for (int x=0; x<5; x++)
+        for (int y=0; y<5; y++)
+        {
+          var pw = pl2.GetKernel(q, p, y/2, x/2);
+          l2.SetKernel(q, p, y, x, pw);
+        }
+      }
+
+      var pl5 = (ConvLayer)pnet[4];
+      var l5  = (ConvLayer)net[4];
+      for (int q=0; q<l5.OutputDepth; q++)
+      {
+        l5.SetBias(q, pl5.GetBias(q));
+        for (int p=0; p<l5.InputDepth; p++)
+        for (int x=0; x<5; x++)
+        for (int y=0; y<5; y++)
+        {
+          var pw = pl5.GetKernel(q, p, y/2, x/2);
+          l5.SetKernel(q, p, y, x, pw);
+        }
+      }
+
+      var pl8 = (ConvLayer)pnet[4];
+      var l8  = (ConvLayer)net[4];
+      for (int q=0; q<l8.OutputDepth; q++)
+      {
+        l8.SetBias(q, pl8.GetBias(q));
+        for (int p=0; p<l8.InputDepth; p++)
+        for (int x=0; x<5; x++)
+        for (int y=0; y<5; y++)
+        {
+          var pw = pl8.GetKernel(q, p, y/2, x/2);
+          l8.SetKernel(q, p, y, x, pw);
+        }
+      }
+
+      var pl9 = (FlattenLayer)pnet[8];
+      var l9  = (FlattenLayer)net[8];
+      for (int q=0; q<l9.OutputDepth; q++)
+      {
+        l9.SetBias(q, pl9.GetBias(q));
+        for (int p=0; p<l9.InputDepth; p++)
+        for (int x=0; x<15; x++)
+        for (int y=0; y<15; y++)
+        {
+          var pw = pl9.GetKernel(q, p, Math.Min(y/2, 6), Math.Min(x/2, 6));
+          l9.SetKernel(q, p, y, x, pw);
+        }
+      }
+
+      // build algorithm
+      var lrate = 0.01D;
       var alg = new BackpropAlgorithm(training, net)
       {
         LossFunction = Loss.CrossEntropySoftMax,
@@ -460,7 +531,7 @@ namespace ML.DeepTests
         UseBatchParallelization = true,
         MaxBatchThreadCount = 8,
         Optimizer = Optimizer.Adadelta,
-        //Regularizator = Regularizator.L2(0.001D),
+        Regularizator = Regularizator.L2(0.001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 

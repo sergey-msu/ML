@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -11,8 +13,6 @@ using System.Windows.Media.Imaging;
 
 using ML.Core;
 using ML.DeepMethods.Models;
-using System.IO;
-using System.Net;
 
 namespace PicturePrimitive
 {
@@ -54,7 +54,7 @@ namespace PicturePrimitive
     private void initNet()
     {
       var assembly = Assembly.GetExecutingAssembly();
-      using (var stream = assembly.GetManifestResourceStream("ML.CifarTruncDemo.net.mld"))
+      using (var stream = assembly.GetManifestResourceStream("ML.CifarTruncDemo.cat-dog-19.35.mld"))
       {
         m_Network = ConvNet.Deserialize(stream);
         m_Network.IsTraining = false;

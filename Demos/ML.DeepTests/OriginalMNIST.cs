@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using ML.Core;
+using ML.DeepMethods.Algorithms;
 
 namespace ML.DeepTests
 {
@@ -29,6 +30,11 @@ namespace ML.DeepTests
     public override string SrcMark    { get { return "original"; } }
     public override string DataPath   { get { return RootPath+@"\data\mnist"; }}
     public override string OutputPath { get { return RootPath+@"\output\mnist_original"; }}
+
+    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    {
+      return Examples.CreateMNISTSimpleDemoWithBatching(sample);
+    }
 
     #region Export
 
@@ -178,7 +184,6 @@ namespace ML.DeepTests
       var tstart = DateTime.Now;
       var now = DateTime.Now;
 
-      Alg = Examples.CreateMNISTSimpleDemoWithBatching(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) =>
                              {
                                Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);

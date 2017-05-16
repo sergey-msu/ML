@@ -48,6 +48,10 @@ namespace ML.DeepTests
     public override string DataPath   { get { return RootPath+@"\data\cifar10trunc"; }}
     public override string OutputPath { get { return RootPath+@"\output\cifar10_original_trunc"; }}
 
+    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    {
+      return Examples.CreateCIFAR10Trunc2ClassesDemo2_SEALED(m_TrainingSet);
+    }
 
     #region Export
 
@@ -236,7 +240,6 @@ namespace ML.DeepTests
       var tstart = DateTime.Now;
       var now = DateTime.Now;
 
-      Alg = Examples.CreateCIFAR10Trunc2ClassesDemo2_SEALED(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) =>
                              {
                                Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);

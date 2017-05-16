@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using ML.Core;
 using System.Threading.Tasks;
+using ML.DeepMethods.Algorithms;
 
 namespace ML.DeepTests
 {
@@ -25,6 +26,11 @@ namespace ML.DeepTests
     public override string SrcMark    { get { return "kaggle"; } }
     public override string DataPath   { get { return RootPath+@"\data\cat-dog"; }}
     public override string OutputPath { get { return RootPath+@"\output\cat-dog"; }}
+
+    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    {
+      return Examples.CreateKaggleCatOrDogDemo1(sample);
+    }
 
     #region Export
 
@@ -165,7 +171,6 @@ namespace ML.DeepTests
       var tstart = DateTime.Now;
       var now = DateTime.Now;
 
-      Alg = Examples.CreateKaggleCatOrDogDemo1(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) =>
                              {
                                Utils.HandleEpochEnded(Alg, null, m_ValidationSet, OutputPath); // no labeled testing set in Kaggle :(

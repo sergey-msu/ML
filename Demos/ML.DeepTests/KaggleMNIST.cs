@@ -34,6 +34,11 @@ namespace ML.DeepTests
     public override string DataPath   { get { return RootPath+@"\data\mnist"; }}
     public override string OutputPath { get { return RootPath+@"\output\mnist_kaggle"; }}
 
+    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    {
+      return Examples.CreateMNISTSimpleDemo_SEALED(m_TrainingSet);
+    }
+
     #region Export
 
     protected override void Export()
@@ -187,7 +192,6 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg = Examples.CreateMNISTSimpleDemo_SEALED(m_TrainingSet);
       Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, OutputPath); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;

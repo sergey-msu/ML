@@ -13,7 +13,8 @@ namespace ML.DeepTests
         //new KaggleMNIST();
         //new KaggleCIFAR10();
         //new KaggleCatDog();
-        new KaggleCatDogTrunk();
+        //new KaggleCatDogTrunk();
+        new KaggleCatDog64Trunk();
 
       try
       {
