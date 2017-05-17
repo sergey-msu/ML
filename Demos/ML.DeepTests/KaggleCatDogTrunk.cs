@@ -60,13 +60,22 @@ namespace ML.DeepTests
 
     protected override void Load()
     {
-      var path = @"C:\Users\User\Desktop\science\Machine learning\data\cat-dog\train\kaggle";
-      var tezt = new ClassifiedSample<double[][,]>();
-      loadData(path, tezt);
-      var alg = CreateAlgorithm(tezt);
-      var errs = alg.GetErrors(tezt.Subset(0, 10000));
-
-      Console.ReadLine();
+      //var path = @"C:\Users\User\Desktop\science\Machine learning\data\cat-dog\train\kaggle";
+      //var tezt = new ClassifiedSample<double[][,]>();
+      //loadData(path, tezt);
+      //var alg = CreateAlgorithm(tezt);
+      //var net = alg.Net;
+      //net.IsTraining = false;
+      //var valid = tezt.Subset(0, 2000);
+      //int errors = 0;
+      //foreach (var data in valid)
+      //{
+      //  var res = alg.Classify(data.Key);
+      //  if (res != data.Value)
+      //    errors += 1;
+      //}
+      //Console.WriteLine(errors);
+      //Console.ReadLine();
 
 
 

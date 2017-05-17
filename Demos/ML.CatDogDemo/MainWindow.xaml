@@ -1,4 +1,4 @@
-﻿<Window x:Class="PicturePrimitive.MainWindow"
+﻿<Window x:Class="ML.CatDogDemo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Animal Recognition v1.0 (truncated, only CAT or DOG)"

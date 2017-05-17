@@ -33,7 +33,7 @@ namespace ML.DeepTests
 
     protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
     {
-      return Examples.CreateMNISTSimpleDemoWithBatching(sample);
+      return Examples.CreateMNISTSimpleDemo_SEALED(sample);
     }
 
     #region Export

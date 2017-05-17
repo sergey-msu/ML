@@ -68,7 +68,7 @@ namespace ML.MetricalMethods.Algorithms
       }
     }
 
-    public override double EstimateClose(double[] x, Class cls)
+    public override double EstimateProximity(double[] x, Class cls)
     {
       var closeness = 0.0D;
       int idx = -1;

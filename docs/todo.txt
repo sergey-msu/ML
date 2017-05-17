@@ -1,11 +1,8 @@
 
 
 - unit tests over CIFAR-10 (layers, activations, softmax, batching etc.)
-- use only horses and frogs
 - inspect convnet.js
 - add kernel_constraint to layers
-
-- logistic softmax: check + gradient unittests
 
 - refactor CNN layers to use Input and Output
 - refactor masking in AlgorithmBase
@@ -13,16 +10,12 @@
 ***************************** CURRENT *****************************
 
 - CNN:
-  - [DONE] Batch CPU parallelization
-  - stochastic gradient training
-  - [DONE] batch learning
+  - stochastic gradient training (add shiffling)
   - batch normalization https://arxiv.org/pdf/1502.03167.pdf
-  - [DONE] dropout
-  - [DONE] add activation layer
   - GPU parallelization
+  - SSE (Vector class) parallelization
   - Read training set from hard drive not in-memory!
   - extract stop criteria from backpropalgorithm
-  - [DONE] split 'size' into 'height' and 'width' in all layers
   - serialization/deserialization
   - compare Keras and ML calcuations
 
@@ -47,19 +40,6 @@
   - U-Net
   - test with CIFAR-10 images db: http://www.cs.toronto.edu/~kriz/cifar.html
 
-- implement Backpropagation algorithm for general full-connected NN
-  - [DONE] implement algorithm
-  - [DONE] add start weight randomization
-  - [DONE] add events to NN algorithms
-  - add stochastic gradient descent
-  - [DONE] add batching
-
-- [DONE] add neuron NN + unit tests
-
-- [DONE] neuron UseBias -> explicit neuron.BiasWeight value
-
-- [DONE] Allwaye UseBias. Get rid of use_bias! fix tests
-
 - integration tests: use data files
 
 - demos project (+data samples)
@@ -73,11 +53,11 @@
 - add ability to update parameters in a batch from some start index (extend TryUpdateParams)
 
 - General NN architecture
+  - review architecture: public/internal members - try to use assembly from ouside
   - Read https://tproger.ru/translations/neural-network-zoo-1/ - NN zoo
   - add ability to loop nodes
   - develop way to create simple base networks (factory methods)
   - add network-wide global context
-  - review architecture: public/internal members - try to use assembly from ouside
 
  - General ML architcture review
    - review/rewrite Algorithm architecture
@@ -90,6 +70,25 @@
    - implement C4.5 algorithm for decision trees
 
 ***************************** DONE *****************************
+
+- CNN:
+  - Batch CPU parallelization
+  - batch learning
+  - dropout
+  - add activation layer
+  - split 'size' into 'height' and 'width' in all layers
+  - use only cats and dogs
+  - logistic softmax: check + gradient unittests
+
+- implement Backpropagation algorithm for general full-connected NN
+  - implement algorithm
+  - add start weight randomization
+  - add events to NN algorithms
+  - add batching
+
+- add neuron NN + unit tests
+- neuron UseBias -> explicit neuron.BiasWeight value
+- always UseBias. Get rid of use_bias! fix tests
 
 - implement more NN optimizatiors (https://habrahabr.ru/post/318970/)
   - Momentum

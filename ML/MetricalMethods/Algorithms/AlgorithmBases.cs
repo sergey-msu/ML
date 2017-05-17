@@ -37,7 +37,7 @@ namespace ML.MetricalMethods.Algorithms
 
       foreach (var cls in Classes.Values)
       {
-        var est = EstimateClose(obj, cls);
+        var est = EstimateProximity(obj, cls);
         if (est > maxEst)
         {
           maxEst = est;
@@ -51,7 +51,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public abstract double EstimateClose(TObj obj, Class cls);
+    public abstract double EstimateProximity(TObj obj, Class cls);
 
     /// <summary>
     /// Calculates margins
@@ -69,7 +69,7 @@ namespace ML.MetricalMethods.Algorithms
 
         foreach (var cls in Classes.Values)
         {
-          var closeness = EstimateClose(pData.Key, cls);
+          var closeness = EstimateProximity(pData.Key, cls);
           if (cls == pData.Value) si = closeness;
           else
           {
@@ -102,7 +102,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public override double EstimateClose(double[] obj, Class cls)
+    public override double EstimateProximity(double[] obj, Class cls)
     {
       var closeness = 0.0D;
       var sLength = TrainingSample.Count;

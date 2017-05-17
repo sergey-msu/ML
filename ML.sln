@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML.DeepTests", "Demos\ML.De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML.DigitsDemo", "Demos\ML.DigitsDemo\ML.DigitsDemo.csproj", "{C6CB1370-40EA-454F-996E-2FDEC8C93ABD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML.CifarTruncDemo", "Demos\ML.CifarTruncDemo\ML.CifarTruncDemo.csproj", "{E1D4321F-A228-41D5-BFD8-0C1921CAC176}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML.CatDogDemo", "Demos\ML.CatDogDemo\ML.CatDogDemo.csproj", "{E1D4321F-A228-41D5-BFD8-0C1921CAC176}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

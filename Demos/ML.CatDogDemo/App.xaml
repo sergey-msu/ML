@@ -1,9 +1,9 @@
-﻿<Application x:Class="ML.CifarTruncDemo.App"
+﻿<Application x:Class="ML.CatDogDemo.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ML.CifarTruncDemo"
+             xmlns:local="clr-namespace:ML.CatDogDemo"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+
     </Application.Resources>
 </Application>

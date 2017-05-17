@@ -37,7 +37,7 @@ namespace ML.Contracts
     /// <summary>
     /// Estimate point closeness to some class
     /// </summary>
-    double EstimateClose(TObj obj, Class cls);
+    double EstimateProximity(TObj obj, Class cls);
 
     /// <summary>
     /// Calculates margins

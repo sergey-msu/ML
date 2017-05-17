@@ -17,28 +17,33 @@ namespace ML.DeepTests
     /// </summary>
     public static BackpropAlgorithm CreateMNISTSimpleDemo_SEALED(ClassifiedSample<double[][,]> training)
     {
-      Console.WriteLine("init CreateMNISTSimpleDemo");
-      var activation = Activation.ReLU;
+      Console.WriteLine("init CreateMNISTSimpleDemo_SEALED");
+      var activation = Activation.LeakyReLU();
       var net = new ConvNet(1, 28) { IsTraining=true };
 
-      net.AddLayer(new ConvLayer(outputDepth: 8, windowSize: 5));
+      net.AddLayer(new ConvLayer(outputDepth: 12, windowSize: 5, padding: 2));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 18, windowSize: 5));
+      net.AddLayer(new ConvLayer(outputDepth: 24, windowSize: 5, padding: 2));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
-      net.AddLayer(new FlattenLayer(outputDim: 10, activation: activation));
+      net.AddLayer(new FlattenLayer(outputDim: 64, activation: activation));
+      net.AddLayer(new DropoutLayer(rate: 0.5D));
+      net.AddLayer(new DenseLayer(outputDim: 10, activation: activation));
 
       net._Build();
 
       net.RandomizeParameters(seed: 0);
 
-      var lrate = 0.005D;
+      var lrate = 0.001D;
       var alg = new BackpropAlgorithm(training, net)
       {
-        EpochCount = 15,
+        EpochCount = 500,
         LearningRate = lrate,
-        BatchSize = 1,
+        BatchSize = 4,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 4,
         LossFunction = Loss.Euclidean,
-        Optimizer = Optimizer.SGD,
+        Optimizer = Optimizer.RMSProp,
+        Regularizator = Regularizator.L2(0.0001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
 
@@ -86,8 +91,8 @@ namespace ML.DeepTests
       var activation = Activation.ReLU;
       var net = new ConvNet(1, 28) { IsTraining=true };
 
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2));
       net.AddLayer(new DropoutLayer(0.25));
       net.AddLayer(new FlattenLayer(outputDim: 128, activation: activation));
@@ -381,7 +386,7 @@ namespace ML.DeepTests
     }
 
     /// <summary>
-    /// Error: 19.35
+    /// Error: 19.1
     /// </summary>
     public static BackpropAlgorithm CreateKaggleCatOrDogDemo_Pretrained(ClassifiedSample<double[][,]> training)
     {
@@ -389,7 +394,7 @@ namespace ML.DeepTests
 
       ConvNet net;
       var assembly = Assembly.GetExecutingAssembly();
-      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-19.35.mld"))
+      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-19.1.mld"))
       {
         net = ConvNet.Deserialize(stream);
         net.IsTraining = true;
@@ -413,7 +418,7 @@ namespace ML.DeepTests
     }
 
     /// <summary>
-    /// Error: from 19.35 to
+    /// Error: from 19.1 to
     /// </summary>
     public static BackpropAlgorithm CreateKaggleCatOrDogDemo_Pretrained_LiftTo64Size(ClassifiedSample<double[][,]> training)
     {
@@ -422,7 +427,7 @@ namespace ML.DeepTests
       // pretrained
       ConvNet pnet;
       var assembly = Assembly.GetExecutingAssembly();
-      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-19.35.mld"))
+      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-19.1.mld"))
       {
         pnet = ConvNet.Deserialize(stream);
         pnet.IsTraining = true;

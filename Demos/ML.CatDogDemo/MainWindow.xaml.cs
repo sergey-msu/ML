@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using ML.Core;
 using ML.DeepMethods.Models;
 
-namespace PicturePrimitive
+namespace ML.CatDogDemo
 {
   /// <summary>
   /// Interaction logic for MainWindow.xaml
@@ -54,7 +54,7 @@ namespace PicturePrimitive
     private void initNet()
     {
       var assembly = Assembly.GetExecutingAssembly();
-      using (var stream = assembly.GetManifestResourceStream("ML.CifarTruncDemo.cat-dog-19.35.mld"))
+      using (var stream = assembly.GetManifestResourceStream("ML.CatDogDemo.cat-dog-19.1.mld"))
       {
         m_Network = ConvNet.Deserialize(stream);
         m_Network.IsTraining = false;

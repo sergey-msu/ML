@@ -20,7 +20,11 @@ namespace ML.DeepMethods.LossFunctions
         res += expected[i] * Math.Log(actual[i]);
       }
 
-      return (se*Math.Log(sa) - res) * MathUtils.ENTROPY_COEFF;
+      var result = (se*Math.Log(sa) - res) * MathUtils.ENTROPY_COEFF;
+      if (double.IsNaN(result))
+        throw new MLException(string.Format("Argument of entropy is out of range. Make sure that activation function's output is (0, 1). Values: se={0}, sa={1}", se, sa));
+
+      return result;
     }
 
     public double Derivative(int idx, double[] actual, double[] expected)
