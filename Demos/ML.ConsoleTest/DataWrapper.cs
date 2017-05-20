@@ -28,10 +28,10 @@ namespace ML.ConsoleTest
       readData(resourceName);
     }
 
-    public readonly Dictionary<string, Class> Classes = new Dictionary<string, Class>();
+    public readonly Dictionary<string, Class>   Classes = new Dictionary<string, Class>();
     public readonly Dictionary<string, Feature> Features = new Dictionary<string, Feature>();
-    public readonly ClassifiedSample<double[]> Data = new ClassifiedSample<double[]>();
-    public readonly ClassifiedSample<double[]> TrainingSample = new ClassifiedSample<double[]>();
+    public readonly ClassifiedSample<double[]>  Data = new ClassifiedSample<double[]>();
+    public readonly ClassifiedSample<double[]>  TrainingSample = new ClassifiedSample<double[]>();
     public readonly List<DataError> Errors = new List<DataError>();
 
     public int Dimension { get; private set; }
@@ -107,7 +107,7 @@ namespace ML.ConsoleTest
 
         var success = true;
         var point = new double[dim];
-        for (var i = 0; i < dim; i++)
+        for (var i=0; i<dim; i++)
         {
           double result;
           var ftIdx = featureIndxs[i];

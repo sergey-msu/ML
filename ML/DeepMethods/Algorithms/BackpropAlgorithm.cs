@@ -50,7 +50,6 @@ namespace ML.DeepMethods.Algorithms
     private IRegularizator m_Regularizator;
     private ILearningRateScheduler m_LearningRateScheduler;
 
-    private int m_EpochLength;
     private int m_InputDepth;
     private int m_InputHeight;
     private int m_InputWidth;
@@ -68,7 +67,6 @@ namespace ML.DeepMethods.Algorithms
     private int m_Batch;
     private int m_Iteration;
 
-    private Dictionary<Class, double[]> m_ExpectedOutputs;
     private double[][]    m_Gradient;
     private double[][][,] m_Values;
     private double[][][,] m_Errors;
@@ -77,8 +75,7 @@ namespace ML.DeepMethods.Algorithms
 
     #region .ctor
 
-    public BackpropAlgorithm(ClassifiedSample<double[][,]> classifiedSample, ConvNet net)
-      : base(classifiedSample, net)
+    public BackpropAlgorithm(ConvNet net) : base(net)
     {
       m_EpochCount   = DFT_EPOCH_COUNT;
       m_LearningRate = DFT_LEARNING_RATE;
@@ -226,28 +223,30 @@ namespace ML.DeepMethods.Algorithms
 
     #region Public
 
-    public void RunEpoch()
+    public void RunEpoch(MultiRegressionSample<double[][,]> sample)
     {
-      runEpoch();
+      if (sample==null)
+        throw new MLException("Sample can not be nul");
+
+      runEpoch(sample);
     }
 
-    public void RunBatch(int skip, int take)
+    public void RunBatch(MultiRegressionSample<double[][,]> sample)
     {
-      if (skip<0) throw new MLException("Skip value must be non-negative");
-      if (take<=0) throw new MLException("Take value must be positive");
+      if (sample==null)
+        throw new MLException("Sample can not be nul");
 
-      var batch = TrainingSample.Subset(skip, take);
-      runBatch(batch);
+      runBatch(sample);
     }
 
-    public void RunIteration(double[][,] data, Class cls)
+    public void RunIteration(double[][,] data, double[] expected)
     {
-      runIteration(data, cls);
+      runIteration(data, expected);
     }
 
-    public double FeedForward(double[][,] data, Class cls)
+    public double FeedForward(double[][,] data, double[] expected)
     {
-      return feedForward(data, cls);
+      return feedForward(data, expected);
     }
 
     public void FlushGradient()
@@ -259,7 +258,6 @@ namespace ML.DeepMethods.Algorithms
     {
       // init fields
 
-      m_EpochLength = TrainingSample.Count;
       m_InputDepth  = Net.InputDepth;
       m_InputHeight = Net.InputHeight;
       m_InputWidth  = Net.InputWidth;
@@ -282,24 +280,6 @@ namespace ML.DeepMethods.Algorithms
         }
       }
 
-      // init expected outputs
-
-      m_ExpectedOutputs = new Dictionary<Class, double[]>();
-      var count = Classes.Count;
-      if (count != OutputDepth)
-        throw new MLException("Number of classes must be equal to dimension of output vector");
-
-      for (int i=0; i<count; i++)
-      {
-        var cls = Classes.FirstOrDefault(p => (int)p.Value.Value == i).Value;
-        if (cls == null)
-          throw new MLException(string.Format("There is no class with value {0}. It is neccessary to have full set of classes with values from 0 to {1}", i, count));
-
-        var output = new double[count];
-        output[i] = 1.0D;
-        m_ExpectedOutputs[cls] = output;
-      }
-
       // init optimizer
       if (m_Optimizer==null)
         m_Optimizer = Registry.Optimizer.SGD;
@@ -315,26 +295,26 @@ namespace ML.DeepMethods.Algorithms
 
     #endregion
 
-    protected override void DoTrain()
+    protected override void TrainImpl(MultiRegressionSample<double[][,]> sample)
     {
-      doTrain();
+      doTrain(sample);
     }
 
     #region .pvt
 
-    private void doTrain()
+    private void doTrain(MultiRegressionSample<double[][,]> sample)
     {
       for (int epoch=0; epoch<m_EpochCount; epoch++)
       {
-        runEpoch();
+        runEpoch(sample);
         if (checkStopCriteria()) break;
       }
     }
 
-    private void runEpoch()
+    private void runEpoch(MultiRegressionSample<double[][,]> sample)
     {
       // loop on batches
-      foreach (var batch in TrainingSample.Batch(m_BatchSize))
+      foreach (var batch in sample.Batch(m_BatchSize))
       {
         runBatch(batch);
       }
@@ -348,7 +328,7 @@ namespace ML.DeepMethods.Algorithms
       if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
     }
 
-    private void runBatch(ClassifiedSample<double[][,]> sampleBatch)
+    private void runBatch(MultiRegressionSample<double[][,]> sampleBatch)
     {
       // loop over batch
       if (m_UseBatchParallelization)
@@ -380,10 +360,10 @@ namespace ML.DeepMethods.Algorithms
       if (BatchEndedEvent != null) BatchEndedEvent(this, EventArgs.Empty);
     }
 
-    private void runIteration(double[][,] input, Class cls)
+    private void runIteration(double[][,] input, double[] expected)
     {
       // feed forward
-      var iterLoss = feedForward(input, cls);
+      var iterLoss = feedForward(input, expected);
 
       // feed backward
       var lcount = Net.LayerCount;
@@ -408,7 +388,7 @@ namespace ML.DeepMethods.Algorithms
       m_IterLossValue += iterLoss;
     }
 
-    private double feedForward(double[][,] input, Class cls)
+    private double feedForward(double[][,] input, double[] expected)
     {
       Net.Calculate(input, m_Values);
 
@@ -419,18 +399,17 @@ namespace ML.DeepMethods.Algorithms
       var output = new double[len];
       for (int j=0; j<len; j++) output[j] = result[j][0, 0];
 
-      var expect = m_ExpectedOutputs[cls];
       var llayer = Net[lidx];
 
       for (int p=0; p<llayer.OutputDepth; p++)
       {
-        var ej = m_LossFunction.Derivative(p, output, expect);
+        var ej = m_LossFunction.Derivative(p, output, expected);
         var value = result[p][0, 0];
         var deriv = (llayer.ActivationFunction != null) ? llayer.ActivationFunction.DerivativeFromValue(value) : 1;
         errors[p][0, 0] = ej * deriv / m_BatchSize;
       }
 
-      var loss = m_LossFunction.Value(output, expect) / m_BatchSize;
+      var loss = m_LossFunction.Value(output, expected) / m_BatchSize;
       if (m_Regularizator != null)
         loss += (m_Regularizator.Value(Net.Weights) / m_BatchSize);
 

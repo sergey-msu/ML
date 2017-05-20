@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Examples.cs" />
+    <Compile Include="MainColors.cs" />
     <Compile Include="KaggleCatDogTrunk.cs" />
     <Compile Include="KaggleCatDog.cs" />
     <Compile Include="OriginalCIFAR10Trunc.cs" />

@@ -4,24 +4,11 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using ML.Core;
 using ML.DeepMethods.Algorithms;
-using ML.DeepMethods.Models;
-using System.Reflection;
 
 namespace ML.DeepTests
 {
-  public class KaggleCatDog64Trunk : KaggleCatDogTrunk
-  {
-    public override int NormImgSize { get { return 64; } }
-
-    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
-    {
-      return Examples.CreateKaggleCatOrDogDemo_Pretrained_LiftTo64Size(sample);
-    }
-  }
-
   public class KaggleCatDogTrunk : Runner
   {
     public const int    TRAIN_COUNT  = 10000;
@@ -30,19 +17,19 @@ namespace ML.DeepTests
     public const string CAT_PREFIX   = "cat.";
     public const string DOG_PREFIX   = "dog.";
 
-    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
+    private Dictionary<int, double[]> m_Classes = new Dictionary<int, double[]>
     {
-      { 0, new Class("cat", 0) },
-      { 1, new Class("dog", 1) }
+      { 0, new[] { 1.0D, 0.0D } }, // cat
+      { 1, new[] { 0.0D, 1.0D } }  // dog
     };
 
     public override string SrcMark    { get { return "kaggle"; } }
     public override string DataPath   { get { return RootPath+@"\data\cat-dog"; }}
     public override string OutputPath { get { return RootPath+@"\output\cat-dog"; }}
 
-    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateKaggleCatOrDogDemo_Pretrained(sample);
+      return Examples.CreateKaggleCatOrDogDemo1();
     }
 
     public virtual int NormImgSize { get { return 32; } }
@@ -81,7 +68,7 @@ namespace ML.DeepTests
 
       // preload all
       Console.WriteLine("preload all data...");
-      var dataset = new ClassifiedSample<double[][,]>();
+      var dataset = new MultiRegressionSample<double[][,]>();
       loadData(TrainPath, dataset);
 
       //var cnt = 0;
@@ -100,7 +87,7 @@ namespace ML.DeepTests
       loadTest(dataset);
     }
 
-    private void loadData(string path, ClassifiedSample<double[][,]> sample)
+    private void loadData(string path, MultiRegressionSample<double[][,]> sample)
     {
       sample.Clear();
 
@@ -112,17 +99,17 @@ namespace ML.DeepTests
       {
         var data = loadFile(file.FullName);
 
-        Class cls;
+        double[] mark;
         if (file.Name.StartsWith(CAT_PREFIX))
-          cls = m_Classes[0];
+          mark = m_Classes[0];
         else if (file.Name.StartsWith(DOG_PREFIX))
-          cls = m_Classes[1];
+          mark = m_Classes[1];
         else
           throw new MLException("Unknown file");
 
         lock (sample)
         {
-          sample.Add(data, cls);
+          sample.Add(data, mark);
           loaded++;
           if (loaded % 1000 == 0)
             Console.Write("\rloaded: {0} of {1}        ", loaded, total);
@@ -174,9 +161,9 @@ namespace ML.DeepTests
       return result;
     }
 
-    private void shuffle(ref ClassifiedSample<double[][,]> sample)
+    private void shuffle(ref MultiRegressionSample<double[][,]> sample)
     {
-      var result = new ClassifiedSample<double[][,]>();
+      var result = new MultiRegressionSample<double[][,]>();
 
       var cnt = sample.Count;
       var ids = Enumerable.Range(0, cnt).ToList();
@@ -196,7 +183,7 @@ namespace ML.DeepTests
       sample = result;
     }
 
-    private void loadTrain(ClassifiedSample<double[][,]> dataset)
+    private void loadTrain(MultiRegressionSample<double[][,]> dataset)
     {
       m_TrainingSet = dataset.Subset(0, TRAIN_COUNT);
     }
@@ -219,7 +206,7 @@ namespace ML.DeepTests
       }
     }
 
-    private void loadTest(ClassifiedSample<double[][,]> dataset)
+    private void loadTest(MultiRegressionSample<double[][,]> dataset)
     {
       m_TestingSet = dataset.Subset(TRAIN_COUNT, TEST_COUNT);
     }
@@ -245,7 +232,7 @@ namespace ML.DeepTests
 
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
+      Alg.Train(m_TrainingSet);
 
       Console.WriteLine("\n--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }

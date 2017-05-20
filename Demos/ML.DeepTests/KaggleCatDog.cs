@@ -17,19 +17,19 @@ namespace ML.DeepTests
     public const string DOG_PREFIX = "dog.";
 
     private List<double[][,]>      m_Test = new List<double[][,]>();
-    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
+    private Dictionary<int, double[]> m_Classes = new Dictionary<int, double[]>
     {
-      { 0, new Class("cat", 0) },
-      { 1, new Class("dog", 1) }
+      { 0, new[] { 1.0D, 0.0D } }, // cat
+      { 1, new[] { 0.0D, 1.0D } }  // dog
     };
 
     public override string SrcMark    { get { return "kaggle"; } }
     public override string DataPath   { get { return RootPath+@"\data\cat-dog"; }}
     public override string OutputPath { get { return RootPath+@"\output\cat-dog"; }}
 
-    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateKaggleCatOrDogDemo1(sample);
+      return Examples.CreateKaggleCatOrDogDemo1();
     }
 
     #region Export
@@ -56,7 +56,7 @@ namespace ML.DeepTests
       //loadTest(TestPath, m_Test);
     }
 
-    private void loadTrain(string path, ClassifiedSample<double[][,]> sample)
+    private void loadTrain(string path, MultiRegressionSample<double[][,]> sample)
     {
       sample.Clear();
 
@@ -68,17 +68,17 @@ namespace ML.DeepTests
       {
         var data = loadFile(file.FullName);
 
-        Class cls;
+        double[] mark;
         if (file.Name.StartsWith(CAT_PREFIX))
-          cls = m_Classes[0];
+          mark = m_Classes[0];
         else if (file.Name.StartsWith(DOG_PREFIX))
-          cls = m_Classes[1];
+          mark = m_Classes[1];
         else
           throw new MLException("Unknown file");
 
         lock (sample)
         {
-          sample.Add(data, cls);
+          sample.Add(data, mark);
           loaded++;
           if (loaded % 1000 == 0)
             Console.Write("\rloaded: {0} of {1}        ", loaded, total);
@@ -140,9 +140,9 @@ namespace ML.DeepTests
       return result;
     }
 
-    private void shuffle(ref ClassifiedSample<double[][,]> sample)
+    private void shuffle(ref MultiRegressionSample<double[][,]> sample)
     {
-      var result = new ClassifiedSample<double[][,]>();
+      var result = new MultiRegressionSample<double[][,]>();
 
       var cnt = sample.Count;
       var ids = Enumerable.Range(0, cnt).ToList();
@@ -183,7 +183,7 @@ namespace ML.DeepTests
 
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
+      Alg.Train(m_TrainingSet);
 
       Console.WriteLine("\n--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }

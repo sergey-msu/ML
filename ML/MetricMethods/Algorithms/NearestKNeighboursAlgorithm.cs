@@ -4,7 +4,7 @@ using System.Linq;
 using ML.Contracts;
 using ML.Core;
 
-namespace ML.MetricalMethods.Algorithms
+namespace ML.MetricMethods.Algorithms
 {
   /// <summary>
   /// Nearest K Neighbours Algorithm
@@ -13,10 +13,8 @@ namespace ML.MetricalMethods.Algorithms
   {
     private int m_K;
 
-    public NearestKNeighboursAlgorithm(ClassifiedSample<double[]> classifiedSample,
-                                       IMetric metric,
-                                       int k)
-      : base(classifiedSample, metric)
+    public NearestKNeighboursAlgorithm(IMetric metric, int k)
+      : base(metric)
     {
       K = k;
     }
@@ -62,7 +60,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Leave-one-out optimization
     /// </summary>
-    public void Train_LOO(int? minK = null, int? maxK = null)
+    public void OptimizeLOO(int? minK = null, int? maxK = null)
     {
       if (!minK.HasValue || minK.Value<1) minK = 1;
       if (!maxK.HasValue || maxK.Value>TrainingSample.Count) maxK = TrainingSample.Count;
@@ -70,19 +68,24 @@ namespace ML.MetricalMethods.Algorithms
       var kOpt = int.MaxValue;
       var minErrCnt = int.MaxValue;
 
-      for (int k = minK.Value; k <= maxK.Value; k++)
+      for (int k=minK.Value; k<=maxK.Value; k++)
       {
         var errCnt = 0;
         m_K = k;
 
-        for (int i = 0; i < TrainingSample.Count; i++)
+        var initSample = TrainingSample;
+
+        for (int i=0; i<initSample.Count; i++)
         {
-          var pData = TrainingSample.ElementAt(i);
-          using (var mask = this.ApplySampleMask((p, c, idx) => idx != i))
-          {
-            var cls = this.Classify(pData.Key);
-            if (cls != pData.Value) errCnt++;
-          }
+          var pData = initSample.ElementAt(i);
+          var looSample  = initSample.ApplyMask((p, c, idx) => idx != i);
+          TrainingSample = looSample;
+
+          var predClass = this.Predict(pData.Key);
+          var realClass = pData.Value;
+          if (predClass != realClass) errCnt++;
+
+          TrainingSample = initSample;
         }
 
         if (errCnt < minErrCnt)

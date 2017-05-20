@@ -4,18 +4,18 @@ using System.Linq;
 using ML.Core;
 using ML.Core.Mathematics;
 using ML.DeepMethods.Models;
+using ML.Contracts;
 
 namespace ML.DeepMethods.Algorithms
 {
   /// <summary>
   /// Feedforward Convolutional Neural Network machine learning algorithm
   /// </summary>
-  public abstract class ConvNetAlgorithmBase: AlgorithmBase<double[][,]>
+  public abstract class ConvNetAlgorithmBase : MultiRegressionAlgorithmBase<double[][,]>
   {
     private ConvNet m_Net;
 
-    protected ConvNetAlgorithmBase(ClassifiedSample<double[][,]> trainingSample, ConvNet net)
-      : base(trainingSample)
+    protected ConvNetAlgorithmBase(ConvNet net)
     {
       if (net==null)
         throw new MLException("Network can not be null");
@@ -28,25 +28,29 @@ namespace ML.DeepMethods.Algorithms
     /// </summary>
     public ConvNet Net { get { return m_Net; } }
 
+
     /// <summary>
     /// Maps object to corresponding class
     /// </summary>
-    public override Class Classify(double[][,] input)
+    public override double[] Predict(double[][,] x)
     {
-      var result = m_Net.Calculate(input);
-      var res = MathUtils.ArgMax<double>(result);
-      var cls = m_Classes.FirstOrDefault(c => (int)c.Value.Value == res).Value  ?? Class.None;
+      var result = m_Net.Calculate(x);
+      var len = result.Length;
 
-      return cls;
+      var flatResult = new double[len];
+      for (int i=0; i<len; i++)
+        flatResult[i] = result[i][0,0];
+
+      return flatResult;
     }
 
-    public override IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<double[][,]> classifiedSample)
+    public override IEnumerable<ErrorInfo<double[][,], Class>> GetClassificationErrors(MultiRegressionSample<double[][,]> testSample, Class[] classes)
     {
       var isTraining = m_Net.IsTraining;
       m_Net.IsTraining = false;
       try
       {
-        return base.GetErrors(classifiedSample);
+        return base.GetClassificationErrors(testSample, classes);
       }
       finally
       {
@@ -57,13 +61,12 @@ namespace ML.DeepMethods.Algorithms
     /// <summary>
     /// Teaches algorithm, produces Result output
     /// </summary>
-    public void Train()
+    protected sealed override void DoTrain()
     {
       m_Net.IsTraining = true;
       try
       {
-        Build();
-        DoTrain();
+        TrainImpl(TrainingSample);
       }
       finally
       {
@@ -71,8 +74,9 @@ namespace ML.DeepMethods.Algorithms
       }
     }
 
-    public abstract void Build();
 
-    protected abstract void DoTrain();
+    protected abstract void TrainImpl(MultiRegressionSample<double[][,]> sample);
+
+    public abstract void Build();
   }
 }

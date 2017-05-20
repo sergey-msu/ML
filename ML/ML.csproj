@@ -77,7 +77,7 @@
     <Compile Include="Core\ActivationFunctions\SignActivation.cs" />
     <Compile Include="Core\ActivationFunctions\TanhActivation.cs" />
     <Compile Include="Core\AlgorithmBase.cs" />
-    <Compile Include="Core\ClassifiedSample.cs" />
+    <Compile Include="Core\Samples.cs" />
     <Compile Include="Contracts\INamed.cs" />
     <Compile Include="Core\ComputingNetworks\CompositeNode.cs" />
     <Compile Include="Core\ComputingNetworks\AggregateNode.cs" />
@@ -143,15 +143,15 @@
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />
     <Compile Include="LogicalMethods\Models\DecisionNode.cs" />
     <Compile Include="LogicalMethods\Models\DecisionTree.cs" />
-    <Compile Include="MetricalMethods\Algorithms\AlgorithmBases.cs" />
-    <Compile Include="MetricalMethods\Algorithms\NearestKNeighboursAlgorithm.cs" />
-    <Compile Include="MetricalMethods\Algorithms\NearestKWeighedNeighboursAlgorithm.cs" />
-    <Compile Include="MetricalMethods\Algorithms\NearestNeighbourAlgorithm.cs" />
-    <Compile Include="MetricalMethods\Algorithms\ParzenFixedAlgorithm.cs" />
-    <Compile Include="MetricalMethods\Algorithms\ParzenVariableAlgorithm.cs" />
-    <Compile Include="MetricalMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
+    <Compile Include="MetricMethods\Algorithms\AlgorithmBases.cs" />
+    <Compile Include="MetricMethods\Algorithms\NearestKNeighboursAlgorithm.cs" />
+    <Compile Include="MetricMethods\Algorithms\NearestKWeighedNeighboursAlgorithm.cs" />
+    <Compile Include="MetricMethods\Algorithms\NearestNeighbourAlgorithm.cs" />
+    <Compile Include="MetricMethods\Algorithms\ParzenFixedAlgorithm.cs" />
+    <Compile Include="MetricMethods\Algorithms\ParzenVariableAlgorithm.cs" />
+    <Compile Include="MetricMethods\Algorithms\PotentialFunctionAlgorithm.cs" />
     <Compile Include="NeuralMethods\Algorithms\BackpropAlgorithm.cs" />
-    <Compile Include="NeuralMethods\Algorithms\NeuralNetworkAlgorithmBase.cs" />
+    <Compile Include="NeuralMethods\Algorithms\NeuralNetAlgorithmBase.cs" />
     <Compile Include="NeuralMethods\LossFunctions\CrossEntropyLoss.cs" />
     <Compile Include="NeuralMethods\LossFunctions\CrossEntropySoftMaxLoss.cs" />
     <Compile Include="NeuralMethods\LossFunctions\EuclideanLoss.cs" />
@@ -164,7 +164,7 @@
     <Compile Include="Utils\NetworkFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="MetricalMethods\Models\" />
+    <Folder Include="MetricMethods\Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

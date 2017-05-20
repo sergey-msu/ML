@@ -4,17 +4,17 @@ using System.Linq;
 using ML.Contracts;
 using ML.Core;
 
-namespace ML.MetricalMethods.Algorithms
+namespace ML.MetricMethods.Algorithms
 {
   /// <summary>
   /// Base class for metric algorithm supplied with some spacial metric
   /// </summary>
-  public abstract class MetricAlgorithmBase<TObj> : AlgorithmBase<TObj>, IMetricAlgorithm<TObj>
+  public abstract class MetricAlgorithmBase<TObj> : ClassificationAlgorithmBase<TObj>, IMetricAlgorithm<TObj>
   {
     public readonly IMetric m_Metric;
 
-    protected MetricAlgorithmBase(ClassifiedSample<TObj> classifiedSample, IMetric metric)
-      : base(classifiedSample)
+    protected MetricAlgorithmBase(IMetric metric)
+      : base()
     {
       if (metric == null)
         throw new MLException("MetricAlgorithmBase.ctor(metric=null)");
@@ -30,12 +30,12 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Classify point
     /// </summary>
-    public override Class Classify(TObj obj)
+    public override Class Predict(TObj obj)
     {
       Class result = null;
       var maxEst = double.MinValue;
 
-      foreach (var cls in Classes.Values)
+      foreach (var cls in TrainingSample.Classes)
       {
         var est = EstimateProximity(obj, cls);
         if (est > maxEst)
@@ -67,13 +67,13 @@ namespace ML.MetricalMethods.Algorithms
         double maxi = double.MinValue;
         double si = 0;
 
-        foreach (var cls in Classes.Values)
+        foreach (var cls in TrainingSample.Classes)
         {
-          var closeness = EstimateProximity(pData.Key, cls);
-          if (cls == pData.Value) si = closeness;
+          var proximity = EstimateProximity(pData.Key, cls);
+          if (cls==pData.Value) si = proximity;
           else
           {
-            if (maxi < closeness) maxi = closeness;
+            if (maxi < proximity) maxi = proximity;
           }
         }
 
@@ -87,6 +87,12 @@ namespace ML.MetricalMethods.Algorithms
     {
       return EstimateClose((double[])obj, cls);
     }
+
+
+    protected override void DoTrain()
+    {
+      // Metric methods are not trainable by default
+    }
   }
 
   /// <summary>
@@ -94,8 +100,8 @@ namespace ML.MetricalMethods.Algorithms
   /// </summary>
   public abstract class OrderedMetricAlgorithmBase : MetricAlgorithmBase<double[]>
   {
-    protected OrderedMetricAlgorithmBase(ClassifiedSample<double[]> classifiedSample, IMetric metric)
-      : base(classifiedSample, metric)
+    protected OrderedMetricAlgorithmBase(IMetric metric)
+      : base(metric)
     {
     }
 
@@ -138,10 +144,8 @@ namespace ML.MetricalMethods.Algorithms
   {
     private readonly IFunction m_Kernel;
 
-    public KernelAlgorithmBase(ClassifiedSample<double[]> classifiedSample,
-                               IMetric metric,
-                               IFunction kernel)
-      : base(classifiedSample, metric)
+    public KernelAlgorithmBase(IMetric metric, IFunction kernel)
+      : base(metric)
     {
       if (kernel == null)
         throw new MLException("KernelAlgorithmBase.ctor(kernel=null)");

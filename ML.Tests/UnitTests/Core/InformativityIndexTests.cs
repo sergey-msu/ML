@@ -17,7 +17,7 @@ namespace ML.Tests.UnitTests.Core
                                                  new Class("C", 3)
                                                };
 
-      public static readonly ClassifiedSample<double[]> SAMPLE_2C = new ClassifiedSample<double[]>
+      public static readonly ClassifiedSample<double[]> SAMPLE_2C = new ClassifiedSample<double[]>()
       {
         { new double[] { 0.0F }, CLASSES[0] },
         { new double[] { 1.0F }, CLASSES[0] },
@@ -26,7 +26,7 @@ namespace ML.Tests.UnitTests.Core
         { new double[] { 4.0F }, CLASSES[1] },
       };
 
-      public static readonly ClassifiedSample<double[]> SAMPLE_3C = new ClassifiedSample<double[]>
+      public static readonly ClassifiedSample<double[]> SAMPLE_3C = new ClassifiedSample<double[]>()
       {
         { new double[] { 0.0F }, CLASSES[0] },
         { new double[] { 1.0F }, CLASSES[0] },

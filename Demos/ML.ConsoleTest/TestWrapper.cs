@@ -2,19 +2,17 @@
 using System.Linq;
 using System.Collections.Generic;
 using ML.Core;
-using ML.Core.Metric;
 using ML.Core.Kernels;
+using ML.Core.Logical;
+using ML.Core.Metric;
+using ML.Core.Registry;
 using ML.Contracts;
 using ML.LogicalMethods.Algorithms;
-using ML.MetricalMethods.Algorithms;
-using ML.Core.Logical;
+using ML.MetricMethods.Algorithms;
 using ML.NeuralMethods.Algorithms;
-using ML.NeuralMethods.Models;
-using ML.Utils;
 using ML.DeepMethods.Models;
-using ML.Core.Registry;
-using ML.DeepMethods;
 using ML.DeepMethods.Registry;
+using ML.Utils;
 
 namespace ML.ConsoleTest
 {
@@ -113,7 +111,8 @@ namespace ML.ConsoleTest
     private void doNearestNeighbourAlgorithmTest()
     {
       var metric = new EuclideanMetric();
-      var alg = new NearestNeighbourAlgorithm(Data.TrainingSample, metric);
+      var alg = new NearestNeighbourAlgorithm(metric);
+      alg.Train(Data.TrainingSample);
 
       Console.WriteLine("Margin:");
       calculateMargin(alg);
@@ -131,10 +130,11 @@ namespace ML.ConsoleTest
     private void doNearestKNeighboursAlgorithmTest()
     {
       var metric = new EuclideanMetric();
-      var alg = new NearestKNeighboursAlgorithm(Data.TrainingSample, metric, 1);
+      var alg = new NearestKNeighboursAlgorithm(metric, 1);
+      alg.Train(Data.TrainingSample);
 
       // LOO
-      alg.Train_LOO();
+      alg.OptimizeLOO();
       var optK = alg.K;
       Console.WriteLine("Nearest K Neigbour: optimal k is {0}", optK);
       Console.WriteLine();
@@ -167,10 +167,11 @@ namespace ML.ConsoleTest
 
       var metric = new EuclideanMetric();
       var kernel = new GaussianKernel();
-      var alg = new ParzenFixedAlgorithm(Data.TrainingSample, metric, kernel, 1.0F);
+      var alg = new ParzenFixedAlgorithm(metric, kernel, 1.0F);
+      alg.Train(Data.TrainingSample);
 
       // LOO
-      alg.Train_LOO(0.1F, 20.0F, 0.2F);
+      alg.OptimizeLOO(0.1F, 20.0F, 0.2F);
       var optH = alg.H;
       Console.WriteLine("Parzen Fixed: optimal h is {0}", optH);
       Console.WriteLine();
@@ -213,7 +214,8 @@ namespace ML.ConsoleTest
       var eqps = new PotentialFunctionAlgorithm.KernelEquipment[Data.TrainingSample.Count];
       for (int i=0; i<Data.TrainingSample.Count; i++)
         eqps[i] = new PotentialFunctionAlgorithm.KernelEquipment(1.0F, 1.5F);
-      var alg = new PotentialFunctionAlgorithm(Data.TrainingSample, metric, kernel, eqps);
+      var alg = new PotentialFunctionAlgorithm(metric, kernel, eqps);
+      alg.Train(Data.TrainingSample);
 
       Console.WriteLine("Margin:");
       calculateMargin(alg);
@@ -225,11 +227,10 @@ namespace ML.ConsoleTest
 
     private void doDecisionTreeAlgorithmTest()
     {
-      var patterns = getSimpleLogicPatterns();
-
-      var alg = new DecisionTreeID3Algorithm<double[]>(Data.TrainingSample);
-      var informativity = new DonskoyIndex<double[]>();
-      alg.Train(patterns, informativity);
+      var alg = new DecisionTreeID3Algorithm<double[]>();
+      alg.Patterns = getSimpleLogicPatterns();
+      alg.Informativity = new DonskoyIndex<double[]>();
+      alg.Train(Data.TrainingSample);
 
       outputError(alg);
 
@@ -246,7 +247,7 @@ namespace ML.ConsoleTest
       net[0].DropoutRate = 0.1D;
       net.IsTraining = true;
 
-      var alg = new BackpropAlgorithm(Data.TrainingSample, net);
+      var alg = new BackpropAlgorithm(net);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.01D;
       alg.BatchSize = 10;
@@ -270,7 +271,7 @@ namespace ML.ConsoleTest
       var alg = createBPAlg();
 
       var now = DateTime.Now;
-      alg.Train();
+      alg.Train(Core.Utils.ClassifiedToRegressionSample(Data.TrainingSample));
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
 
@@ -300,21 +301,7 @@ namespace ML.ConsoleTest
       cnn._Build();
       cnn.RandomizeParameters(0);
 
-      var sample = new ClassifiedSample<double[][,]>();
-      foreach (var obj in Data.TrainingSample)
-      {
-        var data = obj.Key;
-
-        var key = new double[data.Length][,];
-        for (int i=0; i<data.Length; i++)
-          key[i] = new double[1,1];
-
-        for (int i=0; i<data.Length; i++)
-          key[i][0,0] = data[i];
-        sample[key] = obj.Value;
-      }
-
-      var alg = new ML.DeepMethods.Algorithms.BackpropAlgorithm(sample, cnn);
+      var alg = new ML.DeepMethods.Algorithms.BackpropAlgorithm(cnn);
       alg.EpochCount = 6000;
       alg.LearningRate = 0.01D;
       alg.BatchSize = 1;
@@ -336,9 +323,11 @@ namespace ML.ConsoleTest
     private void doCNNAlgorithmTest()
     {
       var alg = createCNNAlg_NN_ForTest();
+      alg.Build();
+      var sample = sampleTo3D(Data.TrainingSample);
 
       var now = DateTime.Now;
-      alg.Train();
+      alg.Train(Core.Utils.ClassifiedToRegressionSample(sample));
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
 
@@ -354,7 +343,24 @@ namespace ML.ConsoleTest
 
     #region auxillary
 
-    private void outputError(AlgorithmBase<double[]> alg)
+    private ClassifiedSample<double[][,]> sampleTo3D(ClassifiedSample<double[]> sample)
+    {
+      var result = new ClassifiedSample<double[][,]>();
+      foreach (var obj in sample)
+      {
+        var data = obj.Key;
+
+        var key = new double[data.Length][,];
+        for (int i=0; i<data.Length; i++)
+          key[i] = new double[1,1] { { data[i] } };
+
+        result[key] = obj.Value;
+      }
+
+      return result;
+    }
+
+    private void outputError(ClassificationAlgorithmBase<double[]> alg)
     {
       Console.WriteLine("Errors:");
       var errors = alg.GetErrors(Data.Data);
@@ -364,7 +370,28 @@ namespace ML.ConsoleTest
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
     }
 
-    private void outputError(AlgorithmBase<double[,,]> alg)
+    private void outputError(MultiRegressionAlgorithmBase<double[]> alg)
+    {
+      Console.WriteLine("Errors:");
+      var errors = alg.GetClassificationErrors(Core.Utils.ClassifiedToRegressionSample(Data.Data), Data.Data.Classes.ToArray());
+      var ec = errors.Count();
+      var dc = Data.Data.Count;
+      var pct = Math.Round(100.0F * ec / dc, 2);
+      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+    }
+
+    private void outputError(MultiRegressionAlgorithmBase<double[][,]> alg)
+    {
+      Console.WriteLine("Errors:");
+      var sample = sampleTo3D(Data.Data);
+      var errors = alg.GetClassificationErrors(Core.Utils.ClassifiedToRegressionSample(sample), sample.Classes.ToArray());
+      var ec = errors.Count();
+      var dc = Data.Data.Count;
+      var pct = Math.Round(100.0F * ec / dc, 2);
+      Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
+    }
+
+    private void outputError(ClassificationAlgorithmBase<double[,,]> alg)
     {
       Console.WriteLine("Errors:");
 
@@ -385,7 +412,7 @@ namespace ML.ConsoleTest
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
     }
 
-    private void outputError(AlgorithmBase<double[][,]> alg)
+    private void outputError(ClassificationAlgorithmBase<double[][,]> alg)
     {
       Console.WriteLine("Errors:");
 

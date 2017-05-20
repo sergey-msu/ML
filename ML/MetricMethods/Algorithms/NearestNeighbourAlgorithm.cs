@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using ML.Contracts;
 using ML.Core;
 
-namespace ML.MetricalMethods.Algorithms
+namespace ML.MetricMethods.Algorithms
 {
   /// <summary>
   /// Nearest Neighbour Algorithm
   /// </summary>
   public sealed class NearestNeighbourAlgorithm : OrderedMetricAlgorithmBase
   {
-    public NearestNeighbourAlgorithm(ClassifiedSample<double[]> classifiedSample, IMetric metric)
-      : base(classifiedSample, metric)
+    public NearestNeighbourAlgorithm(IMetric metric)
+      : base(metric)
     {
     }
 

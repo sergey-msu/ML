@@ -3,104 +3,21 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ML.Contracts;
+using ML.Core.Mathematics;
 
 namespace ML.Core
 {
   /// <summary>
-  /// Base class for algorithm that accepts whole traing sample
+  /// Base class for supervised algorithm with training sample
   /// </summary>
-  public abstract class AlgorithmBase<TObj> : ISupervisedAlgorithm<TObj>
+  public abstract class SupervisedAlgorithmBase<TSample, TObj, TMark>
+    : ISupervisedAlgorithm<TSample, TObj, TMark>
+      where TSample: MarkedSample<TObj, TMark>
   {
-    #region Inner
+    private TSample m_TrainingSample;
 
-      public delegate bool SampleMaskDelegate(object p, Class c, int i);
-
-      public class MaskHandle : IDisposable
-      {
-        private static readonly SampleMaskDelegate ALL = (p, c, i) => true;
-
-        private AlgorithmBase<TObj> m_Algorithm;
-        private SampleMaskDelegate m_Mask;
-        private ClassifiedSample<TObj> m_MaskedSample;
-        private bool m_Disposed;
-
-        public MaskHandle(AlgorithmBase<TObj> algorithm, SampleMaskDelegate mask)
-        {
-          if (algorithm==null)
-            throw new MLException("MaskHandle.ctor(algorithm=null)");
-
-          m_Algorithm = algorithm;
-          m_Mask = mask ?? ALL;
-        }
-
-        public ClassifiedSample<TObj> MaskedSample
-        {
-          get
-          {
-            if (m_Disposed) throw new ObjectDisposedException("MaskHandle has been disposed");
-
-            if (m_MaskedSample == null)
-            {
-              var maskedSample = m_Algorithm.m_TrainingSample
-                                            .Where((kvp, i) => m_Mask(kvp.Key, kvp.Value, i))
-                                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-              m_MaskedSample = new ClassifiedSample<TObj>(maskedSample);
-            }
-
-            return m_MaskedSample;
-          }
-        }
-
-        public void Dispose()
-        {
-          m_Algorithm.m_MaskHandle = null;
-          m_Algorithm = null;
-          m_Disposed = true;
-        }
-      }
-
-      /// <summary>
-      /// Represents classification error
-      /// </summary>
-      public class ErrorInfo
-      {
-        public ErrorInfo(object obj, Class realClass, Class calcClass)
-        {
-          Object = obj;
-          RealClass = realClass;
-          CalcClass = calcClass;
-        }
-
-        /// <summary>
-        /// Classified object
-        /// </summary>
-        public readonly object Object;
-
-        /// <summary>
-        /// Real point class
-        /// </summary>
-        public readonly Class RealClass;
-
-        /// <summary>
-        /// Calculated oblect class
-        /// </summary>
-        public readonly Class CalcClass;
-      }
-
-    #endregion
-
-    protected readonly ClassifiedSample<TObj> m_TrainingSample;
-    protected readonly Dictionary<string, Class> m_Classes;
-    private MaskHandle m_MaskHandle;
-
-    protected AlgorithmBase(ClassifiedSample<TObj> trainingSample)
+    protected SupervisedAlgorithmBase()
     {
-      if (trainingSample == null || !trainingSample.Any())
-        throw new MLException("AlrogithmBase.ctor(trainingSample=null|empty)");
-
-      m_TrainingSample = new ClassifiedSample<TObj>(trainingSample);
-      m_Classes = m_TrainingSample.Classes.ToDictionary(c => c.Name);
     }
 
     /// <summary>
@@ -116,48 +33,166 @@ namespace ML.Core
     /// <summary>
     /// Training sample
     /// </summary>
-    public ClassifiedSample<TObj> TrainingSample
+    public TSample TrainingSample
     {
-      get
+      get { return m_TrainingSample; }
+      internal set
       {
-        return m_MaskHandle != null ? m_MaskHandle.MaskedSample : m_TrainingSample;
+        if (value == null || !value.Any())
+        throw new MLException("SupervisedAlgorithmBase.ctor(trainingSample=null|empty)");
+
+        m_TrainingSample = value;
       }
     }
 
     /// <summary>
-    /// Known classes
+    /// Train the algorithm with some initial marked data
     /// </summary>
-    public Dictionary<string, Class> Classes { get { return m_Classes; } }
-
-
-    /// <summary>
-    /// Maps object to corresponding class
-    /// </summary>
-    public abstract Class Classify(TObj obj);
-
-    public MaskHandle ApplySampleMask(SampleMaskDelegate mask)
+    public void Train(TSample trainingSample)
     {
-      m_MaskHandle = new MaskHandle(this, mask);
-      return m_MaskHandle;
+      TrainingSample = trainingSample;
+      DoTrain();
     }
 
     /// <summary>
-    /// Returns all errors of the given algorithm on some initially classified sample
+    /// Make a prediction
     /// </summary>
-    public virtual IEnumerable<ErrorInfo> GetErrors(ClassifiedSample<TObj> classifiedSample)
+    public abstract TMark Predict(TObj obj);
+
+    /// <summary>
+    /// Returns all errors of the algorithm on some test classified sample
+    /// </summary>
+    public virtual IEnumerable<ErrorInfo<TObj, TMark>> GetErrors(TSample testSample)
     {
-      var errors = new List<ErrorInfo>();
-      Parallel.ForEach(classifiedSample, pdata =>
+      var errors = new List<ErrorInfo<TObj, TMark>>();
+      Parallel.ForEach(testSample, pdata =>
       {
-        var res = this.Classify(pdata.Key);
-        if (res != pdata.Value)
+        var predMark = this.Predict(pdata.Key);
+        var realMark = pdata.Value;
+        if (!object.Equals(predMark, realMark))
           lock (errors)
           {
-            errors.Add(new ErrorInfo(pdata.Key, pdata.Value, res));
+            errors.Add(new ErrorInfo<TObj, TMark>(pdata.Key, realMark, predMark));
           }
       });
 
       return errors;
+    }
+
+    protected abstract void DoTrain();
+  }
+
+  /// <summary>
+  /// Base class for algorithm that accepts whole traing sample
+  /// </summary>
+  public abstract class ClassificationAlgorithmBase<TObj>
+    : SupervisedAlgorithmBase<ClassifiedSample<TObj>, TObj, Class>,
+      IClassificationAlgorithm<TObj>
+  {
+    protected ClassificationAlgorithmBase()
+    {
+    }
+  }
+
+  /// <summary>
+  /// Base class for supervised algorithm for regression purposes
+  /// </summary>
+  public abstract class RegressionAlgorithmBase<TObj>
+    : SupervisedAlgorithmBase<RegressionSample<TObj>, TObj, double>,
+      IRegressionAlgorithm<TObj>
+  {
+    protected RegressionAlgorithmBase()
+    {
+    }
+
+    public virtual Class Classify(TObj x, Class[] classes, double threshold = 0)
+    {
+      var result = Predict(x);
+      return mapValueToClass(result, classes, threshold);
+    }
+
+
+    /// <summary>
+    /// Returns all errors of the algorithm on some test classified sample
+    /// </summary>
+    public virtual IEnumerable<ErrorInfo<TObj, Class>> GetClassificationErrors(RegressionSample<TObj> testSample, Class[] classes, double threshold = 0)
+    {
+      var errors = new List<ErrorInfo<TObj, Class>>();
+      Parallel.ForEach(testSample, pdata =>
+      {
+        var predClass = this.Classify(pdata.Key, classes, threshold);
+        var realClass = mapValueToClass(pdata.Value, classes, threshold);
+        if (!object.Equals(predClass, realClass))
+          lock (errors)
+          {
+            errors.Add(new ErrorInfo<TObj, Class>(pdata.Key, realClass, predClass));
+          }
+      });
+
+      return errors;
+    }
+
+
+    private Class mapValueToClass(double value, Class[] classes, double threshold)
+    {
+      if (classes==null || classes.Length<=0)
+        return Class.Unknown;
+      if (classes.Length != 2)
+        throw new MLException("There must be 2 classes for classification");
+
+      var idx = (value<threshold) ? 0 : 1;
+      return classes[idx];
+    }
+  }
+
+  /// <summary>
+  /// Base class for supervised algorithm for multidimensional regression purposes
+  /// </summary>
+  public abstract class MultiRegressionAlgorithmBase<TObj>
+    : SupervisedAlgorithmBase<MultiRegressionSample<TObj>, TObj, double[]>,
+      IMultiRegressionAlgorithm<TObj>
+  {
+    protected MultiRegressionAlgorithmBase()
+    {
+    }
+
+
+    public virtual Class Classify(TObj x, Class[] classes)
+    {
+      var result = Predict(x);
+      return mapValueToClass(result, classes);
+    }
+
+    /// <summary>
+    /// Returns all errors of the algorithm on some test classified sample
+    /// </summary>
+    public virtual IEnumerable<ErrorInfo<TObj, Class>> GetClassificationErrors(MultiRegressionSample<TObj> testSample, Class[] classes)
+    {
+      var errors = new List<ErrorInfo<TObj, Class>>();
+      Parallel.ForEach(testSample, pdata =>
+      {
+        var predClass = this.Classify(pdata.Key, classes);
+        var realClass = mapValueToClass(pdata.Value, classes);
+        if (!object.Equals(predClass, realClass))
+          lock (errors)
+          {
+            errors.Add(new ErrorInfo<TObj, Class>(pdata.Key, realClass, predClass));
+          }
+      });
+
+      return errors;
+    }
+
+
+    private Class mapValueToClass(double[] value, Class[] classes)
+    {
+      if (value==null || classes==null)
+        return Class.Unknown;
+      if (classes.Length != value.Length)
+        throw new MLException("Wrong class count");
+
+      var idx = MathUtils.ArgMax(value);
+      return classes[idx];
     }
   }
 }

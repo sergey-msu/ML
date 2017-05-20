@@ -30,27 +30,24 @@ namespace ML.DeepTests
     const string CIFAR10_IMG_FILE   = "img_{0}.png";
     const string CIFAR10_LABEL_FILE = "labels.csv";
 
-    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>()
+    private Dictionary<int, double[]> m_Marks = new Dictionary<int, double[]>
     {
-      //{ 0, new Class("airplane",   ) },
-      //{ 1, new Class("automobile", ) },
-      //{ 2, new Class("bird",       ) },
-        { 3, new Class("cat",        0) },
-      //{ 4, new Class("deer",       ) },
-        { 5, new Class("dog",        1) },
-      //{ 6, new Class("frog",       ) },
-      //{ 7, new Class("horse",      2) },
-      //{ 8, new Class("ship",       ) },
-      //{ 9, new Class("truck",      ) },
+      { 0, new[] { 1.0D, 0.0D } }, // cat
+      { 1, new[] { 0.0D, 1.0D } }  // dog
+    };
+    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
+    {
+      { 0, new Class("cat", 0) }, // cat
+      { 1, new Class("dog", 1) }  // dog
     };
 
     public override string SrcMark    { get { return "original"; } }
     public override string DataPath   { get { return RootPath+@"\data\cifar10trunc"; }}
     public override string OutputPath { get { return RootPath+@"\output\cifar10_original_trunc"; }}
 
-    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateCIFAR10Trunc2ClassesDemo2_SEALED(m_TrainingSet);
+      return Examples.CreateCIFAR10Trunc2ClassesDemo2_SEALED();
     }
 
     #region Export
@@ -195,7 +192,7 @@ namespace ML.DeepTests
       //Console.ReadLine();
     }
 
-    private void loadSample(string[] fpaths, ClassifiedSample<double[][,]> sample)
+    private void loadSample(string[] fpaths, MultiRegressionSample<double[][,]> sample)
     {
       foreach (var fpath in fpaths)
       {
@@ -206,8 +203,8 @@ namespace ML.DeepTests
             var label = file.ReadByte();
             if (label<0) break;
 
-            Class cls;
-            if (!m_Classes.TryGetValue(label, out cls))
+            double[] mark;
+            if (!m_Marks.TryGetValue(label, out mark))
             {
               file.Seek(3*32*32, SeekOrigin.Current);
               continue;
@@ -225,7 +222,7 @@ namespace ML.DeepTests
               data[d][y, x] = file.ReadByte()/255.0D;
             }
 
-            sample.Add(data, cls);
+            sample.Add(data, mark);
           }
         }
       }
@@ -252,7 +249,7 @@ namespace ML.DeepTests
 
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
+      Alg.Train(m_TrainingSet);
 
       Console.WriteLine("\n--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }

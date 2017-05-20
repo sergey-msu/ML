@@ -20,15 +20,14 @@ namespace ML.Tests.UnitTests.NN
 
       var sample = new ClassifiedSample<double[]>();
       var point = new[] { 1.0D };
-      var cls = new Class("a", 0);
-      sample[point] = cls;
+      sample[point] = new Class("a", 0);
 
-      var alg = new BackpropAlgorithm(sample, net);
+      var alg = new BackpropAlgorithm(net);
       alg.LearningRate = 2.0D;
       alg.LossFunction = Loss.Euclidean;
 
       // act
-      alg.RunIteration(point, cls);
+      alg.RunIteration(point, new double[] { 1.0D });
 
       // assert
 
@@ -87,15 +86,14 @@ namespace ML.Tests.UnitTests.NN
 
       var sample = new ClassifiedSample<double[]>();
       var point = new[] { 1.0D };
-      var cls = new Class("a", 0);
-      sample[point] = cls;
+      sample[point] = new Class("a", 0);
 
-      var alg = new BackpropAlgorithm(sample, net);
+      var alg = new BackpropAlgorithm(net);
       alg.LearningRate = 2.0D;
       alg.LossFunction = Loss.Euclidean;
 
       // act
-      alg.RunIteration(point, cls);
+      alg.RunIteration(point, new double[] { 1.0D });
 
       // assert
 
@@ -148,7 +146,7 @@ namespace ML.Tests.UnitTests.NN
 
     private void AssertNetGradient(BackpropAlgorithm alg, double[] point, int lidx, int nidx, int widx)
     {
-      var net  = alg.Result;
+      var net  = alg.Net;
       var loss = alg.LossFunction;
       var prev = net[lidx][nidx][widx];
       var grad = alg.Gradient[lidx][nidx, widx];

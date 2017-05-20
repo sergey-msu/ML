@@ -16,27 +16,41 @@ namespace ML.DeepTests
     const string MNIST_IMG_FILE = "kaggle_img_{0}.png";
 
     private List<double[][,]> m_Test = new List<double[][,]>();
-    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
+    private Dictionary<int, double[]> m_Marks = new Dictionary<int, double[]>
     {
-      { 0, new Class("Zero",  0) },
-      { 1, new Class("One",   1) },
-      { 2, new Class("Two",   2) },
-      { 3, new Class("Three", 3) },
-      { 4, new Class("Four",  4) },
-      { 5, new Class("Five",  5) },
-      { 6, new Class("Six",   6) },
-      { 7, new Class("Seven", 7) },
-      { 8, new Class("Eight", 8) },
-      { 9, new Class("Nine",  9) },
+
+      { 0, new double[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // Zero
+      { 1, new double[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 } }, // One
+      { 2, new double[] { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 } }, // Two
+      { 3, new double[] { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 } }, // Three
+      { 4, new double[] { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 } }, // Four
+      { 5, new double[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 } }, // Five
+      { 6, new double[] { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 } }, // Six
+      { 7, new double[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 } }, // Seven
+      { 8, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } }, // Eight
+      { 9, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }, // Nine
+    };
+    private Class[] m_Classes = new Class[10]
+    {
+      new Class("Zero", 0),
+      new Class("One",  1),
+      new Class("Two",  2),
+      new Class("Three",3),
+      new Class("Four", 4),
+      new Class("Five", 5),
+      new Class("Six",  6),
+      new Class("Seven",7),
+      new Class("Eight",8),
+      new Class("Nine", 9)
     };
 
     public override string SrcMark    { get { return "kaggle"; } }
     public override string DataPath   { get { return RootPath+@"\data\mnist"; }}
     public override string OutputPath { get { return RootPath+@"\output\mnist_kaggle"; }}
 
-    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateMNISTSimpleDemo_SEALED(m_TrainingSet);
+      return Examples.CreateMNISTSimpleDemo_SEALED();
     }
 
     #region Export
@@ -118,7 +132,7 @@ namespace ML.DeepTests
       loadTest(objFilePath, m_Test);
     }
 
-    private void loadSample(string ipath, ClassifiedSample<double[][,]> sample)
+    private void loadSample(string ipath, MultiRegressionSample<double[][,]> sample)
     {
       sample.Clear();
 
@@ -146,7 +160,7 @@ namespace ML.DeepTests
             var y = (i-1)/IMG_SIZE;
             data[0][y, x] = shade/255.0D;
           }
-          sample.Add(data, m_Classes[label]);
+          sample.Add(data, m_Marks[label]);
         }
 
         Console.WriteLine("Loaded: {0}", ipath);
@@ -197,7 +211,7 @@ namespace ML.DeepTests
       var now = DateTime.Now;
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
+      Alg.Train(m_TrainingSet);
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }
@@ -216,7 +230,7 @@ namespace ML.DeepTests
       {
         lenet1 = ConvNet.Deserialize(stream);
       }
-      var alg = new BackpropAlgorithm(m_TrainingSet, lenet1);
+      var alg = new BackpropAlgorithm(lenet1);
 
       var fout = Path.Combine(SrcPath, "result1.csv");
       using (var file = File.Open(fout, FileMode.Create, FileAccess.Write))
@@ -227,7 +241,7 @@ namespace ML.DeepTests
         int num = 1;
         foreach (var data in m_Test)
         {
-          var cls = alg.Classify(data);
+          var cls = alg.Classify(data, m_Classes);
           writer.WriteLine("{0},{1}", num++, (int)cls.Value);
         }
 

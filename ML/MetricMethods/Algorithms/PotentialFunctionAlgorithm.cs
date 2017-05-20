@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ML.Contracts;
 using ML.Core;
 
-namespace ML.MetricalMethods.Algorithms
+namespace ML.MetricMethods.Algorithms
 {
   public sealed class PotentialFunctionAlgorithm : MetricAlgorithmBase<double[]>
   {
@@ -12,6 +12,8 @@ namespace ML.MetricalMethods.Algorithms
 
     public struct KernelEquipment
     {
+      public static readonly KernelEquipment Trivial = new KernelEquipment(1.0D, 1.0D);
+
       public KernelEquipment(double gamma, double h)
       {
         Gamma = gamma;
@@ -25,13 +27,12 @@ namespace ML.MetricalMethods.Algorithms
     #endregion
 
     private readonly IFunction m_Kernel;
-    private KernelEquipment[] m_Eqps;
+    private KernelEquipment[]  m_Eqps;
 
-    public PotentialFunctionAlgorithm(ClassifiedSample<double[]> classifiedSample,
-                                      IMetric metric,
+    public PotentialFunctionAlgorithm(IMetric metric,
                                       IFunction kernel,
                                       KernelEquipment[] eqps)
-      : base(classifiedSample, metric)
+      : base(metric)
     {
       if (kernel == null)
         throw new MLException("PotentialAlgorithm.ctor(kernel=null)");
@@ -49,23 +50,7 @@ namespace ML.MetricalMethods.Algorithms
     public KernelEquipment[] Eqps
     {
       get { return m_Eqps; }
-      set
-      {
-        KernelEquipment[] eqps;
-        if (value==null)
-        {
-          var cnt = TrainingSample.Count;
-          eqps = new KernelEquipment[cnt];
-          for (int i=0; i<cnt; i++)
-            eqps[i] = new KernelEquipment(1.0F, 1.0F);
-        }
-        else
-        {
-          eqps = value.ToArray();
-        }
-
-        m_Eqps = eqps;
-      }
+      set { m_Eqps=value; }
     }
 
     public override double EstimateProximity(double[] x, Class cls)
@@ -73,13 +58,16 @@ namespace ML.MetricalMethods.Algorithms
       var closeness = 0.0D;
       int idx = -1;
 
-      foreach (var sData in TrainingSample)
+      foreach (var pData in TrainingSample)
       {
         idx++;
-        if (sData.Value != cls) continue;
+        if (pData.Value != cls) continue;
 
-        var r = Metric.Dist(x, sData.Key) / m_Eqps[idx].H;
-        closeness += m_Eqps[idx].Gamma * m_Kernel.Value(r);
+        var h = (m_Eqps==null) ? 1 : m_Eqps[idx].H;
+        var g = (m_Eqps==null) ? 1 : m_Eqps[idx].Gamma;
+        var r = Metric.Dist(x, pData.Key) / h;
+
+        closeness += (g * m_Kernel.Value(r));
       }
 
       return closeness;

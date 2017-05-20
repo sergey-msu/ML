@@ -15,27 +15,41 @@ namespace ML.DeepTests
     const string Cifar10_IMG_FILE = "{0}.png";
 
     private List<double[][,]> m_Test = new List<double[][,]>();
-    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
+
+    private Dictionary<int, double[]> m_Classes = new Dictionary<int, double[]>
     {
-      { 0, new Class("airplane",   0) },
-      { 1, new Class("automobile", 1) },
-      { 2, new Class("bird",       2) },
-      { 3, new Class("cat",        3) },
-      { 4, new Class("deer",       4) },
-      { 5, new Class("dog",        5) },
-      { 6, new Class("frog",       6) },
-      { 7, new Class("horse",      7) },
-      { 8, new Class("ship",       8) },
-      { 9, new Class("truck",      9) },
+      { 0, new double[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // airplane
+      { 1, new double[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 } }, // automobile
+      { 2, new double[] { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 } }, // bird
+      { 3, new double[] { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 } }, // cat
+      { 4, new double[] { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 } }, // deer
+      { 5, new double[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 } }, // dog
+      { 6, new double[] { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 } }, // frog
+      { 7, new double[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 } }, // horse
+      { 8, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } }, // ship
+      { 9, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }, // truck
+    };
+    private Dictionary<string, int> m_ClassNameMapper = new Dictionary<string, int>
+    {
+      { "airplane",   0 }, // airplane
+      { "automobile", 1 }, // automobile
+      { "bird",       2 }, // bird
+      { "cat",        3 }, // cat
+      { "deer",       4 }, // deer
+      { "dog",        5 }, // dog
+      { "frog",       6 }, // frog
+      { "horse",      7 }, // horse
+      { "ship",       8 }, // ship
+      { "truck",      9 }, // truck
     };
 
     public override string SrcMark    { get { return "kaggle"; } }
     public override string DataPath   { get { return RootPath+@"\data\cifar10"; }}
     public override string OutputPath { get { return RootPath+@"\output\cifar10_kaggle"; }}
 
-    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateCIFAR10Demo1(sample);
+      return Examples.CreateCIFAR10Demo1();
     }
 
     #region Export
@@ -61,7 +75,7 @@ namespace ML.DeepTests
       //loadTest(Cifar10Test, m_Test);
     }
 
-    private void loadTrain(string path, string lpath, ClassifiedSample<double[][,]> sample)
+    private void loadTrain(string path, string lpath, MultiRegressionSample<double[][,]> sample)
     {
       sample.Clear();
 
@@ -73,9 +87,10 @@ namespace ML.DeepTests
         var dir = new DirectoryInfo(path);
         foreach (var file in dir.EnumerateFiles())
         {
-           var data = loadFile(file.FullName);
+           var data    = loadFile(file.FullName);
            var clsName = reader.ReadLine().Split(',')[1];
-           var cls = m_Classes.First(c => c.Value.Name.Equals(clsName)).Value;
+           var clsIdx  = m_ClassNameMapper[clsName];
+           var cls     = m_Classes[clsIdx];
            sample.Add(data, cls);
         }
       }
@@ -130,7 +145,7 @@ namespace ML.DeepTests
       var now = DateTime.Now;
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
+      Alg.Train(m_TrainingSet);
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }

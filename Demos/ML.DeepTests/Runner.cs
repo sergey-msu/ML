@@ -10,9 +10,9 @@ namespace ML.DeepTests
   {
     public const string DFT_ROOT = @"C:\Users\User\Desktop\science\Machine learning";
 
-    protected ClassifiedSample<double[][,]> m_TrainingSet = new ClassifiedSample<double[][,]>();
-    protected ClassifiedSample<double[][,]> m_TestingSet  = new ClassifiedSample<double[][,]>();
-    protected ClassifiedSample<double[][,]> m_ValidationSet; // part of a training set
+    protected MultiRegressionSample<double[][,]> m_TrainingSet = new MultiRegressionSample<double[][,]>();
+    protected MultiRegressionSample<double[][,]> m_TestingSet  = new MultiRegressionSample<double[][,]>();
+    protected MultiRegressionSample<double[][,]> m_ValidationSet; // part of a training set
 
     public string RootPath
     {
@@ -35,7 +35,7 @@ namespace ML.DeepTests
       get
       {
         if (m_Alg==null)
-          m_Alg = CreateAlgorithm(m_TrainingSet);
+          m_Alg = CreateAlgorithm();
         return m_Alg;
       }
     }
@@ -55,7 +55,7 @@ namespace ML.DeepTests
       //Test();
     }
 
-    protected abstract BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample);
+    protected abstract BackpropAlgorithm CreateAlgorithm();
 
     protected virtual void Init()
     {

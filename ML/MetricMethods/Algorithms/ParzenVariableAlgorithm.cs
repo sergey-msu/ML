@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ML.Contracts;
 using ML.Core;
 
-namespace ML.MetricalMethods.Algorithms
+namespace ML.MetricMethods.Algorithms
 {
   /// <summary>
   /// Parzen Variable Window Algorithm
@@ -13,11 +13,10 @@ namespace ML.MetricalMethods.Algorithms
   {
     private int m_K;
 
-    public ParzenVariableAlgorithm(ClassifiedSample<double[]> classifiedSample,
-                                   IMetric metric,
+    public ParzenVariableAlgorithm(IMetric metric,
                                    IFunction kernel,
                                    int k)
-      : base(classifiedSample, metric, kernel)
+      : base(metric, kernel)
     {
       K = k;
     }

@@ -19,16 +19,15 @@ namespace ML.Tests.UnitTests.CNN
 
       var sample = new ClassifiedSample<double[][,]>();
       var point = new double[1][,] { new[,] { { 1.0D } } };
-      var cls = new Class("a", 0);
-      sample[point] = cls;
+      sample[point] = new Class("a", 0);
 
-      var alg = new BackpropAlgorithm(sample, net);
+      var alg = new BackpropAlgorithm(net);
       alg.LearningRate = 2.0D;
       alg.LossFunction = Loss.Euclidean;
       alg.Build();
 
       // act
-      alg.RunIteration(point, cls);
+      alg.RunIteration(point, new double[] { 1.0D });
 
       // assert
 
@@ -72,16 +71,15 @@ namespace ML.Tests.UnitTests.CNN
 
       var sample = new ClassifiedSample<double[][,]>();
       var point = new double[1][,] { new[,] { { 1.0D } } };
-      var cls = new Class("a", 0);
-      sample[point] = cls;
+      sample[point] = new Class("a", 0);
 
-      var alg = new BackpropAlgorithm(sample, net);
+      var alg = new BackpropAlgorithm(net);
       alg.LearningRate = 2.0D;
       alg.LossFunction = Loss.Euclidean;
       alg.Build();
 
       // act
-      alg.RunIteration(point, cls);
+      alg.RunIteration(point, new double[] { 1.0D });
 
       // assert
 

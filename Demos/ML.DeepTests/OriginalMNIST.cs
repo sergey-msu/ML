@@ -26,14 +26,28 @@ namespace ML.DeepTests
       { 8, new Class("Eight", 8) },
       { 9, new Class("Nine",  9) },
     };
+    private Dictionary<int, double[]> m_Marks = new Dictionary<int, double[]>
+    {
+
+      { 0, new double[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // Zero
+      { 1, new double[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 } }, // One
+      { 2, new double[] { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 } }, // Two
+      { 3, new double[] { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 } }, // Three
+      { 4, new double[] { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 } }, // Four
+      { 5, new double[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 } }, // Five
+      { 6, new double[] { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 } }, // Six
+      { 7, new double[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 } }, // Seven
+      { 8, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } }, // Eight
+      { 9, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }, // Nine
+    };
 
     public override string SrcMark    { get { return "original"; } }
     public override string DataPath   { get { return RootPath+@"\data\mnist"; }}
     public override string OutputPath { get { return RootPath+@"\output\mnist_original"; }}
 
-    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateMNISTSimpleDemo_SEALED(sample);
+      return Examples.CreateMNISTSimpleDemo_SEALED();
     }
 
     #region Export
@@ -140,7 +154,7 @@ namespace ML.DeepTests
       loadSample(objFilePath, labelFilePath, m_TestingSet);
     }
 
-    private void loadSample(string ipath, string lpath, ClassifiedSample<double[][,]> sample)
+    private void loadSample(string ipath, string lpath, MultiRegressionSample<double[][,]> sample)
     {
       using (var ifile = File.Open(ipath, FileMode.Open, FileAccess.Read))
       using (var lfile = File.Open(lpath, FileMode.Open, FileAccess.Read))
@@ -167,7 +181,7 @@ namespace ML.DeepTests
           }
 
           var label = lfile.ReadByte();
-          sample.Add(data, m_Classes[label]);
+          sample.Add(data, m_Marks[label]);
         }
 
         Console.WriteLine("Loaded: {0}", ipath);
@@ -196,7 +210,7 @@ namespace ML.DeepTests
 
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
+      Alg.Train(m_TrainingSet);
 
       Console.WriteLine("\n--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }

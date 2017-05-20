@@ -42,14 +42,27 @@ namespace ML.DeepTests
       { 8, new Class("ship",       8) },
       { 9, new Class("truck",      9) },
     };
+    private Dictionary<int, double[]> m_Marks = new Dictionary<int, double[]>
+    {
+      { 0, new double[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // airplane
+      { 1, new double[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 } }, // automobile
+      { 2, new double[] { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 } }, // bird
+      { 3, new double[] { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 } }, // cat
+      { 4, new double[] { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 } }, // deer
+      { 5, new double[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 } }, // dog
+      { 6, new double[] { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 } }, // frog
+      { 7, new double[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 } }, // horse
+      { 8, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } }, // ship
+      { 9, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }, // truck
+    };
 
     public override string SrcMark    { get { return "original"; } }
     public override string DataPath   { get { return RootPath+@"\data\cifar10"; }}
     public override string OutputPath { get { return RootPath+@"\output\cifar10_original"; }}
 
-    protected override BackpropAlgorithm CreateAlgorithm(ClassifiedSample<double[][,]> sample)
+    protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateCIFAR10Demo2(sample);
+      return Examples.CreateCIFAR10Demo2();
     }
 
     protected override void Init()
@@ -103,8 +116,7 @@ namespace ML.DeepTests
               var label = file.ReadByte();
               if (label<0) break;
 
-              var cls = m_Classes[label];
-
+              var cls  = m_Classes[label];
               var data = new byte[3, 32, 32];
 
               for (int d = 0; d < 3; d++)
@@ -177,7 +189,7 @@ namespace ML.DeepTests
       loadSample(filePaths, m_TestingSet);
     }
 
-    private void loadSample(string[] fpaths, ClassifiedSample<double[][,]> sample)
+    private void loadSample(string[] fpaths, MultiRegressionSample<double[][,]> sample)
     {
       foreach (var fpath in fpaths)
       {
@@ -188,7 +200,7 @@ namespace ML.DeepTests
             var label = file.ReadByte();
             if (label<0) break;
 
-            var cls = m_Classes[label];
+            var cls = m_Marks[label];
 
             var data = new double[3][,];
             data[0] = new double[32, 32];
@@ -229,7 +241,7 @@ namespace ML.DeepTests
 
       Console.WriteLine();
       Console.WriteLine("Training started at {0}", now);
-      Alg.Train();
+      Alg.Train(m_TrainingSet);
 
       Console.WriteLine("\n--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
     }

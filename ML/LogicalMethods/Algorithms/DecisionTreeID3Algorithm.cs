@@ -10,12 +10,11 @@ namespace ML.LogicalMethods.Algorithms
   /// <summary>
   /// Decision Tree Algorithm
   /// </summary>
-  public class DecisionTreeID3Algorithm<TObj> : AlgorithmBase<TObj>
+  public class DecisionTreeID3Algorithm<TObj> : ClassificationAlgorithmBase<TObj>
   {
     private DecisionTree<TObj> m_Result;
 
-    public DecisionTreeID3Algorithm(ClassifiedSample<TObj> classifiedSample)
-      : base(classifiedSample)
+    public DecisionTreeID3Algorithm()
     {
     }
 
@@ -27,7 +26,19 @@ namespace ML.LogicalMethods.Algorithms
     /// </summary>
     public DecisionTree<TObj> Result { get { return m_Result; } }
 
-    public override Class Classify(TObj obj)
+    /// <summary>
+    /// Logical patterns (predicates)
+    /// </summary>
+    public IEnumerable<Predicate<TObj>> Patterns { get; set; }
+
+    /// <summary>
+    /// Informativity index
+    /// </summary>
+    public IInformativityIndex<TObj> Informativity { get; set; }
+
+
+
+    public override Class Predict(TObj obj)
     {
       if (m_Result==null)
         throw new MLException("Decision tree is empty");
@@ -38,14 +49,14 @@ namespace ML.LogicalMethods.Algorithms
     /// <summary>
     /// Generate decision tree via ID3 algorithm
     /// </summary>
-    public void Train(IEnumerable<Predicate<TObj>> patterns, IInformativityIndex<TObj> informativity)
+    protected override void DoTrain()
     {
-      if (patterns==null || !patterns.Any())
+      if (Patterns==null || !Patterns.Any())
         throw new MLException("Patterns are empty or null");
-      if (informativity==null)
-        throw new MLException("Informativity is null");
+      if (Informativity==null)
+        throw new MLException("Informativity index is null");
 
-      var root = trainID3Core(patterns, TrainingSample, informativity);
+      var root = trainID3Core(Patterns, TrainingSample, Informativity);
 
       m_Result = new DecisionTree<TObj>(root);
     }

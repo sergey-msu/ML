@@ -12,6 +12,9 @@ namespace ML.Tests.UnitTests.CNN
   [TestClass]
   public class GradientTests : TestBase
   {
+     private readonly Class[]    CLASSES  = new Class[] { new Class("a", 0), new Class("b", 1) };
+     private readonly double[][] EXPECTED = new double[2][] { new[] { 1.0D, 0.0D }, new[] { 0.0D, 1.0D } };
+
     #region Iter
 
     [TestMethod]
@@ -24,15 +27,13 @@ namespace ML.Tests.UnitTests.CNN
       net._Build();
       net.RandomizeParameters(seed: 0);
 
-      var sample = new ClassifiedSample<double[][,]>();
       var point1 = RandomPoint(3,1,1);
       var point2 = RandomPoint(3,1,1); // just for 2 dim output
-      var cls1 = new Class("a", 0);
-      var cls2 = new Class("b", 1);
-      sample[point1] = cls1;
-      sample[point2] = cls2;
+      var sample = new ClassifiedSample<double[][,]>();
+      sample[point1] = CLASSES[0];
+      sample[point2] = CLASSES[1];
 
-      var alg = new BackpropAlgorithm(sample, net)
+      var alg = new BackpropAlgorithm(net)
       {
         LearningRate = 0.1D,
         LossFunction = Loss.Euclidean
@@ -40,10 +41,10 @@ namespace ML.Tests.UnitTests.CNN
       alg.Build();
 
       // act
-      alg.RunIteration(point1, cls1);
+      alg.RunIteration(point1, EXPECTED[0]);
 
       // assert
-      AssertNetGradient(alg, point1, cls1);
+      AssertNetGradient(alg, point1, EXPECTED[0]);
     }
 
     [TestMethod]
@@ -58,15 +59,13 @@ namespace ML.Tests.UnitTests.CNN
       net._Build();
       net.RandomizeParameters(seed: 0);
 
-      var sample = new ClassifiedSample<double[][,]>();
       var point1 = RandomPoint(3, 1, 1);
       var point2 = RandomPoint(3, 1, 1); // just for 2 dim output
-      var cls1 = new Class("a", 0);
-      var cls2 = new Class("b", 1);
-      sample[point1] = cls1;
-      sample[point2] = cls2;
+      var sample = new ClassifiedSample<double[][,]>();
+      sample[point1] = CLASSES[0];
+      sample[point2] = CLASSES[1];
 
-      var alg = new BackpropAlgorithm(sample, net)
+      var alg = new BackpropAlgorithm(net)
       {
         LearningRate = 0.1D,
         LossFunction = Loss.Euclidean
@@ -74,11 +73,11 @@ namespace ML.Tests.UnitTests.CNN
       alg.Build();
 
       // act
-      alg.RunIteration(point1, cls1);
+      alg.RunIteration(point1, EXPECTED[0]);
       ((DropoutLayer)alg.Net[1]).ApplyCustomMask=true;
 
       // assert
-      AssertNetGradient(alg, point1, cls1);
+      AssertNetGradient(alg, point1, EXPECTED[0]);
     }
 
     [TestMethod]
@@ -93,15 +92,13 @@ namespace ML.Tests.UnitTests.CNN
       net._Build();
       net.RandomizeParameters(seed: 0);
 
-      var sample = new ClassifiedSample<double[][,]>();
       var point1 = RandomPoint(3,2,2);
       var point2 = RandomPoint(3,2,2); // just for 2 dim output
-      var cls1 = new Class("a", 0);
-      var cls2 = new Class("b", 1);
-      sample[point1] = cls1;
-      sample[point2] = cls2;
+      var sample = new ClassifiedSample<double[][,]>();
+      sample[point1] = CLASSES[0];
+      sample[point2] = CLASSES[1];
 
-      var alg = new BackpropAlgorithm(sample, net)
+      var alg = new BackpropAlgorithm(net)
       {
         LearningRate = 0.1D,
         LossFunction = Loss.Euclidean
@@ -109,10 +106,10 @@ namespace ML.Tests.UnitTests.CNN
       alg.Build();
 
       // act
-      alg.RunIteration(point1, cls1);
+      alg.RunIteration(point1, EXPECTED[0]);
 
       // assert
-      AssertNetGradient(alg, point1, cls1);
+      AssertNetGradient(alg, point1, EXPECTED[0]);
     }
 
     [TestMethod]
@@ -137,11 +134,10 @@ namespace ML.Tests.UnitTests.CNN
       for (int i=0; i<10; i++)
       {
         var point = RandomPoint(1,14,14);
-        var cls   = new Class(i.ToString(), i);
-        sample[point] = cls;
+        sample[point] = new Class(i.ToString(), i);
       }
 
-      var alg = new BackpropAlgorithm(sample, net)
+      var alg = new BackpropAlgorithm(net)
       {
         LearningRate = 0.005D,
         LossFunction = Loss.Euclidean
@@ -150,10 +146,11 @@ namespace ML.Tests.UnitTests.CNN
 
       // act
       var data = sample.First();
-      alg.RunIteration(data.Key, data.Value);
+      var expected = new double[10] { 1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D };
+      alg.RunIteration(data.Key, expected);
 
       // assert
-      AssertNetGradient(alg, data.Key, data.Value);
+      AssertNetGradient(alg, data.Key, expected);
     }
 
     [TestMethod]
@@ -179,11 +176,10 @@ namespace ML.Tests.UnitTests.CNN
       for (int i=0; i<3; i++)
       {
         var point = RandomPoint(1,5,5);
-        var cls   = new Class(i.ToString(), i);
-        sample[point] = cls;
+        sample[point] = new Class(i.ToString(), i);
       }
 
-      var alg = new BackpropAlgorithm(sample, net)
+      var alg = new BackpropAlgorithm(net)
       {
         LearningRate = 0.1D,
         LossFunction = Loss.Euclidean
@@ -192,11 +188,12 @@ namespace ML.Tests.UnitTests.CNN
 
       // act
       var data = sample.First();
-      alg.RunIteration(data.Key, data.Value);
+      var expected = new double[3] { 1.0D, 0.0D, 0.0D };
+      alg.RunIteration(data.Key, expected);
       ((DropoutLayer)alg.Net[4]).ApplyCustomMask=true;
 
       // assert
-      AssertNetGradient(alg, data.Key, data.Value);
+      AssertNetGradient(alg, data.Key, expected);
     }
 
     [TestMethod]
@@ -222,12 +219,11 @@ namespace ML.Tests.UnitTests.CNN
       for (int i=0; i<3; i++)
       {
         var point = RandomPoint(1,5,5);
-        var cls   = new Class(i.ToString(), i);
-        sample[point] = cls;
+        sample[point] = new Class(i.ToString(), i);
       }
 
       var regularizator = Regularizator.Composite(Regularizator.L1(0.1D), Regularizator.L2(0.3D));
-      var alg = new BackpropAlgorithm(sample, net)
+      var alg = new BackpropAlgorithm(net)
       {
         LearningRate  = 0.1D,
         LossFunction  = Loss.CrossEntropySoftMax,
@@ -237,12 +233,13 @@ namespace ML.Tests.UnitTests.CNN
 
       // act
       var data = sample.First();
-      alg.RunIteration(data.Key, data.Value);
+      var expected = new double[3] { 1.0D, 0.0D, 0.0D };
+      alg.RunIteration(data.Key, expected);
       regularizator.Apply(alg.Gradient, alg.Net.Weights);
       ((DropoutLayer)alg.Net[4]).ApplyCustomMask=true;
 
       // assert
-      AssertNetGradient(alg, data.Key, data.Value);
+      AssertNetGradient(alg, data.Key, expected);
     }
 
     #endregion
@@ -253,7 +250,7 @@ namespace ML.Tests.UnitTests.CNN
 
     #region .pvt
 
-    private void AssertNetGradient(BackpropAlgorithm alg, double[][,] data, Class cls)
+    private void AssertNetGradient(BackpropAlgorithm alg, double[][,] data, double[] expected)
     {
       var weights = alg.Net.Weights;
 
@@ -271,7 +268,7 @@ namespace ML.Tests.UnitTests.CNN
           AssertDerivative(x =>
           {
             w[j] = x;
-            var loss = alg.FeedForward(data, cls);
+            var loss = alg.FeedForward(data, expected);
             w[j] = prev;
             return loss;
           }, prev, actg);

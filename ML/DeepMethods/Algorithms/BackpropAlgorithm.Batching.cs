@@ -50,7 +50,7 @@ namespace ML.DeepMethods.Algorithms
 
           public bool IsBusy { get { return m_IsBusy; } }
 
-          public bool DoIter(double[][,] input, Class cls)
+          public bool DoIter(double[][,] input, double[] expected)
           {
             if (m_IsBusy) return false;
 
@@ -62,8 +62,7 @@ namespace ML.DeepMethods.Algorithms
 
             try
             {
-              //lock (m_Algorithm) { System.Threading.Thread.Sleep(2000); }
-              m_Algorithm.runIteration(m_Values, m_Errors, m_GradientPortion, input, cls);
+              m_Algorithm.runIteration(m_Values, m_Errors, m_GradientPortion, input, expected);
             }
             finally
             {
@@ -87,7 +86,7 @@ namespace ML.DeepMethods.Algorithms
         m_Items = new BatchItem[maxDegreesOfParallelism];
       }
 
-      public void Push(double[][,] data, Class cls)
+      public void Push(double[][,] data, double[] expected)
       {
         int i = -1;
         while (true)
@@ -108,7 +107,7 @@ namespace ML.DeepMethods.Algorithms
             }
           }
 
-          if (!item.DoIter(data, cls)) continue;
+          if (!item.DoIter(data, expected)) continue;
           return;
         }
       }
@@ -119,10 +118,10 @@ namespace ML.DeepMethods.Algorithms
     #region .pvt
 
     private void runIteration(double[][][,] values, double[][][,] errors, double[][] gradientPortions,
-                              double[][,] input, Class cls)
+                              double[][,] input, double[] expected)
     {
       // feed forward
-      var iterLoss = feedForward(values, errors, input, cls);
+      var iterLoss = feedForward(values, errors, input, expected);
 
       // feed backward
       var lcount = Net.LayerCount;
@@ -159,7 +158,7 @@ namespace ML.DeepMethods.Algorithms
       }
     }
 
-    private double feedForward(double[][][,] values, double[][][,] errors, double[][,] input, Class cls)
+    private double feedForward(double[][][,] values, double[][][,] errors, double[][,] input, double[] expected)
     {
       Net.Calculate(input, values);
 
@@ -169,18 +168,17 @@ namespace ML.DeepMethods.Algorithms
       var output = new double[len];
       for (int j=0; j<len; j++) output[j] = result[j][0, 0];
 
-      var expect = m_ExpectedOutputs[cls];
       var llayer = Net[lidx];
 
       for (int p=0; p<llayer.OutputDepth; p++)
       {
-        var ej = m_LossFunction.Derivative(p, output, expect);
+        var ej = m_LossFunction.Derivative(p, output, expected);
         var value = result[p][0, 0];
         var deriv = (llayer.ActivationFunction != null) ? llayer.ActivationFunction.DerivativeFromValue(value) : 1;
         errors[lidx][p][0, 0] = ej * deriv / m_BatchSize;
       }
 
-      var loss = m_LossFunction.Value(output, expect) / m_BatchSize;
+      var loss = m_LossFunction.Value(output, expected) / m_BatchSize;
       if (m_Regularizator != null)
         loss += (m_Regularizator.Value(Net.Weights) / m_BatchSize);
 

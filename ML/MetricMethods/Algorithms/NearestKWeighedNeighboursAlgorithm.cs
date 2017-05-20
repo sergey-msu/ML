@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ML.Contracts;
 using ML.Core;
 
-namespace ML.MetricalMethods.Algorithms
+namespace ML.MetricMethods.Algorithms
 {
   /// <summary>
   /// Nearest K Neighbours with Weights Algorithm
@@ -14,11 +14,10 @@ namespace ML.MetricalMethods.Algorithms
     private int m_K;
     private double[] m_Weights;
 
-    public NearestKWeighedNeighboursAlgorithm(ClassifiedSample<double[]> classifiedSample,
-                                               IMetric metric,
-                                               int k,
-                                               double[] weights)
-      : base(classifiedSample, metric)
+    public NearestKWeighedNeighboursAlgorithm(IMetric metric,
+                                              int k,
+                                              double[] weights)
+      : base(metric)
     {
       K = k;
       Weights = weights;

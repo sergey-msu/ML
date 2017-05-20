@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ML.Contracts;
 using ML.Core;
 
-namespace ML.MetricalMethods.Algorithms
+namespace ML.MetricMethods.Algorithms
 {
   /// <summary>
   /// Parzen Fixed Window Algorithm
@@ -13,11 +13,10 @@ namespace ML.MetricalMethods.Algorithms
   {
     private double m_H;
 
-    public ParzenFixedAlgorithm(ClassifiedSample<double[]> classifiedSample,
-                                IMetric metric,
+    public ParzenFixedAlgorithm(IMetric metric,
                                 IFunction kernel,
                                 double h)
-      : base(classifiedSample, metric, kernel)
+      : base(metric, kernel)
     {
       H = h;
     }
@@ -63,7 +62,7 @@ namespace ML.MetricalMethods.Algorithms
     /// <summary>
     /// Leave-one-out optimization
     /// </summary>
-    public void Train_LOO(double hMin, double hMax, double step)
+    public void OptimizeLOO(double hMin, double hMax, double step)
     {
       var hOpt = double.MaxValue;
       var minErrCnt = int.MaxValue;
@@ -73,14 +72,19 @@ namespace ML.MetricalMethods.Algorithms
         var errCnt = 0;
         m_H = h;
 
-        for (int i = 0; i < TrainingSample.Count; i++)
+        var initSample = TrainingSample;
+
+        for (int i=0; i<initSample.Count; i++)
         {
-          var pData = TrainingSample.ElementAt(i);
-          using (var mask = this.ApplySampleMask((p, c, idx) => idx != i))
-          {
-            var cls = this.Classify(pData.Key);
-            if (cls != pData.Value) errCnt++;
-          }
+          var pData = initSample.ElementAt(i);
+          var looSample  = initSample.ApplyMask((p, c, idx) => idx != i);
+          TrainingSample = looSample;
+
+          var predClass = this.Predict(pData.Key);
+          var realClass = pData.Value;
+          if (predClass != realClass) errCnt++;
+
+          TrainingSample = initSample;
         }
 
         if (errCnt < minErrCnt)

@@ -11,7 +11,7 @@ namespace ML.Core
     /// <summary>
     /// Default class singleton
     /// </summary>
-    public static readonly Class None = new Class("[NONE]", -1);
+    public static readonly Class Unknown = new Class("[NONE]", -1);
 
     private readonly string m_Name;
     private readonly double  m_Value;

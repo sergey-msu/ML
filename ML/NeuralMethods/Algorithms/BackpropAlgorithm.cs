@@ -11,7 +11,7 @@ namespace ML.NeuralMethods.Algorithms
   /// Multi-layer neural network training algorithm.
   /// Using Backpropagation principle as a core.
   /// </summary>
-  public class BackpropAlgorithm : NeuralNetworkAlgorithmBase
+  public class BackpropAlgorithm : NeuralNetAlgorithmBase
   {
     #region Inner
 
@@ -35,7 +35,6 @@ namespace ML.NeuralMethods.Algorithms
 
     #region Fields
 
-    private Dictionary<Class, double[]> m_ExpectedOutputs;
     private int m_EpochLength;
 
     private ILossFunction m_LossFunction;
@@ -67,8 +66,7 @@ namespace ML.NeuralMethods.Algorithms
 
     #region .ctor
 
-    public BackpropAlgorithm(ClassifiedSample<double[]> classifiedSample, NeuralNetwork net)
-      : base(classifiedSample, net)
+    public BackpropAlgorithm(NeuralNetwork net) : base(net)
     {
       init();
     }
@@ -173,7 +171,7 @@ namespace ML.NeuralMethods.Algorithms
 
     public void RunEpoch()
     {
-      runEpoch(Result);
+      runEpoch(Net);
     }
 
     public void RunBatch(int skip, int take)
@@ -181,26 +179,26 @@ namespace ML.NeuralMethods.Algorithms
       if (skip<0) throw new MLException("Skip value must be non-negative");
       if (take<=0) throw new MLException("Take value must be positive");
 
-      runBatch(Result, TrainingSample.Subset(skip, take));
+      runBatch(Net, TrainingSample.Subset(skip, take));
     }
 
-    public void RunIteration(double[] data, Class cls)
+    public void RunIteration(double[] data, double[] expected)
     {
-      runIteration(Result, data, cls);
+      runIteration(Net, data, expected);
     }
 
     public void FlushGradient()
     {
-      updateWeights(Result);
+      updateWeights(Net);
     }
 
     #endregion
 
-    protected override void DoTrain()
+    protected override void TrainImpl()
     {
       for (int epoch=0; epoch<m_EpochCount; epoch++)
       {
-        runEpoch(Result);
+        runEpoch(Net);
         if (checkStopCriteria()) break;
       }
     }
@@ -214,38 +212,22 @@ namespace ML.NeuralMethods.Algorithms
       m_LearningRate = DFT_LEARNING_RATE;
       m_Stop         = DTF_STOP_CRITERIA;
       m_EpochLength  = TrainingSample.Count;
-      m_InputDim     = Result.InputDim;
-      m_OutputDim    = Result[Result.LayerCount-1].NeuronCount;
+      m_InputDim     = Net.InputDim;
+      m_OutputDim    = Net[Net.LayerCount-1].NeuronCount;
 
-      m_Errors = new double[Result.LayerCount][];
-      for (int i=0; i<Result.LayerCount; i++)
+      m_Errors = new double[Net.LayerCount][];
+      for (int i=0; i<Net.LayerCount; i++)
       {
-        var ncount = Result[i].NeuronCount;
+        var ncount = Net[i].NeuronCount;
         m_Errors[i] = new double[ncount];
       }
 
-      m_Gradient = new double[Result.LayerCount][,];
-      for (int i=0; i<Result.LayerCount; i++)
+      m_Gradient = new double[Net.LayerCount][,];
+      for (int i=0; i<Net.LayerCount; i++)
       {
-        var pcount = (i>0) ? Result[i-1].NeuronCount : m_InputDim;
-        var lcount = Result[i].NeuronCount;
+        var pcount = (i>0) ? Net[i-1].NeuronCount : m_InputDim;
+        var lcount = Net[i].NeuronCount;
         m_Gradient[i] = new double[lcount, pcount+1]; // take bias into account
-      }
-
-      m_ExpectedOutputs = new Dictionary<Class, double[]>();
-      var count = Classes.Count;
-      if (count != OutputDim)
-        throw new MLException("Number of classes must be equal to dimension of output vector");
-
-      for (int i=0; i<count; i++)
-      {
-        var cls = Classes.FirstOrDefault(p => (int)p.Value.Value == i).Value;
-        if (cls==null)
-          throw new MLException(string.Format("There is no class with value {0}. It is neccessary to have full set of classes with values from 0 to {1}", i, count));
-
-        var output = new double[count];
-        output[i] = 1.0D;
-        m_ExpectedOutputs[cls] = output;
       }
     }
 
@@ -265,7 +247,7 @@ namespace ML.NeuralMethods.Algorithms
       if (EpochEndedEvent != null) EpochEndedEvent(this, EventArgs.Empty);
     }
 
-    private void runBatch(NeuralNetwork net, ClassifiedSample<double[]> sampleBatch)
+    private void runBatch(NeuralNetwork net, MultiRegressionSample<double[]> sampleBatch)
     {
       // loop on batch
       foreach (var pdata in sampleBatch)
@@ -284,10 +266,10 @@ namespace ML.NeuralMethods.Algorithms
       m_Batch++;
     }
 
-    private void runIteration(NeuralNetwork net, double[] input, Class cls)
+    private void runIteration(NeuralNetwork net, double[] input, double[] expected)
     {
       // forward calculation
-      var serr = feedForward(net, input, cls);
+      var serr = feedForward(net, input, expected);
 
       // error backpropagation
       var lcount = net.LayerCount;
@@ -301,21 +283,20 @@ namespace ML.NeuralMethods.Algorithms
       m_Iteration++;
     }
 
-    private double feedForward(NeuralNetwork net, double[] input, Class cls)
+    private double feedForward(NeuralNetwork net, double[] input, double[] expected)
     {
       var output = net.Calculate(input);
-      var expect = m_ExpectedOutputs[cls];
       var llayer = net[net.LayerCount-1];
       var errors = m_Errors[net.LayerCount-1];
 
       for (int j=0; j<m_OutputDim; j++)
       {
         var neuron = llayer[j];
-        var ej = m_LossFunction.Derivative(j, output, expect);
+        var ej = m_LossFunction.Derivative(j, output, expected);
         errors[j] = ej * neuron.Derivative;
       }
 
-      return m_LossFunction.Value(output, expect);
+      return m_LossFunction.Value(output, expected);
     }
 
     private void feedBackward(NeuralNetwork net, NeuralLayer layer, int lidx, double[] input)
