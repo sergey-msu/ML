@@ -13,7 +13,6 @@ namespace ML.DeepMethods.Models
   {
     #region Fields
 
-    [NonSerialized]
     private object m_Sync = new object();
 
     [NonSerialized] // TODO fixup! seed must be serialized

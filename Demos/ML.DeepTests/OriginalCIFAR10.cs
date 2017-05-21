@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -231,7 +232,7 @@ namespace ML.DeepTests
 
       Alg.EpochEndedEvent += (o, e) =>
                              {
-                               Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);
+                               Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath);
                                tstart = DateTime.Now;
                              };
       Alg.BatchEndedEvent += (o, e) =>

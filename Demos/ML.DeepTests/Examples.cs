@@ -5,6 +5,7 @@ using ML.Core.Registry;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Registry;
 using System.Reflection;
+using ML.DeepMethods.Optimizers;
 
 namespace ML.DeepTests
 {
@@ -262,7 +263,7 @@ namespace ML.DeepTests
 
     #endregion
 
-    #region CIFAR10 2 classes truncated
+    #region CIFAR10 2 truncated
 
     /// <summary>
     /// Error = 22.5 Epoch = 62
@@ -373,10 +374,11 @@ namespace ML.DeepTests
       net.AddLayer(new DropoutLayer(0.25));
 
       net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
       net.AddLayer(new DropoutLayer(0.25));
 
-      net.AddLayer(new FlattenLayer(outputDim: 256, activation: activation));
+      net.AddLayer(new FlattenLayer(outputDim: 64, activation: activation));
       net.AddLayer(new DropoutLayer(0.5));
       net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
 
@@ -384,16 +386,16 @@ namespace ML.DeepTests
 
       net.RandomizeParameters(seed: 0);
 
-      var lrate = 0.1D;
+      var lrate = 0.05D;
       var alg = new BackpropAlgorithm(net)
       {
         LossFunction = Loss.CrossEntropySoftMax,
         EpochCount = 500,
         LearningRate = lrate,
-        BatchSize = 4,
+        BatchSize = 8,
         UseBatchParallelization = true,
         MaxBatchThreadCount = 8,
-        Optimizer = Optimizer.Adadelta,
+        Optimizer = Optimizer.Adadelta, // new AdadeltaOptimizer(gamma: 0.9D, useLearningRate: true),
         Regularizator = Regularizator.L2(0.001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
@@ -412,7 +414,7 @@ namespace ML.DeepTests
 
       ConvNet net;
       var assembly = Assembly.GetExecutingAssembly();
-      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cat-dog-19.1.mld"))
+      using (var stream = assembly.GetManifestResourceStream("ML.DeepTests.Pretrained.cn_e16_p37.65.mld"))
       {
         net = ConvNet.Deserialize(stream);
         net.IsTraining = true;

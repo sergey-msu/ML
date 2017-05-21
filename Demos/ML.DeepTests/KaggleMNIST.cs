@@ -206,7 +206,7 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, OutputPath); // we do not have public test data in kaggle :(
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, m_Classes, OutputPath); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;
       Console.WriteLine();

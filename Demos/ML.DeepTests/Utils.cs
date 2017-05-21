@@ -9,9 +9,9 @@ namespace ML.DeepTests
 {
   public static class Utils
   {
-    public static void HandleEpochEnded(BackpropAlgorithm alg, MultiRegressionSample<double[][,]> test, MultiRegressionSample<double[][,]> train, string outputPath)
+    public static void HandleEpochEnded(BackpropAlgorithm alg, MultiRegressionSample<double[][,]> test, MultiRegressionSample<double[][,]> train, Class[] classes, string outputPath)
     {
-      Console.WriteLine("---------------- Epoch #: {0} ({1})", alg.Epoch, DateTime.Now);
+      Console.WriteLine("---------------- Epoch #{0} ({1})", alg.Epoch, DateTime.Now);
       Console.WriteLine("L:\t{0}", alg.LossValue);
       Console.WriteLine("DW:\t{0}", alg.Step2);
       Console.WriteLine("LR:\t{0}", alg.LearningRate);
@@ -22,7 +22,7 @@ namespace ML.DeepTests
         Console.WriteLine("Test: none");
       else
       {
-        var terrors = alg.GetErrors(test);
+        var terrors = alg.GetClassificationErrors(test, classes);
         var tec = terrors.Count();
         var tdc = test.Count;
         var tpct = Math.Round(100.0F * tec / tdc, 2);
@@ -35,7 +35,7 @@ namespace ML.DeepTests
         Console.WriteLine("Train: none");
       else
       {
-        var verrors = alg.GetErrors(train);
+        var verrors = alg.GetClassificationErrors(train, classes);
         var vec = verrors.Count();
         var vdc = train.Count;
         var vpct = Math.Round(100.0F * vec / vdc, 2);

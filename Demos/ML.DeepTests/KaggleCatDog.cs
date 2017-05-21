@@ -17,10 +17,15 @@ namespace ML.DeepTests
     public const string DOG_PREFIX = "dog.";
 
     private List<double[][,]>      m_Test = new List<double[][,]>();
-    private Dictionary<int, double[]> m_Classes = new Dictionary<int, double[]>
+    private Dictionary<int, double[]> m_Marks = new Dictionary<int, double[]>
     {
       { 0, new[] { 1.0D, 0.0D } }, // cat
       { 1, new[] { 0.0D, 1.0D } }  // dog
+    };
+    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
+    {
+      { 0, new Class("cat", 0) },
+      { 1, new Class("dog", 1) }
     };
 
     public override string SrcMark    { get { return "kaggle"; } }
@@ -70,9 +75,9 @@ namespace ML.DeepTests
 
         double[] mark;
         if (file.Name.StartsWith(CAT_PREFIX))
-          mark = m_Classes[0];
+          mark = m_Marks[0];
         else if (file.Name.StartsWith(DOG_PREFIX))
-          mark = m_Classes[1];
+          mark = m_Marks[1];
         else
           throw new MLException("Unknown file");
 
@@ -173,7 +178,7 @@ namespace ML.DeepTests
 
       Alg.EpochEndedEvent += (o, e) =>
                              {
-                               Utils.HandleEpochEnded(Alg, null, m_ValidationSet, OutputPath); // no labeled testing set in Kaggle :(
+                               Utils.HandleEpochEnded(Alg, null, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath); // no labeled testing set in Kaggle :(
                                tstart = DateTime.Now;
                              };
       Alg.BatchEndedEvent += (o, e) =>

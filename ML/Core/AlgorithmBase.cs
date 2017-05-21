@@ -105,12 +105,12 @@ namespace ML.Core
     {
     }
 
+
     public virtual Class Classify(TObj x, Class[] classes, double threshold = 0)
     {
       var result = Predict(x);
       return mapValueToClass(result, classes, threshold);
     }
-
 
     /// <summary>
     /// Returns all errors of the algorithm on some test classified sample

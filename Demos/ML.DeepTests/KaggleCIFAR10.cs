@@ -16,7 +16,7 @@ namespace ML.DeepTests
 
     private List<double[][,]> m_Test = new List<double[][,]>();
 
-    private Dictionary<int, double[]> m_Classes = new Dictionary<int, double[]>
+    private Dictionary<int, double[]> m_Marks = new Dictionary<int, double[]>
     {
       { 0, new double[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // airplane
       { 1, new double[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 } }, // automobile
@@ -29,18 +29,18 @@ namespace ML.DeepTests
       { 8, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 } }, // ship
       { 9, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }, // truck
     };
-    private Dictionary<string, int> m_ClassNameMapper = new Dictionary<string, int>
+    private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>
     {
-      { "airplane",   0 }, // airplane
-      { "automobile", 1 }, // automobile
-      { "bird",       2 }, // bird
-      { "cat",        3 }, // cat
-      { "deer",       4 }, // deer
-      { "dog",        5 }, // dog
-      { "frog",       6 }, // frog
-      { "horse",      7 }, // horse
-      { "ship",       8 }, // ship
-      { "truck",      9 }, // truck
+      { 0, new Class("airplane",   0) },
+      { 1, new Class("automobile", 1) },
+      { 2, new Class("bird",       2) },
+      { 3, new Class("cat",        3) },
+      { 4, new Class("deer",       4) },
+      { 5, new Class("dog",        5) },
+      { 6, new Class("frog",       6) },
+      { 7, new Class("horse",      7) },
+      { 8, new Class("ship",       8) },
+      { 9, new Class("truck",      9) }
     };
 
     public override string SrcMark    { get { return "kaggle"; } }
@@ -89,9 +89,9 @@ namespace ML.DeepTests
         {
            var data    = loadFile(file.FullName);
            var clsName = reader.ReadLine().Split(',')[1];
-           var clsIdx  = m_ClassNameMapper[clsName];
-           var cls     = m_Classes[clsIdx];
-           sample.Add(data, cls);
+           var cls     = m_Classes.First(c => c.Value.Name.Equals(clsName));
+           var mark    = m_Marks[cls.Key];
+           sample.Add(data, mark);
         }
       }
 
@@ -140,7 +140,7 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, OutputPath); // we do not have public test data in kaggle :(
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, m_Classes.Values.ToArray(), OutputPath); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;
       Console.WriteLine();

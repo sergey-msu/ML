@@ -122,61 +122,6 @@ namespace ML.Tests.UnitTests.CNN
       Assert.AreEqual( 2, result[1][2,1]);
     }
 
-    [TestMethod]
-    public void ConvLayer_Backprop()
-    {
-      var layer = simpleRectConvLayer();
-      var prevLayer = new LayerMock(Activation.ReLU);
-
-      var prevValues = new double[2][,]
-      {
-        new double[3,4] { {1, 1, -1, -1},
-                          {1, 1, -1, -1},
-                          {1, 1, -1, -1}, },
-        new double[3,4] { {1, 1, -1, -1},
-                          {1, 1, -1, -1},
-                          {1, 1, -1, -1}, }
-      };
-      var prevErrors = new double[2][,]
-      {
-        new double[3,4] { {1, 0, -1, 0},
-                          {1, 0, -1, 0},
-                          {1, 0, -1, 0}, },
-        new double[3,4] { {1, 0, -1, 0},
-                          {1, 0, -1, 0},
-                          {1, 0, -1, 0}, }
-      };
-      var errors = new double[2][,] { new double[3,2], new double[3,2] };
-
-      layer.Backprop(prevLayer, prevValues, prevErrors, errors);
-
-      //Assert.AreEqual(, prevErrors[0][0,0]);
-      //Assert.AreEqual(, prevErrors[0][0,1]);
-      //Assert.AreEqual(, prevErrors[0][0,2]);
-      //Assert.AreEqual(, prevErrors[0][0,3]);
-      //Assert.AreEqual(, prevErrors[0][1,0]);
-      //Assert.AreEqual(, prevErrors[0][1,1]);
-      //Assert.AreEqual(, prevErrors[0][1,2]);
-      //Assert.AreEqual(, prevErrors[0][1,3]);
-      //Assert.AreEqual(, prevErrors[0][2,0]);
-      //Assert.AreEqual(, prevErrors[0][2,1]);
-      //Assert.AreEqual(, prevErrors[0][2,2]);
-      //Assert.AreEqual(, prevErrors[0][2,3]);
-      //
-      //Assert.AreEqual(, prevErrors[1][0,0]);
-      //Assert.AreEqual(, prevErrors[1][0,1]);
-      //Assert.AreEqual(, prevErrors[1][0,2]);
-      //Assert.AreEqual(, prevErrors[1][0,3]);
-      //Assert.AreEqual(, prevErrors[1][1,0]);
-      //Assert.AreEqual(, prevErrors[1][1,1]);
-      //Assert.AreEqual(, prevErrors[1][1,2]);
-      //Assert.AreEqual(, prevErrors[1][1,3]);
-      //Assert.AreEqual(, prevErrors[1][2,0]);
-      //Assert.AreEqual(, prevErrors[1][2,1]);
-      //Assert.AreEqual(, prevErrors[1][2,2]);
-      //Assert.AreEqual(, prevErrors[1][2,3]);
-    }
-
     #endregion
 
     #region .pvt
@@ -192,6 +137,8 @@ namespace ML.Tests.UnitTests.CNN
       layer.InputHeight = 3;
       layer.InputWidth  = 4;
       layer.InputDepth  = 2;
+
+      layer.IsTraining = true;
 
       layer._Build();
 

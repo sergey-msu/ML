@@ -35,8 +35,6 @@ namespace ML.NeuralMethods.Algorithms
 
     #region Fields
 
-    private int m_EpochLength;
-
     private ILossFunction m_LossFunction;
     private StopCriteria m_Stop;
 
@@ -211,7 +209,6 @@ namespace ML.NeuralMethods.Algorithms
       m_BatchSize    = DFT_BATCH_SIZE;
       m_LearningRate = DFT_LEARNING_RATE;
       m_Stop         = DTF_STOP_CRITERIA;
-      m_EpochLength  = TrainingSample.Count;
       m_InputDim     = Net.InputDim;
       m_OutputDim    = Net[Net.LayerCount-1].NeuronCount;
 
