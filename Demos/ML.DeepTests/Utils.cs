@@ -9,7 +9,11 @@ namespace ML.DeepTests
 {
   public static class Utils
   {
-    public static void HandleEpochEnded(BackpropAlgorithm alg, MultiRegressionSample<double[][,]> test, MultiRegressionSample<double[][,]> train, Class[] classes, string outputPath)
+    public static void HandleClassificationEpochEnded(BackpropAlgorithm alg,
+                                                      MultiRegressionSample<double[][,]> test,
+                                                      MultiRegressionSample<double[][,]> train,
+                                                      Class[] classes,
+                                                      string outputPath)
     {
       Console.WriteLine("---------------- Epoch #{0} ({1})", alg.Epoch, DateTime.Now);
       Console.WriteLine("L:\t{0}", alg.LossValue);
@@ -45,6 +49,41 @@ namespace ML.DeepTests
       }
 
       var ofileName = string.Format("cn_e{0}_p{1}.mld", alg.Epoch, Math.Round(pct.Value, 2));
+      var ofilePath = Path.Combine(outputPath, ofileName);
+      using (var stream = File.Open(ofilePath, FileMode.Create))
+      {
+        alg.Net.Serialize(stream);
+      }
+    }
+
+    public static void HandleRegressionEpochEnded(BackpropAlgorithm alg,
+                                                  MultiRegressionSample<double[][,]> test,
+                                                  MultiRegressionSample<double[][,]> train,
+                                                  string outputPath)
+    {
+      Console.WriteLine("---------------- Epoch #{0} ({1})", alg.Epoch, DateTime.Now);
+      Console.WriteLine("L:\t{0}", alg.LossValue);
+      Console.WriteLine("DW:\t{0}", alg.Step2);
+      Console.WriteLine("LR:\t{0}", alg.LearningRate);
+
+      double? rerror = null;
+      if (test==null || !test.Any())
+        Console.WriteLine("Test: none");
+      else
+      {
+        rerror = alg.GetRegressionError(test);
+        Console.WriteLine("Test error: {0}", Math.Round(rerror.Value, 2));
+      }
+
+      if (train==null || !train.Any())
+        Console.WriteLine("Train: none");
+      else
+      {
+        rerror = alg.GetRegressionError(train);
+        Console.WriteLine("Train error: {0}", Math.Round(rerror.Value, 2));
+      }
+
+      var ofileName = string.Format("cn_e{0}_regerr_{1}.mld", alg.Epoch, rerror.Value);
       var ofilePath = Path.Combine(outputPath, ofileName);
       using (var stream = File.Open(ofilePath, FileMode.Create))
       {
@@ -118,6 +157,60 @@ namespace ML.DeepTests
 
         fm.Save(outPath);
       }
+    }
+
+    public static void ExportImageData(double[][,] data, string fpath)
+    {
+      var path = Path.GetDirectoryName(fpath);
+      if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+
+      var height = data[0].GetLength(0);
+      var width = data[0].GetLength(1);
+
+      using (var ofile = File.Open(fpath, FileMode.Create, FileAccess.Write))
+      {
+        var image = new System.Drawing.Bitmap(width, height);
+
+        for (int y=0; y<height; y++)
+        for (int x=0; x<width; x++)
+        {
+          var rmap = data[0];
+          var gmap = (data.Length>1) ? data[1] : data[0];
+          var bmap = (data.Length>2) ? data[2] : data[0];
+
+          var r = (int)(rmap[y, x]*255);
+          var g = (int)(gmap[y, x]*255);
+          var b = (int)(bmap[y, x]*255);
+          image.SetPixel(x, y, System.Drawing.Color.FromArgb(r, g, b));
+        }
+
+        image.Save(ofile, System.Drawing.Imaging.ImageFormat.Png);
+
+        ofile.Flush();
+      }
+    }
+
+    public static void Shuffle<TSample>(ref TSample sample)
+      where TSample : MarkedSample<double[][,], double[]>, new()
+    {
+      var result = new TSample();
+
+      var cnt = sample.Count;
+      var ids = Enumerable.Range(0, cnt).ToList();
+      var random = new Random(0);
+
+      var res = cnt;
+      for (int i=0; i<cnt; i++)
+      {
+        var pos = random.Next(res--);
+        var idx = ids[pos];
+        ids.RemoveAt(pos);
+
+        var data = sample.ElementAt(idx);
+        result[data.Key] = data.Value;
+      }
+
+      sample = result;
     }
 
   }

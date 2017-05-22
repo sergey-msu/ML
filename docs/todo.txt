@@ -6,6 +6,8 @@
 
 - refactor CNN layers to use Input and Output
 
+- add SoftmaxLayer
+
 ***************************** CURRENT *****************************
 
 - CNN:

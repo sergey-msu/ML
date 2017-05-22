@@ -58,6 +58,20 @@ namespace ML.DeepMethods.Algorithms
       }
     }
 
+    public override double GetRegressionError(MultiRegressionSample<double[][,]> testSample)
+    {
+      var isTraining = m_Net.IsTraining;
+      m_Net.IsTraining = false;
+      try
+      {
+        return base.GetRegressionError(testSample);
+      }
+      finally
+      {
+        m_Net.IsTraining = isTraining;
+      }
+    }
+
     /// <summary>
     /// Teaches algorithm, produces Result output
     /// </summary>

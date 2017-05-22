@@ -1,7 +1,7 @@
 ﻿<Window x:Class="ML.CatDogDemo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ML from sandbox: Cat or Dog?"
+        Title="ML from sandbox: main colors"
         AllowDrop="True"
         Drop="onImageDrop"
         SizeToContent="Height"
@@ -38,7 +38,7 @@
                FontSize="20">
           <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0">
             <TextBlock>Drop or Upload</TextBlock>
-            <TextBlock FontSize="13" HorizontalAlignment="Center">Cat or Dog image</TextBlock>
+            <TextBlock FontSize="13" HorizontalAlignment="Center">product image</TextBlock>
           </StackPanel>
         </Label>
         <Border x:Name="m_Border"
@@ -54,45 +54,38 @@
                   Width="75"
                   Content="Upload"
                   Click="onUploadButtonClick"/>
-          <Button Height="24" Visibility="Collapsed"
-                  Width="75"
-                  Content="Test"
-                  Click="onTestButtonClick"/>
         </StackPanel>
       </Grid>
 
-      <Grid Grid.Column="1" Visibility="Collapsed" x:Name="m_ResultsPanel" Width="150">
+      <Grid Grid.Column="1" Visibility="Visible" x:Name="m_ResultsPanel" Width="150">
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="Auto"/>
-          <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Image Grid.Row="0"
-                 x:Name="m_ImgNormalized"
-                 Height="64" Width="64"
-                 Margin="10"
-                 RenderOptions.BitmapScalingMode="LowQuality"/>
+               x:Name="m_ImgNormalized"
+               Height="64" Width="64"
+               Margin="10"
+               RenderOptions.BitmapScalingMode="LowQuality"/>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0,0,0">
-          <TextBlock Width="25">Cat:</TextBlock>
-          <Rectangle Name="m_Bar0" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
-          <TextBlock Name="m_Prob0"/>
+          <TextBlock Width="60" VerticalAlignment="Center">Color #1:</TextBlock>
+          <Rectangle Name="m_Color1" Margin="5,0" Height="50" Width="50" Fill="Transparent" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="20,0,0,0">
-          <TextBlock Width="25">Dog:</TextBlock>
-          <Rectangle Name="m_Bar1" Margin="5,0" Height="10" Width="1" Fill="Green" VerticalAlignment="Center"/>
-          <TextBlock Name="m_Prob1"/>
+          <TextBlock Width="60" VerticalAlignment="Center">Color #2:</TextBlock>
+          <Rectangle Name="m_Color2" Margin="5,0" Height="50" Width="50" Fill="Transparent" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="20,0,0,0">
-          <TextBlock>Elapsed:</TextBlock>
-          <TextBlock Name="m_PredictionTime" Margin="5,0,0,0"/>
+          <TextBlock Width="60" VerticalAlignment="Center">Color #3:</TextBlock>
+          <Rectangle Name="m_Color3" Margin="5,0" Height="50" Width="50" Fill="Transparent" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="20,0,0,0">
-          <TextBlock>Architecture: <Hyperlink Click="ArchitectureButton_Click">details</Hyperlink></TextBlock>
+          <TextBlock Width="60" VerticalAlignment="Center">Color #B:</TextBlock>
+          <Rectangle Name="m_Color4" Margin="5,0" Height="50" Width="50" Fill="Transparent" VerticalAlignment="Center"/>
         </StackPanel>
-        <TextBlock x:Name="m_TxtResult" Grid.Row="5" VerticalAlignment="Center" TextAlignment="Center" FontSize="30" Margin="0,45.9,0,104"/>
       </Grid>
 
     </Grid>

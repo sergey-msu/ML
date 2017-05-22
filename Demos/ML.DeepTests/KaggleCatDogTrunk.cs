@@ -12,7 +12,7 @@ namespace ML.DeepTests
   public class KaggleCatDogTrunk : Runner
   {
     public const int    TRAIN_COUNT  = 10000;
-    public const int    TEST_COUNT   = 2000;
+    public const int    TEST_COUNT   = 2500;
     public const string SRC_IMG_FILE = "{0}.{1}.jpg";
     public const string CAT_PREFIX   = "cat.";
     public const string DOG_PREFIX   = "dog.";
@@ -34,7 +34,7 @@ namespace ML.DeepTests
 
     protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateKaggleCatOrDogDemo1();
+      return Examples.CreateKaggleCatOrDogDemo1_SEALED();
     }
 
     public virtual int NormImgSize { get { return 32; } }
@@ -52,25 +52,6 @@ namespace ML.DeepTests
 
     protected override void Load()
     {
-      //var path = @"C:\Users\User\Desktop\science\Machine learning\data\cat-dog\train\kaggle";
-      //var tezt = new ClassifiedSample<double[][,]>();
-      //loadData(path, tezt);
-      //var alg = CreateAlgorithm(tezt);
-      //var net = alg.Net;
-      //net.IsTraining = false;
-      //var valid = tezt.Subset(0, 2000);
-      //int errors = 0;
-      //foreach (var data in valid)
-      //{
-      //  var res = alg.Classify(data.Key);
-      //  if (res != data.Value)
-      //    errors += 1;
-      //}
-      //Console.WriteLine(errors);
-      //Console.ReadLine();
-
-
-
       // preload all
       Console.WriteLine("preload all data...");
       var dataset = new MultiRegressionSample<double[][,]>();
@@ -81,7 +62,7 @@ namespace ML.DeepTests
       //  exportImageData(data.Key, cnt++);
 
       Console.WriteLine("shuffling data...");
-      shuffle(ref dataset);
+      Utils.Shuffle(ref dataset);
 
       // train
       Console.WriteLine("load train data...");
@@ -102,7 +83,7 @@ namespace ML.DeepTests
 
       foreach (var file in dir.EnumerateFiles())
       {
-        var data = loadFile(file.FullName);
+        var data = LoadFile(file.FullName);
 
         double[] mark;
         if (file.Name.StartsWith(CAT_PREFIX))
@@ -112,19 +93,16 @@ namespace ML.DeepTests
         else
           throw new MLException("Unknown file");
 
-        lock (sample)
-        {
-          sample.Add(data, mark);
-          loaded++;
-          if (loaded % 1000 == 0)
-            Console.Write("\rloaded: {0} of {1}        ", loaded, total);
-        }
+        sample.Add(data, mark);
+        loaded++;
+        if (loaded % 1000 == 0)
+          Console.Write("\rloaded: {0} of {1}        ", loaded, total);
       };
 
       Console.WriteLine("\nLoaded files from: {0}", path);
     }
 
-    private double[][,] loadFile(string fpath)
+    protected virtual double[][,] LoadFile(string fpath)
     {
       var image = (Bitmap)Image.FromFile(fpath);
       var w = image.Width;
@@ -134,81 +112,42 @@ namespace ML.DeepTests
       // crop image to center square size
       // and normalize image to NORM_IMG_SIZE x NORM_IMG_SIZE
 
-      var normImage = new Bitmap(NormImgSize, NormImgSize);
-      using (var gr = Graphics.FromImage(normImage))
+      using (var normImage = new Bitmap(NormImgSize, NormImgSize))
       {
-        gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-        gr.CompositingQuality = CompositingQuality.HighQuality;
-        gr.SmoothingMode = SmoothingMode.AntiAlias;
+        using (var gr = Graphics.FromImage(normImage))
+        {
+          gr.InterpolationMode  = InterpolationMode.HighQualityBicubic;
+          gr.CompositingQuality = CompositingQuality.HighQuality;
+          gr.SmoothingMode      = SmoothingMode.AntiAlias;
 
-        gr.DrawImage(image,
-                     new Rectangle(0, 0, NormImgSize, NormImgSize),
-                     new Rectangle((w-s)/2, (h-s)/2, s, s),
-                     GraphicsUnit.Pixel);
+          gr.DrawImage(image,
+                       new Rectangle(0, 0, NormImgSize, NormImgSize),
+                       new Rectangle((w - s) / 2, (h - s) / 2, s, s),
+                       GraphicsUnit.Pixel);
+        }
+
+        // digitize images
+
+        var result = new double[3][,];
+        for (int i=0; i<3; i++)
+          result[i] = new double[NormImgSize, NormImgSize];
+
+        for (var y=0; y<NormImgSize; y++)
+        for (var x=0; x<NormImgSize; x++)
+        {
+          var pixel = normImage.GetPixel(x, y);
+          result[0][y, x] = pixel.R/255.0D;
+          result[1][y, x] = pixel.G/255.0D;
+          result[2][y, x] = pixel.B/255.0D;
+        }
+
+        return result;
       }
-
-      // digitize images
-
-      var result = new double[3][,];
-      for (int i=0; i<3; i++)
-        result[i] = new double[NormImgSize, NormImgSize];
-
-      int x,y;
-      for (y=0; y<NormImgSize; y++)
-      for (x=0; x<NormImgSize; x++)
-      {
-        var pixel = normImage.GetPixel(x, y);
-        result[0][y, x] = pixel.R/255.0D;
-        result[1][y, x] = pixel.G/255.0D;
-        result[2][y, x] = pixel.B/255.0D;
-      }
-
-      return result;
-    }
-
-    private void shuffle(ref MultiRegressionSample<double[][,]> sample)
-    {
-      var result = new MultiRegressionSample<double[][,]>();
-
-      var cnt = sample.Count;
-      var ids = Enumerable.Range(0, cnt).ToList();
-      var random = new Random(0);
-
-      var res = cnt;
-      for (int i=0; i<cnt; i++)
-      {
-        var pos = random.Next(res--);
-        var idx = ids[pos];
-        ids.RemoveAt(pos);
-
-        var data = sample.ElementAt(idx);
-        result[data.Key] = data.Value;
-      }
-
-      sample = result;
     }
 
     private void loadTrain(MultiRegressionSample<double[][,]> dataset)
     {
       m_TrainingSet = dataset.Subset(0, TRAIN_COUNT);
-    }
-
-    private void exportImageData(double[][,] data, int cnt)
-    {
-      using (var ofile = File.Open(string.Format(@"C:\Users\User\Desktop\science\Machine learning\data\cat-dog\train\file_{0}.png", cnt), FileMode.Create, FileAccess.Write))
-      {
-        var image = new Bitmap(NormImgSize, NormImgSize);
-
-        for (int y = 0; y < NormImgSize; y++)
-        for (int x = 0; x < NormImgSize; x++)
-        {
-          image.SetPixel(x, y, Color.FromArgb((int)(data[0][y, x]*255), (int)(data[1][y, x]*255), (int)(data[2][y, x]*255)));
-        }
-
-        image.Save(ofile, System.Drawing.Imaging.ImageFormat.Png);
-
-        ofile.Flush();
-      }
     }
 
     private void loadTest(MultiRegressionSample<double[][,]> dataset)
@@ -227,7 +166,7 @@ namespace ML.DeepTests
 
       Alg.EpochEndedEvent += (o, e) =>
                              {
-                               Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath);
+                               Utils.HandleClassificationEpochEnded(Alg, m_TestingSet, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath);
                                tstart = DateTime.Now;
                              };
       Alg.BatchEndedEvent += (o, e) =>
@@ -252,5 +191,58 @@ namespace ML.DeepTests
     }
 
     #endregion
+  }
+
+  public class KaggleCatDogTrunk_BlackWhite : KaggleCatDogTrunk
+  {
+    public override string OutputPath { get { return RootPath+@"\output\cat-dog-blackwhite"; }}
+
+    protected override BackpropAlgorithm CreateAlgorithm()
+    {
+      return Examples.CreateKaggleCatOrDogBlackWhiteDemo1_Pretrained(@"C:\ML\output\cat-dog-blackwhite\_pretrained\___cn_e75_p28.28.mld");
+    }
+
+    public override int NormImgSize { get { return 48; } }
+
+    protected override double[][,] LoadFile(string fpath)
+    {
+      var image = (Bitmap)Image.FromFile(fpath);
+      var w = image.Width;
+      var h = image.Height;
+      var s = Math.Min(w, h);
+
+      // crop image to center square size
+      // and normalize image to NORM_IMG_SIZE x NORM_IMG_SIZE
+
+      using (var normImage = new Bitmap(NormImgSize, NormImgSize))
+      {
+        using (var gr = Graphics.FromImage(normImage))
+        {
+          gr.InterpolationMode  = InterpolationMode.HighQualityBicubic;
+          gr.CompositingQuality = CompositingQuality.HighQuality;
+          gr.SmoothingMode      = SmoothingMode.AntiAlias;
+
+          gr.DrawImage(image,
+                       new Rectangle(0, 0, NormImgSize, NormImgSize),
+                       new Rectangle((w - s) / 2, (h - s) / 2, s, s),
+                       GraphicsUnit.Pixel);
+        }
+
+        // digitize images
+
+        var result = new double[1][,] { new double[NormImgSize, NormImgSize] };
+
+        for (var y=0; y<NormImgSize; y++)
+        for (var x=0; x<NormImgSize; x++)
+        {
+          var pixel = normImage.GetPixel(x, y);
+          var level = (pixel.R + pixel.G + pixel.B) / (3*255.0D);
+          result[0][y, x] = level;
+        }
+
+        return result;
+      }
+    }
+
   }
 }

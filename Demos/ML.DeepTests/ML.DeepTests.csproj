@@ -83,8 +83,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="Pretrained\cat-dog-19.1.mld" />
-    <EmbeddedResource Include="Pretrained\cn_e16_p37.65.mld" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ML\ML.csproj">

@@ -34,7 +34,7 @@ namespace ML.DeepTests
 
     protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateKaggleCatOrDogDemo1();
+      return Examples.CreateKaggleCatOrDogDemo1_SEALED();
     }
 
     #region Export
@@ -54,7 +54,7 @@ namespace ML.DeepTests
       Console.WriteLine("load train data...");
       loadTrain(TrainPath, m_TrainingSet);
       Console.WriteLine("shuffling train data...");
-      shuffle(ref m_TrainingSet);
+      Utils.Shuffle(ref m_TrainingSet);
 
       // test
       //Console.WriteLine("load test data...");
@@ -145,28 +145,6 @@ namespace ML.DeepTests
       return result;
     }
 
-    private void shuffle(ref MultiRegressionSample<double[][,]> sample)
-    {
-      var result = new MultiRegressionSample<double[][,]>();
-
-      var cnt = sample.Count;
-      var ids = Enumerable.Range(0, cnt).ToList();
-      var random = new Random(0);
-
-      var res = cnt;
-      for (int i=0; i<cnt; i++)
-      {
-        var pos = random.Next(res--);
-        var idx = ids[pos];
-        ids.RemoveAt(pos);
-
-        var data = sample.ElementAt(idx);
-        result[data.Key] = data.Value;
-      }
-
-      sample = result;
-    }
-
     #endregion
 
     #region Train
@@ -178,7 +156,7 @@ namespace ML.DeepTests
 
       Alg.EpochEndedEvent += (o, e) =>
                              {
-                               Utils.HandleEpochEnded(Alg, null, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath); // no labeled testing set in Kaggle :(
+                               Utils.HandleClassificationEpochEnded(Alg, null, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath); // no labeled testing set in Kaggle :(
                                tstart = DateTime.Now;
                              };
       Alg.BatchEndedEvent += (o, e) =>

@@ -183,6 +183,29 @@ namespace ML.Core
       return errors;
     }
 
+    /// <summary>
+    /// Returns all errors of the algorithm on some test classified sample
+    /// </summary>
+    public virtual double GetRegressionError(MultiRegressionSample<TObj> testSample)
+    {
+      var sync = new object();
+      var total = 0.0D;
+      Parallel.ForEach(testSample, pdata =>
+      {
+        var pred = Predict(pdata.Key);
+        var real = pdata.Value;
+          lock (sync)
+          {
+            var error = 0.0D;
+            var len = pred.Length;
+            for (int i=0; i<len; i++)
+              error += Math.Abs(pred[i] - real[i]);
+            total += (error/2);
+          }
+      });
+
+      return total / testSample.Count;
+    }
 
     private Class mapValueToClass(double[] value, Class[] classes)
     {

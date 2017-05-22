@@ -54,43 +54,6 @@ namespace ML.DeepTests
       return alg;
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    public static BackpropAlgorithm CreateMNISTSimpleDemoWithBatching()
-    {
-      Console.WriteLine("init CreateMNISTSimpleDemoWithBatching");
-      var activation = Activation.ReLU;
-      var net = new ConvNet(1, 28) { IsTraining=true };
-
-      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 5));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 24, windowSize: 5));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2, activation: activation));
-      net.AddLayer(new FlattenLayer(outputDim: 10, activation: activation));
-
-      net._Build();
-
-      net.RandomizeParameters(seed: 0);
-
-      var lrate = 0.0001D;
-      var alg = new BackpropAlgorithm(net)
-      {
-        EpochCount = 50,
-        LearningRate = lrate,
-        BatchSize = 8,
-        UseBatchParallelization = true,
-        MaxBatchThreadCount = 8,
-        LossFunction = Loss.Euclidean,
-        Optimizer = Optimizer.RMSProp,
-        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
-      };
-
-      alg.Build();
-
-      return alg;
-    }
-
     public static BackpropAlgorithm CreateMNISTHardDemo()
     {
       Console.WriteLine("init CreateMNISTHardDemo");
@@ -361,7 +324,7 @@ namespace ML.DeepTests
     /// <summary>
     ///
     /// </summary>
-    public static BackpropAlgorithm CreateKaggleCatOrDogDemo1()
+    public static BackpropAlgorithm CreateKaggleCatOrDogDemo1_SEALED()
     {
       Console.WriteLine("init CreateKaggleCatOrDogDemo1");
 
@@ -374,7 +337,6 @@ namespace ML.DeepTests
       net.AddLayer(new DropoutLayer(0.25));
 
       net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
-      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
       net.AddLayer(new DropoutLayer(0.25));
 
@@ -395,7 +357,7 @@ namespace ML.DeepTests
         BatchSize = 8,
         UseBatchParallelization = true,
         MaxBatchThreadCount = 8,
-        Optimizer = Optimizer.Adadelta, // new AdadeltaOptimizer(gamma: 0.9D, useLearningRate: true),
+        Optimizer = Optimizer.Adadelta,
         Regularizator = Regularizator.L2(0.001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
@@ -427,6 +389,130 @@ namespace ML.DeepTests
         EpochCount = 500,
         LearningRate = lrate,
         BatchSize = 4,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Adadelta,
+        Regularizator = Regularizator.L2(0.001D),
+        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
+      };
+
+      alg.Build();
+
+      return alg;
+    }
+
+    #endregion
+
+    #region Main Colors
+
+    /// <summary>
+    /// Error = 0.92
+    /// </summary>
+    public static BackpropAlgorithm CreateMainColorsDemo1()
+    {
+      Console.WriteLine("init CreateMainColorsDemo1");
+      var activation = Activation.LeakyReLU();
+      var net = new ConvNet(3, 48) { IsTraining=true };
+
+      net.AddLayer(new ConvLayer(outputDepth: 12, windowSize: 5, padding: 2));
+      net.AddLayer(new ConvLayer(outputDepth: 12, windowSize: 5, padding: 2));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 24, windowSize: 5, padding: 2));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+      net.AddLayer(new FlattenLayer(outputDim: 32, activation: activation));
+      net.AddLayer(new DropoutLayer(rate: 0.5D));
+      net.AddLayer(new DenseLayer(outputDim: 12, activation: activation));
+
+      net._Build();
+
+      net.RandomizeParameters(seed: 0);
+
+      var lrate = 0.01D;
+      var alg = new BackpropAlgorithm(net)
+      {
+        EpochCount = 500,
+        LearningRate = lrate,
+        BatchSize = 8,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        LossFunction = Loss.Euclidean,
+        Optimizer = Optimizer.SGD,
+        Regularizator = Regularizator.L2(0.0001D),
+        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
+      };
+
+      alg.Build();
+
+      return alg;
+    }
+
+    #endregion
+
+
+    #region KAGGLE Cat or Dog Filters (BW etc.)
+
+    public static BackpropAlgorithm CreateKaggleCatOrDogBlackWhiteDemo1()
+    {
+      Console.WriteLine("init CreateKaggleCatOrDogBlackWhiteDemo1");
+
+      var activation = Activation.ReLU;
+      var net = new ConvNet(1, 48) { IsTraining=true };
+
+      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 5, padding: 1, activation: activation));
+      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
+
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      net.AddLayer(new DropoutLayer(0.25));
+
+      net.AddLayer(new FlattenLayer(outputDim: 64, activation: activation));
+      net.AddLayer(new DropoutLayer(0.5));
+      net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
+
+      net._Build();
+
+      net.RandomizeParameters(seed: 0);
+
+      var lrate = 0.1D;
+      var alg = new BackpropAlgorithm(net)
+      {
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 500,
+        LearningRate = lrate,
+        BatchSize = 8,
+        UseBatchParallelization = true,
+        MaxBatchThreadCount = 8,
+        Optimizer = Optimizer.Adadelta,
+        Regularizator = Regularizator.L2(0.001D),
+        LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
+      };
+
+      alg.Build();
+
+      return alg;
+    }
+
+    public static BackpropAlgorithm CreateKaggleCatOrDogBlackWhiteDemo1_Pretrained(string fpath)
+    {
+      Console.WriteLine("init CreateKaggleCatOrDogBlackWhiteDemo1_Pretrained");
+
+      ConvNet net;
+      var assembly = Assembly.GetExecutingAssembly();
+      using (var stream = System.IO.File.Open(fpath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+      {
+        net = ConvNet.Deserialize(stream);
+        net.IsTraining = true;
+      }
+
+      var lrate = 0.001D;
+      var alg = new BackpropAlgorithm(net)
+      {
+        LossFunction = Loss.CrossEntropySoftMax,
+        EpochCount = 500,
+        LearningRate = lrate,
+        BatchSize = 8,
         UseBatchParallelization = true,
         MaxBatchThreadCount = 8,
         Optimizer = Optimizer.Adadelta,
