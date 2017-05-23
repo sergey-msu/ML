@@ -6,7 +6,8 @@ namespace ML.DeepMethods.Optimizers
 {
   /// <summary>
   /// Base class for all optimizers.
-  /// (see http://caffe.berkeleyvision.org/tutorial/solver.html for standart optimizers description)
+  /// (see http://caffe.berkeleyvision.org/tutorial/solver.html and
+  ///      http://cs231n.github.io/neural-networks-3 for standart optimizers description)
   /// </summary>
   public abstract class OptimizerBase : IOptimizer
   {

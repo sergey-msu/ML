@@ -100,6 +100,53 @@ namespace ML.Tests.UnitTests.CNN
 
     #endregion
 
+    #region Nesterov
+
+    [TestMethod]
+    public void NesterovOptimizer_SimpleMultivar()
+    {
+      // arrange
+      var func = new Mocks.SimpleMultivar();
+      var lr = 0.01D;
+      var mu = 0.9D;
+      var w  = new double[2][] { new[] { 1.0D, 1.0D }, new[] { 1.0D } };
+      var optimizer = new NesterovOptimizer(mu);
+
+      // act & assert
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.8100, w[0][0]);
+      Assert.AreEqual(0.9620, w[0][1]);
+      Assert.AreEqual(0.8100, w[1][0]);
+      Assert.AreEqual(0.073644, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.58087600, w[0][0], EPS);
+      Assert.AreEqual(0.89769200, w[0][1], EPS);
+      Assert.AreEqual(0.58087600, w[1][0], EPS);
+      Assert.AreEqual(0.10913113, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.34650097, w[0][0], EPS);
+      Assert.AreEqual(0.80441249, w[0][1], EPS);
+      Assert.AreEqual(0.34650097, w[1][0], EPS);
+      Assert.AreEqual(0.11856438, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(0.13370505, w[0][0], EPS);
+      Assert.AreEqual(0.68265581, w[0][1], EPS);
+      Assert.AreEqual(0.13370505, w[1][0], EPS);
+      Assert.AreEqual(0.10538890, optimizer.Step2, EPS);
+
+      optimizer.Push(w, func.Gradient(w), lr);
+      Assert.AreEqual(-0.03941244, w[0][0], EPS);
+      Assert.AreEqual( 0.53637786, w[0][1], EPS);
+      Assert.AreEqual(-0.03941244, w[1][0], EPS);
+      Assert.AreEqual( 0.08133656, optimizer.Step2, EPS);
+    }
+
+    #endregion
+
     #region Adagrad
 
     [TestMethod]

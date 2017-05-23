@@ -115,6 +115,7 @@
     <Compile Include="DeepMethods\Optimizers\AdadeltaOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\AdamaxOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\AdamOptimizer.cs" />
+    <Compile Include="DeepMethods\Optimizers\NesterovOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\RMSPropOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\AdagradOptimizer.cs" />
     <Compile Include="DeepMethods\Optimizers\MomentumOptimizer.cs" />

@@ -52,6 +52,7 @@ namespace ML.DeepMethods.Registry
     public static readonly AdamaxOptimizer   Adamax   = new AdamaxOptimizer();
     public static readonly AdamOptimizer     Adam     = new AdamOptimizer();
     public static readonly MomentumOptimizer Momentum = new MomentumOptimizer();
+    public static readonly NesterovOptimizer Nesterov = new NesterovOptimizer();
     public static readonly RMSPropOptimizer  RMSProp  = new RMSPropOptimizer();
   }
 

@@ -612,7 +612,7 @@ namespace ML.DeepTests
         BatchSize = 8,
         UseBatchParallelization = true,
         MaxBatchThreadCount = 8,
-        Optimizer = Optimizer.Adam,
+        Optimizer = Optimizer.Nesterov,
         Regularizator = Regularizator.L2(0.001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };
