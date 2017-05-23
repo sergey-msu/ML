@@ -81,9 +81,11 @@ namespace ML.DeepTests
       var loaded = 0;
       var total = dir.GetFiles().Length;
 
+      int c = 0;
       foreach (var file in dir.EnumerateFiles())
       {
         var data = LoadFile(file.FullName);
+        //Utils.ExportImageData(data, @"F:\Work\science\Machine learning\data\cat-dog\train\"+(c++)+".png");
 
         double[] mark;
         if (file.Name.StartsWith(CAT_PREFIX))
@@ -104,44 +106,46 @@ namespace ML.DeepTests
 
     protected virtual double[][,] LoadFile(string fpath)
     {
-      var image = (Bitmap)Image.FromFile(fpath);
-      var w = image.Width;
-      var h = image.Height;
-      var s = Math.Min(w, h);
-
-      // crop image to center square size
-      // and normalize image to NORM_IMG_SIZE x NORM_IMG_SIZE
-
-      using (var normImage = new Bitmap(NormImgSize, NormImgSize))
+      using (var image = (Bitmap)Image.FromFile(fpath))
       {
-        using (var gr = Graphics.FromImage(normImage))
+        var w = image.Width;
+        var h = image.Height;
+        var s = Math.Min(w, h);
+
+        // crop image to center square size
+        // and normalize image to NORM_IMG_SIZE x NORM_IMG_SIZE
+
+        using (var normImage = new Bitmap(NormImgSize, NormImgSize))
         {
-          gr.InterpolationMode  = InterpolationMode.HighQualityBicubic;
-          gr.CompositingQuality = CompositingQuality.HighQuality;
-          gr.SmoothingMode      = SmoothingMode.AntiAlias;
+          using (var gr = Graphics.FromImage(normImage))
+          {
+            gr.InterpolationMode  = InterpolationMode.HighQualityBicubic;
+            gr.CompositingQuality = CompositingQuality.HighQuality;
+            gr.SmoothingMode      = SmoothingMode.AntiAlias;
 
-          gr.DrawImage(image,
-                       new Rectangle(0, 0, NormImgSize, NormImgSize),
-                       new Rectangle((w - s) / 2, (h - s) / 2, s, s),
-                       GraphicsUnit.Pixel);
+            gr.DrawImage(image,
+                         new Rectangle(0, 0, NormImgSize, NormImgSize),
+                         new Rectangle((w - s) / 2, (h - s) / 2, s, s),
+                         GraphicsUnit.Pixel);
+          }
+
+          // digitize images
+
+          var result = new double[3][,];
+          for (int i=0; i<3; i++)
+            result[i] = new double[NormImgSize, NormImgSize];
+
+          for (var y=0; y<NormImgSize; y++)
+          for (var x=0; x<NormImgSize; x++)
+          {
+            var pixel = normImage.GetPixel(x, y);
+            result[0][y, x] = pixel.R/255.0D;
+            result[1][y, x] = pixel.G/255.0D;
+            result[2][y, x] = pixel.B/255.0D;
+          }
+
+          return result;
         }
-
-        // digitize images
-
-        var result = new double[3][,];
-        for (int i=0; i<3; i++)
-          result[i] = new double[NormImgSize, NormImgSize];
-
-        for (var y=0; y<NormImgSize; y++)
-        for (var x=0; x<NormImgSize; x++)
-        {
-          var pixel = normImage.GetPixel(x, y);
-          result[0][y, x] = pixel.R/255.0D;
-          result[1][y, x] = pixel.G/255.0D;
-          result[2][y, x] = pixel.B/255.0D;
-        }
-
-        return result;
       }
     }
 
@@ -245,4 +249,85 @@ namespace ML.DeepTests
     }
 
   }
+
+  public class KaggleCatDogTrunk_Filters : KaggleCatDogTrunk
+  {
+    public override string OutputPath { get { return RootPath+@"\output\cat-dog-filters"; }}
+
+    protected override BackpropAlgorithm CreateAlgorithm()
+    {
+      //return Examples.CreateKaggleCatOrDogFiltersDemo1();
+      return Examples.CreateKaggleCatOrDogFiltersDemo1_Pretrained(@"C:\ML\output\cat-dog-filters\_pretrained\cn_e20_p36.64.mld");
+    }
+
+    public override int NormImgSize { get { return 48; } }
+
+    protected override double[][,] LoadFile(string fpath)
+    {
+      using (var image = (Bitmap)Image.FromFile(fpath))
+      using (var filtImage = Utils.Filters.Sobel3x3Filter(image))
+      using (var normImage = new Bitmap(NormImgSize, NormImgSize))
+      using (var normFiltImage = new Bitmap(NormImgSize, NormImgSize))
+      {
+        var w = image.Width;
+        var h = image.Height;
+        var s = Math.Min(w, h);
+
+        // crop image to center square size
+        // and normalize image to NORM_IMG_SIZE x NORM_IMG_SIZE
+
+        using (var gr = Graphics.FromImage(normImage))
+        {
+          gr.InterpolationMode  = InterpolationMode.HighQualityBicubic;
+          gr.CompositingQuality = CompositingQuality.HighQuality;
+          gr.SmoothingMode      = SmoothingMode.AntiAlias;
+
+          gr.DrawImage(image,
+                       new Rectangle(0, 0, NormImgSize, NormImgSize),
+                       new Rectangle((w - s) / 2, (h - s) / 2, s, s),
+                       GraphicsUnit.Pixel);
+        }
+        using (var gr = Graphics.FromImage(normFiltImage))
+        {
+          gr.InterpolationMode  = InterpolationMode.HighQualityBicubic;
+          gr.CompositingQuality = CompositingQuality.HighQuality;
+          gr.SmoothingMode      = SmoothingMode.AntiAlias;
+
+          gr.DrawImage(filtImage,
+                       new Rectangle(0, 0, NormImgSize, NormImgSize),
+                       new Rectangle((w - s) / 2, (h - s) / 2, s, s),
+                       GraphicsUnit.Pixel);
+        }
+
+        // digitize images
+
+        var result = new double[2][,]
+        {
+          new double[NormImgSize, NormImgSize],
+          new double[NormImgSize, NormImgSize]
+        };
+
+        // grayscale
+        for (var y=0; y<NormImgSize; y++)
+        for (var x=0; x<NormImgSize; x++)
+        {
+          var pixel = normImage.GetPixel(x, y);
+          var level = (pixel.R + pixel.G + pixel.B) / (3*255.0D);
+          result[0][y, x] = level;
+        }
+
+        // filter
+        for (var y=0; y<NormImgSize; y++)
+        for (var x=0; x<NormImgSize; x++)
+        {
+          var pixel = normFiltImage.GetPixel(x, y);
+          var level = (pixel.R + pixel.G + pixel.B) / (3*255.0D);
+          result[1][y, x] = level;
+        }
+
+        return result;
+      }
+    }
+  }
+
 }

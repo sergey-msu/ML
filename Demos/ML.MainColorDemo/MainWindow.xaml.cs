@@ -44,7 +44,7 @@ namespace ML.CatDogDemo
       try
       {
         var assembly = Assembly.GetExecutingAssembly();
-        using (var stream = assembly.GetManifestResourceStream("ML.MainColorDemo.cn_e29_regerr_1.38.mld"))
+        using (var stream = assembly.GetManifestResourceStream("ML.MainColorDemo.net.mld"))
         {
           m_Network = ConvNet.Deserialize(stream);
           m_Network.IsTraining = false;
@@ -78,9 +78,13 @@ namespace ML.CatDogDemo
     {
       try
       {
+        //using (var bitmap = loadImage(path, data))
+        //using (var normBitmap = doNormalization(bitmap, true))
+        //  doRecognition(normBitmap);
+
         using (var bitmap = loadImage(path, data))
-        using (var normBitmap = doNormalization(bitmap, true))
-          doRecognition(normBitmap);
+        using (var normBitmap = doDowngrade(bitmap))
+          doDirect(normBitmap);
       }
       catch (Exception ex)
       {
@@ -198,13 +202,75 @@ namespace ML.CatDogDemo
 
       for (int i=0; i<12; i+=3)
       {
-        var r = (byte)(result[i][0,0]*255);
-        var g = (byte)(result[i+1][0,0]*255);
-        var b = (byte)(result[i+2][0,0]*255);
+        var r = (byte)(Math.Min(result[i][0,0]*255, 255));
+        var g = (byte)(Math.Min(result[i+1][0,0]*255, 255));
+        var b = (byte)(Math.Min(result[i+2][0,0]*255, 255));
         var color = System.Windows.Media.Color.FromRgb(r, g, b);
-        var barName = string.Format("m_Color{0}", i%4+1);
+        var barName = string.Format("m_Color{0}", i/3+1);
         ((System.Windows.Shapes.Rectangle)this.FindName(barName)).Fill = new SolidColorBrush(color);
       }
+    }
+
+    #endregion
+
+    #region Direct
+
+    private void doDirect(Bitmap bitmap)
+    {
+      //const int factor = 63;
+      var kk = 0.3F;
+
+      var kernel = new Func<float, float>(r => { if (r<kk) return 1.0F; if (r>1) return 0.0F; return (1.0F-r)/(1-kk); });
+      var hist = new Dictionary<System.Drawing.Color, float>();
+      var h = bitmap.Height;
+      var w = bitmap.Width;
+      for (int x=0; x<w; x++)
+      for (int y=0; y<h; y++)
+      {
+        var p = bitmap.GetPixel(x, y);
+        //var qp = System.Drawing.Color.FromArgb(factor*(p.R/factor), factor*(p.G/factor), factor*(p.B/factor));
+
+        var xi  = (2.0F*x-w)/w;
+        var eta = (2.0F*y-h)/h;
+        var r = xi*xi + eta*eta;
+        var weight = kernel(r);
+        if (weight<=0) continue;
+
+        if (!hist.ContainsKey(p)) hist[p] = 0.0F;
+        hist[p] += weight;
+      }
+
+      var ccount = 3;
+      var topColors = hist.OrderByDescending(c => c.Value)
+                          .Take(ccount)
+                          .Select(c => c.Key)
+                          .ToList();
+
+      for (int i=0; i<3; i++)
+      {
+        var tcolor = topColors[i];
+        var color = System.Windows.Media.Color.FromRgb(tcolor.R, tcolor.G, tcolor.B);
+        var barName = string.Format("m_Color{0}", i+1);
+        ((System.Windows.Shapes.Rectangle)this.FindName(barName)).Fill = new SolidColorBrush(color);
+      }
+    }
+
+    private Bitmap doDowngrade(Bitmap bitmap)
+    {
+      const int factor = 25;
+
+      var result = new Bitmap(bitmap.Width, bitmap.Height);
+      for (int x=0; x<bitmap.Width; x++)
+      for (int y=0; y<bitmap.Height; y++)
+      {
+        var p = bitmap.GetPixel(x, y);
+        var d = System.Drawing.Color.FromArgb(factor*(p.R/factor), factor*(p.G/factor), factor*(p.B/factor));
+        result.SetPixel(x, y, d);
+      }
+
+      m_ImgNormalized.Source = imageSourceFromBitmap(result);
+
+      return result;
     }
 
     #endregion
@@ -271,8 +337,8 @@ namespace ML.CatDogDemo
       {
         var p = bitmap.GetPixel(x, y);
         data[0][y, x] = p.R / 255.0D;
-        data[1][y, x] = p.R / 255.0D;
-        data[2][y, x] = p.R / 255.0D;
+        data[1][y, x] = p.G / 255.0D;
+        data[2][y, x] = p.B / 255.0D;
       }
 
       return data;

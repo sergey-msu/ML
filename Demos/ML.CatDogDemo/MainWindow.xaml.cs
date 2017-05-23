@@ -318,7 +318,7 @@ namespace ML.CatDogDemo
 
     private void onTestButtonClick(object sender, RoutedEventArgs e)
     {
-      var path = @"C:\Users\User\Desktop\science\Machine learning\data\cat-dog\train\kaggle";
+      var path = @"F:\Work\science\Machine learning\data\cat-dog\train\kaggle";
       var errors = 0;
       var dir = new DirectoryInfo(path);
       var total = dir.GetFiles().Length;

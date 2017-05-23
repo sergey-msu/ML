@@ -15,13 +15,14 @@ namespace ML.DeepTests
     public const int    TRAIN_PCT = 70;
 
 
-    public override string SrcMark { get { return "original"; } }
-    public override string DataPath { get { return RootPath + @"\data\main-colors"; } }
+    public override string SrcMark    { get { return "original"; } }
+    public override string DataPath   { get { return RootPath + @"\data\main-colors"; } }
     public override string OutputPath { get { return RootPath + @"\output\main-colors"; } }
 
     protected override BackpropAlgorithm CreateAlgorithm()
     {
-      return Examples.CreateMainColorsDemo1();
+      return Examples.CreateMainColorsDemo1_Pretrain(@"F:\Work\science\Machine learning\data\main-colors-test\pretrain\original\net.mld");
+      //return Examples.CreateMainColorsDemo1();
     }
 
     public virtual int NormImgSize { get { return 48; } }
@@ -91,6 +92,7 @@ namespace ML.DeepTests
         var fname = Path.GetFileNameWithoutExtension(file.Name);
         var id = int.Parse(fname.Substring(IMG_PREFIX.Length));
         var data = loadFile(file.FullName);
+        Utils.ExportImageData(data, @"F:\Work\science\Machine learning\data\main-colors\train\1.png");
 
         sample.Add(data, marks[id]);
         loaded++;

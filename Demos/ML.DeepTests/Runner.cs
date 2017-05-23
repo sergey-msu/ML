@@ -8,7 +8,7 @@ namespace ML.DeepTests
 {
   public abstract class Runner
   {
-    public const string DFT_ROOT = @"C:\Users\User\Desktop\science\Machine learning";
+    public const string DFT_ROOT = @"F:\Work\Science\Machine learning";
 
     protected MultiRegressionSample<double[][,]> m_TrainingSet = new MultiRegressionSample<double[][,]>();
     protected MultiRegressionSample<double[][,]> m_TestingSet  = new MultiRegressionSample<double[][,]>();
