@@ -1,12 +1,8 @@
 
+- serialization
+- refactor CNN layers to use Inputs and Outputs
+- COMMIT A WILLFUL DECISION: do we need ComputingLayer architecture? Does Build/DoBuild implement in a proper way?
 
-- unit tests over CIFAR-10 (layers, activations, softmax, batching etc.)
-- inspect convnet.js
-- add kernel_constraint to layers
-
-- refactor CNN layers to use Input and Output
-
-- add SoftmaxLayer
 
 ***************************** CURRENT *****************************
 
@@ -19,8 +15,9 @@
   - extract stop criteria from backpropalgorithm
   - serialization/deserialization
   - compare Keras and ML calcuations
-
-- COMMIT A WILLFUL DECISION: do we need ComputingLayer architecture? Does Build/DoBuild implement in a proper way?
+  - inspect convnet.js
+  - add kernel_constraint to layers
+  - add SoftmaxLayer
 
 - NN and CNN:
   - possibility of: train -> add nodes/layers -> train etc...
@@ -69,6 +66,8 @@
 
  - Implement more algorithms
    - implement C4.5 algorithm for decision trees
+
+ - Implement Boosting (Gradient etc.)
 
 ***************************** DONE *****************************
 

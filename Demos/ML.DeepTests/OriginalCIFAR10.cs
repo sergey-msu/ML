@@ -232,7 +232,7 @@ namespace ML.DeepTests
 
       Alg.EpochEndedEvent += (o, e) =>
                              {
-                               Utils.HandleClassificationEpochEnded(Alg, m_TestingSet, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath);
+                               Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet,  OutputPath);
                                tstart = DateTime.Now;
                              };
       Alg.BatchEndedEvent += (o, e) =>

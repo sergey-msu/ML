@@ -326,7 +326,7 @@ namespace ML.DeepTests
     /// </summary>
     public static BackpropAlgorithm CreateKaggleCatOrDogDemo1_SEALED()
     {
-      Console.WriteLine("init CreateKaggleCatOrDogDemo1");
+      Console.WriteLine("init CreateKaggleCatOrDogDemo1_SEALED");
 
       var activation = Activation.ReLU;
       var net = new ConvNet(3, 32) { IsTraining=true };
@@ -336,6 +336,7 @@ namespace ML.DeepTests
       net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
       net.AddLayer(new DropoutLayer(0.25));
 
+      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
       net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
       net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
       net.AddLayer(new DropoutLayer(0.25));
@@ -612,7 +613,7 @@ namespace ML.DeepTests
         BatchSize = 8,
         UseBatchParallelization = true,
         MaxBatchThreadCount = 8,
-        Optimizer = Optimizer.Nesterov,
+        Optimizer = Optimizer.Adadelta,
         Regularizator = Regularizator.L2(0.001D),
         LearningRateScheduler = LearningRateScheduler.DropBased(lrate, 5, 0.5D)
       };

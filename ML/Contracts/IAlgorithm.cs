@@ -35,7 +35,7 @@ namespace ML.Contracts
     /// <summary>
     /// Returns all errors of the algorithm on some test classified sample
     /// </summary>
-    IEnumerable<ErrorInfo<TObj, TMark>> GetErrors(TSample testSample);
+    IEnumerable<ErrorInfo<TObj, TMark>> GetErrors(TSample testSample, double threshold, bool parallel);
   }
 
   /// <summary>

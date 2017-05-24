@@ -5,7 +5,6 @@ using ML.Contracts;
 using ML.Core;
 using ML.DeepMethods.Algorithms;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
@@ -13,13 +12,12 @@ namespace ML.DeepTests
 {
   public static class Utils
   {
-    public static void HandleClassificationEpochEnded(BackpropAlgorithm alg,
-                                                      MultiRegressionSample<double[][,]> test,
-                                                      MultiRegressionSample<double[][,]> train,
-                                                      Class[] classes,
-                                                      string outputPath)
+    public static void HandleEpochEnded(BackpropAlgorithm alg,
+                                        MultiRegressionSample<double[][,]> test,
+                                        MultiRegressionSample<double[][,]> train,
+                                        string outputPath)
     {
-      Console.WriteLine("---------------- Epoch #{0} ({1})", alg.Epoch, DateTime.Now);
+      Console.WriteLine("\r------------------------------------------- Epoch #{0} ({1})                    ", alg.Epoch, DateTime.Now);
       Console.WriteLine("L:\t{0}", alg.LossValue);
       Console.WriteLine("DW:\t{0}", alg.Step2);
       Console.WriteLine("LR:\t{0}", alg.LearningRate);
@@ -30,7 +28,7 @@ namespace ML.DeepTests
         Console.WriteLine("Test: none");
       else
       {
-        var terrors = alg.GetClassificationErrors(test, classes);
+        var terrors = alg.GetErrors(test, 0, true);
         var tec = terrors.Count();
         var tdc = test.Count;
         var tpct = Math.Round(100.0F * tec / tdc, 2);
@@ -43,7 +41,7 @@ namespace ML.DeepTests
         Console.WriteLine("Train: none");
       else
       {
-        var verrors = alg.GetClassificationErrors(train, classes);
+        var verrors = alg.GetErrors(train, 0, true);
         var vec = verrors.Count();
         var vdc = train.Count;
         var vpct = Math.Round(100.0F * vec / vdc, 2);
@@ -53,41 +51,6 @@ namespace ML.DeepTests
       }
 
       var ofileName = string.Format("cn_e{0}_p{1}.mld", alg.Epoch, Math.Round(pct.Value, 2));
-      var ofilePath = Path.Combine(outputPath, ofileName);
-      using (var stream = File.Open(ofilePath, FileMode.Create))
-      {
-        alg.Net.Serialize(stream);
-      }
-    }
-
-    public static void HandleRegressionEpochEnded(BackpropAlgorithm alg,
-                                                  MultiRegressionSample<double[][,]> test,
-                                                  MultiRegressionSample<double[][,]> train,
-                                                  string outputPath)
-    {
-      Console.WriteLine("---------------- Epoch #{0} ({1})", alg.Epoch, DateTime.Now);
-      Console.WriteLine("L:\t{0}", alg.LossValue);
-      Console.WriteLine("DW:\t{0}", alg.Step2);
-      Console.WriteLine("LR:\t{0}", alg.LearningRate);
-
-      var rerror = 0.0D;
-      if (test==null || !test.Any())
-        Console.WriteLine("Test: none");
-      else
-      {
-        rerror = alg.GetRegressionError(test);
-        Console.WriteLine("Test error: {0}", Math.Round(rerror, 2));
-      }
-
-      if (train==null || !train.Any())
-        Console.WriteLine("Train: none");
-      else
-      {
-        var terror = alg.GetRegressionError(train);
-        Console.WriteLine("Train error: {0}", Math.Round(terror, 2));
-      }
-
-      var ofileName = string.Format("cn_e{0}_regerr_{1}.mld", alg.Epoch, Math.Round(rerror, 2));
       var ofilePath = Path.Combine(outputPath, ofileName);
       using (var stream = File.Open(ofilePath, FileMode.Create))
       {

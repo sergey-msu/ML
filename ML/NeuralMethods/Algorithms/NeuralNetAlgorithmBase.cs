@@ -35,13 +35,13 @@ namespace ML.NeuralMethods.Algorithms
     }
 
 
-    public override IEnumerable<ErrorInfo<double[], Class>> GetClassificationErrors(MultiRegressionSample<double[]> testSample, Class[] classes)
+    public override IEnumerable<ErrorInfo<double[], double[]>> GetErrors(MultiRegressionSample<double[]> testSample, double threshold, bool parallel)
     {
       var isTraining = m_Net.IsTraining;
       m_Net.IsTraining = false;
       try
       {
-        return base.GetClassificationErrors(testSample, classes);
+        return base.GetErrors(testSample, threshold, parallel);
       }
       finally
       {

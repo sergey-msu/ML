@@ -119,6 +119,8 @@ namespace ML.DeepMethods.Models
     {
       get
       {
+        if (!m_IsTraining) return null;
+
         if (m_MaxIndexPositions==null)
         {
           lock (m_Sync)

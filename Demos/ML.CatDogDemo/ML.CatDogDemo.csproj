@@ -57,8 +57,7 @@
     <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ML, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ML">
       <HintPath>..\..\3rdparties\ML.dll</HintPath>
     </Reference>
     <Reference Include="NFX, Version=3.0.0.1, Culture=neutral, processorArchitecture=MSIL">
@@ -86,6 +85,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Utils.cs" />
     <Page Include="ArchitectureWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -124,8 +124,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="cat-dog-19.1.mld" />
     <EmbeddedResource Include="cat-dog-20.2.mld" />
+    <EmbeddedResource Include="cat-dog-filt-19.28.mld" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

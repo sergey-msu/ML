@@ -8,14 +8,17 @@ namespace ML.DeepTests
     {
       var runner =
         //new OriginalMNIST();
+        //new KaggleMNIST();
+
         //new OriginalCIFAR10();
         //new OriginalCIFAR10Trunc();
-        //new KaggleMNIST();
         //new KaggleCIFAR10();
+
         //new KaggleCatDog();
         //new KaggleCatDogTrunk_BlackWhite();
         new KaggleCatDogTrunk_Filters();
         //new KaggleCatDogTrunk();
+
         //new MainColors();
 
       try

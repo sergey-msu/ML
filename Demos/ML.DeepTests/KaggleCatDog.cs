@@ -156,7 +156,7 @@ namespace ML.DeepTests
 
       Alg.EpochEndedEvent += (o, e) =>
                              {
-                               Utils.HandleClassificationEpochEnded(Alg, null, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath); // no labeled testing set in Kaggle :(
+                               Utils.HandleEpochEnded(Alg, null, m_ValidationSet, OutputPath); // no labeled testing set in Kaggle :(
                                tstart = DateTime.Now;
                              };
       Alg.BatchEndedEvent += (o, e) =>

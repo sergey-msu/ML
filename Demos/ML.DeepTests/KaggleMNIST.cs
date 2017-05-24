@@ -7,6 +7,7 @@ using System.Linq;
 using ML.Core;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Models;
+using ML.Core.Mathematics;
 
 namespace ML.DeepTests
 {
@@ -206,7 +207,7 @@ namespace ML.DeepTests
 
     protected override void Train()
     {
-      Alg.EpochEndedEvent += (o, e) => Utils.HandleClassificationEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, m_Classes, OutputPath); // we do not have public test data in kaggle :(
+      Alg.EpochEndedEvent += (o, e) => Utils.HandleEpochEnded(Alg, m_TrainingSet.Subset(0, 10000), m_ValidationSet, OutputPath); // we do not have public test data in kaggle :(
 
       var now = DateTime.Now;
       Console.WriteLine();
@@ -241,7 +242,9 @@ namespace ML.DeepTests
         int num = 1;
         foreach (var data in m_Test)
         {
-          var cls = alg.Classify(data, m_Classes);
+          var mark = alg.Predict(data);
+          var idx = MathUtils.ArgMax(mark);
+          var cls = m_Classes[idx];
           writer.WriteLine("{0},{1}", num++, (int)cls.Value);
         }
 

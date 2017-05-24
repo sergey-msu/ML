@@ -44,27 +44,13 @@ namespace ML.DeepMethods.Algorithms
       return flatResult;
     }
 
-    public override IEnumerable<ErrorInfo<double[][,], Class>> GetClassificationErrors(MultiRegressionSample<double[][,]> testSample, Class[] classes)
+    public override IEnumerable<ErrorInfo<double[][,], double[]>> GetErrors(MultiRegressionSample<double[][,]> testSample, double threshold, bool parallel)
     {
       var isTraining = m_Net.IsTraining;
       m_Net.IsTraining = false;
       try
       {
-        return base.GetClassificationErrors(testSample, classes);
-      }
-      finally
-      {
-        m_Net.IsTraining = isTraining;
-      }
-    }
-
-    public override double GetRegressionError(MultiRegressionSample<double[][,]> testSample)
-    {
-      var isTraining = m_Net.IsTraining;
-      m_Net.IsTraining = false;
-      try
-      {
-        return base.GetRegressionError(testSample);
+        return base.GetErrors(testSample, threshold, parallel);
       }
       finally
       {

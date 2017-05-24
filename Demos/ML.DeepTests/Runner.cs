@@ -22,12 +22,12 @@ namespace ML.DeepTests
         return args.Count()>1 ? args[1] : DFT_ROOT;
       }
     }
-    public abstract string SrcMark { get; }
-    public abstract string DataPath  { get; }
+    public abstract string SrcMark    { get; }
+    public abstract string DataPath   { get; }
+    public abstract string OutputPath { get; }
     public string SrcPath   { get { return DataPath+@"\src\"+SrcMark; }}
     public string TestPath  { get { return DataPath+@"\test\"+SrcMark; }}
     public string TrainPath { get { return DataPath+@"\train\"+SrcMark; }}
-    public abstract string OutputPath { get; }
 
     private BackpropAlgorithm m_Alg;
     public  BackpropAlgorithm Alg

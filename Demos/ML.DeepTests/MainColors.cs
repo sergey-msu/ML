@@ -169,7 +169,7 @@ namespace ML.DeepTests
 
       Alg.EpochEndedEvent += (o, e) =>
                              {
-                               Utils.HandleRegressionEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);
+                               Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet, OutputPath);
                                tstart = DateTime.Now;
                              };
       Alg.BatchEndedEvent += (o, e) =>

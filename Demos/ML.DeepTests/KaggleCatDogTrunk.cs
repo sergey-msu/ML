@@ -81,7 +81,6 @@ namespace ML.DeepTests
       var loaded = 0;
       var total = dir.GetFiles().Length;
 
-      int c = 0;
       foreach (var file in dir.EnumerateFiles())
       {
         var data = LoadFile(file.FullName);
@@ -170,7 +169,7 @@ namespace ML.DeepTests
 
       Alg.EpochEndedEvent += (o, e) =>
                              {
-                               Utils.HandleClassificationEpochEnded(Alg, m_TestingSet, m_ValidationSet, m_Classes.Values.ToArray(), OutputPath);
+                               Utils.HandleEpochEnded(Alg, m_TestingSet, m_ValidationSet,  OutputPath);
                                tstart = DateTime.Now;
                              };
       Alg.BatchEndedEvent += (o, e) =>
@@ -257,7 +256,7 @@ namespace ML.DeepTests
     protected override BackpropAlgorithm CreateAlgorithm()
     {
       //return Examples.CreateKaggleCatOrDogFiltersDemo1();
-      return Examples.CreateKaggleCatOrDogFiltersDemo1_Pretrained(@"C:\ML\output\cat-dog-filters\_pretrained\cn_e20_p36.64.mld");
+      return Examples.CreateKaggleCatOrDogFiltersDemo1_Pretrained(@"C:\ML\output\cat-dog-filters\_pretrained\cn_e205_p19.52.mld");
     }
 
     public override int NormImgSize { get { return 48; } }

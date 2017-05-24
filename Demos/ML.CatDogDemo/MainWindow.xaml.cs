@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using ML.Core;
 using ML.DeepMethods.Models;
 using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
+using ML.DeepMethods.Algorithms;
 
 namespace ML.CatDogDemo
 {
@@ -36,6 +38,7 @@ namespace ML.CatDogDemo
     }
 
     private ConvNet m_Network;
+    private ConvNet m_NetworkF;
     private Dictionary<int, Class> m_Classes = new Dictionary<int, Class>()
     {
       { 3, new Class("Cat", 0) },
@@ -53,6 +56,11 @@ namespace ML.CatDogDemo
         {
           m_Network = ConvNet.Deserialize(stream);
           m_Network.IsTraining = false;
+        }
+        using (var stream = assembly.GetManifestResourceStream("ML.CatDogDemo.cat-dog-filt-19.28.mld"))
+        {
+          m_NetworkF = ConvNet.Deserialize(stream);
+          m_NetworkF.IsTraining = false;
         }
       }
       catch (Exception error)
@@ -85,7 +93,7 @@ namespace ML.CatDogDemo
       {
         using (var bitmap = loadImage(path, data))
         using (var normBitmap = doNormalization(bitmap, true))
-          doRecognition(normBitmap);
+          doRecognition(bitmap, normBitmap);
       }
       catch (Exception ex)
       {
@@ -182,7 +190,7 @@ namespace ML.CatDogDemo
 
     #region Recognition
 
-    private Class doRecognition(Bitmap normBitmap)
+    private Class doRecognition(Bitmap bitmap, Bitmap normBitmap)
     {
       if (normBitmap == null)
       {
@@ -200,16 +208,26 @@ namespace ML.CatDogDemo
         ((TextBlock)this.FindName(probName)).Text = "";
       }
 
-      var data = bitmapToInput(normBitmap);
+      var data1 = bitmapToInput(normBitmap);
+      var data2 = getNetFData(bitmap);
       var start = DateTime.Now;
-      var result = m_Network.Calculate(data);
+
+      var alp1 = 0.7D;
+      var alp2 = 0.3D;
+      var result1 = m_Network.Calculate(data1);
+      var result2 = m_NetworkF.Calculate(data2);
+      var result  = new double[result1.Length];
+      result[0] = alp1*result1[0][0,0] + (1-alp1)*result2[0][0,0];
+      result[1] = alp2*result1[1][0,0] + (1-alp2)*result2[1][0,0];
+
+
       var end = DateTime.Now;
       m_PredictionTime.Text = string.Format("{0} ms", (int)(end-start).TotalMilliseconds);
 
       var max = double.MinValue;
       var idx = -1;
       var total = 0.0D;
-      for (int i = 0; i < m_Classes.Count; i++) { total += result[i][0, 0]; }
+      for (int i = 0; i < m_Classes.Count; i++) { total += result[i]; }
       if (total <= 0)
       {
         m_TxtResult.Text = "?";
@@ -218,15 +236,15 @@ namespace ML.CatDogDemo
 
       for (int i = 0; i < m_Classes.Count; i++)
       {
-        var prob = Math.Round(result[i][0, 0] / total, 2);
+        var prob = Math.Round(result[i] / total, 2);
         var barName = string.Format("m_Bar{0}", i);
         var probName = string.Format("m_Prob{0}", i);
         ((System.Windows.Shapes.Rectangle)this.FindName(barName)).Width = prob * 30;
         ((TextBlock)this.FindName(probName)).Text = prob.ToString();
 
-        if (result[i][0, 0] > max)
+        if (result[i] > max)
         {
-          max = result[i][0, 0];
+          max = result[i];
           idx = i;
         }
       }
@@ -319,26 +337,166 @@ namespace ML.CatDogDemo
     private void onTestButtonClick(object sender, RoutedEventArgs e)
     {
       var path = @"F:\Work\science\Machine learning\data\cat-dog\train\kaggle";
-      var errors = 0;
+      var errors1 = 0;
+      var errors1C = 0;
+      var errors1D = 0;
+      var errors2 = 0;
+      var errors2C = 0;
+      var errors2D = 0;
+      var errorsC1 = 0;
+      var errorsC2 = 0;
+      var errorsR = 0;
+      var pct1 = 0;
+      var pct1C = 0;
+      var pct1D = 0;
+      var pct2 = 0;
+      var pct2C = 0;
+      var pct2D = 0;
+      var pctC = 0;
+      var pctC1 = 0;
+      var pctC2 = 0;
+      var pctR = 0;
+      var alp1 = 0.95D;
+      var alp2 = 0.05D;
       var dir = new DirectoryInfo(path);
       var total = dir.GetFiles().Length;
 
-      foreach (var file in dir.EnumerateFiles().Skip(10000).Take(4000))
+      var sample = new MultiRegressionSample<double[][,]>();
+      var cat = new double[] { 1.0D, 0.0D };
+      var dog = new double[] { 0.0D, 1.0D };
+
+      int cnt = 0;
+      foreach (var file in dir.EnumerateFiles().Shuffle(0).Skip(10000).Take(500))
       {
         var fname = Path.GetFileNameWithoutExtension(file.Name);
         var expected = fname.StartsWith("cat.") ? 0 : 1;
-        using (var bitmap = new Bitmap(file.FullName))
-        using (var normBitmap = doNormalization(bitmap, false))
-        using (var grayBitmap = makeGrayscale3v0(normBitmap))
+        var data1 = getNetData(file.FullName);
+        double[][,] data2;
+        using (var image = (Bitmap)System.Drawing.Image.FromFile(file.FullName))
+          data2 = getNetFData(image);
+
+        sample.Add(data2, expected==0 ? cat : dog);
+
+        var result1 = m_Network.Calculate(data1).Select(d => d[0,0]).ToArray();
+        var actual1 = ML.Core.Mathematics.MathUtils.ArgMax(result1);
+        if (expected != actual1)
         {
-          var data = bitmapToInput(grayBitmap);
-          var result = m_Network.Calculate(data).Select(d => d[0,0]).ToArray();
-          var actual = ML.Core.Mathematics.MathUtils.ArgMax<double>(result);
-          if (expected != actual) errors++;
+          if (expected==0) errors1C++;
+          else errors1D++;
+          errors1++;
         }
+
+        var result2 = m_NetworkF.Calculate(data2).Select(d => d[0,0]).ToArray();
+        var actual2 = ML.Core.Mathematics.MathUtils.ArgMax(result2);
+        if (expected != actual2)
+        {
+          if (expected==0) errors2C++;
+          else errors2D++;
+          errors2++;
+        }
+
+        var resultR = new double[result1.Length];
+        resultR[0] = alp1*result1[0] + (1-alp1)*result2[0];
+        resultR[1] = alp2*result1[1] + (1-alp2)*result2[1];
+        var actualR = ML.Core.Mathematics.MathUtils.ArgMax(resultR);
+        if (expected != actualR) errorsR++;
+
+        if ((expected != actual1) && (expected != actual2))
+        {
+          if (expected==0) errorsC1++;
+          else errorsC2++;
+        }
+
+        cnt++;
+        pct1  = errors1*100/cnt;
+        pct2  = errors2*100/cnt;
+        pctC1 = errorsC1*100/cnt;
+        pctC2 = errorsC2*100/cnt;
+        pctC  = (errorsC1+errorsC2)*100/cnt;
+        pctR  = errorsR*100/cnt;
       }
 
-      MessageBox.Show("Errors: "+errors+" from 4000 ("+(errors*100/4000)+"%)");
+      var alg = new BackpropAlgorithm(m_NetworkF);
+      var err = alg.GetErrors(sample, 0, true);
+
+      var message = "Errors1: {0}%, Errors2: {1}%, ErrorsC: {2}%, ErrorR: {3}%";
+      MessageBox.Show(string.Format(message, pct1, pct2, pctC, pctR));
+    }
+
+    private double[][,] getNetData(string fpath)
+    {
+      using (var bitmap = new Bitmap(fpath))
+      using (var normBitmap = doNormalization(bitmap, false))
+      using (var grayBitmap = makeGrayscale3v0(normBitmap))
+      {
+        return bitmapToInput(grayBitmap);
+      }
+    }
+
+    private double[][,] getNetFData(Bitmap image)
+    {
+      using (var filtImage = Utils.Filters.Sobel3x3Filter(image))
+      using (var normImage = new Bitmap(48, 48))
+      using (var normFiltImage = new Bitmap(48, 48))
+      {
+        var w = image.Width;
+        var h = image.Height;
+        var s = Math.Min(w, h);
+
+        // crop image to center square size
+        // and normalize image to NORM_IMG_SIZE x NORM_IMG_SIZE
+
+        using (var gr = Graphics.FromImage(normImage))
+        {
+          gr.InterpolationMode  = InterpolationMode.HighQualityBicubic;
+          gr.CompositingQuality = CompositingQuality.HighQuality;
+          gr.SmoothingMode      = SmoothingMode.AntiAlias;
+
+          gr.DrawImage(image,
+                       new Rectangle(0, 0, 48, 48),
+                       new Rectangle((w - s) / 2, (h - s) / 2, s, s),
+                       GraphicsUnit.Pixel);
+        }
+        using (var gr = Graphics.FromImage(normFiltImage))
+        {
+          gr.InterpolationMode  = InterpolationMode.HighQualityBicubic;
+          gr.CompositingQuality = CompositingQuality.HighQuality;
+          gr.SmoothingMode      = SmoothingMode.AntiAlias;
+
+          gr.DrawImage(filtImage,
+                       new Rectangle(0, 0, 48, 48),
+                       new Rectangle((w - s) / 2, (h - s) / 2, s, s),
+                       GraphicsUnit.Pixel);
+        }
+
+        // digitize images
+
+        var result = new double[2][,]
+        {
+          new double[48, 48],
+          new double[48, 48]
+        };
+
+        // grayscale
+        for (var y=0; y<48; y++)
+        for (var x=0; x<48; x++)
+        {
+          var pixel = normImage.GetPixel(x, y);
+          var level = (pixel.R + pixel.G + pixel.B) / (3*255.0D);
+          result[0][y, x] = level;
+        }
+
+        // filter
+        for (var y=0; y<48; y++)
+        for (var x=0; x<48; x++)
+        {
+          var pixel = normFiltImage.GetPixel(x, y);
+          var level = (pixel.R + pixel.G + pixel.B) / (3*255.0D);
+          result[1][y, x] = level;
+        }
+
+        return result;
+      }
     }
 
     private Bitmap makeGrayscale3v0(Bitmap bitmap)

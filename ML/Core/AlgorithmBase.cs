@@ -10,10 +10,10 @@ namespace ML.Core
   /// <summary>
   /// Base class for supervised algorithm with training sample
   /// </summary>
-  public abstract class SupervisedAlgorithmBase<TSample, TObj, TMark>
-    : ISupervisedAlgorithm<TSample, TObj, TMark>
+  public abstract class SupervisedAlgorithmBase<TSample, TObj, TMark> : ISupervisedAlgorithm<TSample, TObj, TMark>
       where TSample: MarkedSample<TObj, TMark>
   {
+    private object m_ErrSynk = new object();
     private TSample m_TrainingSample;
 
     protected SupervisedAlgorithmBase()
@@ -62,22 +62,32 @@ namespace ML.Core
     /// <summary>
     /// Returns all errors of the algorithm on some test classified sample
     /// </summary>
-    public virtual IEnumerable<ErrorInfo<TObj, TMark>> GetErrors(TSample testSample)
+    public virtual IEnumerable<ErrorInfo<TObj, TMark>> GetErrors(TSample testSample, double threshold, bool parallel)
     {
       var errors = new List<ErrorInfo<TObj, TMark>>();
-      Parallel.ForEach(testSample, pdata =>
+      var body = new Action<KeyValuePair<TObj, TMark>>(pdata =>
       {
         var predMark = this.Predict(pdata.Key);
         var realMark = pdata.Value;
-        if (!object.Equals(predMark, realMark))
-          lock (errors)
-          {
+        var proximity = CalculateProximity(predMark, realMark, threshold);
+        if (proximity > 0)
+        {
+          lock (m_ErrSynk)
             errors.Add(new ErrorInfo<TObj, TMark>(pdata.Key, realMark, predMark));
-          }
+         }
       });
+
+      if (parallel)
+        Parallel.ForEach(testSample, body);
+      else
+        foreach (var pdata in testSample)
+          body(pdata);
 
       return errors;
     }
+
+
+    protected abstract double CalculateProximity(TMark mark1, TMark mark2, double threshold);
 
     protected abstract void DoTrain();
   }
@@ -91,6 +101,12 @@ namespace ML.Core
   {
     protected ClassificationAlgorithmBase()
     {
+    }
+
+
+    protected override double CalculateProximity(Class mark1, Class mark2, double threshold)
+    {
+      return (mark1 == mark2) ? 0 : 1;
     }
   }
 
@@ -106,42 +122,13 @@ namespace ML.Core
     }
 
 
-    public virtual Class Classify(TObj x, Class[] classes, double threshold = 0)
+    protected override double CalculateProximity(double mark1, double mark2, double threshold)
     {
-      var result = Predict(x);
-      return mapValueToClass(result, classes, threshold);
-    }
+      var marg1 = threshold - mark1;
+      var marg2 = threshold - mark2;
 
-    /// <summary>
-    /// Returns all errors of the algorithm on some test classified sample
-    /// </summary>
-    public virtual IEnumerable<ErrorInfo<TObj, Class>> GetClassificationErrors(RegressionSample<TObj> testSample, Class[] classes, double threshold = 0)
-    {
-      var errors = new List<ErrorInfo<TObj, Class>>();
-      Parallel.ForEach(testSample, pdata =>
-      {
-        var predClass = this.Classify(pdata.Key, classes, threshold);
-        var realClass = mapValueToClass(pdata.Value, classes, threshold);
-        if (!object.Equals(predClass, realClass))
-          lock (errors)
-          {
-            errors.Add(new ErrorInfo<TObj, Class>(pdata.Key, realClass, predClass));
-          }
-      });
-
-      return errors;
-    }
-
-
-    private Class mapValueToClass(double value, Class[] classes, double threshold)
-    {
-      if (classes==null || classes.Length<=0)
-        return Class.Unknown;
-      if (classes.Length != 2)
-        throw new MLException("There must be 2 classes for classification");
-
-      var idx = (value<threshold) ? 0 : 1;
-      return classes[idx];
+      if ((marg1>0 && marg2>0) || (marg1<=0 && marg2<=0)) return 0;
+      return 1;
     }
   }
 
@@ -157,65 +144,15 @@ namespace ML.Core
     }
 
 
-    public virtual Class Classify(TObj x, Class[] classes)
+    protected override double CalculateProximity(double[] mark1, double[] mark2, double threshold)
     {
-      var result = Predict(x);
-      return mapValueToClass(result, classes);
-    }
+      if (mark1==null || mark2==null)
+        return (mark1==mark2) ? 0 : double.PositiveInfinity;
 
-    /// <summary>
-    /// Returns all errors of the algorithm on some test classified sample
-    /// </summary>
-    public virtual IEnumerable<ErrorInfo<TObj, Class>> GetClassificationErrors(MultiRegressionSample<TObj> testSample, Class[] classes)
-    {
-      var errors = new List<ErrorInfo<TObj, Class>>();
-      Parallel.ForEach(testSample, pdata =>
-      {
-        var predClass = this.Classify(pdata.Key, classes);
-        var realClass = mapValueToClass(pdata.Value, classes);
-        if (!object.Equals(predClass, realClass))
-          lock (errors)
-          {
-            errors.Add(new ErrorInfo<TObj, Class>(pdata.Key, realClass, predClass));
-          }
-      });
+      var len = mark1.Length;
+      if (mark1.Length != mark2.Length) return double.PositiveInfinity;
 
-      return errors;
-    }
-
-    /// <summary>
-    /// Returns all errors of the algorithm on some test classified sample
-    /// </summary>
-    public virtual double GetRegressionError(MultiRegressionSample<TObj> testSample)
-    {
-      var sync = new object();
-      var total = 0.0D;
-      Parallel.ForEach(testSample, pdata =>
-      {
-        var pred = Predict(pdata.Key);
-        var real = pdata.Value;
-          lock (sync)
-          {
-            var error = 0.0D;
-            var len = pred.Length;
-            for (int i=0; i<len; i++)
-              error += Math.Abs(pred[i] - real[i]);
-            total += (error/2);
-          }
-      });
-
-      return total / testSample.Count;
-    }
-
-    private Class mapValueToClass(double[] value, Class[] classes)
-    {
-      if (value==null || classes==null)
-        return Class.Unknown;
-      if (classes.Length != value.Length)
-        throw new MLException("Wrong class count");
-
-      var idx = MathUtils.ArgMax(value);
-      return classes[idx];
+      return MathUtils.ArgMax(mark1)==MathUtils.ArgMax(mark2) ? 0 : 1;
     }
   }
 }

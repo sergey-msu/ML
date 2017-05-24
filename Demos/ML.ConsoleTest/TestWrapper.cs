@@ -118,7 +118,7 @@ namespace ML.ConsoleTest
       calculateMargin(alg);
 
       Console.WriteLine("Errors:");
-      var errors = alg.GetErrors(Data.Data);
+      var errors = alg.GetErrors(Data.Data, 0, true);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -149,7 +149,7 @@ namespace ML.ConsoleTest
       for (int k = 1; k < 5; k++)
       {
         alg.K = k;
-        var errors = alg.GetErrors(Data.Data);
+        var errors = alg.GetErrors(Data.Data, 0, true);
         var ec = errors.Count();
         var dc = Data.Data.Count;
         var pct = Math.Round(100.0F * ec / dc, 2);
@@ -192,7 +192,7 @@ namespace ML.ConsoleTest
         if (h <= optH && h + step > optH) h = optH;
 
         alg.H = h;
-        var errors = alg.GetErrors(Data.Data);
+        var errors = alg.GetErrors(Data.Data, 0, true);
         var ec = errors.Count();
         var dc = Data.Data.Count;
         var pct = Math.Round(100.0F * ec / dc, 2);
@@ -363,7 +363,7 @@ namespace ML.ConsoleTest
     private void outputError(ClassificationAlgorithmBase<double[]> alg)
     {
       Console.WriteLine("Errors:");
-      var errors = alg.GetErrors(Data.Data);
+      var errors = alg.GetErrors(Data.Data, 0, true);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -373,7 +373,7 @@ namespace ML.ConsoleTest
     private void outputError(MultiRegressionAlgorithmBase<double[]> alg)
     {
       Console.WriteLine("Errors:");
-      var errors = alg.GetClassificationErrors(Core.Utils.ClassifiedToRegressionSample(Data.Data), Data.Data.Classes.ToArray());
+      var errors = alg.GetErrors(Core.Utils.ClassifiedToRegressionSample(Data.Data), 0, true);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -384,7 +384,7 @@ namespace ML.ConsoleTest
     {
       Console.WriteLine("Errors:");
       var sample = sampleTo3D(Data.Data);
-      var errors = alg.GetClassificationErrors(Core.Utils.ClassifiedToRegressionSample(sample), sample.Classes.ToArray());
+      var errors = alg.GetErrors(Core.Utils.ClassifiedToRegressionSample(sample), 0, true);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -405,7 +405,7 @@ namespace ML.ConsoleTest
         sample[key] = obj.Value;
       }
 
-      var errors = alg.GetErrors(sample);
+      var errors = alg.GetErrors(sample, 0, true);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -430,7 +430,7 @@ namespace ML.ConsoleTest
         sample[key] = obj.Value;
       }
 
-      var errors = alg.GetErrors(sample);
+      var errors = alg.GetErrors(sample, 0, true);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
