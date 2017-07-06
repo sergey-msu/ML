@@ -70,7 +70,7 @@ namespace ML.MetricMethods.Algorithms
       for (double h = hMin; h <= hMax; h += step)
       {
         var errCnt = 0;
-        m_H = h;
+        H = h;
 
         var initSample = TrainingSample;
 
@@ -94,7 +94,7 @@ namespace ML.MetricMethods.Algorithms
         }
       }
 
-      m_H = hOpt;
+      H = hOpt;
     }
   }
 }

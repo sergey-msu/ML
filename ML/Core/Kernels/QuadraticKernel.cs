@@ -3,22 +3,18 @@
 namespace ML.Core.Kernels
 {
   /// <summary>
-  /// Quardatic kernel r -> 1-r^2, [-1, 1]
+  /// Quardatic (Optimal Epanechnikov) kernel r -> 3/4*(1-r^2), [-1, 1]
   /// </summary>
-  public sealed class QuadraticKernel : IFunction
+  public sealed class QuadraticKernel : IKernel
   {
+    public const double COEFF = 0.75D;
+
     public string ID { get { return "QDR"; } }
     public string Name { get { return "Quadratic"; } }
 
     public double Value(double r)
     {
-      return (r > -1 && r < 1) ? (1 - r*r) : 0;
+      return (r > -1 && r < 1) ? COEFF*(1 - r*r) : 0;
     }
-
-    public double Derivative(double r)
-    {
-      return (r > -1 && r < 1) ? -r*2 : 0;
-    }
-
   }
 }

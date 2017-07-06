@@ -13,6 +13,7 @@ using ML.NeuralMethods.Algorithms;
 using ML.DeepMethods.Models;
 using ML.DeepMethods.Registry;
 using ML.Utils;
+using ML.BayesianMethods.Algorithms;
 
 namespace ML.ConsoleTest
 {
@@ -62,7 +63,8 @@ namespace ML.ConsoleTest
         //testSerDeser();
 
         //doNearestNeighbourAlgorithmTest();
-        doNearestKNeighboursAlgorithmTest();
+        //doNearestKNeighboursAlgorithmTest();
+        doBayesianAlgorithmTest();
         //doParzenFixedAlgorithmTest();
         //doPotentialFixedAlgorithmTest();
         //doDecisionTreeAlgorithmTest();
@@ -149,6 +151,53 @@ namespace ML.ConsoleTest
         Console.WriteLine("{0}:\t{1} of {2}\t({3}%) {4}", k, ec, dc, pct, k == optK ? "<-LOO optimal" : string.Empty);
       }
       Console.WriteLine();
+
+      Visualizer.Run(alg);
+    }
+
+    private void doBayesianAlgorithmTest()
+    {
+      var metric = new EuclideanMetric();
+      var kernel = new GaussianKernel();
+      var alg = new BayesianAlgorithm(metric, kernel, 1.0F);
+      alg.Train(Data.TrainingSample);
+
+      // LOO
+      var hmin = 0.01D;
+      var hmax = 2.0D;
+      var step = 0.01D;
+      alg.OptimizeLOO(hmin, hmax, step);
+      var optH = alg.H;
+      Console.WriteLine("Bayesian: optimal h is {0}", optH);
+      Console.WriteLine();
+
+      // Margins
+      Console.WriteLine("Margins:");
+      calculateMargin(alg);
+      Console.WriteLine();
+
+      //Error distribution
+      var message = string.Empty;
+      Console.WriteLine("Errors:");
+      for (double h1 = hmin; h1 < hmax; h1 += step)
+      {
+        var h = h1;
+        if (h <= optH && h + step > optH) h = optH;
+
+        alg.H = h;
+        var errors = alg.GetErrors(Data.Data, 0, true);
+        var ec = errors.Count();
+        var dc = Data.Data.Count;
+        var pct = Math.Round(100.0F * ec / dc, 2);
+        var mes = string.Format("{0}:\t{1} of {2}\t({3}%) {4}", Math.Round(h, 2), ec, dc, pct, h == optH ? "<-LOO optimal" : string.Empty);
+        Console.WriteLine(mes);
+
+        if (h==optH) message = mes;
+      }
+      Console.WriteLine();
+      Console.WriteLine("-----------------------------------------");
+      Console.WriteLine("Bayesian: optimal h is {0}", optH);
+      Console.WriteLine(message);
 
       Visualizer.Run(alg);
     }
