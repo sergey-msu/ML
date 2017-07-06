@@ -8,7 +8,7 @@ namespace ML.Core
   /// </summary>
   public class Feature : INamed
   {
-    public readonly string m_Name;
+    private readonly string m_Name;
 
     public Feature(string name)
     {

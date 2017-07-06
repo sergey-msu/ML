@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BayesianMethods\Algorithms\BayesianAlgorithm.cs" />
     <Compile Include="Contracts\IInformativityIndex.cs" />
     <Compile Include="Contracts\ILearningRateScheduler.cs" />
     <Compile Include="Contracts\IOptimizer.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Core\ActivationFunctions\SignActivation.cs" />
     <Compile Include="Core\ActivationFunctions\TanhActivation.cs" />
     <Compile Include="Core\AlgorithmBase.cs" />
+    <Compile Include="Core\ComputingNetworks\_ComputingNode.cs" />
     <Compile Include="Core\Samples.cs" />
     <Compile Include="Contracts\INamed.cs" />
     <Compile Include="Core\ComputingNetworks\CompositeNode.cs" />
@@ -144,7 +146,7 @@
     <Compile Include="Core\Mathematics\RandomGenerator.cs" />
     <Compile Include="LogicalMethods\Models\DecisionNode.cs" />
     <Compile Include="LogicalMethods\Models\DecisionTree.cs" />
-    <Compile Include="MetricMethods\Algorithms\AlgorithmBases.cs" />
+    <Compile Include="MetricMethods\Algorithms\AlgorithmBase.cs" />
     <Compile Include="MetricMethods\Algorithms\NearestKNeighboursAlgorithm.cs" />
     <Compile Include="MetricMethods\Algorithms\NearestKWeighedNeighboursAlgorithm.cs" />
     <Compile Include="MetricMethods\Algorithms\NearestNeighbourAlgorithm.cs" />
@@ -165,6 +167,7 @@
     <Compile Include="Utils\NetworkFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="BayesianMethods\Models\" />
     <Folder Include="MetricMethods\Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

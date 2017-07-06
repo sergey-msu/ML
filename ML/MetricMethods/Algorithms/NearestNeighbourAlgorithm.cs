@@ -25,6 +25,29 @@ namespace ML.MetricMethods.Algorithms
     /// </summary>
     public override string Name { get { return "Nearest Neighbour"; } }
 
+
+    /// <summary>
+    /// Classify point
+    /// </summary>
+    public override Class Predict(double[] obj)
+    {
+      var minDist = double.MaxValue;
+      Class result = null;
+
+      foreach (var pData in TrainingSample)
+      {
+        var dist = Metric.Dist(pData.Key, obj);
+        if (dist<minDist)
+        {
+          minDist = dist;
+          result = pData.Value;
+        }
+      }
+
+      return result;
+    }
+
+
     /// <summary>
     /// Calculate 'weight' - a contribution of training point (i-th from ordered training sample)
     /// to closeness of test point to its class

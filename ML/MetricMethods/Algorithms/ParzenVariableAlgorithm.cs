@@ -14,7 +14,7 @@ namespace ML.MetricMethods.Algorithms
     private int m_K;
 
     public ParzenVariableAlgorithm(IMetric metric,
-                                   IFunction kernel,
+                                   IKernel kernel,
                                    int k)
       : base(metric, kernel)
     {

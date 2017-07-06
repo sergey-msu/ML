@@ -26,11 +26,11 @@ namespace ML.MetricMethods.Algorithms
 
     #endregion
 
-    private readonly IFunction m_Kernel;
+    private readonly IKernel m_Kernel;
     private KernelEquipment[]  m_Eqps;
 
     public PotentialFunctionAlgorithm(IMetric metric,
-                                      IFunction kernel,
+                                      IKernel kernel,
                                       KernelEquipment[] eqps)
       : base(metric)
     {
@@ -45,7 +45,7 @@ namespace ML.MetricMethods.Algorithms
 
     public override string Name { get { return "Potential Functions"; } }
 
-    public IFunction Kernel { get { return m_Kernel; } }
+    public IKernel Kernel { get { return m_Kernel; } }
 
     public KernelEquipment[] Eqps
     {
@@ -53,7 +53,7 @@ namespace ML.MetricMethods.Algorithms
       set { m_Eqps=value; }
     }
 
-    public override double EstimateProximity(double[] x, Class cls)
+    public override double CalculateClassScore(double[] x, Class cls)
     {
       var closeness = 0.0D;
       int idx = -1;

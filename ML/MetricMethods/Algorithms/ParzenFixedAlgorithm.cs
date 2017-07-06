@@ -14,7 +14,7 @@ namespace ML.MetricMethods.Algorithms
     private double m_H;
 
     public ParzenFixedAlgorithm(IMetric metric,
-                                IFunction kernel,
+                                IKernel kernel,
                                 double h)
       : base(metric, kernel)
     {

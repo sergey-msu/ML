@@ -44,6 +44,65 @@ namespace ML.MetricMethods.Algorithms
       }
     }
 
+    /// <summary>
+    /// Classify point
+    /// </summary>
+    public override Class Predict(double[] obj)
+    {
+      var scores = new List<KeyValuePair<Class, double>>();
+      var len = 0;
+
+      foreach (var pData in TrainingSample)
+      {
+        var dist = Metric.Dist(obj, pData.Key);
+
+        if (len<m_K)
+        {
+          scores.Add(new KeyValuePair<Class, double>(pData.Value, dist));
+          len++;
+          continue;
+        }
+
+        var maxDist = -1.0D;
+        int idx = -1;
+        for (int i=0; i<m_K; i++)
+        {
+          var mData = scores[i];
+          var mDist = mData.Value;
+          if (mDist>maxDist)
+          {
+            maxDist = mDist;
+            idx = i;
+          }
+        }
+
+        if (dist<maxDist)
+          scores[idx] = new KeyValuePair<Class, double>(pData.Value, dist);
+      }
+
+      var hist = new Dictionary<Class, int>();
+      for (int i=0; i<m_K; i++)
+      {
+        var mData = scores[i];
+
+        if (!hist.ContainsKey(mData.Key)) hist[mData.Key] = 1;
+        else hist[mData.Key]++;
+      }
+
+      var max = double.MinValue;
+      Class result = null;
+      foreach (var h in hist)
+      {
+        if (h.Value>max)
+        {
+          max = h.Value;
+          result = h.Key;
+        }
+      }
+
+      return result;
+    }
+
 
     /// <summary>
     /// Calculate 'weight' - a contribution of training point (i-th from ordered training sample)
@@ -63,7 +122,7 @@ namespace ML.MetricMethods.Algorithms
     public void OptimizeLOO(int? minK = null, int? maxK = null)
     {
       if (!minK.HasValue || minK.Value<1) minK = 1;
-      if (!maxK.HasValue || maxK.Value>TrainingSample.Count) maxK = TrainingSample.Count;
+      if (!maxK.HasValue || maxK.Value>TrainingSample.Count) maxK = TrainingSample.Count-1;
 
       var kOpt = int.MaxValue;
       var minErrCnt = int.MaxValue;

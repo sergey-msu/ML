@@ -62,19 +62,12 @@ namespace ML.ConsoleTest
         //testSerDeser();
 
         //doNearestNeighbourAlgorithmTest();
-        //doNearestKNeighboursAlgorithmTest();
+        doNearestKNeighboursAlgorithmTest();
         //doParzenFixedAlgorithmTest();
         //doPotentialFixedAlgorithmTest();
         //doDecisionTreeAlgorithmTest();
-
-        //doPerceptronAlgorithmTest();
-        //var stop = DateTime.Now;
-        //Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
-
-        //start = DateTime.Now;
-
         //doMultilayerNNAlgorithmTest();
-        doCNNAlgorithmTest();
+        //doCNNAlgorithmTest();
 
         var stop = DateTime.Now;
         Console.WriteLine("elapsed: "+(stop-start).TotalMilliseconds);
@@ -146,10 +139,10 @@ namespace ML.ConsoleTest
 
       //Error distribution
       Console.WriteLine("Errors:");
-      for (int k = 1; k < 5; k++)
+      for (int k = 2; k < Math.Min(alg.TrainingSample.Count, 50); k++)
       {
         alg.K = k;
-        var errors = alg.GetErrors(Data.Data, 0, true);
+        var errors = alg.GetErrors(Data.Data, 0, false);
         var ec = errors.Count();
         var dc = Data.Data.Count;
         var pct = Math.Round(100.0F * ec / dc, 2);
@@ -243,13 +236,13 @@ namespace ML.ConsoleTest
 
     private BackpropAlgorithm createBPAlg()
     {
-      var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 2, 15, 3 }, Activation.Logistic(1));
-      net[0].DropoutRate = 0.1D;
+      var net = NetworkFactory.CreateFullyConnectedNetwork(new[] { 6, 32, 32, 2 }, Activation.Logistic(1));
+      //net[0].DropoutRate = 0.1D;
       net.IsTraining = true;
 
       var alg = new BackpropAlgorithm(net);
       alg.EpochCount = 6000;
-      alg.LearningRate = 0.01D;
+      alg.LearningRate = 0.001D;
       alg.BatchSize = 10;
       alg.LossFunction = Loss.Euclidean;
 
@@ -289,14 +282,16 @@ namespace ML.ConsoleTest
 
     private ML.DeepMethods.Algorithms.BackpropAlgorithm createCNNAlg_NN_ForTest()
     {
-      var cnn = new ConvNet(2, 1) { IsTraining=true };
+      var cnn = new ConvNet(6, 1) { IsTraining=true };
       cnn.AddLayer(new DenseLayer(15, activation: Activation.Logistic(1)));
-      cnn.AddLayer(new MaxPoolingLayer(1, 1));
+      cnn.AddLayer(new DenseLayer(15, activation: Activation.Logistic(1)));
+      cnn.AddLayer(new DenseLayer(15, activation: Activation.Logistic(1)));
+      //cnn.AddLayer(new MaxPoolingLayer(1, 1));
       //cnn.AddLayer(new _ActivationLayer(Activation.Logistic(1)));
-      cnn.AddLayer(new DropoutLayer(0.1));
-      cnn.AddLayer(new FlattenLayer(3, activation: Activation.Logistic(1)));
+      //cnn.AddLayer(new DropoutLayer(0.1));
+      cnn.AddLayer(new FlattenLayer(2, activation: Activation.Logistic(1)));
       //cnn.AddLayer(new _ActivationLayer(Activation.Logistic(1)));
-      cnn.AddLayer(new MaxPoolingLayer(1, 1));
+      //cnn.AddLayer(new MaxPoolingLayer(1, 1));
 
       cnn._Build();
       cnn.RandomizeParameters(0);

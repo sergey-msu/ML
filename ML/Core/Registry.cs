@@ -15,7 +15,7 @@ namespace ML.Core.Registry
     public static readonly RectangularKernel Rectangular = new RectangularKernel();
     public static readonly TriangularKernel  Triangular  = new TriangularKernel();
 
-    public static readonly Dictionary<string, IFunction> ByID = new Dictionary<string, IFunction>
+    public static readonly Dictionary<string, IKernel> ByID = new Dictionary<string, IKernel>
     {
       { Gaussian.ID,    Gaussian },
       { Quadratic.ID,   Quadratic },

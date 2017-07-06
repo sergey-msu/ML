@@ -17,6 +17,17 @@
   }
 
   /// <summary>
+  /// Represents 1D kernel: even, positive, L1-normed to 1 real-valued function
+  /// </summary>
+  public interface IKernel : IMnemonicNamed
+  {
+    /// <summary>
+    /// Calculates kernel value
+    /// </summary>
+    double Value(double r);
+  }
+
+  /// <summary>
   /// Contract for neural networks activation function
   /// </summary>
   public interface IActivationFunction : IFunction

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ML.Core;
 using ML.Contracts;
 using System.IO;
+using System.Globalization;
 
 namespace ML.ConsoleTest
 {
@@ -40,6 +41,9 @@ namespace ML.ConsoleTest
       m_InputDim = algorithm.TrainingSample.First().Key.Length;
 
       var fn = string.Format("data/{0}-{1:yyyyMMdd-hhmmss}.csv", algorithm.ID, DateTime.Now);
+      var dir = Path.GetDirectoryName(fn);
+      Directory.CreateDirectory(dir);
+
       using (var file = File.Create(fn))
       using (var writer = new StreamWriter(file))
       {
@@ -63,8 +67,8 @@ namespace ML.ConsoleTest
     {
       for (var k=0; k<Math.Max(m_XCnt, m_YCnt); k++)
       {
-        var px = (k<m_XCnt) ? getProjPoint(k, 0)[0].ToString() : string.Empty;
-        var py = (k<m_YCnt) ? getProjPoint(0, k)[1].ToString() : string.Empty;
+        var px = (k<m_XCnt) ? getProjPoint(k, 0)[0].ToString(CultureInfo.InvariantCulture) : string.Empty;
+        var py = (k<m_YCnt) ? getProjPoint(0, k)[1].ToString(CultureInfo.InvariantCulture) : string.Empty;
         var pd = string.Empty;
         if (k<m_YCnt)
         {

@@ -36,7 +36,7 @@ namespace ML.Core
     public TSample TrainingSample
     {
       get { return m_TrainingSample; }
-      internal set
+      set
       {
         if (value == null || !value.Any())
         throw new MLException("SupervisedAlgorithmBase.ctor(trainingSample=null|empty)");

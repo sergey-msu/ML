@@ -331,19 +331,48 @@ namespace ML.DeepTests
       var activation = Activation.ReLU;
       var net = new ConvNet(3, 32) { IsTraining=true };
 
-      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
-      net.AddLayer(new DropoutLayer(0.25));
+      //net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 3, padding: 1, activation: activation));
+      //net.AddLayer(new ConvLayer(outputDepth: 16, windowSize: 3, padding: 1, activation: activation));
+      //net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      //net.AddLayer(new DropoutLayer(0.25));
+      //
+      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      //net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
+      //net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
+      //net.AddLayer(new DropoutLayer(0.25));
+      //
+      //net.AddLayer(new FlattenLayer(outputDim: 64, activation: activation));
+      //net.AddLayer(new DropoutLayer(0.5));
+      //net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
 
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new ConvLayer(outputDepth: 32, windowSize: 3, padding: 1, activation: activation));
-      net.AddLayer(new MaxPoolingLayer(windowSize: 3, stride: 2));
-      net.AddLayer(new DropoutLayer(0.25));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvLayer(outputDepth: 64, windowSize: 3, padding: 1));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
 
-      net.AddLayer(new FlattenLayer(outputDim: 64, activation: activation));
-      net.AddLayer(new DropoutLayer(0.5));
-      net.AddLayer(new DenseLayer(outputDim: 2, activation: Activation.Exp));
+      net.AddLayer(new ConvLayer(outputDepth: 128, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvLayer(outputDepth: 128, windowSize: 3, padding: 1));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+
+      net.AddLayer(new ConvLayer(outputDepth: 256, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvLayer(outputDepth: 256, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvLayer(outputDepth: 256, windowSize: 3, padding: 1));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+
+      net.AddLayer(new ConvLayer(outputDepth: 512, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvLayer(outputDepth: 512, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvLayer(outputDepth: 512, windowSize: 3, padding: 1));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+
+      net.AddLayer(new ConvLayer(outputDepth: 512, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvLayer(outputDepth: 512, windowSize: 3, padding: 1));
+      net.AddLayer(new ConvLayer(outputDepth: 512, windowSize: 3, padding: 1));
+      net.AddLayer(new MaxPoolingLayer(windowSize: 2, stride: 2, activation: activation));
+
+      net.AddLayer(new FlattenLayer(outputDim: 4096, activation: activation));
+      net.AddLayer(new DropoutLayer(rate: 0.5D));
+      net.AddLayer(new FlattenLayer(outputDim: 4096, activation: activation));
+      net.AddLayer(new DropoutLayer(rate: 0.5D));
+      net.AddLayer(new DenseLayer(outputDim: 2, activation: activation));
 
       net._Build();
 

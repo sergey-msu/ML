@@ -16,8 +16,8 @@ namespace ML.DeepTests
 
         //new KaggleCatDog();
         //new KaggleCatDogTrunk_BlackWhite();
-        new KaggleCatDogTrunk_Filters();
-        //new KaggleCatDogTrunk();
+        //new KaggleCatDogTrunk_Filters();
+        new KaggleCatDogTrunk();
 
         //new MainColors();
 

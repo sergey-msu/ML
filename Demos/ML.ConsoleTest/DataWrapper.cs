@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using ML.Core;
+using System.Globalization;
 
 namespace ML.ConsoleTest
 {
@@ -111,7 +112,7 @@ namespace ML.ConsoleTest
         {
           double result;
           var ftIdx = featureIndxs[i];
-          if(!double.TryParse(data[ftIdx], out result))
+          if (!double.TryParse(data[ftIdx], NumberStyles.Number, CultureInfo.InvariantCulture, out result))
           {
             success = false;
             break;

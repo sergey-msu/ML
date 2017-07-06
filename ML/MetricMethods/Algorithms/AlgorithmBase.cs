@@ -11,7 +11,7 @@ namespace ML.MetricMethods.Algorithms
   /// </summary>
   public abstract class MetricAlgorithmBase<TObj> : ClassificationAlgorithmBase<TObj>, IMetricAlgorithm<TObj>
   {
-    public readonly IMetric m_Metric;
+    private readonly IMetric m_Metric;
 
     protected MetricAlgorithmBase(IMetric metric)
       : base()
@@ -37,7 +37,7 @@ namespace ML.MetricMethods.Algorithms
 
       foreach (var cls in TrainingSample.Classes)
       {
-        var est = EstimateProximity(obj, cls);
+        var est = CalculateClassScore(obj, cls);
         if (est > maxEst)
         {
           maxEst = est;
@@ -51,7 +51,7 @@ namespace ML.MetricMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public abstract double EstimateProximity(TObj obj, Class cls);
+    public abstract double CalculateClassScore(TObj obj, Class cls);
 
     /// <summary>
     /// Calculates margins
@@ -69,7 +69,7 @@ namespace ML.MetricMethods.Algorithms
 
         foreach (var cls in TrainingSample.Classes)
         {
-          var proximity = EstimateProximity(pData.Key, cls);
+          var proximity = CalculateClassScore(pData.Key, cls);
           if (cls==pData.Value) si = proximity;
           else
           {
@@ -81,11 +81,6 @@ namespace ML.MetricMethods.Algorithms
       }
 
       return result.OrderBy(r => r.Value).ToDictionary(r => r.Key, r => r.Value);
-    }
-
-    public double EstimateClose(object obj, Class cls)
-    {
-      return EstimateClose((double[])obj, cls);
     }
 
 
@@ -108,7 +103,7 @@ namespace ML.MetricMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public override double EstimateProximity(double[] obj, Class cls)
+    public override double CalculateClassScore(double[] obj, Class cls)
     {
       var closeness = 0.0D;
       var sLength = TrainingSample.Count;
@@ -142,9 +137,9 @@ namespace ML.MetricMethods.Algorithms
   /// </summary>
   public abstract class KernelAlgorithmBase : OrderedMetricAlgorithmBase
   {
-    private readonly IFunction m_Kernel;
+    private readonly IKernel m_Kernel;
 
-    public KernelAlgorithmBase(IMetric metric, IFunction kernel)
+    public KernelAlgorithmBase(IMetric metric, IKernel kernel)
       : base(metric)
     {
       if (kernel == null)
@@ -153,6 +148,6 @@ namespace ML.MetricMethods.Algorithms
       m_Kernel = kernel;
     }
 
-    public IFunction Kernel { get { return m_Kernel; } }
+    public IKernel Kernel { get { return m_Kernel; } }
   }
 }
