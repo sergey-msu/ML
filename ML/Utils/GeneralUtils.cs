@@ -1,11 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using ML.Core;
 
-namespace ML.Core
+namespace ML.Utils
 {
-  public static class Utils
+  public static class GeneralUtils
   {
+    private static Dictionary<int, int> s_SampleDimCache = new Dictionary<int, int>();
+
+
+    public static int GetDimension(this ClassifiedSample<double[]> sample, bool cache = true)
+    {
+      return sample.First().Key.Length;
+    }
+
     public static TResult GetThroughMap<TKey, TResult>(TKey key, Dictionary<TKey, TResult> map)
     {
       TResult result;
@@ -105,6 +115,53 @@ namespace ML.Core
       }
 
       return result;
+    }
+
+    public const double ENTROPY_COEFF = 1.44269504089F; // 1/ln(2)
+
+    /// <summary>
+    /// Calculates h(z) = -z*log2(z)
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double EntropyH(double z)
+    {
+      return (0.0D <= z && z < double.Epsilon) ? 0.0D : -z*Math.Log(z)*ENTROPY_COEFF;
+    }
+
+    /// <summary>
+    /// Calculates maximum value within array alog with its index
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int ArgMax<T>(T[] array)
+      where T : IComparable<T>
+    {
+      var idx = -1;
+      var max = default(T);
+
+      if (array==null) return -1;
+
+      var len = array.Length;
+      for (int i=0; i<len; i++)
+      {
+        var val = array[i];
+        if (i==0 || val.CompareTo(max)>0)
+        {
+          idx = i;
+          max = val;
+        }
+      }
+
+      return idx;
+    }
+
+    /// <summary>
+    /// Throws if arrays have different lenghts
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void CheckDimensions(double[] p1, double[] p2)
+    {
+      if (p1.Length != p2.Length)
+        throw new MLException("Can not add point with different dimension");
     }
 
   }

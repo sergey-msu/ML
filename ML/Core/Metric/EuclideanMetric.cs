@@ -1,4 +1,5 @@
 ﻿using ML.Core.Mathematics;
+using ML.Utils;
 using System;
 
 namespace ML.Core.Metric
@@ -6,7 +7,7 @@ namespace ML.Core.Metric
   /// <summary>
   /// Represents Euclidead metrics
   /// </summary>
-  public sealed class EuclideanMetric : MetricBase
+  public sealed class EuclideanMetric : MetricBase<double[]>
   {
     public override string ID { get { return "EUCL"; } }
     public override string Name { get { return "Euclidean"; } }
@@ -16,7 +17,7 @@ namespace ML.Core.Metric
     /// </summary>
     public override double Dist(double[] p1, double[] p2)
     {
-      MathUtils.CheckDimensions(p1, p2);
+      GeneralUtils.CheckDimensions(p1, p2);
       return Math.Sqrt(Dist2(p1, p2));
     }
     /// <summary>
@@ -24,7 +25,7 @@ namespace ML.Core.Metric
     /// </summary>
     public double Dist2(double[] p1, double[] p2)
     {
-      MathUtils.CheckDimensions(p1, p2);
+      GeneralUtils.CheckDimensions(p1, p2);
 
       var dim = p1.Length;
       double sum2 = 0.0F;

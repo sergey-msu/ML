@@ -28,8 +28,8 @@ namespace ML.ConsoleTest
       //var file = "normal.2classes.1000.csv";
       //var file = "normal.2classes.200.all.csv";
       //var file = "normal.2classes.200.csv";
-      var file = "normal.3classes.1000.csv";
-      //var file = "normal.3classes.1000.all.csv";
+      //var file = "normal.3classes.1000.csv";
+      var file = "normal.3classes.1000.all.csv";
       //var file = "flower.3classes.100.all.csv";
       //var file = "primitive3.csv";
       //var file = "ionosphere.csv";
@@ -37,7 +37,7 @@ namespace ML.ConsoleTest
       //var file = "breast-cancer.csv";
       //var file = "bupa.csv";
 
-      var data = new DataWrapper(file);
+      var data = new DataWrapper(file, false);
       var test = new TestWrapper(data);
       test.Run();
 

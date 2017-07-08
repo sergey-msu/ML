@@ -9,12 +9,12 @@ namespace ML.MetricMethods.Algorithms
   /// <summary>
   /// Nearest K Neighbours with Weights Algorithm
   /// </summary>
-  public sealed class NearestKWeighedNeighboursAlgorithm : OrderedMetricAlgorithmBase
+  public sealed class NearestKWeighedNeighboursAlgorithm : OrderedMetricAlgorithmBase<double[]>
   {
     private int m_K;
     private double[] m_Weights;
 
-    public NearestKWeighedNeighboursAlgorithm(IMetric metric,
+    public NearestKWeighedNeighboursAlgorithm(IMetric<double[]> metric,
                                               int k,
                                               double[] weights)
       : base(metric)

@@ -11,9 +11,9 @@ namespace ML.MetricMethods.Algorithms
   /// </summary>
   public abstract class MetricAlgorithmBase<TObj> : ClassificationAlgorithmBase<TObj>, IMetricAlgorithm<TObj>
   {
-    private readonly IMetric m_Metric;
+    private readonly IMetric<TObj> m_Metric;
 
-    protected MetricAlgorithmBase(IMetric metric)
+    protected MetricAlgorithmBase(IMetric<TObj> metric)
       : base()
     {
       if (metric == null)
@@ -25,7 +25,12 @@ namespace ML.MetricMethods.Algorithms
     /// <summary>
     /// Space metric
     /// </summary>
-    public IMetric Metric { get { return m_Metric; } }
+    public IMetric<TObj> Metric { get { return m_Metric; } }
+
+    /// <summary>
+    /// Estimate value of Γ(obj, cls) - object proximity to some class
+    /// </summary>
+    public abstract double CalculateClassScore(TObj obj, Class cls);
 
     /// <summary>
     /// Classify point
@@ -48,41 +53,6 @@ namespace ML.MetricMethods.Algorithms
       return result;
     }
 
-    /// <summary>
-    /// Estimated closeness of given point to given classes
-    /// </summary>
-    public abstract double CalculateClassScore(TObj obj, Class cls);
-
-    /// <summary>
-    /// Calculates margins
-    /// </summary>
-    public Dictionary<int, double> CalculateMargins()
-    {
-      var result = new SortedDictionary<int, double>();
-      int idx = -1;
-
-      foreach (var pData in TrainingSample)
-      {
-        idx++;
-        double maxi = double.MinValue;
-        double si = 0;
-
-        foreach (var cls in TrainingSample.Classes)
-        {
-          var proximity = CalculateClassScore(pData.Key, cls);
-          if (cls==pData.Value) si = proximity;
-          else
-          {
-            if (maxi < proximity) maxi = proximity;
-          }
-        }
-
-        result.Add(idx, si - maxi);
-      }
-
-      return result.OrderBy(r => r.Value).ToDictionary(r => r.Key, r => r.Value);
-    }
-
 
     protected override void DoTrain()
     {
@@ -93,9 +63,9 @@ namespace ML.MetricMethods.Algorithms
   /// <summary>
   /// Base class for metric algorithm that relies on order of training sample with respect to fixed test point
   /// </summary>
-  public abstract class OrderedMetricAlgorithmBase : MetricAlgorithmBase<double[]>
+  public abstract class OrderedMetricAlgorithmBase<TObj> : MetricAlgorithmBase<TObj>
   {
-    protected OrderedMetricAlgorithmBase(IMetric metric)
+    protected OrderedMetricAlgorithmBase(IMetric<TObj> metric)
       : base(metric)
     {
     }
@@ -103,7 +73,7 @@ namespace ML.MetricMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public override double CalculateClassScore(double[] obj, Class cls)
+    public override double CalculateClassScore(TObj obj, Class cls)
     {
       var closeness = 0.0D;
       var sLength = TrainingSample.Count;
@@ -129,25 +99,6 @@ namespace ML.MetricMethods.Algorithms
     /// <param name="i">Point number in ordered training sample</param>
     /// <param name="x">Test point</param>
     /// <param name="orderedSample">Ordered training sample</param>
-    protected abstract double CalculateWeight(int i, double[] x, Dictionary<double[], double> orderedSample);
-  }
-
-  /// <summary>
-  /// Base class for metric algorithm supplied with some kernel function
-  /// </summary>
-  public abstract class KernelAlgorithmBase : OrderedMetricAlgorithmBase
-  {
-    private readonly IKernel m_Kernel;
-
-    public KernelAlgorithmBase(IMetric metric, IKernel kernel)
-      : base(metric)
-    {
-      if (kernel == null)
-        throw new MLException("KernelAlgorithmBase.ctor(kernel=null)");
-
-      m_Kernel = kernel;
-    }
-
-    public IKernel Kernel { get { return m_Kernel; } }
+    protected abstract double CalculateWeight(int i, TObj x, Dictionary<TObj, double> orderedSample);
   }
 }

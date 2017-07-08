@@ -6,6 +6,7 @@ using ML.DeepMethods.LearningRateSchedulers;
 using ML.DeepMethods.Optimizers;
 using ML.DeepMethods.Regularization;
 using ML.Contracts;
+using ML.Utils;
 
 namespace ML.DeepMethods.Registry
 {
@@ -19,7 +20,7 @@ namespace ML.DeepMethods.Registry
 
     public static LpLoss Lp(double p)
     {
-      return Core.Utils.GetThroughMap(p, m_Lp);
+      return GeneralUtils.GetThroughMap(p, m_Lp);
     }
   }
 
@@ -30,12 +31,12 @@ namespace ML.DeepMethods.Registry
 
     public static L2Regularizator L2(double coeff)
     {
-      return Core.Utils.GetThroughMap(coeff, m_L2);
+      return GeneralUtils.GetThroughMap(coeff, m_L2);
     }
 
     public static L1Regularizator L1(double coeff)
     {
-      return Core.Utils.GetThroughMap(coeff, m_L1);
+      return GeneralUtils.GetThroughMap(coeff, m_L1);
     }
 
     public static CompositeRegularizator Composite(params IRegularizator[] regularizators)

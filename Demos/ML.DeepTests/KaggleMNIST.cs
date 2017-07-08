@@ -8,6 +8,7 @@ using ML.Core;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Models;
 using ML.Core.Mathematics;
+using ML.Utils;
 
 namespace ML.DeepTests
 {
@@ -243,7 +244,7 @@ namespace ML.DeepTests
         foreach (var data in m_Test)
         {
           var mark = alg.Predict(data);
-          var idx = MathUtils.ArgMax(mark);
+          var idx = GeneralUtils.ArgMax(mark);
           var cls = m_Classes[idx];
           writer.WriteLine("{0},{1}", num++, (int)cls.Value);
         }

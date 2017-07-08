@@ -9,11 +9,11 @@ namespace ML.MetricMethods.Algorithms
   /// <summary>
   /// Nearest K Neighbours Algorithm
   /// </summary>
-  public sealed class NearestKNeighboursAlgorithm : OrderedMetricAlgorithmBase
+  public sealed class NearestKNeighboursAlgorithm : OrderedMetricAlgorithmBase<double[]>
   {
     private int m_K;
 
-    public NearestKNeighboursAlgorithm(IMetric metric, int k)
+    public NearestKNeighboursAlgorithm(IMetric<double[]> metric, int k)
       : base(metric)
     {
       K = k;
@@ -114,47 +114,6 @@ namespace ML.MetricMethods.Algorithms
     protected override double CalculateWeight(int i, double[] x, Dictionary<double[], double> orderedSample)
     {
       return (i < m_K) ? 1 : 0;
-    }
-
-    /// <summary>
-    /// Leave-one-out optimization
-    /// </summary>
-    public void OptimizeLOO(int? minK = null, int? maxK = null)
-    {
-      if (!minK.HasValue || minK.Value<1) minK = 1;
-      if (!maxK.HasValue || maxK.Value>TrainingSample.Count) maxK = TrainingSample.Count-1;
-
-      var kOpt = int.MaxValue;
-      var minErrCnt = int.MaxValue;
-
-      for (int k=minK.Value; k<=maxK.Value; k++)
-      {
-        var errCnt = 0;
-        m_K = k;
-
-        var initSample = TrainingSample;
-
-        for (int i=0; i<initSample.Count; i++)
-        {
-          var pData = initSample.ElementAt(i);
-          var looSample  = initSample.ApplyMask((p, c, idx) => idx != i);
-          TrainingSample = looSample;
-
-          var predClass = this.Predict(pData.Key);
-          var realClass = pData.Value;
-          if (predClass != realClass) errCnt++;
-
-          TrainingSample = initSample;
-        }
-
-        if (errCnt < minErrCnt)
-        {
-          minErrCnt = errCnt;
-          kOpt = k;
-        }
-      }
-
-      m_K = kOpt;
     }
   }
 }

@@ -2,6 +2,7 @@
 using ML.Contracts;
 using ML.Core.Mathematics;
 using ML.Core;
+using ML.Utils;
 
 namespace ML.NeuralMethods.LossFunctions
 {
@@ -20,7 +21,7 @@ namespace ML.NeuralMethods.LossFunctions
         res += expected[i] * Math.Log(actual[i]);
       }
 
-      return (se*Math.Log(sa) - res) * MathUtils.ENTROPY_COEFF;
+      return (se*Math.Log(sa) - res) * GeneralUtils.ENTROPY_COEFF;
     }
 
     public double Derivative(int idx, double[] actual, double[] expected)
@@ -34,7 +35,7 @@ namespace ML.NeuralMethods.LossFunctions
         se += expected[i];
       }
 
-      var result = (se/sa - expected[idx]/actual[idx]) * MathUtils.ENTROPY_COEFF;
+      var result = (se/sa - expected[idx]/actual[idx]) * GeneralUtils.ENTROPY_COEFF;
       if (double.IsNaN(result))
         throw new MLException("Argument of entropy is out of range. Make sure that activation function's output is (0, 1)");
 

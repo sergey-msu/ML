@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ML.Contracts;
 using ML.Core.Mathematics;
+using ML.Utils;
 
 namespace ML.Core
 {
@@ -152,7 +153,7 @@ namespace ML.Core
       var len = mark1.Length;
       if (mark1.Length != mark2.Length) return double.PositiveInfinity;
 
-      return MathUtils.ArgMax(mark1)==MathUtils.ArgMax(mark2) ? 0 : 1;
+      return GeneralUtils.ArgMax(mark1)==GeneralUtils.ArgMax(mark2) ? 0 : 1;
     }
   }
 }

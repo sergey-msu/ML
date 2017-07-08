@@ -60,26 +60,44 @@ namespace ML.Contracts
   }
 
   /// <summary>
+  /// Contract for ML algorithm that can be represented in the form
+  /// a(x) = argmax Γ(x,y),
+  /// where Γ(x,y) is the proximity of object a to the class y
+  /// </summary>
+  public interface IGammaAlgorithm<TObj> : IClassificationAlgorithm<TObj>
+  {
+    /// <summary>
+    /// Estimate value of Γ(obj, cls) - object proximity to some class
+    /// </summary>
+    double CalculateClassScore(TObj obj, Class cls);
+  }
+
+  /// <summary>
   /// Contract for general metric classification algorithm
   /// </summary>
-  public interface IMetricAlgorithm<TObj> : IClassificationAlgorithm<TObj>
+  public interface IMetricAlgorithm<TObj> : IGammaAlgorithm<TObj>
   {
     /// <summary>
     /// Space metric
     /// </summary>
-    IMetric Metric { get; }
-
-    /// <summary>
-    /// Estimate point closeness to some class
-    /// </summary>
-    double CalculateClassScore(TObj obj, Class cls);
-
-    /// <summary>
-    /// Calculates margins
-    /// </summary>
-    Dictionary<int, double> CalculateMargins();
+    IMetric<TObj> Metric { get; }
   }
 
+  /// <summary>
+  /// Contract for general ML classification algorithm with some kernel function
+  /// </summary>
+  public interface IKernelAlgorithm<TObj> : IGammaAlgorithm<TObj>
+  {
+    /// <summary>
+    /// Kernel
+    /// </summary>
+    IKernel Kernel { get; }
+
+    /// <summary>
+    /// Window width
+    /// </summary>
+    double H { get; set; }
+  }
 
   /// <summary>
   /// Represents classification error

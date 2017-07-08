@@ -4,6 +4,7 @@ using ML.Core.Metric;
 using ML.Core.Logical;
 using ML.Core.ActivationFunctions;
 using ML.Contracts;
+using ML.Utils;
 
 namespace ML.Core.Registry
 {
@@ -32,7 +33,7 @@ namespace ML.Core.Registry
     public static readonly EuclideanMetric Euclidean = new EuclideanMetric();
     public static readonly LInftyMetric    LInfty    = new LInftyMetric();
 
-    public static readonly Dictionary<string, IMetric> ByID = new Dictionary<string, IMetric>
+    public static readonly Dictionary<string, IMetric<double[]>> ByID = new Dictionary<string, IMetric<double[]>>
     {
       { Euclidean.ID, Euclidean },
       { LInfty.ID,    LInfty }
@@ -40,7 +41,7 @@ namespace ML.Core.Registry
 
     public static LpMetric Lp(double p)
     {
-      return Core.Utils.GetThroughMap(p, m_Lp);
+      return GeneralUtils.GetThroughMap(p, m_Lp);
     }
   }
 
@@ -87,22 +88,22 @@ namespace ML.Core.Registry
 
     public static ShiftedStepActivation ShiftedStep(double p)
     {
-      return Core.Utils.GetThroughMap(p, m_ShiftedSteps);
+      return GeneralUtils.GetThroughMap(p, m_ShiftedSteps);
     }
 
     public static RationalActivation Rational(double p)
     {
-      return Core.Utils.GetThroughMap(p, m_Rationals);
+      return GeneralUtils.GetThroughMap(p, m_Rationals);
     }
 
     public static LogisticActivation Logistic(double a)
     {
-      return Core.Utils.GetThroughMap(a, m_Logistics);
+      return GeneralUtils.GetThroughMap(a, m_Logistics);
     }
 
     public static LeakyReLUActivation LeakyReLU(double leak = LeakyReLUActivation.DFT_LEAK)
     {
-      return Core.Utils.GetThroughMap(leak, m_LeakyReLUs);
+      return GeneralUtils.GetThroughMap(leak, m_LeakyReLUs);
     }
   }
 }

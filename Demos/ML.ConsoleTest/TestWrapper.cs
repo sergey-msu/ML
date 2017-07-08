@@ -64,7 +64,10 @@ namespace ML.ConsoleTest
 
         //doNearestNeighbourAlgorithmTest();
         //doNearestKNeighboursAlgorithmTest();
-        doBayesianAlgorithmTest();
+        //doParzenBayesianAlgorithmTest();
+        //doNaiveBayesianAlgorithmTest();
+        //doProductBayesianAlgorithmTest();
+        doQuadraticDiscriminantAlgorithmTest();
         //doParzenFixedAlgorithmTest();
         //doPotentialFixedAlgorithmTest();
         //doDecisionTreeAlgorithmTest();
@@ -129,7 +132,7 @@ namespace ML.ConsoleTest
       alg.Train(Data.TrainingSample);
 
       // LOO
-      alg.OptimizeLOO();
+      StatUtils.OptimizeLOO(alg);
       var optK = alg.K;
       Console.WriteLine("Nearest K Neigbour: optimal k is {0}", optK);
       Console.WriteLine();
@@ -155,18 +158,18 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private void doBayesianAlgorithmTest()
+    private void doParzenBayesianAlgorithmTest()
     {
       var metric = new EuclideanMetric();
       var kernel = new GaussianKernel();
-      var alg = new BayesianAlgorithm(metric, kernel, 1.0F);
+      var alg = new ParzenBayesianAlgorithm(metric, kernel, 1.0F);
       alg.Train(Data.TrainingSample);
 
       // LOO
       var hmin = 0.01D;
-      var hmax = 2.0D;
-      var step = 0.01D;
-      alg.OptimizeLOO(hmin, hmax, step);
+      var hmax = 5.0D;
+      var step = 0.05D;
+      StatUtils.OptimizeLOO(alg, hmin, hmax, step);
       var optH = alg.H;
       Console.WriteLine("Bayesian: optimal h is {0}", optH);
       Console.WriteLine();
@@ -202,6 +205,114 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
+    private void doNaiveBayesianAlgorithmTest()
+    {
+      var kernel = new GaussianKernel();
+      var alg = new NaiveBayesianAlgorithm(kernel);
+      alg.Train(Data.TrainingSample);
+
+      // LOO
+      var hmin = 0.01D;
+      var hmax = 5.0D;
+      var step = 0.05D;
+      StatUtils.OptimizeLOO(alg, hmin, hmax, step);
+      var optH = alg.H;
+      Console.WriteLine("Naive Bayesian: optimal h is {0}", optH);
+      Console.WriteLine();
+
+      // Margins
+      Console.WriteLine("Margins:");
+      calculateMargin(alg);
+      Console.WriteLine();
+
+      //Error distribution
+      var message = string.Empty;
+      Console.WriteLine("Errors:");
+      for (double h1 = hmin; h1 < hmax; h1 += step)
+      {
+        var h = h1;
+        if (h <= optH && h + step > optH) h = optH;
+
+        alg.H = h;
+        var errors = alg.GetErrors(Data.Data, 0, true);
+        var ec = errors.Count();
+        var dc = Data.Data.Count;
+        var pct = Math.Round(100.0F * ec / dc, 2);
+        var mes = string.Format("{0}:\t{1} of {2}\t({3}%) {4}", Math.Round(h, 2), ec, dc, pct, h == optH ? "<-LOO optimal" : string.Empty);
+        Console.WriteLine(mes);
+
+        if (h==optH) message = mes;
+      }
+      Console.WriteLine();
+      Console.WriteLine("-----------------------------------------");
+      Console.WriteLine("Bayesian: optimal h is {0}", optH);
+      Console.WriteLine(message);
+
+      Visualizer.Run(alg);
+    }
+
+    private void doProductBayesianAlgorithmTest()
+    {
+      var kernel = new GaussianKernel();
+      var alg = new ProductBayesianAlgorithm(kernel);
+      alg.Train(Data.TrainingSample);
+
+      // LOO
+      var hmin = 0.01D;
+      var hmax = 5.0D;
+      var step = 0.05D;
+      StatUtils.OptimizeLOO(alg, hmin, hmax, step);
+      var optH = alg.H;
+      Console.WriteLine("Naive Bayesian: optimal h is {0}", optH);
+      Console.WriteLine();
+
+      // Margins
+      Console.WriteLine("Margins:");
+      calculateMargin(alg);
+      Console.WriteLine();
+
+      //Error distribution
+      var message = string.Empty;
+      Console.WriteLine("Errors:");
+      for (double h1 = hmin; h1 < hmax; h1 += step)
+      {
+        var h = h1;
+        if (h <= optH && h + step > optH) h = optH;
+
+        alg.H = h;
+        var errors = alg.GetErrors(Data.Data, 0, true);
+        var ec = errors.Count();
+        var dc = Data.Data.Count;
+        var pct = Math.Round(100.0F * ec / dc, 2);
+        var mes = string.Format("{0}:\t{1} of {2}\t({3}%) {4}", Math.Round(h, 2), ec, dc, pct, h == optH ? "<-LOO optimal" : string.Empty);
+        Console.WriteLine(mes);
+
+        if (h==optH) message = mes;
+      }
+      Console.WriteLine();
+      Console.WriteLine("-----------------------------------------");
+      Console.WriteLine("Bayesian: optimal h is {0}", optH);
+      Console.WriteLine(message);
+
+      Visualizer.Run(alg);
+    }
+
+    private void doQuadraticDiscriminantAlgorithmTest()
+    {
+      var alg = new QuadraticDiscriminantAlgorithm();
+      alg.Train(Data.TrainingSample);
+      Console.WriteLine("Training finished");
+
+      var errors = alg.GetErrors(Data.Data, 0, true);
+      var ec = errors.Count();
+      var dc = Data.Data.Count;
+      var pct = Math.Round(100.0F * ec / dc, 2);
+      var mes = string.Format("{0} of {1}\t({2}%)", ec, dc, pct);
+      Console.WriteLine(mes);
+
+      Visualizer.Run(alg);
+    }
+
     private void doParzenFixedAlgorithmTest()
     {
       var timer = new System.Diagnostics.Stopwatch();
@@ -213,7 +324,7 @@ namespace ML.ConsoleTest
       alg.Train(Data.TrainingSample);
 
       // LOO
-      alg.OptimizeLOO(0.1F, 20.0F, 0.2F);
+       StatUtils.OptimizeLOO(alg, 0.1F, 20.0F, 0.2F);
       var optH = alg.H;
       Console.WriteLine("Parzen Fixed: optimal h is {0}", optH);
       Console.WriteLine();
@@ -256,7 +367,7 @@ namespace ML.ConsoleTest
       var eqps = new PotentialFunctionAlgorithm.KernelEquipment[Data.TrainingSample.Count];
       for (int i=0; i<Data.TrainingSample.Count; i++)
         eqps[i] = new PotentialFunctionAlgorithm.KernelEquipment(1.0F, 1.5F);
-      var alg = new PotentialFunctionAlgorithm(metric, kernel, eqps);
+      var alg = new PotentialFunctionAlgorithm(metric, kernel, eqps: eqps);
       alg.Train(Data.TrainingSample);
 
       Console.WriteLine("Margin:");
@@ -313,7 +424,7 @@ namespace ML.ConsoleTest
       var alg = createBPAlg();
 
       var now = DateTime.Now;
-      alg.Train(Core.Utils.ClassifiedToRegressionSample(Data.TrainingSample));
+      alg.Train(GeneralUtils.ClassifiedToRegressionSample(Data.TrainingSample));
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
 
@@ -371,7 +482,7 @@ namespace ML.ConsoleTest
       var sample = sampleTo3D(Data.TrainingSample);
 
       var now = DateTime.Now;
-      alg.Train(Core.Utils.ClassifiedToRegressionSample(sample));
+      alg.Train(GeneralUtils.ClassifiedToRegressionSample(sample));
 
       Console.WriteLine("--------- ELAPSED TRAIN ----------" + (DateTime.Now-now).TotalMilliseconds);
 
@@ -417,7 +528,7 @@ namespace ML.ConsoleTest
     private void outputError(MultiRegressionAlgorithmBase<double[]> alg)
     {
       Console.WriteLine("Errors:");
-      var errors = alg.GetErrors(Core.Utils.ClassifiedToRegressionSample(Data.Data), 0, true);
+      var errors = alg.GetErrors(GeneralUtils.ClassifiedToRegressionSample(Data.Data), 0, true);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -428,7 +539,7 @@ namespace ML.ConsoleTest
     {
       Console.WriteLine("Errors:");
       var sample = sampleTo3D(Data.Data);
-      var errors = alg.GetErrors(Core.Utils.ClassifiedToRegressionSample(sample), 0, true);
+      var errors = alg.GetErrors(GeneralUtils.ClassifiedToRegressionSample(sample), 0, true);
       var ec = errors.Count();
       var dc = Data.Data.Count;
       var pct = Math.Round(100.0F * ec / dc, 2);
@@ -481,9 +592,9 @@ namespace ML.ConsoleTest
       Console.WriteLine("{0} of {1} ({2}%)", ec, dc, pct);
     }
 
-    private void calculateMargin(IMetricAlgorithm<double[]> algorithm)
+    private void calculateMargin(IGammaAlgorithm<double[]> algorithm)
     {
-      var res = algorithm.CalculateMargins();
+      var res = StatUtils.CalculateMargins(algorithm);
       foreach (var r in res)
       {
         Console.WriteLine("{0}\t{1}", r.Key, r.Value);

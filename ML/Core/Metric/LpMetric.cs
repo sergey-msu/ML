@@ -1,12 +1,12 @@
-﻿using ML.Core.Mathematics;
-using System;
+﻿using System;
+using ML.Utils;
 
 namespace ML.Core.Metric
 {
   /// <summary>
   /// Represents L_p metrics
   /// </summary>
-  public sealed class LpMetric : MetricBase
+  public sealed class LpMetric : MetricBase<double[]>
   {
     public override string ID { get { return "LP"; } }
     public override string Name { get { return "L p"; } }
@@ -29,7 +29,7 @@ namespace ML.Core.Metric
     /// </summary>
     public override double Dist(double[] p1, double[] p2)
     {
-      MathUtils.CheckDimensions(p1, p2);
+      GeneralUtils.CheckDimensions(p1, p2);
 
       var dim = p1.Length;
       double sum = 0.0F;

@@ -8,9 +8,9 @@ namespace ML.MetricMethods.Algorithms
   /// <summary>
   /// Nearest Neighbour Algorithm
   /// </summary>
-  public sealed class NearestNeighbourAlgorithm : OrderedMetricAlgorithmBase
+  public sealed class NearestNeighbourAlgorithm : OrderedMetricAlgorithmBase<double[]>
   {
-    public NearestNeighbourAlgorithm(IMetric metric)
+    public NearestNeighbourAlgorithm(IMetric<double[]> metric)
       : base(metric)
     {
     }

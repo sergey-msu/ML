@@ -1,12 +1,12 @@
-﻿using ML.Core.Mathematics;
-using System;
+﻿using System;
+using ML.Utils;
 
 namespace ML.Core.Metric
 {
   /// <summary>
   /// Represents L_infty metrics
   /// </summary>
-  public sealed class LInftyMetric : MetricBase
+  public sealed class LInftyMetric : MetricBase<double[]>
   {
     public override string ID { get { return "LINFTY"; } }
     public override string Name { get { return "L infinity"; } }
@@ -16,7 +16,7 @@ namespace ML.Core.Metric
     /// </summary>
     public override double Dist(double[] p1, double[] p2)
     {
-      MathUtils.CheckDimensions(p1, p2);
+      GeneralUtils.CheckDimensions(p1, p2);
 
       var dim = p1.Length;
       var max = double.MinValue;

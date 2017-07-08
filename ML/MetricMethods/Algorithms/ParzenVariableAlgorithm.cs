@@ -9,15 +9,20 @@ namespace ML.MetricMethods.Algorithms
   /// <summary>
   /// Parzen Variable Window Algorithm
   /// </summary>
-  public sealed class ParzenVariableAlgorithm : KernelAlgorithmBase
+  public sealed class ParzenVariableAlgorithm : OrderedMetricAlgorithmBase<double[]>, IKernelAlgorithm<double[]>
   {
+    private readonly IKernel m_Kernel;
     private int m_K;
 
-    public ParzenVariableAlgorithm(IMetric metric,
+    public ParzenVariableAlgorithm(IMetric<double[]> metric,
                                    IKernel kernel,
                                    int k)
-      : base(metric, kernel)
+      : base(metric)
     {
+      if (kernel == null)
+        throw new MLException("KernelAlgorithmBase.ctor(kernel=null)");
+
+      m_Kernel = kernel;
       K = k;
     }
 
@@ -31,6 +36,8 @@ namespace ML.MetricMethods.Algorithms
     /// </summary>
     public override string Name { get { return "Parzen Window of Variable Width"; } }
 
+    public IKernel Kernel { get { return m_Kernel; } }
+
     /// <summary>
     /// Neighbour count
     /// </summary>
@@ -40,10 +47,16 @@ namespace ML.MetricMethods.Algorithms
       set
       {
         if (value <= 0)
-          throw new MLException("NearestKNeighboursAlgorithm.K(value<=0)");
+          throw new MLException("ParzenVariableAlgorithm.K(value<=0)");
 
         m_K = value;
       }
+    }
+
+    public double H
+    {
+      get { return m_K; }
+      set { throw new NotSupportedException("Use K parameter instead"); }
     }
 
     /// <summary>

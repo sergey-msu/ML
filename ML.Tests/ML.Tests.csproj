@@ -69,14 +69,16 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="UnitTests\Bayesian\BayesianTests.cs" />
     <Compile Include="UnitTests\CNN\GradientTests.cs" />
     <Compile Include="UnitTests\CNN\BackpropTests.cs" />
     <Compile Include="UnitTests\CNN\Mocks.cs" />
     <Compile Include="UnitTests\CNN\OptimizerTests.cs" />
     <Compile Include="UnitTests\Core\ComputingNodeTests.cs" />
+    <Compile Include="UnitTests\Core\MathOpsTests.cs" />
     <Compile Include="UnitTests\Core\InformativityIndexTests.cs" />
     <Compile Include="UnitTests\Core\KernelTests.cs" />
-    <Compile Include="UnitTests\Core\MathUtilsTests.cs" />
+    <Compile Include="UnitTests\Utils\GeneralUtilsTests.cs" />
     <Compile Include="UnitTests\Core\MetricTests.cs" />
     <Compile Include="UnitTests\CNN\ConvNetTests.cs" />
     <Compile Include="UnitTests\NN\BackpropTests.cs" />

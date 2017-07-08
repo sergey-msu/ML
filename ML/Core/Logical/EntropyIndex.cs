@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ML.Core.Mathematics;
+using ML.Utils;
 
 namespace ML.Core.Logical
 {
@@ -51,9 +51,9 @@ namespace ML.Core.Logical
       foreach (var cData in clsInfos)
       {
         var bag = cData.Value;
-        result += MathUtils.EntropyH(bag.Pc / l);
-        result += (p == 0) ? 0 : -(double)p / l * MathUtils.EntropyH(bag.pc / p);
-        result += (p == l) ? 0 : -(double)(l - p) / l * MathUtils.EntropyH((bag.Pc-bag.pc) / (l - p));
+        result += GeneralUtils.EntropyH(bag.Pc / l);
+        result += (p == 0) ? 0 : -(double)p / l * GeneralUtils.EntropyH(bag.pc / p);
+        result += (p == l) ? 0 : -(double)(l - p) / l * GeneralUtils.EntropyH((bag.Pc-bag.pc) / (l - p));
       }
 
       return result;

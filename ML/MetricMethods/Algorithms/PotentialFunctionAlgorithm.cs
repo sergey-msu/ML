@@ -6,7 +6,7 @@ using ML.Core;
 
 namespace ML.MetricMethods.Algorithms
 {
-  public sealed class PotentialFunctionAlgorithm : MetricAlgorithmBase<double[]>
+  public sealed class PotentialFunctionAlgorithm : MetricAlgorithmBase<double[]>, IKernelAlgorithm<double[]>
   {
     #region Inner
 
@@ -28,10 +28,12 @@ namespace ML.MetricMethods.Algorithms
 
     private readonly IKernel m_Kernel;
     private KernelEquipment[]  m_Eqps;
+    private double m_H;
 
-    public PotentialFunctionAlgorithm(IMetric metric,
+    public PotentialFunctionAlgorithm(IMetric<double[]> metric,
                                       IKernel kernel,
-                                      KernelEquipment[] eqps)
+                                      double h = 1,
+                                      KernelEquipment[] eqps = null)
       : base(metric)
     {
       if (kernel == null)
@@ -39,6 +41,7 @@ namespace ML.MetricMethods.Algorithms
 
       m_Kernel = kernel;
       Eqps = eqps;
+      H = h;
     }
 
     public override string ID { get { return "PF"; } }
@@ -53,6 +56,18 @@ namespace ML.MetricMethods.Algorithms
       set { m_Eqps=value; }
     }
 
+    public double H
+    {
+      get { return m_H; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("PotentialFunctionAlgorithm.H(value<=0)");
+
+        m_H = value;
+      }
+    }
+
     public override double CalculateClassScore(double[] x, Class cls)
     {
       var closeness = 0.0D;
@@ -63,7 +78,7 @@ namespace ML.MetricMethods.Algorithms
         idx++;
         if (pData.Value != cls) continue;
 
-        var h = (m_Eqps==null) ? 1 : m_Eqps[idx].H;
+        var h = (m_Eqps==null) ? m_H : m_Eqps[idx].H;
         var g = (m_Eqps==null) ? 1 : m_Eqps[idx].Gamma;
         var r = Metric.Dist(x, pData.Key) / h;
 

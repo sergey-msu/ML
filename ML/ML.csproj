@@ -62,7 +62,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BayesianMethods\Algorithms\BayesianAlgorithm.cs" />
+    <Compile Include="BayesianMethods\Algorithms\AlgorithmBase.cs" />
+    <Compile Include="BayesianMethods\Algorithms\NaiveBayesianAlgorithm.cs" />
+    <Compile Include="BayesianMethods\Algorithms\QuadraticDiscriminantAlgorithm.cs" />
+    <Compile Include="BayesianMethods\Algorithms\ProductBayesianAlgorithm.cs" />
+    <Compile Include="BayesianMethods\Algorithms\ParzenBayesianAlgorithm.cs" />
     <Compile Include="Contracts\IInformativityIndex.cs" />
     <Compile Include="Contracts\ILearningRateScheduler.cs" />
     <Compile Include="Contracts\IOptimizer.cs" />
@@ -79,6 +83,7 @@
     <Compile Include="Core\ActivationFunctions\TanhActivation.cs" />
     <Compile Include="Core\AlgorithmBase.cs" />
     <Compile Include="Core\ComputingNetworks\_ComputingNode.cs" />
+    <Compile Include="Core\Mathematics\MatrixOps.cs" />
     <Compile Include="Core\Samples.cs" />
     <Compile Include="Contracts\INamed.cs" />
     <Compile Include="Core\ComputingNetworks\CompositeNode.cs" />
@@ -101,7 +106,6 @@
     <Compile Include="Core\Logical\DonskoyIndex.cs" />
     <Compile Include="Core\Logical\IndexBase.cs" />
     <Compile Include="Core\Logical\GiniIndex.cs" />
-    <Compile Include="Core\Utils.cs" />
     <Compile Include="DeepMethods\Algorithms\BackpropAlgorithm.Batching.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\DropBasedScheduler.cs" />
     <Compile Include="DeepMethods\LearningRateSchedulers\ConstantScheduler.cs" />
@@ -163,8 +167,9 @@
     <Compile Include="NeuralMethods\Models\NeuralNetwork.cs" />
     <Compile Include="NeuralMethods\Models\Neuron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Core\Mathematics\MathUtils.cs" />
+    <Compile Include="Utils\GeneralUtils.cs" />
     <Compile Include="Utils\NetworkFactory.cs" />
+    <Compile Include="Utils\StatUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BayesianMethods\Models\" />

@@ -24,8 +24,9 @@ namespace ML.ConsoleTest
     private const string CLASS_VALUE     = "_value";
     private const string TRAINING_HEADER = "_training";
 
-    public DataWrapper(string resourceName)
+    public DataWrapper(string resourceName, bool normalizeData = true)
     {
+      NormalizeData = normalizeData;
       readData(resourceName);
     }
 
@@ -36,6 +37,8 @@ namespace ML.ConsoleTest
     public readonly List<DataError> Errors = new List<DataError>();
 
     public int Dimension { get; private set; }
+
+    public bool NormalizeData { get; set; }
 
     private void readData(string file)
     {
@@ -96,6 +99,8 @@ namespace ML.ConsoleTest
     private void readBody(StreamReader reader, int[] featureIndxs, int trainingIndx, int classesIndx, int clsValIdx)
     {
       var dim = featureIndxs.Length;
+      var min = double.MaxValue;
+      var max = double.MinValue;
       var lineNum = 0;
 
       while (true)
@@ -118,6 +123,9 @@ namespace ML.ConsoleTest
             break;
           }
           point[i] = result;
+
+          if (min > result) min = result;
+          if (max < result) max = result;
         }
 
         if (!success)
@@ -143,6 +151,19 @@ namespace ML.ConsoleTest
           if (isTraining)
             TrainingSample.Add(point, cls);
         }
+      }
+
+      if (NormalizeData)
+        normalizeData(min, max);
+    }
+
+    private void normalizeData(double min, double max)
+    {
+      foreach (var pData in Data)
+      {
+        var data = pData.Key;
+        for (int i=0; i<data.Length; i++)
+          data[i] = (data[i] - min) / (max - min);
       }
     }
 

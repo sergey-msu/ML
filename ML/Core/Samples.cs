@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ML.Utils;
 
 namespace ML.Core
 {
@@ -63,7 +64,7 @@ namespace ML.Core
     /// Retrieves subset of the sample
     public RegressionSample<TObj> Subset(int skip, int take)
     {
-      return Utils.Subset<RegressionSample<TObj>, TObj, double>(this, skip, take);
+      return GeneralUtils.Subset<RegressionSample<TObj>, TObj, double>(this, skip, take);
     }
 
     /// <summary>
@@ -71,7 +72,7 @@ namespace ML.Core
     /// </summary>
     public IEnumerable<RegressionSample<TObj>> Batch(int size)
     {
-      return Utils.Batch<RegressionSample<TObj>, TObj, double>(this, size);
+      return GeneralUtils.Batch<RegressionSample<TObj>, TObj, double>(this, size);
     }
 
     /// <summary>
@@ -79,7 +80,7 @@ namespace ML.Core
     /// </summary>
     public RegressionSample<TObj> ApplyMask(SampleMaskDelegate<TObj, double> mask)
     {
-      return Utils.ApplyMask<RegressionSample<TObj>, TObj, double>(this, mask);
+      return GeneralUtils.ApplyMask<RegressionSample<TObj>, TObj, double>(this, mask);
     }
   }
 
@@ -108,7 +109,7 @@ namespace ML.Core
     /// Retrieves subset of the sample
     public MultiRegressionSample<TObj> Subset(int skip, int take)
     {
-      return Utils.Subset<MultiRegressionSample<TObj>, TObj, double[]>(this, skip, take);
+      return GeneralUtils.Subset<MultiRegressionSample<TObj>, TObj, double[]>(this, skip, take);
     }
 
     /// <summary>
@@ -116,7 +117,7 @@ namespace ML.Core
     /// </summary>
     public IEnumerable<MultiRegressionSample<TObj>> Batch(int size)
     {
-      return Utils.Batch<MultiRegressionSample<TObj>, TObj, double[]>(this, size);
+      return GeneralUtils.Batch<MultiRegressionSample<TObj>, TObj, double[]>(this, size);
     }
 
     /// <summary>
@@ -124,7 +125,7 @@ namespace ML.Core
     /// </summary>
     public MultiRegressionSample<TObj> ApplyMask(SampleMaskDelegate<TObj, double[]> mask)
     {
-      return Utils.ApplyMask<MultiRegressionSample<TObj>, TObj, double[]>(this, mask);
+      return GeneralUtils.ApplyMask<MultiRegressionSample<TObj>, TObj, double[]>(this, mask);
     }
   }
 
@@ -133,6 +134,10 @@ namespace ML.Core
   /// </summary>
   public class ClassifiedSample<TObj> : MarkedSample<TObj, Class>
   {
+    private readonly object m_Sync = new object();
+
+    private List<Class> m_CachedClasses;
+
     #region .ctor
 
     public ClassifiedSample()
@@ -149,14 +154,38 @@ namespace ML.Core
 
     #endregion
 
-    public IEnumerable<Class> Classes { get { return this.Values.Distinct(); } }
+    public IEnumerable<Class> Classes
+    {
+      get
+      {
+        m_CachedClasses = this.Values.Distinct().ToList();
+        return m_CachedClasses;
+      }
+    }
+
+    public IEnumerable<Class> CachedClasses
+    {
+      get
+      {
+        if (m_CachedClasses==null)
+        {
+          lock (m_Sync)
+          {
+            if (m_CachedClasses==null)
+              return Classes;
+          }
+        }
+
+        return m_CachedClasses;
+      }
+    }
 
     /// <summary>
     /// Retrieves subset of the sample
     /// </summary>
     public ClassifiedSample<TObj> Subset(int skip, int take)
     {
-      return Utils.Subset<ClassifiedSample<TObj>, TObj, Class>(this, skip, take);
+      return GeneralUtils.Subset<ClassifiedSample<TObj>, TObj, Class>(this, skip, take);
     }
 
     /// <summary>
@@ -164,7 +193,7 @@ namespace ML.Core
     /// </summary>
     public IEnumerable<ClassifiedSample<TObj>> Batch(int size)
     {
-      return Utils.Batch<ClassifiedSample<TObj>, TObj, Class>(this, size);
+      return GeneralUtils.Batch<ClassifiedSample<TObj>, TObj, Class>(this, size);
     }
 
     /// <summary>
@@ -172,116 +201,8 @@ namespace ML.Core
     /// </summary>
     public ClassifiedSample<TObj> ApplyMask(SampleMaskDelegate<TObj, Class> mask)
     {
-      return Utils.ApplyMask<ClassifiedSample<TObj>, TObj, Class>(this, mask);
+      return GeneralUtils.ApplyMask<ClassifiedSample<TObj>, TObj, Class>(this, mask);
     }
   }
-
-  ///// <summary>
-  ///// Represents a classified (e.g. supplied with corresponding class) set of points: [point, class]
-  ///// </summary>
-  //public class ClassifiedSample<TObj> : MultiRegressionSample<TObj>
-  //{
-  //  private Dictionary<Class, double[]> m_ClassMapping;
-
-  //  #region .ctor
-
-  //  public ClassifiedSample(IEnumerable<Class> classes)
-  //  {
-  //    ctor(classes);
-  //  }
-
-  //  public ClassifiedSample(IEnumerable<Class> classes, Dictionary<TObj, double[]> other) : base(other)
-  //  {
-  //    ctor(classes);
-  //  }
-
-  //  public ClassifiedSample(IEnumerable<Class> classes, ClassifiedSample<TObj> other) : base(other)
-  //  {
-  //    ctor(classes);
-  //  }
-
-  //  private void ctor(IEnumerable<Class> classes)
-  //  {
-  //    if (classes==null || !classes.Any())
-  //      throw new MLException("ClassifiedSample.ctor(classes=null|empty)");
-
-  //    var clist = classes.ToList();
-  //    m_ClassMapping = new Dictionary<Class, double[]>();
-
-  //    int idx = 0;
-  //    foreach (var cls in clist)
-  //    {
-  //      var value = new double[clist.Count];
-  //      value[idx] = 1;
-  //      m_ClassMapping[cls] = value;
-  //    }
-  //  }
-
-  //  #endregion
-
-  //  public IEnumerable<Class> Classes { get { return m_ClassMapping.Keys; } }
-
-  //  public void Add(TObj obj, Class cls)
-  //  {
-  //    double[] value;
-  //    if (!m_ClassMapping.TryGetValue(cls, out value))
-  //      new MLException("Unknown class");
-
-  //    this.Add(obj, value);
-  //  }
-
-  //  public double[] MarkFor(Class cls)
-  //  {
-  //    return m_ClassMapping[cls];
-  //  }
-
-  //  public Class ClassFor(TObj obj)
-  //  {
-  //    if (obj==null)
-  //      throw new MLException("Object can not be null");
-
-  //    double[] mark;
-  //    if (!this.TryGetValue(obj, out mark))
-  //      throw new MLException("Unknown object");
-  //    if (!m_ClassMapping.ContainsValue(mark))
-  //      throw new MLException("Unknown value mark");
-
-  //    return m_ClassMapping.First(m => m.Value==mark).Key;
-  //  }
-
-  //  public Class ClassFor(double[] mark)
-  //  {
-  //    if (mark==null)
-  //      throw new MLException("Mark can not be null");
-  //    if (!m_ClassMapping.ContainsValue(mark))
-  //      throw new MLException("Unknown value mark");
-
-  //    return m_ClassMapping.First(m => m.Value==mark).Key;
-  //  }
-
-  //  /// <summary>
-  //  /// Retrieves subset of the sample
-  //  /// </summary>
-  //  public ClassifiedSample<TObj> Subset(int skip, int take)
-  //  {
-  //    return Utils.Subset<ClassifiedSample<TObj>, TObj, double[]>(this, skip, take, Classes);
-  //  }
-
-  //  /// <summary>
-  //  /// Enumerate sample batches
-  //  /// </summary>
-  //  public new IEnumerable<ClassifiedSample<TObj>> Batch(int size)
-  //  {
-  //    return Utils.Batch<ClassifiedSample<TObj>, TObj, double[]>(this, size, Classes);
-  //  }
-
-  //  /// <summary>
-  //  /// Apply mask to the sample
-  //  /// </summary>
-  //  public new ClassifiedSample<TObj> ApplyMask(SampleMaskDelegate<TObj, double[]> mask)
-  //  {
-  //    return Utils.ApplyMask<ClassifiedSample<TObj>, TObj, double[]>(this, mask, Classes);
-  //  }
-  //}
 
 }

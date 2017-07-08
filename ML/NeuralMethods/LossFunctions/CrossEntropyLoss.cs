@@ -1,6 +1,6 @@
 ﻿using System;
 using ML.Contracts;
-using ML.Core.Mathematics;
+using ML.Utils;
 
 namespace ML.DeepMethods.LossFunctions
 {
@@ -15,12 +15,12 @@ namespace ML.DeepMethods.LossFunctions
         res += expected[i] * Math.Log(actual[i]);
       }
 
-      return -res * MathUtils.ENTROPY_COEFF;
+      return -res * GeneralUtils.ENTROPY_COEFF;
     }
 
     public double Derivative(int idx, double[] actual, double[] expected)
     {
-      return -MathUtils.ENTROPY_COEFF * expected[idx] / actual[idx];
+      return -GeneralUtils.ENTROPY_COEFF * expected[idx] / actual[idx];
     }
   }
 }

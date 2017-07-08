@@ -9,16 +9,19 @@ namespace ML.BayesianMethods.Algorithms
   /// <summary>
   /// Bayesian non-parametric classification algorithm.
   /// Deals with a probability distributions on classes (not to be confused with Bayesian learning, where probability distributions are considered on algorithm parameters).
-  /// If class multiplicative penalties are absent, the algorithm is non-parametric Parzen window implementation of Maximum posterior probability (MAP) classification
+  /// If class multiplicative penalties are absent, the algorithm is non-parametric Parzen window implementation of maximum posterior probability (MAP) classification
   /// </summary>
-  public class BayesianAlgorithm : ClassificationAlgorithmBase<double[]>, IMetricAlgorithm<double[]>
+  public class ParzenBayesianAlgorithm : ClassificationAlgorithmBase<double[]>, IKernelAlgorithm<double[]>, IMetricAlgorithm<double[]>
   {
-    private readonly IMetric m_Metric;
+    private readonly IMetric<double[]> m_Metric;
     private readonly IKernel m_Kernel;
     private readonly Dictionary<Class, double> m_ClassLosses;
     private double m_H;
 
-    public BayesianAlgorithm(IMetric metric, IKernel kernel, double h, Dictionary<Class, double> classLosses=null)
+    public ParzenBayesianAlgorithm(IMetric<double[]> metric,
+                                   IKernel kernel,
+                                   double h = 1,
+                                   Dictionary<Class, double> classLosses=null)
     {
       if (metric == null)
         throw new MLException("BayesianAlgorithm.ctor(metric=null)");
@@ -32,12 +35,12 @@ namespace ML.BayesianMethods.Algorithms
 
     public override string ID { get { return "BAYES"; } }
 
-    public override string Name { get { return "Bayesian non-parametric algorithm"; } }
+    public override string Name { get { return "Bayesian non-parametric classification"; } }
 
     /// <summary>
     /// Space metric
     /// </summary>
-    public IMetric Metric { get { return m_Metric; } }
+    public IMetric<double[]> Metric { get { return m_Metric; } }
 
     /// <summary>
     /// Kernel function
@@ -72,6 +75,7 @@ namespace ML.BayesianMethods.Algorithms
     public override Class Predict(double[] obj)
     {
       var hist = new Dictionary<Class, double>();
+
       foreach (var pData in TrainingSample)
       {
         var r = Metric.Dist(obj, pData.Key) / m_H;
@@ -82,11 +86,14 @@ namespace ML.BayesianMethods.Algorithms
         else hist[cls] += k;
       }
 
-      foreach (var score in hist)
+      if (m_ClassLosses != null)
       {
-        double penalty;
-        if (m_ClassLosses != null && m_ClassLosses.TryGetValue(score.Key, out penalty))
-          hist[score.Key] = penalty*score.Value;
+        foreach (var score in hist)
+        {
+          double penalty;
+          if(m_ClassLosses.TryGetValue(score.Key, out penalty))
+            hist[score.Key] = penalty*score.Value;
+        }
       }
 
       Class result = null;
@@ -104,12 +111,12 @@ namespace ML.BayesianMethods.Algorithms
     }
 
     /// <summary>
-    /// Estimated closeness of given point to given classes
+    /// Estimates closeness of given point to given classes
     /// </summary>
     public double CalculateClassScore(double[] obj, Class cls)
     {
       var score = 0.0D;
-      foreach (var pData in TrainingSample.ApplyMask((o, c, i) => c==cls))
+      foreach (var pData in TrainingSample.Where(d => d.Value.Equals(cls)))
       {
         var r = Metric.Dist(pData.Key, obj) / m_H;
         score += Kernel.Value(r);
@@ -121,75 +128,6 @@ namespace ML.BayesianMethods.Algorithms
 
       return score;
     }
-
-    /// <summary>
-    /// Leave-one-out optimization
-    /// </summary>
-    public void OptimizeLOO(double hMin, double hMax, double step)
-    {
-      var hOpt = double.MaxValue;
-      var minErrCnt = int.MaxValue;
-
-      for (double h = hMin; h <= hMax; h += step)
-      {
-        var errCnt = 0;
-        H = h;
-
-        var initSample = TrainingSample;
-
-        for (int i=0; i<initSample.Count; i++)
-        {
-          var pData = initSample.ElementAt(i);
-          var looSample  = initSample.ApplyMask((p, c, idx) => idx != i);
-          TrainingSample = looSample;
-
-          var predClass = this.Predict(pData.Key);
-          var realClass = pData.Value;
-          if (predClass != realClass) errCnt++;
-
-          TrainingSample = initSample;
-        }
-
-        if (errCnt < minErrCnt)
-        {
-          minErrCnt = errCnt;
-          hOpt = h;
-        }
-      }
-
-      H = hOpt;
-    }
-
-    /// <summary>
-    /// Calculates margins
-    /// </summary>
-    public Dictionary<int, double> CalculateMargins()
-    {
-      var result = new Dictionary<int, double>();
-      int idx = -1;
-
-      foreach (var pData in TrainingSample)
-      {
-        idx++;
-        double maxi = double.MinValue;
-        double si = 0;
-
-        foreach (var cls in TrainingSample.Classes)
-        {
-          var proximity = CalculateClassScore(pData.Key, cls);
-          if (cls==pData.Value) si = proximity;
-          else
-          {
-            if (maxi < proximity) maxi = proximity;
-          }
-        }
-
-        result.Add(idx, si - maxi);
-      }
-
-      return result.OrderBy(r => r.Value).ToDictionary(r => r.Key, r => r.Value);
-    }
-
 
     protected override void DoTrain()
     {

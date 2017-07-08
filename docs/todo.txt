@@ -2,8 +2,10 @@
 - GLOBAL REFACTORING in Metric methods!!!
   - rewrite Predict() method in more efficient way: use one walk through TrainingSample
   - do not remove CalculateClassScore method (Gamma_Y(x) calculation), it may be useful as API
-  - rewrite CalculateMargins() method in more efficient way
-  - do we need Metric.Sort() then?
+  - do we need CalculateWeight(), Metric.Sort() then?
+  - rewrite CalculateMargins() methods in more efficient way
+  - [DONE] OptimizeLOO() for kernel algorithms with h parameter - stronlgy need to put in base class
+  - [DONE] KernelAlgorithmBase - why inherited from OrderedMetricAlgorithmBase?
 
 - serialization
 - refactor CNN layers to use Inputs and Outputs

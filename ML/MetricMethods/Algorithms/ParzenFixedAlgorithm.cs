@@ -9,15 +9,20 @@ namespace ML.MetricMethods.Algorithms
   /// <summary>
   /// Parzen Fixed Window Algorithm
   /// </summary>
-  public sealed class ParzenFixedAlgorithm : KernelAlgorithmBase
+  public sealed class ParzenFixedAlgorithm : OrderedMetricAlgorithmBase<double[]>, IKernelAlgorithm<double[]>
   {
+    private readonly IKernel m_Kernel;
     private double m_H;
 
-    public ParzenFixedAlgorithm(IMetric metric,
+    public ParzenFixedAlgorithm(IMetric<double[]> metric,
                                 IKernel kernel,
-                                double h)
-      : base(metric, kernel)
+                                double h = 1)
+      : base(metric)
     {
+      if (kernel == null)
+        throw new MLException("PotentialAlgorithm.ctor(kernel=null)");
+
+      m_Kernel = kernel;
       H = h;
     }
 
@@ -46,6 +51,9 @@ namespace ML.MetricMethods.Algorithms
       }
     }
 
+    public IKernel Kernel { get { return m_Kernel; } }
+
+
     /// <summary>
     /// Calculate 'weight' - a contribution of training point (i-th from ordered training sample)
     /// to closeness of test point to its class
@@ -57,44 +65,6 @@ namespace ML.MetricMethods.Algorithms
     {
       var r = orderedSample.ElementAt(i).Value / m_H;
       return Kernel.Value(r);
-    }
-
-    /// <summary>
-    /// Leave-one-out optimization
-    /// </summary>
-    public void OptimizeLOO(double hMin, double hMax, double step)
-    {
-      var hOpt = double.MaxValue;
-      var minErrCnt = int.MaxValue;
-
-      for (double h = hMin; h <= hMax; h += step)
-      {
-        var errCnt = 0;
-        H = h;
-
-        var initSample = TrainingSample;
-
-        for (int i=0; i<initSample.Count; i++)
-        {
-          var pData = initSample.ElementAt(i);
-          var looSample  = initSample.ApplyMask((p, c, idx) => idx != i);
-          TrainingSample = looSample;
-
-          var predClass = this.Predict(pData.Key);
-          var realClass = pData.Value;
-          if (predClass != realClass) errCnt++;
-
-          TrainingSample = initSample;
-        }
-
-        if (errCnt < minErrCnt)
-        {
-          minErrCnt = errCnt;
-          hOpt = h;
-        }
-      }
-
-      H = hOpt;
     }
   }
 }

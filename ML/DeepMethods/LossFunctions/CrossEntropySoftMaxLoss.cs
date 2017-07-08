@@ -1,7 +1,7 @@
 ﻿using System;
 using ML.Contracts;
-using ML.Core.Mathematics;
 using ML.Core;
+using ML.Utils;
 
 namespace ML.DeepMethods.LossFunctions
 {
@@ -20,7 +20,7 @@ namespace ML.DeepMethods.LossFunctions
         res += expected[i] * Math.Log(actual[i]);
       }
 
-      var result = (se*Math.Log(sa) - res) * MathUtils.ENTROPY_COEFF;
+      var result = (se*Math.Log(sa) - res) * GeneralUtils.ENTROPY_COEFF;
       if (double.IsNaN(result))
         throw new MLException(string.Format("Argument of entropy is out of range. Make sure that activation function's output is (0, 1). Values: se={0}, sa={1}", se, sa));
 
@@ -38,7 +38,7 @@ namespace ML.DeepMethods.LossFunctions
         se += expected[i];
       }
 
-      var result = (se/sa - expected[idx]/actual[idx]) * MathUtils.ENTROPY_COEFF;
+      var result = (se/sa - expected[idx]/actual[idx]) * GeneralUtils.ENTROPY_COEFF;
       if (double.IsNaN(result))
         throw new MLException(string.Format("Argument of entropy is out of range. Make sure that activation function's output is (0, 1). Values: idx={0}, actual={1}, expected={2}, se={3}, sa={4}", idx, actual[idx], expected[idx], se, sa));
 
