@@ -51,7 +51,7 @@ namespace ML.BayesianMethods.Algorithms
       foreach (var cls in classes)
         pHist[cls] = CalculateClassScore(obj, cls);
 
-      Class result = null;
+      var result = Class.Unknown;
       var max = double.MinValue;
       foreach (var score in pHist)
       {

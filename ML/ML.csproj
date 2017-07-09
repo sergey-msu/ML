@@ -67,6 +67,7 @@
     <Compile Include="BayesianMethods\Algorithms\QuadraticDiscriminantAlgorithm.cs" />
     <Compile Include="BayesianMethods\Algorithms\ProductBayesianAlgorithm.cs" />
     <Compile Include="BayesianMethods\Algorithms\ParzenBayesianAlgorithm.cs" />
+    <Compile Include="Contracts\IDistribution.cs" />
     <Compile Include="Contracts\IInformativityIndex.cs" />
     <Compile Include="Contracts\ILearningRateScheduler.cs" />
     <Compile Include="Contracts\IOptimizer.cs" />
@@ -83,6 +84,9 @@
     <Compile Include="Core\ActivationFunctions\TanhActivation.cs" />
     <Compile Include="Core\AlgorithmBase.cs" />
     <Compile Include="Core\ComputingNetworks\_ComputingNode.cs" />
+    <Compile Include="Core\Distributions\ClassFeatureKey.cs" />
+    <Compile Include="Core\Distributions\DistributionBase.cs" />
+    <Compile Include="Core\Distributions\NormalDistribution.cs" />
     <Compile Include="Core\Mathematics\MatrixOps.cs" />
     <Compile Include="Core\Samples.cs" />
     <Compile Include="Contracts\INamed.cs" />

@@ -107,7 +107,7 @@ namespace ML.Core
 
     protected override double CalculateProximity(Class mark1, Class mark2, double threshold)
     {
-      return (mark1 == mark2) ? 0 : 1;
+      return (mark1.Equals(mark2)) ? 0 : 1;
     }
   }
 

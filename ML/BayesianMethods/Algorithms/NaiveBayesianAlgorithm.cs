@@ -13,53 +13,18 @@ namespace ML.BayesianMethods.Algorithms
   /// in a special case of independent (as random variables) features.
   /// If class multiplicative penalties are absent, the algorithm is non-parametric Parzen window implementation of Maximum posterior probability (MAP) classification
   /// </summary>
-  public class NaiveBayesianAlgorithm : ClassificationAlgorithmBase<double[]>, IKernelAlgorithm<double[]>
+  public class NaiveBayesianAlgorithm : BayesianNonparametricAlgorithmBase
   {
-    private readonly IKernel m_Kernel;
-    private readonly Dictionary<Class, double> m_ClassLosses;
-    private double m_H;
-
     public NaiveBayesianAlgorithm(IKernel kernel,
                                   double h = 1,
                                   Dictionary<Class, double> classLosses=null)
+      : base(kernel, h, classLosses)
     {
-      if (kernel == null)
-        throw new MLException("BayesianAlgorithm.ctor(kernel=null)");
-
-      m_Kernel = kernel;
-      m_ClassLosses = classLosses;
-      H = h;
     }
 
     public override string ID { get { return "NBAYES"; } }
 
     public override string Name { get { return "Naive Bayesian non-parametric classification"; } }
-
-    /// <summary>
-    /// Kernel function
-    /// </summary>
-    public IKernel Kernel { get { return m_Kernel; } }
-
-    /// <summary>
-    /// Additional multiplicative penalty to wrong object classification.
-    /// If null, all class penalties dafault to 1 (no special effect on classification - pure MAP classification)
-    /// </summary>
-    public Dictionary<Class, double> ClassLosses { get { return m_ClassLosses; } }
-
-    /// <summary>
-    /// Window width
-    /// </summary>
-    public double H
-    {
-     get { return m_H; }
-     set
-     {
-       if (value <= double.Epsilon)
-         throw new MLException("BayesianAlgorithm.H(value<=0)");
-
-       m_H = value;
-     }
-    }
 
 
     /// <summary>
@@ -89,25 +54,25 @@ namespace ML.BayesianMethods.Algorithms
 
           if (i==0) lHist[cls] += 1;
 
-          var r = (obj[i] - data[i])/m_H;
+          var r = (obj[i] - data[i])/H;
           pHist[cls] += Kernel.Value(r);
         }
 
         foreach (var cls in classes)
         {
-          yHist[cls] += Math.Log(pHist[cls] / (m_H * lHist[cls]));
+          yHist[cls] += Math.Log(pHist[cls] / (H * lHist[cls]));
           pHist[cls] = 0.0D;
         }
       }
 
       foreach (var cls in classes)
       {
-        var ly = (m_ClassLosses == null) ? 1.0D : m_ClassLosses[cls];
+        var ly = (ClassLosses == null) ? 1.0D : ClassLosses[cls];
         yHist[cls] += Math.Log(lHist[cls]*ly / TrainingSample.Count);
       }
 
       var max = double.MinValue;
-      Class result = null;
+      var result = Class.Unknown;
       foreach (var cls in classes)
       {
         var prob = yHist[cls];
@@ -124,7 +89,7 @@ namespace ML.BayesianMethods.Algorithms
     /// <summary>
     /// Estimated closeness of given point to given classes
     /// </summary>
-    public double CalculateClassScore(double[] obj, Class cls)
+    public override double CalculateClassScore(double[] obj, Class cls)
     {
       var dim = TrainingSample.GetDimension();
       var my = 0;
@@ -139,24 +104,19 @@ namespace ML.BayesianMethods.Algorithms
 
           if (i==0) my += 1;
 
-          var r = (obj[i] - pData.Key[i])/m_H;
+          var r = (obj[i] - pData.Key[i])/H;
           p += Kernel.Value(r);
         }
 
-        y += Math.Log(p / (m_H * my));
+        y += Math.Log(p / (H * my));
         p = 0.0D;
       }
 
       double penalty;
-      if (m_ClassLosses != null && m_ClassLosses.TryGetValue(cls, out penalty))
+      if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
         y += Math.Log(my*penalty / TrainingSample.Count);
 
       return y;
-    }
-
-    protected override void DoTrain()
-    {
-      // Nonparametric Bayesian methods are not trainable by default
     }
   }
 }

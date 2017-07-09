@@ -75,6 +75,7 @@
     <Compile Include="UnitTests\CNN\Mocks.cs" />
     <Compile Include="UnitTests\CNN\OptimizerTests.cs" />
     <Compile Include="UnitTests\Core\ComputingNodeTests.cs" />
+    <Compile Include="UnitTests\Core\DistributionTests.cs" />
     <Compile Include="UnitTests\Core\MathOpsTests.cs" />
     <Compile Include="UnitTests\Core\InformativityIndexTests.cs" />
     <Compile Include="UnitTests\Core\KernelTests.cs" />

@@ -90,7 +90,7 @@ namespace ML.MetricMethods.Algorithms
       }
 
       var max = double.MinValue;
-      Class result = null;
+      var result = Class.Unknown;
       foreach (var h in hist)
       {
         if (h.Value>max)

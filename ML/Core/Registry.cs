@@ -5,6 +5,7 @@ using ML.Core.Logical;
 using ML.Core.ActivationFunctions;
 using ML.Contracts;
 using ML.Utils;
+using ML.Core.Distributions;
 
 namespace ML.Core.Registry
 {
@@ -104,6 +105,14 @@ namespace ML.Core.Registry
     public static LeakyReLUActivation LeakyReLU(double leak = LeakyReLUActivation.DFT_LEAK)
     {
       return GeneralUtils.GetThroughMap(leak, m_LeakyReLUs);
+    }
+  }
+
+  public static class Distribution
+  {
+    public static NormalDistribution Normal(double theta, double sigma)
+    {
+      return new NormalDistribution(theta, sigma);
     }
   }
 }

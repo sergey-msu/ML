@@ -67,8 +67,8 @@ namespace ML.LogicalMethods.Models
 
     public LeafNode(Class cls)
     {
-      if (cls == null)
-        throw new MLException("DecisionTree+InnerNode.ctor(cls=null)");
+      if (cls.IsUnknown)
+        throw new MLException("DecisionTree+InnerNode.ctor(cls.IsUnknown)");
 
       m_Class = cls;
     }

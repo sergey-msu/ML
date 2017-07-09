@@ -12,24 +12,22 @@ namespace ML.BayesianMethods.Algorithms
   /// in a special case of independent (as random variables) features.
   /// If class multiplicative penalties are absent, the algorithm is non-parametric Parzen window implementation of Maximum posterior probability (MAP) classification
   /// </summary>
-  public abstract class BayesianAlgorithmBase : ClassificationAlgorithmBase<double[]>, IKernelAlgorithm<double[]>
+  public abstract class BayesianNonparametricAlgorithmBase : ClassificationAlgorithmBase<double[]>, IKernelAlgorithm<double[]>
   {
     private readonly IKernel m_Kernel;
     private readonly Dictionary<Class, double> m_ClassLosses;
     private double m_H;
 
-    public BayesianAlgorithmBase(IKernel kernel, double h, Dictionary<Class, double> classLosses=null)
+    public BayesianNonparametricAlgorithmBase(IKernel kernel, double h, Dictionary<Class, double> classLosses=null)
     {
       if (kernel == null)
         throw new MLException("BayesianAlgorithm.ctor(kernel=null)");
 
       m_Kernel = kernel;
       m_ClassLosses = classLosses;
+      H = h;
     }
 
-    public override string ID { get { return "NBAYES"; } }
-
-    public override string Name { get { return "Naive Bayesian non-parametric classification"; } }
 
     /// <summary>
     /// Kernel function
@@ -51,35 +49,18 @@ namespace ML.BayesianMethods.Algorithms
      set
      {
        if (value <= double.Epsilon)
-         throw new MLException("BayesianAlgorithm.H(value<=0)");
+         throw new MLException("BayesianParzenAlgorithmBase.H(value<=0)");
 
        m_H = value;
      }
     }
 
-
-    /// <summary>
-    /// Classify point
-    /// </summary>
-    public override Class Predict(double[] obj)
-    {
-      return null;
-    }
-
-    /// <summary>
-    /// Estimated closeness of given point to given classes
-    /// </summary>
-    public double CalculateClassScore(double[] obj, Class cls)
-    {
-      var score = 0.0D;
-
-      return score;
-    }
-
+    public abstract double CalculateClassScore(double[] obj, Class cls);
 
     protected override void DoTrain()
     {
       // Nonparametric Bayesian methods are not trainable by default
     }
+
   }
 }

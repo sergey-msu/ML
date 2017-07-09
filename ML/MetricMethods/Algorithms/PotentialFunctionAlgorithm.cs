@@ -76,7 +76,7 @@ namespace ML.MetricMethods.Algorithms
       foreach (var pData in TrainingSample)
       {
         idx++;
-        if (pData.Value != cls) continue;
+        if (!pData.Value.Equals(cls)) continue;
 
         var h = (m_Eqps==null) ? m_H : m_Eqps[idx].H;
         var g = (m_Eqps==null) ? 1 : m_Eqps[idx].Gamma;

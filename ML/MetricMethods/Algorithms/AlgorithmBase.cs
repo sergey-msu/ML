@@ -37,7 +37,7 @@ namespace ML.MetricMethods.Algorithms
     /// </summary>
     public override Class Predict(TObj obj)
     {
-      Class result = null;
+      var result = Class.Unknown;
       var maxEst = double.MinValue;
 
       foreach (var cls in TrainingSample.Classes)

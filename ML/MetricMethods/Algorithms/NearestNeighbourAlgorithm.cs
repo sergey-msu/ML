@@ -32,7 +32,7 @@ namespace ML.MetricMethods.Algorithms
     public override Class Predict(double[] obj)
     {
       var minDist = double.MaxValue;
-      Class result = null;
+      var result = Class.Unknown;
 
       foreach (var pData in TrainingSample)
       {

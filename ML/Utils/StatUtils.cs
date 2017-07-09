@@ -25,7 +25,7 @@ namespace ML.Utils
         foreach (var cls in alg.TrainingSample.Classes)
         {
           var proximity = alg.CalculateClassScore(pData.Key, cls);
-          if (cls==pData.Value) si = proximity;
+          if (cls.Equals(pData.Value)) si = proximity;
           else
           {
             if (maxi < proximity) maxi = proximity;
@@ -65,7 +65,7 @@ namespace ML.Utils
 
             var predClass = alg.Predict(pData.Key);
             var realClass = pData.Value;
-            if (predClass != realClass) errCnt++;
+            if (!predClass.Equals(realClass)) errCnt++;
           }
           finally
           {
@@ -111,7 +111,7 @@ namespace ML.Utils
 
             var predClass = alg.Predict(pData.Key);
             var realClass = pData.Value;
-            if (predClass != realClass) errCnt++;
+            if (!predClass.Equals(realClass)) errCnt++;
           }
           finally
           {

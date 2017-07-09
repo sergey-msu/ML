@@ -6,15 +6,23 @@ namespace ML.Core
   /// <summary>
   /// Represents a classification class
   /// </summary>
-  public class Class : INamed
+  public struct Class : INamed
   {
     /// <summary>
     /// Default class singleton
     /// </summary>
-    public static readonly Class Unknown = new Class("[NONE]", -1);
+    public static readonly Class Unknown = new Class(-1);
 
     private readonly string m_Name;
-    private readonly double  m_Value;
+    private readonly double m_Value;
+    private readonly bool m_IsUnknown;
+
+    private Class(int value)
+    {
+      m_Name = "[NONE]";
+      m_Value = value;
+      m_IsUnknown = true;
+    }
 
     public Class(string name, double? value = null)
     {
@@ -23,6 +31,7 @@ namespace ML.Core
 
       m_Name = name;
       m_Value = value ?? 0.0F;
+      m_IsUnknown = false;
     }
 
     /// <summary>
@@ -35,18 +44,23 @@ namespace ML.Core
     /// </summary>
     public double Value { get { return m_Value; } }
 
+    /// <summary>
+    /// Determines whether the class is unknown class
+    /// </summary>
+    public bool IsUnknown { get { return m_IsUnknown; } }
+
     #region Overrides
 
     public override bool Equals(object obj)
     {
       if (obj==null) return false;
+      if (!(obj is Class)) return false;
+      if (m_IsUnknown) return false;
 
-      var other = obj as Class;
-      if (other==null) return false;
-
-      if (!m_Name.Equals(other.m_Name)) return false;
-
-      return m_Value == other.m_Value;
+      var other = (Class)obj;
+      return (!other.m_IsUnknown &&
+              m_Name.Equals(other.m_Name) &&
+              m_Value == other.m_Value);
     }
 
     public override int GetHashCode()

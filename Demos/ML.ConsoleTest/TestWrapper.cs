@@ -66,8 +66,8 @@ namespace ML.ConsoleTest
         //doNearestKNeighboursAlgorithmTest();
         //doParzenBayesianAlgorithmTest();
         //doNaiveBayesianAlgorithmTest();
-        //doProductBayesianAlgorithmTest();
-        doQuadraticDiscriminantAlgorithmTest();
+        doProductBayesianAlgorithmTest();
+        //doQuadraticDiscriminantAlgorithmTest();
         //doParzenFixedAlgorithmTest();
         //doPotentialFixedAlgorithmTest();
         //doDecisionTreeAlgorithmTest();
