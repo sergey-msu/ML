@@ -9,7 +9,7 @@ namespace ML.Core
   public struct Class : INamed
   {
     /// <summary>
-    /// Default class singleton
+    /// Unknown (unclassified) class singleton
     /// </summary>
     public static readonly Class Unknown = new Class(-1);
 

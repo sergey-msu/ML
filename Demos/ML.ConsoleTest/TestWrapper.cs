@@ -14,6 +14,7 @@ using ML.DeepMethods.Models;
 using ML.DeepMethods.Registry;
 using ML.Utils;
 using ML.BayesianMethods.Algorithms;
+using ML.Core.Distributions;
 
 namespace ML.ConsoleTest
 {
@@ -62,15 +63,19 @@ namespace ML.ConsoleTest
 
         //testSerDeser();
 
+        //doBayesianParzenAlgorithmTest();
+        //doNaiveBayesianKernelAlgorithmTest();
+        //doBayesianKernelAlgorithmTest();
+        //doQuadraticDiscriminantAlgorithmTest();
+        doNaiveBayesianGeneralAlgorithmTest();
+
         //doNearestNeighbourAlgorithmTest();
         //doNearestKNeighboursAlgorithmTest();
-        //doParzenBayesianAlgorithmTest();
-        //doNaiveBayesianAlgorithmTest();
-        doProductBayesianAlgorithmTest();
-        //doQuadraticDiscriminantAlgorithmTest();
         //doParzenFixedAlgorithmTest();
         //doPotentialFixedAlgorithmTest();
+
         //doDecisionTreeAlgorithmTest();
+
         //doMultilayerNNAlgorithmTest();
         //doCNNAlgorithmTest();
 
@@ -147,7 +152,7 @@ namespace ML.ConsoleTest
       for (int k = 2; k < Math.Min(alg.TrainingSample.Count, 50); k++)
       {
         alg.K = k;
-        var errors = alg.GetErrors(Data.Data, 0, false);
+        var errors = alg.GetErrors(Data.Data, 0, true);
         var ec = errors.Count();
         var dc = Data.Data.Count;
         var pct = Math.Round(100.0F * ec / dc, 2);
@@ -158,11 +163,12 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private void doParzenBayesianAlgorithmTest()
+
+    private void doBayesianParzenAlgorithmTest()
     {
       var metric = new EuclideanMetric();
       var kernel = new GaussianKernel();
-      var alg = new ParzenBayesianAlgorithm(metric, kernel, 1.0F);
+      var alg = new BayesianParzenAlgorithm(metric, kernel, 1.0F);
       alg.Train(Data.TrainingSample);
 
       // LOO
@@ -205,10 +211,10 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private void doNaiveBayesianAlgorithmTest()
+    private void doNaiveBayesianKernelAlgorithmTest()
     {
       var kernel = new GaussianKernel();
-      var alg = new NaiveBayesianAlgorithm(kernel);
+      var alg = new NaiveBayesianKernelAlgorithm(kernel);
       alg.Train(Data.TrainingSample);
 
       // LOO
@@ -251,10 +257,29 @@ namespace ML.ConsoleTest
       Visualizer.Run(alg);
     }
 
-    private void doProductBayesianAlgorithmTest()
+    private void doNaiveBayesianGeneralAlgorithmTest()
+    {
+      var distr = new NormalDistribution();
+      var alg = new NaiveBayesianGeneralAlgorithm<NormalDistribution, NormalDistribution.Parameters>(distr);
+      alg.Train(Data.TrainingSample);
+
+      //Errors
+      Console.WriteLine("Errors:");
+
+      var errors = alg.GetErrors(Data.Data, 0, false);
+      var ec = errors.Count();
+      var dc = Data.Data.Count;
+      var pct = Math.Round(100.0F * ec / dc, 2);
+      var mes = string.Format("\t{0} of {1}\t({2}%)", ec, dc, pct);
+      Console.WriteLine(mes);
+
+      Visualizer.Run(alg);
+    }
+
+    private void doBayesianKernelAlgorithmTest()
     {
       var kernel = new GaussianKernel();
-      var alg = new ProductBayesianAlgorithm(kernel);
+      var alg = new BayesianKernelAlgorithm(kernel);
       alg.Train(Data.TrainingSample);
 
       // LOO
@@ -312,6 +337,7 @@ namespace ML.ConsoleTest
 
       Visualizer.Run(alg);
     }
+
 
     private void doParzenFixedAlgorithmTest()
     {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ML.Core;
 using ML.Contracts;
 using ML.Utils;
@@ -11,14 +10,13 @@ namespace ML.BayesianMethods.Algorithms
   /// <summary>
   /// Performs quadratic discriminant analysis.
   /// </summary>
-  public class QuadraticDiscriminantAlgorithm : ClassificationAlgorithmBase<double[]>
+  public class QuadraticDiscriminantAlgorithm : BayesianAlgorithmBase
   {
     private readonly Dictionary<Class, double> m_ClassLosses;
 
     private Dictionary<Class, double[]>  m_Mus;
     private Dictionary<Class, double[,]> m_ISs;
     private Dictionary<Class, double>    m_Dets;
-    private Dictionary<Class, int>       m_LHist;
 
 
     public QuadraticDiscriminantAlgorithm(Dictionary<Class, double> classLosses=null)
@@ -28,14 +26,7 @@ namespace ML.BayesianMethods.Algorithms
 
 
     public override string ID { get { return "QDISC"; } }
-
     public override string Name { get { return "Quadratic discriminant classification"; } }
-
-    /// <summary>
-    /// Additional multiplicative penalty to wrong object classification.
-    /// If null, all class penalties dafault to 1 (no special effect on classification - pure MAP classification)
-    /// </summary>
-    public Dictionary<Class, double> ClassLosses { get { return m_ClassLosses; } }
 
 
     /// <summary>
@@ -43,22 +34,17 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override Class Predict(double[] obj)
     {
-      var dim = TrainingSample.GetDimension();
       var classes = TrainingSample.CachedClasses;
-
-      var pHist = new Dictionary<Class, double>();
-
-      foreach (var cls in classes)
-        pHist[cls] = CalculateClassScore(obj, cls);
-
       var result = Class.Unknown;
       var max = double.MinValue;
-      foreach (var score in pHist)
+
+      foreach (var cls in classes)
       {
-        if (score.Value > max)
+        var p = CalculateClassScore(obj, cls);
+        if (p > max)
         {
-          max = score.Value;
-          result = score.Key;
+          max = p;
+          result = cls;
         }
       }
 
@@ -68,13 +54,13 @@ namespace ML.BayesianMethods.Algorithms
     /// <summary>
     /// Estimates closeness of given point to given classes
     /// </summary>
-    public double CalculateClassScore(double[] obj, Class cls)
+    public override double CalculateClassScore(double[] obj, Class cls)
     {
-      var dim = TrainingSample.GetDimension();
-      var my   = m_LHist[cls];
-      var mu   = m_Mus[cls];
-      var IS   = m_ISs[cls];
-      var det  = m_Dets[cls];
+      var dim = DataDim;
+      var my  = ClassHist[cls];
+      var mu  = m_Mus[cls];
+      var IS  = m_ISs[cls];
+      var det = m_Dets[cls];
 
       var p = 0.0D;
       for (int i=0; i<dim; i++)
@@ -87,7 +73,7 @@ namespace ML.BayesianMethods.Algorithms
       double penalty;
       if (m_ClassLosses == null || m_ClassLosses.TryGetValue(cls, out penalty))
         penalty = 1.0D;
-      p += Math.Log(penalty*my / TrainingSample.Count);
+      p += Math.Log(penalty*my / DataCount);
 
       return p;
     }
@@ -97,28 +83,26 @@ namespace ML.BayesianMethods.Algorithms
       m_Dets  = new Dictionary<Class, double>();
       m_ISs   = new Dictionary<Class, double[,]>();
       m_Mus   = new Dictionary<Class, double[]>();
-      m_LHist = new Dictionary<Class, int>();
     }
 
 
-    protected override void DoTrain()
+    protected override void TrainImpl()
     {
       // prepare
 
       Reset();
 
-      var dim = TrainingSample.GetDimension();
+      var dim = DataDim;
       var classes = TrainingSample.CachedClasses;
 
       var Ss = new Dictionary<Class, double[,]>();
 
       foreach (var cls in classes)
       {
-        m_Dets[cls]  = 0.0D;
-        m_ISs[cls]   = new double[dim, dim];
-        m_Mus[cls]   = new double[dim];
-        m_LHist[cls] = 0;
-        Ss[cls]      = new double[dim, dim];
+        m_Dets[cls] = 0.0D;
+        m_ISs[cls]  = new double[dim, dim];
+        m_Mus[cls]  = new double[dim];
+        Ss[cls]     = new double[dim, dim];
       }
 
       // calculate class expectation vectors
@@ -129,7 +113,7 @@ namespace ML.BayesianMethods.Algorithms
         var cls  = pData.Value;
         var mu = m_Mus[cls];
 
-        m_LHist[cls] += 1;
+        ClassHist[cls] += 1;
 
         for (int i=0; i<dim; i++)
           mu[i] += data[i];
@@ -137,7 +121,7 @@ namespace ML.BayesianMethods.Algorithms
 
       foreach (var cls in classes)
       {
-        var my = m_LHist[cls];
+        var my = ClassHist[cls];
         var mu = m_Mus[cls];
         for (int i=0; i<dim; i++)
           mu[i] /= my;
@@ -149,7 +133,7 @@ namespace ML.BayesianMethods.Algorithms
       {
         var data = pData.Key;
         var cls  = pData.Value;
-        var my   = m_LHist[cls];
+        var my   = ClassHist[cls];
         var mu   = m_Mus[cls];
         var S    = Ss[cls];
 

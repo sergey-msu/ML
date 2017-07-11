@@ -7,29 +7,35 @@ using ML.Contracts;
 namespace ML.BayesianMethods.Algorithms
 {
   /// <summary>
-  /// Bayesian non-parametric classification algorithm.
+  /// Bayesian non-parametric classification algorithm with general multidimensional kernel.
+  ///
+  /// a(x) = argmax[ ly*P(y)*p(x|y) ]
+  /// where p(x|y) = 1/(m*V)*SUMM( K(r(x-xi)/h)/h,, i=1..cnt),
+  /// r  - metric function
+  /// ly - penalty for error on object of class y
+  /// V  - norm constant, supposed to be independent on class, so it can be omitted in argmax
+  ///
   /// Deals with a probability distributions on classes (not to be confused with Bayesian learning, where probability distributions are considered on algorithm parameters).
   /// If class multiplicative penalties are absent, the algorithm is non-parametric Parzen window implementation of maximum posterior probability (MAP) classification
   /// </summary>
-  public class ParzenBayesianAlgorithm : BayesianNonparametricAlgorithmBase, IMetricAlgorithm<double[]>
+  public class BayesianParzenAlgorithm : BayesianKernelAlgorithmBase, IMetricAlgorithm<double[]>
   {
     private readonly IMetric<double[]> m_Metric;
 
-    public ParzenBayesianAlgorithm(IMetric<double[]> metric,
+    public BayesianParzenAlgorithm(IMetric<double[]> metric,
                                    IKernel kernel,
                                    double h = 1,
                                    Dictionary<Class, double> classLosses=null)
       : base(kernel, h, classLosses)
     {
       if (metric == null)
-        throw new MLException("BayesianAlgorithm.ctor(metric=null)");
+        throw new MLException("BayesianParzenAlgorithm.ctor(metric=null)");
 
       m_Metric = metric;
     }
 
     public override string ID { get { return "BAYES"; } }
-
-    public override string Name { get { return "Bayesian non-parametric classification"; } }
+    public override string Name { get { return "Bayesian Parzen non-parametric classification with general multidimensional kernel"; } }
 
     /// <summary>
     /// Space metric
@@ -42,7 +48,8 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override Class Predict(double[] obj)
     {
-      var hist = new Dictionary<Class, double>();
+      var classes = TrainingSample.CachedClasses;
+      var pHist = new Dictionary<Class, double>();
 
       foreach (var pData in TrainingSample)
       {
@@ -50,28 +57,23 @@ namespace ML.BayesianMethods.Algorithms
         var k = Kernel.Value(r);
         var cls = pData.Value;
 
-        if (!hist.ContainsKey(cls)) hist[cls] = k;
-        else hist[cls] += k;
-      }
-
-      if (ClassLosses != null)
-      {
-        foreach (var score in hist)
-        {
-          double penalty;
-          if(ClassLosses.TryGetValue(score.Key, out penalty))
-            hist[score.Key] = penalty*score.Value;
-        }
+        if (!pHist.ContainsKey(cls)) pHist[cls] = k;
+        else pHist[cls] += k;
       }
 
       var result = Class.Unknown;
       var max = double.MinValue;
-      foreach (var score in hist)
+      foreach (var cls in classes)
       {
-        if (score.Value > max)
+        var p = pHist[cls];
+        double penalty;
+        if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
+          p = penalty*p;
+
+        if (p > max)
         {
-          max = score.Value;
-          result = score.Key;
+          max = p;
+          result = cls;
         }
       }
 

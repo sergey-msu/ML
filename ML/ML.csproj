@@ -63,10 +63,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BayesianMethods\Algorithms\AlgorithmBase.cs" />
-    <Compile Include="BayesianMethods\Algorithms\NaiveBayesianAlgorithm.cs" />
+    <Compile Include="BayesianMethods\Algorithms\NaiveBayesianGeneralAlgorithm.cs" />
+    <Compile Include="BayesianMethods\Algorithms\NaiveBayesianKernelAlgorithm.cs" />
     <Compile Include="BayesianMethods\Algorithms\QuadraticDiscriminantAlgorithm.cs" />
-    <Compile Include="BayesianMethods\Algorithms\ProductBayesianAlgorithm.cs" />
-    <Compile Include="BayesianMethods\Algorithms\ParzenBayesianAlgorithm.cs" />
+    <Compile Include="BayesianMethods\Algorithms\BayesianKernelAlgorithm.cs" />
+    <Compile Include="BayesianMethods\Algorithms\BayesianParzenAlgorithm.cs" />
     <Compile Include="Contracts\IDistribution.cs" />
     <Compile Include="Contracts\IInformativityIndex.cs" />
     <Compile Include="Contracts\ILearningRateScheduler.cs" />

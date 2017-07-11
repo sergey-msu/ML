@@ -4,6 +4,7 @@
   - do not remove CalculateClassScore method (Gamma_Y(x) calculation), it may be useful as API
   - do we need CalculateWeight(), Metric.Sort() then?
   - rewrite CalculateMargins() methods in more efficient way
+  - cover Bayesian methods with unit tests
   - [DONE] OptimizeLOO() for kernel algorithms with h parameter - stronlgy need to put in base class
   - [DONE] KernelAlgorithmBase - why inherited from OrderedMetricAlgorithmBase?
 

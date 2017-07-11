@@ -3,33 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Contracts;
-using ML.Utils;
 
 namespace ML.BayesianMethods.Algorithms
 {
   /// <summary>
-  /// Bayesian non-parametric classification algorithm.
+  /// Bayesian non-parametric classification algorithm with  product-like multidimensional kernel.
+  ///
+  /// a(x) = argmax[ ly*P(y)*p(x|y) ]
+  /// where p(x|y) = 1/m*SUMM( PROD( K((xj-xji)/h)/h, j=1..n), i=1..m),
+  /// xj  - j-th feature of x
+  /// xji - j-th feature of i-th training object x_i
+  /// ly  - penalty for error on object of class y
+  /// m   - number of training objects
+  /// n   - feature space dimension
+  ///
   /// Deals with a probability distributions on classes (not to be confused with Bayesian learning, where probability distributions are considered on algorithm parameters).
   /// If class multiplicative penalties are absent, the algorithm is non-parametric Parzen window implementation of maximum posterior probability (MAP) classification.
   /// Key idea is to model multidimensional distributions as products of Parzen approximation of all features
   /// </summary>
-  public class ProductBayesianAlgorithm : BayesianNonparametricAlgorithmBase
+  public class BayesianKernelAlgorithm : BayesianKernelAlgorithmBase
   {
     private readonly double[] m_Hs;
 
-    public ProductBayesianAlgorithm(IKernel kernel,
-                                    double h = 1,
-                                    Dictionary<Class, double> classLosses=null,
-                                    double[] hs = null)
+    public BayesianKernelAlgorithm(IKernel kernel,
+                                   double h = 1,
+                                   Dictionary<Class, double> classLosses=null,
+                                   double[] hs = null)
       : base(kernel, h, classLosses)
     {
       m_Hs = hs;
     }
 
 
-    public override string ID { get { return "BAYES"; } }
-
-    public override string Name { get { return "Bayesian non-parametric classification"; } }
+    public override string ID { get { return "PKBAYES"; } }
+    public override string Name { get { return "Bayesian non-parametric classification with product-like multidimensional kernel"; } }
 
     /// <summary>
     /// Window widths
@@ -42,8 +49,9 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override Class Predict(double[] obj)
     {
+      var dim = DataDim;
+      var classes = TrainingSample.CachedClasses;
       var pHist = new Dictionary<Class, double>();
-      var dim = TrainingSample.GetDimension();
 
       foreach (var pData in TrainingSample)
       {
@@ -62,24 +70,19 @@ namespace ML.BayesianMethods.Algorithms
         else pHist[cls] += p;
       }
 
-      if (ClassLosses != null)
-      {
-        foreach (var score in pHist)
-        {
-          double penalty;
-          if(ClassLosses.TryGetValue(score.Key, out penalty))
-            pHist[score.Key] = penalty*score.Value;
-        }
-      }
-
       var result = Class.Unknown;
       var max = double.MinValue;
-      foreach (var score in pHist)
+      foreach (var cls in classes)
       {
-        if (score.Value > max)
+        var p = pHist[cls];
+        double penalty;
+        if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
+          p = penalty*p;
+
+        if (p > max)
         {
-          max = score.Value;
-          result = score.Key;
+          max = p;
+          result = cls;
         }
       }
 
@@ -91,8 +94,8 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override double CalculateClassScore(double[] obj, Class cls)
     {
-      var dim = TrainingSample.GetDimension();
       var score = 0.0D;
+      var dim = DataDim;
 
       foreach (var pData in TrainingSample.Where(d => d.Value.Equals(cls)))
       {
@@ -111,7 +114,7 @@ namespace ML.BayesianMethods.Algorithms
 
       double penalty;
       if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
-        score *= (penalty / TrainingSample.Count);
+        score *= (penalty / DataCount);
 
       return score;
     }

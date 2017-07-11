@@ -16,7 +16,7 @@ namespace ML.Tests.UnitTests.Bayesian
     {
       // arrange
       var kernel = new TriangularKernel();
-      var alg = new NaiveBayesianAlgorithm(kernel, 0.3D);
+      var alg = new NaiveBayesianKernelAlgorithm(kernel, 0.3D);
       var sample = new ClassifiedSample<double[]>
       {
         { new[] { 0.2, 0.2 }, new Class("A", 1) },
@@ -43,7 +43,7 @@ namespace ML.Tests.UnitTests.Bayesian
     {
       // arrange
       var kernel = new TriangularKernel();
-      var alg = new NaiveBayesianAlgorithm(kernel, 2.0D);
+      var alg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
       var sample = new ClassifiedSample<double[]>
       {
         { new[] { 2.0, 1.0 }, new Class("A", 1) },

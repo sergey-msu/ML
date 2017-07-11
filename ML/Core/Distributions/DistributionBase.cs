@@ -7,12 +7,17 @@ namespace ML.Core.Distributions
   /// <summary>
   /// Base class for probability distribution (discrete or continuous)
   /// </summary>
-  public abstract class DistributionBase : IDistribution
+  public abstract class DistributionBase<TParam> : IDistribution<TParam>
+    where TParam : IDistributionParameters
   {
     protected DistributionBase()
     {
     }
 
+    /// <summary>
+    /// Parameters of distribution
+    /// </summary>
+    public TParam Params { get; set; }
 
     /// <summary>
     /// Returns value of probalility (in the case of discrete distribution)
@@ -29,6 +34,6 @@ namespace ML.Core.Distributions
     /// Fills distrubution parameters with Maximum Likelihood estimation from a given classified sample.
     /// Ranges result with respect to classes and feature indices
     /// </summary>
-    public abstract Dictionary<ClassFeatureKey, IDistribution> MaximumLikelihood(ClassifiedSample<double[]> sample);
+    public abstract Dictionary<ClassFeatureKey, TParam> MaximumLikelihood(ClassifiedSample<double[]> sample);
   }
 }
