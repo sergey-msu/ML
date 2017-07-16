@@ -110,9 +110,20 @@ namespace ML.Core.Registry
 
   public static class Distribution
   {
-    public static NormalDistribution Normal(double theta, double sigma)
+    public static NormalDistribution Normal(double mu, double sigma)
     {
-      return new NormalDistribution(theta, sigma);
+      var result = new NormalDistribution();
+      result.Params = new NormalDistribution.Parameters(mu, sigma);
+
+      return result;
+    }
+
+    public static BernoulliDistribution Bernoulli(double p)
+    {
+      var result = new BernoulliDistribution();
+      result.Params = new BernoulliDistribution.Parameters(p);
+
+      return result;
     }
   }
 }

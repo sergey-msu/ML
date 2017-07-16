@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ML.Core;
 using ML.Contracts;
 using ML.Utils;
@@ -12,12 +13,15 @@ namespace ML.BayesianMethods.Algorithms
   /// in a special case of independent (as random variables) features.
   /// If class multiplicative penalties are absent, the algorithm is non-parametric Parzen window implementation of Maximum posterior probability (MAP) classification
   /// </summary>
-  public abstract class BayesianAlgorithmBase : ClassificationAlgorithmBase<double[]>
+  public abstract class BayesianAlgorithmBase : ClassificationAlgorithmBase<double[]>, IGammaAlgorithm<double[]>
   {
     private readonly Dictionary<Class, double> m_ClassLosses;
+
+    private Dictionary<Class, double> m_PriorProbs;
     private Dictionary<Class, int> m_ClassHist;
     private int m_DataDim;
     private int m_DataCount;
+    private List<Class> m_DataClasses;
 
 
     protected BayesianAlgorithmBase(Dictionary<Class, double> classLosses=null)
@@ -32,9 +36,11 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public Dictionary<Class, double> ClassLosses { get { return m_ClassLosses; } }
 
-    public Dictionary<Class, int> ClassHist { get { return m_ClassHist; } }
-    public int DataDim   { get { return m_DataDim; } }
-    public int DataCount { get { return m_DataCount; } }
+    public Dictionary<Class, double> PriorProbs { get { return m_PriorProbs; } }
+    public Dictionary<Class, int>    ClassHist  { get { return m_ClassHist; } }
+    public int DataDim             { get { return m_DataDim; } }
+    public int DataCount           { get { return m_DataCount; } }
+    public List<Class> DataClasses { get { return m_DataClasses; } }
 
     /// <summary>
     /// Caclulates object proximity to some class
@@ -44,7 +50,12 @@ namespace ML.BayesianMethods.Algorithms
 
     protected override void DoTrain()
     {
-      m_ClassHist = new Dictionary<Class, int>();
+      m_ClassHist   = new Dictionary<Class, int>();
+      m_PriorProbs  = new Dictionary<Class, double>();
+      m_DataCount   = TrainingSample.Count;
+      m_DataDim     = TrainingSample.GetDimension();
+      m_DataClasses = TrainingSample.Classes.ToList();
+
       foreach (var pData in TrainingSample)
       {
         var cls = pData.Value;
@@ -52,8 +63,8 @@ namespace ML.BayesianMethods.Algorithms
         else m_ClassHist[cls] += 1;
       }
 
-      m_DataCount = TrainingSample.Count;
-      m_DataDim   = TrainingSample.GetDimension();
+      foreach (var cls in m_DataClasses)
+        m_PriorProbs[cls] = m_ClassHist[cls]/(double)m_DataCount;
 
       TrainImpl();
     }
@@ -69,9 +80,9 @@ namespace ML.BayesianMethods.Algorithms
   /// </summary>
   public abstract class BayesianKernelAlgorithmBase : BayesianAlgorithmBase, IKernelAlgorithm<double[]>
   {
+    private double m_H;
     private readonly IKernel m_Kernel;
     private readonly Dictionary<Class, double> m_ClassLosses;
-    private double m_H;
 
     protected BayesianKernelAlgorithmBase(IKernel kernel, double h, Dictionary<Class, double> classLosses=null)
       : base(classLosses)

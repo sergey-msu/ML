@@ -13,8 +13,8 @@ namespace ML.Core.Distributions
     {
       public Parameters(double mu = 0, double sigma = 1)
       {
-        if (sigma <= 0)
-          throw new MLException("NormalDistribution+Parameters.ctor(sigma<=0)");
+        if (sigma < 0)
+          throw new MLException("NormalDistribution+Parameters.ctor(sigma<0)");
 
         Mu = mu;
         Sigma = sigma;
@@ -28,33 +28,13 @@ namespace ML.Core.Distributions
 
     public const double COEFF =  0.3989422804D; // 1.0D/Math.Sqrt(GeneralUtils.DOUBLE_PI);
 
-    private double m_Mu;
-    private double m_Sigma;
-
-    public NormalDistribution(double mu = 0, double sigma = 1)
+    public NormalDistribution()
     {
-      Mu = mu;
-      Sigma = sigma;
     }
 
 
-    public double Mu
-    {
-      get { return m_Mu; }
-      set { m_Mu = value; }
-    }
-
-    public double Sigma
-    {
-      get { return m_Sigma; }
-      set
-      {
-        if (value <= 0)
-          throw new MLException("NormalDistribution.Sigma(value<=0)");
-
-        m_Sigma = value;
-      }
-    }
+    public bool UseSigmaMinThreshold { get; set; }
+    public double SigmaMinThreshold  { get; set; }
 
     /// <summary>
     /// Returns value of probalility (in the case of discrete distribution)
@@ -62,18 +42,32 @@ namespace ML.Core.Distributions
     /// </summary>
     public override double Value(double x)
     {
-      var t = (x - m_Mu)/m_Sigma;
-      return COEFF/m_Sigma * Math.Exp(-t*t/2);
+      var mu = Params.Mu;
+      var sigma = Params.Sigma;
+      var t = (x - mu)/sigma;
+      return COEFF/sigma * Math.Exp(-t*t/2);
     }
 
-    public override void MaximumLikelihood(double[] sample)
+    /// <summary>
+    /// Returns logarithmic value of probalility (in the case of discrete distribution)
+    /// or probability density (in the case of continuous distribution)
+    /// </summary>
+    public override double LogValue(double x)
+    {
+      var mu = Params.Mu;
+      var sigma = Params.Sigma;
+      var t = (x - mu)/sigma;
+
+      return Math.Log(COEFF/sigma) - t*t/2;
+    }
+
+    public override void FromSample(double[] sample)
     {
       var mu = 0.0D;
       var n = sample.Length;
       for (int i=0; i<n; i++)
         mu += sample[i];
       mu /= n;
-      m_Mu = mu;
 
       var sigma = 0.0D;
       for (int i=0; i<n; i++)
@@ -82,10 +76,14 @@ namespace ML.Core.Distributions
         sigma += t*t;
       }
       sigma = Math.Sqrt(sigma/n);
-      m_Sigma = sigma;
+
+      if (UseSigmaMinThreshold && sigma<SigmaMinThreshold)
+        sigma = SigmaMinThreshold;
+
+      Params = new Parameters(mu, sigma);
     }
 
-    public override Dictionary<ClassFeatureKey, Parameters> MaximumLikelihood(ClassifiedSample<double[]> sample)
+    public override Dictionary<ClassFeatureKey, Parameters> FromSample(ClassifiedSample<double[]> sample)
     {
       var result  = new Dictionary<ClassFeatureKey, Parameters>();
       var dim     = sample.GetDimension();
@@ -96,7 +94,7 @@ namespace ML.Core.Distributions
       var mys    = new Dictionary<Class, double>();
       foreach (var cls in classes)
       {
-        mus[cls] = 0.0D;
+        mus[cls]    = 0.0D;
         sigmas[cls] = 0.0D;
         mys[cls]    = 0;
       }
@@ -125,6 +123,8 @@ namespace ML.Core.Distributions
         foreach (var cls in classes)
         {
           var sigma = Math.Sqrt(sigmas[cls] / mys[cls]);
+          if (UseSigmaMinThreshold && sigma<SigmaMinThreshold)
+            sigma = SigmaMinThreshold;
           result[new ClassFeatureKey(cls, i)] = new Parameters(mus[cls], sigma);
           mus[cls] = 0.0D;
           sigmas[cls] = 0.0D;

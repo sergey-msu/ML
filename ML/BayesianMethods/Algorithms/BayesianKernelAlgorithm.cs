@@ -50,7 +50,7 @@ namespace ML.BayesianMethods.Algorithms
     public override Class Predict(double[] obj)
     {
       var dim = DataDim;
-      var classes = TrainingSample.CachedClasses;
+      var classes = DataClasses;
       var pHist = new Dictionary<Class, double>();
 
       foreach (var pData in TrainingSample)

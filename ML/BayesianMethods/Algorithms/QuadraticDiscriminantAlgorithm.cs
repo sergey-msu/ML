@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using ML.Core;
-using ML.Contracts;
-using ML.Utils;
 using ML.Core.Mathematics;
 
 namespace ML.BayesianMethods.Algorithms
@@ -34,7 +32,7 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override Class Predict(double[] obj)
     {
-      var classes = TrainingSample.CachedClasses;
+      var classes = DataClasses;
       var result = Class.Unknown;
       var max = double.MinValue;
 
@@ -57,7 +55,6 @@ namespace ML.BayesianMethods.Algorithms
     public override double CalculateClassScore(double[] obj, Class cls)
     {
       var dim = DataDim;
-      var my  = ClassHist[cls];
       var mu  = m_Mus[cls];
       var IS  = m_ISs[cls];
       var det = m_Dets[cls];
@@ -73,7 +70,7 @@ namespace ML.BayesianMethods.Algorithms
       double penalty;
       if (m_ClassLosses == null || m_ClassLosses.TryGetValue(cls, out penalty))
         penalty = 1.0D;
-      p += Math.Log(penalty*my / DataCount);
+      p += Math.Log(penalty*PriorProbs[cls]);
 
       return p;
     }
@@ -93,7 +90,7 @@ namespace ML.BayesianMethods.Algorithms
       Reset();
 
       var dim = DataDim;
-      var classes = TrainingSample.CachedClasses;
+      var classes = DataClasses;
 
       var Ss = new Dictionary<Class, double[,]>();
 

@@ -13,7 +13,7 @@ namespace ML.BayesianMethods.Algorithms
   /// where p(x|y) = 1/(m*V)*SUMM( K(r(x-xi)/h)/h,, i=1..cnt),
   /// r  - metric function
   /// ly - penalty for error on object of class y
-  /// V  - norm constant, supposed to be independent on class, so it can be omitted in argmax
+  /// V  - norm constant, supposed to be independent of class, so it can be omitted in argmax
   ///
   /// Deals with a probability distributions on classes (not to be confused with Bayesian learning, where probability distributions are considered on algorithm parameters).
   /// If class multiplicative penalties are absent, the algorithm is non-parametric Parzen window implementation of maximum posterior probability (MAP) classification
@@ -48,7 +48,7 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override Class Predict(double[] obj)
     {
-      var classes = TrainingSample.CachedClasses;
+      var classes = DataClasses;
       var pHist = new Dictionary<Class, double>();
 
       foreach (var pData in TrainingSample)

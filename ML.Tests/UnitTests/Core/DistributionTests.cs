@@ -14,11 +14,14 @@ namespace ML.Tests.UnitTests.Core
       BaseClassInit(context);
     }
 
+    #region Normal Distribution
+
     [TestMethod]
     public void NormalDistribution_Value()
     {
       // arrange
-      var distr = new NormalDistribution(mu: 1, sigma: 2);
+      var distr = new NormalDistribution();
+      distr.Params = new NormalDistribution.Parameters(1, 2);
 
       // act
       var v0 = distr.Value(0);
@@ -39,11 +42,12 @@ namespace ML.Tests.UnitTests.Core
       var sample = new[] { -1.0D, 2.0D, 3.0D, 3.5D };
 
       // act
-      distr.MaximumLikelihood(sample);
+      distr.FromSample(sample);
+      var pars = distr.Params;
 
       // assert
-      Assert.AreEqual(1.875D, distr.Mu);
-      Assert.AreEqual(1.74553000547D, distr.Sigma, EPS);
+      Assert.AreEqual(1.875D, pars.Mu);
+      Assert.AreEqual(1.74553000547D, pars.Sigma, EPS);
     }
 
     [TestMethod]
@@ -60,7 +64,7 @@ namespace ML.Tests.UnitTests.Core
       };
 
       // act
-      var res = distr.MaximumLikelihood(sample);
+      var res = distr.FromSample(sample);
       var dA1 = res[new ClassFeatureKey(new Class("A", 1), 0)];
       var dA2 = res[new ClassFeatureKey(new Class("A", 1), 1)];
       var dA3 = res[new ClassFeatureKey(new Class("A", 1), 2)];
@@ -82,5 +86,74 @@ namespace ML.Tests.UnitTests.Core
       Assert.AreEqual(2.7D,  dB3.Mu, EPS);
       Assert.AreEqual(0.1D,  dB3.Sigma, EPS);
     }
+
+    #endregion
+
+    #region Bernoulli Distribution
+
+    [TestMethod]
+    public void BernoulliDistribution_Value()
+    {
+      // arrange
+      var distr = new BernoulliDistribution();
+      distr.Params = new BernoulliDistribution.Parameters(0.3D);
+
+      // act
+      var v0 = distr.Value(0);
+      var v1 = distr.Value(1);
+
+      // assert
+      Assert.AreEqual(0.7D, v0);
+      Assert.AreEqual(0.3D, v1);
+    }
+
+    [TestMethod]
+    public void BernoulliDistribution_MaximumLikelihood_FromSample()
+    {
+      // arrange
+      var distr = new BernoulliDistribution();
+      var sample = new[] { 1.0D, 1.0D, 0.0D, 1.0D };
+
+      // act
+      distr.FromSample(sample);
+      var pars = distr.Params;
+
+      // assert
+      Assert.AreEqual(0.75D, pars.P);
+    }
+
+    [TestMethod]
+    public void BernoulliDistribution_MaximumLikelihood_FromClassifiedSample()
+    {
+      // arrange
+      var distr = new BernoulliDistribution();
+      var sample = new ClassifiedSample<double[]>
+      {
+        { new[] { 1.0D, 1.0D, 0.0D }, new Class("A", 1) },
+        { new[] { 1.0D, 0.0D, 1.0D }, new Class("A", 1) },
+        { new[] { 0.0D, 0.0D, 1.0D }, new Class("B", 2) },
+        { new[] { 0.0D, 0.0D, 0.0D }, new Class("B", 2) },
+      };
+
+      // act
+      var res = distr.FromSample(sample);
+      var dA1 = res[new ClassFeatureKey(new Class("A", 1), 0)];
+      var dA2 = res[new ClassFeatureKey(new Class("A", 1), 1)];
+      var dA3 = res[new ClassFeatureKey(new Class("A", 1), 2)];
+      var dB1 = res[new ClassFeatureKey(new Class("B", 2), 0)];
+      var dB2 = res[new ClassFeatureKey(new Class("B", 2), 1)];
+      var dB3 = res[new ClassFeatureKey(new Class("B", 2), 2)];
+
+      // assert
+      Assert.AreEqual(1.0D, dA1.P, EPS);
+      Assert.AreEqual(0.5D, dA2.P, EPS);
+      Assert.AreEqual(0.5D, dA3.P, EPS);
+      Assert.AreEqual(0.0D, dB1.P, EPS);
+      Assert.AreEqual(0.0D, dB2.P, EPS);
+      Assert.AreEqual(0.5D, dB3.P, EPS);
+    }
+
+    #endregion
+
   }
 }

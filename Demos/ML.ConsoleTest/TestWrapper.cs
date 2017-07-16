@@ -259,7 +259,7 @@ namespace ML.ConsoleTest
 
     private void doNaiveBayesianGeneralAlgorithmTest()
     {
-      var distr = new NormalDistribution();
+      var distr = new NormalDistribution { UseSigmaMinThreshold=true, SigmaMinThreshold=0.00000001D };
       var alg = new NaiveBayesianGeneralAlgorithm<NormalDistribution, NormalDistribution.Parameters>(distr);
       alg.Train(Data.TrainingSample);
 

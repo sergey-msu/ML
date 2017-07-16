@@ -26,7 +26,6 @@ namespace ML.BayesianMethods.Algorithms
     where TParam : IDistributionParameters
   {
     private readonly TDistr m_Distribution;
-    private readonly Dictionary<Class, double> m_ClassLosses;
     private Dictionary<ClassFeatureKey, TParam> m_DistributionParameters;
 
 
@@ -37,10 +36,9 @@ namespace ML.BayesianMethods.Algorithms
         throw new MLException("NaiveBayesianGeneralAlgorithm.ctor(distribution=null)");
 
       m_Distribution = distribution;
-      m_ClassLosses = classLosses;
     }
 
-    public override string ID { get { return "NPBAYES"; } }
+    public override string ID   { get { return "NPBAYES"; } }
     public override string Name { get { return "Naive Bayesian parametric classification"; } }
 
     public TDistr Distribution { get { return m_Distribution; } }
@@ -51,7 +49,7 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override Class Predict(double[] obj)
     {
-      var classes = TrainingSample.CachedClasses;
+      var classes = DataClasses;
       var dim     = DataDim;
       var cnt     = DataCount;
       var max     = double.MinValue;
@@ -65,11 +63,14 @@ namespace ML.BayesianMethods.Algorithms
         {
           var key = new ClassFeatureKey(cls, i);
           m_Distribution.Params = m_DistributionParameters[key];
-          p += Math.Log(m_Distribution.Value(obj[i]));
+          var value = m_Distribution.Value(obj[i]);
+          if (double.IsInfinity(value) || double.IsNaN(value)) return Class.Unknown;
+
+          p += Math.Log(value);
         }
 
-        var ly = (m_ClassLosses == null) ? 1.0D : m_ClassLosses[cls];
-        p += Math.Log(ClassHist[cls]*ly / cnt);
+        var ly = (ClassLosses == null) ? 1.0D : ClassLosses[cls];
+        p += Math.Log(ly*PriorProbs[cls]);
 
         if (p > max)
         {
@@ -89,23 +90,24 @@ namespace ML.BayesianMethods.Algorithms
       var dim = TrainingSample.GetDimension();
       var cnt = TrainingSample.Count;
       var p   = 0.0D;
-      var l   = 0;
 
       foreach (var pData in TrainingSample.Where(d => d.Value.Equals(cls)))
       {
         var data = pData.Key;
-        l += 1;
 
         for (int i=0; i<dim; i++)
         {
           var key = new ClassFeatureKey(cls, i);
           m_Distribution.Params = m_DistributionParameters[key];
-          p += Math.Log(m_Distribution.Value(data[i]));
+          var value = m_Distribution.Value(obj[i]);
+          if (double.IsInfinity(value) || double.IsNaN(value)) return double.NaN;
+
+          p += Math.Log(value);
         }
       }
 
-      var ly = (m_ClassLosses == null) ? 1.0D : m_ClassLosses[cls];
-      p += Math.Log(l*ly / cnt);
+      var ly = (ClassLosses == null) ? 1.0D : ClassLosses[cls];
+      p += Math.Log(ly*PriorProbs[cls]);
 
       return p;
     }
@@ -113,7 +115,7 @@ namespace ML.BayesianMethods.Algorithms
 
     protected override void TrainImpl()
     {
-      m_DistributionParameters = m_Distribution.MaximumLikelihood(TrainingSample);
+      m_DistributionParameters = m_Distribution.FromSample(TrainingSample);
     }
   }
 }

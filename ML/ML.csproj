@@ -87,6 +87,7 @@
     <Compile Include="Core\ComputingNetworks\_ComputingNode.cs" />
     <Compile Include="Core\Distributions\ClassFeatureKey.cs" />
     <Compile Include="Core\Distributions\DistributionBase.cs" />
+    <Compile Include="Core\Distributions\BernoulliDistribution.cs" />
     <Compile Include="Core\Distributions\NormalDistribution.cs" />
     <Compile Include="Core\Mathematics\MatrixOps.cs" />
     <Compile Include="Core\Samples.cs" />

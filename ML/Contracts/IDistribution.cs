@@ -13,7 +13,7 @@ namespace ML.Contracts
   }
 
   /// <summary>
-  /// Contract for probability distribution (discrete or continuous)
+  /// Contract for probability 1D distribution (discrete or continuous)
   /// </summary>
   public interface IDistribution<TParam>
     where TParam : IDistributionParameters
@@ -30,14 +30,55 @@ namespace ML.Contracts
     double Value(double x);
 
     /// <summary>
-    /// Fills distrubution parameters with Maximum Likelihood estimation
+    /// Returns logarithmic value of probalility (in the case of discrete distribution)
+    /// or probability density (in the case of continuous distribution)
     /// </summary>
-    void MaximumLikelihood(double[] sample);
+    double LogValue(double x);
 
     /// <summary>
-    /// Fills distrubution parameters with Maximum Likelihood estimation from a given classified sample.
+    /// Fills distrubution parameters from sample (Maximum Likelihood estimation / frequency analysis etc)
+    /// </summary>
+    void FromSample(double[] sample);
+
+    /// <summary>
+    /// Fills distrubution parameters from given classified sample (Maximum Likelihood estimation / frequency analysis etc)
     /// Ranges result with respect to classes and feature indices
     /// </summary>
-    Dictionary<ClassFeatureKey, TParam> MaximumLikelihood(ClassifiedSample<double[]> sample);
+    Dictionary<ClassFeatureKey, TParam> FromSample(ClassifiedSample<double[]> sample);
+  }
+
+  /// <summary>
+  /// Contract for probability multidimensional distribution (discrete or continuous)
+  /// </summary>
+  public interface IMultidimensionalDistribution<TParam>
+    where TParam : IDistributionParameters
+  {
+    /// <summary>
+    /// Parameters of distribution
+    /// </summary>
+    TParam Params { get; set; }
+
+    /// <summary>
+    /// Returns value of probalility (in the case of discrete distribution)
+    /// or probability density (in the case of continuous distribution)
+    /// </summary>
+    double Value(double[] x);
+
+    /// <summary>
+    /// Returns logarithmic value of probalility (in the case of discrete distribution)
+    /// or probability density (in the case of continuous distribution)
+    /// </summary>
+    double LogValue(double[] x);
+
+    /// <summary>
+    /// Fills distrubution parameters from sample (Maximum Likelihood estimation / frequency analysis etc)
+    /// </summary>
+    void FromSample(double[][] sample);
+
+    /// <summary>
+    /// Fills distrubution parameters from given classified sample (Maximum Likelihood estimation / frequency analysis etc)
+    /// Ranges result with respect to classes and feature indices
+    /// </summary>
+    Dictionary<Class, TParam> FromSample(ClassifiedSample<double[]> sample);
   }
 }
