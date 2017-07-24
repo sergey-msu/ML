@@ -155,5 +155,122 @@ namespace ML.Tests.UnitTests.Core
 
     #endregion
 
+    #region Multinomial Part Distribution
+
+    [TestMethod]
+    public void MultinomialPartDistribution_Value()
+    {
+      // arrange
+      var distr = new MultinomialPartDistribution();
+      distr.Params = new MultinomialPartDistribution.Parameters(0.3D);
+
+      // act
+      var v0 = distr.Value(0);
+      var v1 = distr.Value(1);
+      var v2 = distr.Value(2);
+
+      // assert
+      Assert.AreEqual( 1.0D, v0);
+      Assert.AreEqual( 0.3D, v1);
+      Assert.AreEqual(0.09D, v2);
+    }
+
+    [TestMethod]
+    public void MultinomialPartDistribution_MaximumLikelihood_FromSample()
+    {
+      // arrange
+      var distr = new MultinomialPartDistribution { TotalCount = 10 };
+      var sample = new[] { 2.0D, 1.0D, 0.0D, 3.0D };
+
+      // act
+      distr.FromSample(sample);
+      var pars = distr.Params;
+
+      // assert
+      Assert.AreEqual(0.60D, pars.P, EPS);
+    }
+
+    [TestMethod]
+    public void MultinomialPartDistribution_MaximumLikelihood_FromSample_UseSmoothing()
+    {
+      // arrange
+      var distr = new MultinomialPartDistribution { N = 10, UseSmoothing=true, Alpha=2, TotalCount=80 };
+      var sample = new[] { 0.0D, 0.0D, 0.0D, 0.0D };
+
+      // act
+      distr.FromSample(sample);
+      var pars = distr.Params;
+
+      // assert
+      Assert.AreEqual(0.02D, pars.P, EPS);
+    }
+
+    [TestMethod]
+    public void MultinomialPartDistribution_MaximumLikelihood_FromClassifiedSample()
+    {
+      // arrange
+      var sample = new ClassifiedSample<double[]>
+      {
+        { new[] { 1.0D, 2.0D, 0.0D }, new Class("A", 1) },
+        { new[] { 3.0D, 0.0D, 2.0D }, new Class("A", 1) },
+        { new[] { 0.0D, 3.0D, 1.0D }, new Class("B", 2) },
+        { new[] { 0.0D, 2.0D, 0.0D }, new Class("B", 2) },
+        { new[] { 0.0D, 2.0D, 2.0D }, new Class("B", 2) },
+      };
+      var n = 3; // sample[i].Key.Length - the length of the word dictionary
+      var distr = new MultinomialPartDistribution { N = n };
+
+      // act
+      var res = distr.FromSample(sample);
+      var dA1 = res[new ClassFeatureKey(new Class("A", 1), 0)];
+      var dA2 = res[new ClassFeatureKey(new Class("A", 1), 1)];
+      var dA3 = res[new ClassFeatureKey(new Class("A", 1), 2)];
+      var dB1 = res[new ClassFeatureKey(new Class("B", 2), 0)];
+      var dB2 = res[new ClassFeatureKey(new Class("B", 2), 1)];
+      var dB3 = res[new ClassFeatureKey(new Class("B", 2), 2)];
+
+      // assert
+      Assert.AreEqual( 0.5D, dA1.P, EPS);
+      Assert.AreEqual(0.25D, dA2.P, EPS);
+      Assert.AreEqual(0.25D, dA3.P, EPS);
+      Assert.AreEqual( 0.0D, dB1.P, EPS);
+      Assert.AreEqual( 0.7D, dB2.P, EPS);
+      Assert.AreEqual( 0.3D, dB3.P, EPS);
+    }
+
+    [TestMethod]
+    public void MultinomialPartDistribution_MaximumLikelihood_FromClassifiedSample_UseSmoothing()
+    {
+      // arrange
+      var sample = new ClassifiedSample<double[]>
+      {
+        { new[] { 1.0D, 2.0D, 0.0D }, new Class("A", 1) },
+        { new[] { 3.0D, 0.0D, 2.0D }, new Class("A", 1) },
+        { new[] { 0.0D, 3.0D, 1.0D }, new Class("B", 2) },
+        { new[] { 0.0D, 2.0D, 0.0D }, new Class("B", 2) },
+        { new[] { 0.0D, 2.0D, 2.0D }, new Class("B", 2) },
+      };
+      var n = 3; // sample[i].Key.Length - the length of the word dictionary
+      var distr = new MultinomialPartDistribution { N = n, UseSmoothing=true, Alpha=2 };
+
+      // act
+      var res = distr.FromSample(sample);
+      var dA1 = res[new ClassFeatureKey(new Class("A", 1), 0)];
+      var dA2 = res[new ClassFeatureKey(new Class("A", 1), 1)];
+      var dA3 = res[new ClassFeatureKey(new Class("A", 1), 2)];
+      var dB1 = res[new ClassFeatureKey(new Class("B", 2), 0)];
+      var dB2 = res[new ClassFeatureKey(new Class("B", 2), 1)];
+      var dB3 = res[new ClassFeatureKey(new Class("B", 2), 2)];
+
+      // assert
+      Assert.AreEqual(  0.5D, dA1.P, EPS);
+      Assert.AreEqual( 0.25D, dA2.P, EPS);
+      Assert.AreEqual( 0.25D, dA3.P, EPS);
+      Assert.AreEqual(0.125D, dB1.P, EPS);
+      Assert.AreEqual(  0.7D, dB2.P, EPS);
+      Assert.AreEqual(  0.3D, dB3.P, EPS);
+    }
+
+    #endregion
   }
 }

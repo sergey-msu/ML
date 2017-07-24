@@ -29,15 +29,14 @@ namespace ML.Core.Distributions
     }
 
     /// <summary>
-    /// Returns value of probalility (in the case of discrete distribution)
-    /// or probability density (in the case of continuous distribution)
+    /// Returns Bernoulli probability density
     /// </summary>
     public override double Value(double x)
     {
       if (x==0) return 1-Params.P;
       if (x==1) return Params.P;
 
-      throw new MLException("Bernoully distrisution input is out of range {0, 1}");
+      throw new MLException("Bernoulli distribution input is out of range {0, 1}");
     }
 
     /// <summary>
@@ -46,7 +45,10 @@ namespace ML.Core.Distributions
     /// </summary>
     public override double LogValue(double x)
     {
-      return Math.Log(Value(x));
+      if (x==0) return Math.Log(1-Params.P);
+      if (x==1) return Math.Log(Params.P);
+
+      throw new MLException("Bernoulli distribution input is out of range {0, 1}");
     }
 
     public override void FromSample(double[] sample)

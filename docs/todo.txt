@@ -5,8 +5,10 @@
   - do we need CalculateWeight(), Metric.Sort() then?
   - rewrite CalculateMargins() methods in more efficient way
   - cover Bayesian methods with unit tests
+  - do we need IMultidimensionalDistribution interface?
   - [DONE] OptimizeLOO() for kernel algorithms with h parameter - stronlgy need to put in base class
   - [DONE] KernelAlgorithmBase - why inherited from OrderedMetricAlgorithmBase?
+  - revise "throw new..." . It may work 10-times faster if not to do this (retrun double.NaN instead etc.)
 
 - serialization
 - refactor CNN layers to use Inputs and Outputs

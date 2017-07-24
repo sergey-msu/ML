@@ -165,5 +165,33 @@ namespace ML.Utils
         throw new MLException("Can not add point with different dimension");
     }
 
+    /// <summary>
+    /// Calculates power of a given number.
+    /// Works 10-times falser than Math.Pow (Release x64)
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double Pow(double p, int pow)
+    {
+      if (p==0)
+      {
+        if (pow <= 0) return double.NaN; // throw new Exception("Zero raised in non-positive power");
+        return 0;
+      }
+
+      if (pow==0) return 1;
+      if (pow==1) return p;
+
+      if (pow<0)
+      {
+        pow = -pow;
+        p = 1.0D/p;
+      }
+
+      var result = p;
+      for (int i=0; i<pow-1; i++)
+        result *= p;
+
+      return result;
+    }
   }
 }

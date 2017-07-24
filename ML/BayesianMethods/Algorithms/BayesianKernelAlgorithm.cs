@@ -7,7 +7,7 @@ using ML.Contracts;
 namespace ML.BayesianMethods.Algorithms
 {
   /// <summary>
-  /// Bayesian non-parametric classification algorithm with  product-like multidimensional kernel.
+  /// Bayesian non-parametric classification algorithm with product-like multidimensional kernel.
   ///
   /// a(x) = argmax[ ly*P(y)*p(x|y) ]
   /// where p(x|y) = 1/m*SUMM( PROD( K((xj-xji)/h)/h, j=1..n), i=1..m),

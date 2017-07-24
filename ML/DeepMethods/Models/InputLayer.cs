@@ -29,7 +29,9 @@ namespace ML.DeepMethods.Models
 
     protected override void DoCalculate(double[][,] input, double[][,] result)
     {
-      result = input;
+      var len = result.Length;
+      for (int i=0; i<len; i++)
+        result[i] = input[i];
     }
 
     protected override void DoBackprop(DeepLayerBase prevLayer, double[][,] prevValues, double[][,] prevError, double[][,] errors)

@@ -137,7 +137,8 @@ namespace ML.ConsoleTest
       alg.Train(Data.TrainingSample);
 
       // LOO
-      StatUtils.OptimizeLOO(alg);
+      var kmax = 10;
+      StatUtils.OptimizeLOO(alg, maxK: kmax);
       var optK = alg.K;
       Console.WriteLine("Nearest K Neigbour: optimal k is {0}", optK);
       Console.WriteLine();
@@ -149,7 +150,7 @@ namespace ML.ConsoleTest
 
       //Error distribution
       Console.WriteLine("Errors:");
-      for (int k = 2; k < Math.Min(alg.TrainingSample.Count, 50); k++)
+      for (int k = 2; k < kmax; k++)
       {
         alg.K = k;
         var errors = alg.GetErrors(Data.Data, 0, true);
@@ -188,7 +189,7 @@ namespace ML.ConsoleTest
       //Error distribution
       var message = string.Empty;
       Console.WriteLine("Errors:");
-      for (double h1 = hmin; h1 < hmax; h1 += step)
+      for (double h1 = hmin; h1 <= hmax; h1 = Math.Round(h1+step, 8))
       {
         var h = h1;
         if (h <= optH && h + step > optH) h = optH;
@@ -208,6 +209,7 @@ namespace ML.ConsoleTest
       Console.WriteLine("Bayesian: optimal h is {0}", optH);
       Console.WriteLine(message);
 
+      alg.H = optH;
       Visualizer.Run(alg);
     }
 
@@ -254,6 +256,7 @@ namespace ML.ConsoleTest
       Console.WriteLine("Bayesian: optimal h is {0}", optH);
       Console.WriteLine(message);
 
+      alg.H = optH;
       Visualizer.Run(alg);
     }
 
@@ -284,7 +287,7 @@ namespace ML.ConsoleTest
 
       // LOO
       var hmin = 0.01D;
-      var hmax = 5.0D;
+      var hmax = 2.0D;
       var step = 0.05D;
       StatUtils.OptimizeLOO(alg, hmin, hmax, step);
       var optH = alg.H;
@@ -319,6 +322,7 @@ namespace ML.ConsoleTest
       Console.WriteLine("Bayesian: optimal h is {0}", optH);
       Console.WriteLine(message);
 
+      alg.H = optH;
       Visualizer.Run(alg);
     }
 

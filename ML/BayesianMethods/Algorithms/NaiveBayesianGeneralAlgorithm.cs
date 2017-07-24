@@ -51,7 +51,6 @@ namespace ML.BayesianMethods.Algorithms
     {
       var classes = DataClasses;
       var dim     = DataDim;
-      var cnt     = DataCount;
       var max     = double.MinValue;
       var result  = Class.Unknown;
 
@@ -63,10 +62,10 @@ namespace ML.BayesianMethods.Algorithms
         {
           var key = new ClassFeatureKey(cls, i);
           m_Distribution.Params = m_DistributionParameters[key];
-          var value = m_Distribution.Value(obj[i]);
+          var value = m_Distribution.LogValue(obj[i]);
           if (double.IsInfinity(value) || double.IsNaN(value)) return Class.Unknown;
 
-          p += Math.Log(value);
+          p += value;
         }
 
         var ly = (ClassLosses == null) ? 1.0D : ClassLosses[cls];
@@ -88,7 +87,6 @@ namespace ML.BayesianMethods.Algorithms
     public override double CalculateClassScore(double[] obj, Class cls)
     {
       var dim = TrainingSample.GetDimension();
-      var cnt = TrainingSample.Count;
       var p   = 0.0D;
 
       foreach (var pData in TrainingSample.Where(d => d.Value.Equals(cls)))
@@ -99,10 +97,10 @@ namespace ML.BayesianMethods.Algorithms
         {
           var key = new ClassFeatureKey(cls, i);
           m_Distribution.Params = m_DistributionParameters[key];
-          var value = m_Distribution.Value(obj[i]);
+          var value = m_Distribution.LogValue(obj[i]);
           if (double.IsInfinity(value) || double.IsNaN(value)) return double.NaN;
 
-          p += Math.Log(value);
+          p += value;
         }
       }
 
