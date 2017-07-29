@@ -79,6 +79,8 @@
     <Compile Include="UnitTests\Core\MathOpsTests.cs" />
     <Compile Include="UnitTests\Core\InformativityIndexTests.cs" />
     <Compile Include="UnitTests\Core\KernelTests.cs" />
+    <Compile Include="UnitTests\Text\AlgorithmsTests.cs" />
+    <Compile Include="UnitTests\Text\TextPreprocessorTests.cs" />
     <Compile Include="UnitTests\Utils\GeneralUtilsTests.cs" />
     <Compile Include="UnitTests\Core\MetricTests.cs" />
     <Compile Include="UnitTests\CNN\ConvNetTests.cs" />

@@ -156,4 +156,33 @@ namespace ML.Core
       return GeneralUtils.ArgMax(mark1)==GeneralUtils.ArgMax(mark2) ? 0 : 1;
     }
   }
+
+  public struct ClassScore : IEquatable<ClassScore>
+  {
+    public ClassScore(Class cls, double score)
+    {
+      Class = cls;
+      Score = score;
+    }
+
+    public readonly Class Class;
+    public readonly double Score;
+
+
+    public bool Equals(ClassScore other)
+    {
+      return Class.Equals(other.Class) && Score==other.Score;
+    }
+
+    public override bool Equals(object obj)
+    {
+      if (!(obj is ClassScore)) return false;
+      return Equals((ClassScore)obj);
+    }
+
+    public override int GetHashCode()
+    {
+      return Class.GetHashCode() ^ Score.GetHashCode();
+    }
+  }
 }

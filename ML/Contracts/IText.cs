@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ML.Core;
+using System;
 using System.Collections.Generic;
 
 namespace ML.Contracts
@@ -13,7 +14,7 @@ namespace ML.Contracts
     /// (e.g. "A pioneer in the then-burgeoning world of commercial magazine fiction"
     ///        --> ["pioneer", "burgeon", "world", "commercial", "magazine", "fiction"])
     /// </summary>
-    string[] Preprocess(string doc);
+    List<string> Preprocess(string doc);
   }
 
   /// <summary>
@@ -26,23 +27,28 @@ namespace ML.Contracts
     /// <summary>
     /// Performs basic dovument tokenization
     /// </summary>
-    string[] Tokenize(string doc);
+    List<string> Tokenize(string doc);
   }
 
   /// <summary>
-  /// Contract for container for stopword - the one that must not be taken into account (e.g. "the", "me", "a" etc.)
+  /// Contract for container for stopwords - the one that must not be taken into account (e.g. "the", "me", "a" etc.)
   /// </summary>
-  public interface IStopwordsContainer
+  public interface IStopwords
   {
     /// <summary>
     /// Returns all stopwords
     /// </summary>
-    IEnumerable<string> GetStopwords();
+    IEnumerable<string> All();
+
+    /// <summary>
+    /// Returns true if passed word is a stopword, false otherwise
+    /// </summary>
+    bool Contains(string word);
 
     /// <summary>
     /// Adds new stopword to known stopword collection
     /// </summary>
-    void AddStopword(string stopword);
+    void Add(string stopword);
   }
 
   /// <summary>
@@ -57,7 +63,7 @@ namespace ML.Contracts
   }
 
   /// <summary>
-  /// Contract for stemmer algorithm (e.g. "sses" -> "s", "ies" -> "i" etc.)
+  /// Contract for stemmer algorithm that transforms word into its root form (e.g. "sses" -> "s", "ies" -> "i" etc.)
   /// </summary>
   public interface IStemmer
   {

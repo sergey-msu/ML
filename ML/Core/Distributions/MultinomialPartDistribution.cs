@@ -47,12 +47,32 @@ namespace ML.Core.Distributions
     /// <summary>
     /// Total count of elementary events in underlying probability space (e.g. full number of tokens(words) in some class in a document classification task etc.)
     /// </summary>
-    public int TotalCount { get { return m_TotalCount; } set { m_TotalCount=value; } }
+    public int TotalCount
+    {
+      get { return m_TotalCount; }
+      set
+      {
+        if (value <= 0)
+          throw new MLException("Total count must be positive");
+
+        m_TotalCount=value;
+      }
+    }
 
     /// <summary>
     /// Smoothing coefficient
     /// </summary>
-    public double Alpha { get { return m_Alpha; } set { m_Alpha=value; } }
+    public double Alpha
+    {
+      get { return m_Alpha; }
+      set
+      {
+        if (value<=0)
+          throw new MLException("Smoothing coefficient must be positive");
+
+        m_Alpha=value;
+      }
+    }
 
     /// <summary>
     /// If true, uses Laplace/Lidstone smoothing
@@ -68,7 +88,7 @@ namespace ML.Core.Distributions
 
     public override double LogValue(double x)
     {
-      return x * Math.Log(Params.P);
+      return x*Math.Log(Params.P);
     }
 
     public override void FromSample(double[] sample)
