@@ -21,8 +21,8 @@ namespace ML.Core.ActivationFunctions
     }
 
 
-    public string ID   { get { return "LRELU"; } }
-    public string Name { get { return "Leaky Rectified Linear Unit"; } }
+    public string Name   { get { return "LRELU"; } }
+
     public double Leak { get { return m_Leak; } }
 
     public double Value(double r)

@@ -7,7 +7,7 @@ namespace ML.Contracts
   /// <summary>
   /// Contract of ML algorithm (supervised or not, classification or regression etc.)
   /// </summary>
-  public interface IAlgorithm : IMnemonicNamed
+  public interface IAlgorithm : INamed
   {
   }
 

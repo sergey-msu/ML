@@ -3,7 +3,7 @@
   /// <summary>
   /// Simple function contract (i.e. activation function for neural networks, kernels etc.)
   /// </summary>
-  public interface IFunction : IMnemonicNamed
+  public interface IFunction : INamed
   {
     /// <summary>
     /// Calculates function value
@@ -19,7 +19,7 @@
   /// <summary>
   /// Represents 1D kernel: even, positive, L1-normed to 1 real-valued function
   /// </summary>
-  public interface IKernel : IMnemonicNamed
+  public interface IKernel : INamed
   {
     /// <summary>
     /// Calculates kernel value

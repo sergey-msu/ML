@@ -40,7 +40,7 @@ namespace ML.ConsoleTest
       m_Shear = shear;
       m_InputDim = algorithm.TrainingSample.First().Key.Length;
 
-      var fn = string.Format("data/{0}-{1:yyyyMMdd-hhmmss}.csv", algorithm.ID, DateTime.Now);
+      var fn = string.Format("data/{0}-{1:yyyyMMdd-hhmmss}.csv", algorithm.Name, DateTime.Now);
       var dir = Path.GetDirectoryName(fn);
       Directory.CreateDirectory(dir);
 

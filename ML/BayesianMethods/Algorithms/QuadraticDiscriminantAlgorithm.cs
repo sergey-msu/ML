@@ -23,8 +23,8 @@ namespace ML.BayesianMethods.Algorithms
     }
 
 
-    public override string ID { get { return "QDISC"; } }
-    public override string Name { get { return "Quadratic discriminant classification"; } }
+    public override string Name { get { return "QDISC"; } }
+
 
 
     /// <summary>
@@ -68,8 +68,7 @@ namespace ML.BayesianMethods.Algorithms
       p -= Math.Log(det)/2;
 
       double penalty;
-      if (m_ClassLosses == null || m_ClassLosses.TryGetValue(cls, out penalty))
-        penalty = 1.0D;
+      if (m_ClassLosses == null || m_ClassLosses.TryGetValue(cls, out penalty)) penalty = 1.0D;
       p += Math.Log(penalty*PriorProbs[cls]);
 
       return p;

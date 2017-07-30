@@ -29,12 +29,7 @@ namespace ML.MetricMethods.Algorithms
     /// <summary>
     /// Algorithm mnemonic ID
     /// </summary>
-    public override string ID { get { return "PVW"; } }
-
-    /// <summary>
-    /// Algorithm name
-    /// </summary>
-    public override string Name { get { return "Parzen Window of Variable Width"; } }
+    public override string Name { get { return "PVW"; } }
 
     public IKernel Kernel { get { return m_Kernel; } }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using ML.Contracts;
 using ML.DeepMethods.Models;
-using ML.Core.Registry;
+using ML.Registry;
 
 namespace ML.Tests.UnitTests.CNN
 {
@@ -77,9 +77,7 @@ namespace ML.Tests.UnitTests.CNN
 
     public class LinearActivation : IActivationFunction
     {
-      public string ID { get { return "LA"; } }
-
-      public string Name { get { return "LinearActivation"; } }
+      public string Name { get { return "LA"; } }
 
       public double Value(double r)
       {

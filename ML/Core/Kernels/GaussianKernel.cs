@@ -10,8 +10,8 @@ namespace ML.Core.Kernels
   {
     public const double COEFF = 0.398942280401D;
 
-    public string ID { get { return "GAUSS"; } }
-    public string Name { get { return "Gaussian"; } }
+    public string Name { get { return "GAUSS"; } }
+
 
     public double Value(double r)
     {

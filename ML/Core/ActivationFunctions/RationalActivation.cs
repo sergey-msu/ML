@@ -18,8 +18,8 @@ namespace ML.Core.ActivationFunctions
       m_Shift = shift;
     }
 
-    public string ID { get { return "RAT"; } }
-    public string Name { get { return "Rational"; } }
+    public string Name { get { return "RAT"; } }
+
     public double Shift { get { return m_Shift; } }
 
 

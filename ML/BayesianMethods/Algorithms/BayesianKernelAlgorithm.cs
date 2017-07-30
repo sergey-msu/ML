@@ -35,8 +35,7 @@ namespace ML.BayesianMethods.Algorithms
     }
 
 
-    public override string ID { get { return "PKBAYES"; } }
-    public override string Name { get { return "Bayesian non-parametric classification with product-like multidimensional kernel"; } }
+    public override string Name { get { return "PKBAYES"; } }
 
     /// <summary>
     /// Window widths
@@ -113,8 +112,8 @@ namespace ML.BayesianMethods.Algorithms
       }
 
       double penalty;
-      if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
-        score *= (penalty / DataCount);
+      if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
+      score *= (penalty / DataCount);
 
       return score;
     }

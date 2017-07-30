@@ -5,7 +5,7 @@ using ML.Core;
 using ML.Core.Kernels;
 using ML.Core.Logical;
 using ML.Core.Metric;
-using ML.Core.Registry;
+using ML.Registry;
 using ML.Contracts;
 using ML.LogicalMethods.Algorithms;
 using ML.MetricMethods.Algorithms;

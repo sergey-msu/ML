@@ -13,12 +13,8 @@ namespace ML.Core.Metric
     /// <summary>
     /// Metric mnemonic ID
     /// </summary>
-    public abstract string ID { get; }
-
-    /// <summary>
-    /// Metric name
-    /// </summary>
     public abstract string Name { get; }
+
     /// <summary>
     /// Distance between two points
     /// </summary>

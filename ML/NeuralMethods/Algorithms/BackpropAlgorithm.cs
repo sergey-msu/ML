@@ -79,8 +79,8 @@ namespace ML.NeuralMethods.Algorithms
 
     #region Properties
 
-    public override string ID { get { return "MLP_BP"; } }
-    public override string Name { get { return "MLP Neural Network with Backpropagation"; } }
+    public override string Name { get { return "MLP_BP"; } }
+
 
     public int InputDim          { get { return m_InputDim; } }
     public int OutputDim         { get { return m_OutputDim; } }

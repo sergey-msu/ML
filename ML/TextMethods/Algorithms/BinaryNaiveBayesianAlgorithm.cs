@@ -18,8 +18,7 @@ namespace ML.TextMethods.Algorithms
 
     #region Properties
 
-    public override string ID   { get { return "BINNB"; } }
-    public override string Name { get { return "Binary Naive Bayes Algorithm"; } }
+    public override string Name   { get { return "BINNB"; } }
 
     public Dictionary<ClassFeatureKey, double> Frequencies { get { return m_Frequencies; } }
 

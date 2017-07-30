@@ -18,8 +18,8 @@ namespace ML.LogicalMethods.Algorithms
     {
     }
 
-    public override string ID { get { return "ID3_DTREE"; } }
-    public override string Name { get { return "ID3 Decision Tree"; } }
+    public override string Name { get { return "ID3_DTREE"; } }
+
 
     /// <summary>
     /// Tree root node

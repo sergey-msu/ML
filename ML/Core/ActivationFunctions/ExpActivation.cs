@@ -8,8 +8,8 @@ namespace ML.Core.ActivationFunctions
   /// </summary>
   public class ExpActivation : IActivationFunction
   {
-    public string ID { get { return "EXP"; } }
-    public string Name { get { return "Exponent"; } }
+    public string Name { get { return "EXP"; } }
+
 
     public double Value(double r)
     {

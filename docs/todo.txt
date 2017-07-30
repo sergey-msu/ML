@@ -9,6 +9,11 @@
   - [DONE] OptimizeLOO() for kernel algorithms with h parameter - stronlgy need to put in base class
   - [DONE] KernelAlgorithmBase - why inherited from OrderedMetricAlgorithmBase?
   - revise "throw new..." . It may work 10-times faster if not to do this (retrun double.NaN instead etc.)
+  - revise /Core folder architecture: where things should be?
+    - move registry in ML/  root folder;
+    - move non-general thing from Core/ folder to ...Methods/ subfolders
+  - inspect and refactor all "Inamed.Name" mnemonic IDs
+  - revise exceptions text ("ClasName.Prop(value=null) vs. human-readable etc.")
 
 - serialization
 - refactor CNN layers to use Inputs and Outputs

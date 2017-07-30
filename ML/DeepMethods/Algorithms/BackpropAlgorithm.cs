@@ -95,8 +95,8 @@ namespace ML.DeepMethods.Algorithms
 
     #region Properties
 
-    public override string ID   { get { return "CNN_BP"; } }
-    public override string Name { get { return "Convolutional Neural Network with Backpropagation"; } }
+    public override string Name   { get { return "CNN_BP"; } }
+
 
     public int InputDepth  { get { return m_InputDepth; } }
     public int InputHeight { get { return m_InputHeight; } }

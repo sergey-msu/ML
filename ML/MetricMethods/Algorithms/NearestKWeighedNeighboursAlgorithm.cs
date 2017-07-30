@@ -26,12 +26,7 @@ namespace ML.MetricMethods.Algorithms
     /// <summary>
     /// Algorithm mnemonic ID
     /// </summary>
-    public override string ID { get { return "WNNK"; } }
-
-    /// <summary>
-    /// Algorithm name
-    /// </summary>
-    public override string Name { get { return "Weighed Nearest K Neighbours"; } }
+    public override string Name { get { return "WNNK"; } }
 
     /// <summary>
     /// Neighbour count

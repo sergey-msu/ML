@@ -44,9 +44,7 @@ namespace ML.MetricMethods.Algorithms
       H = h;
     }
 
-    public override string ID { get { return "PF"; } }
-
-    public override string Name { get { return "Potential Functions"; } }
+    public override string Name { get { return "PF"; } }
 
     public IKernel Kernel { get { return m_Kernel; } }
 

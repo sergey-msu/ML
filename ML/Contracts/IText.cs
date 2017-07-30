@@ -74,4 +74,16 @@ namespace ML.Contracts
   }
 
   //TODO: Lemmatization
+
+  public interface ITFWeightingScheme : INamed
+  {
+    void Reset();
+
+    double GetFrequency(int[] initFreqs, int idx);
+  }
+
+  public interface IIDFWeightingScheme : INamed
+  {
+    List<double> GetWeights(int vocabularyCount, List<int> idfFreqs);
+  }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using ML.DeepMethods.Models;
 using ML.Core;
-using ML.Core.Registry;
+using ML.Registry;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Registry;
 using System.Reflection;

@@ -6,7 +6,7 @@ namespace ML.Contracts
   /// <summary>
   /// Metric contract
   /// </summary>
-  public interface IMetric<TObj> : IMnemonicNamed
+  public interface IMetric<TObj> : INamed
   {
     /// <summary>
     /// Distance between two points

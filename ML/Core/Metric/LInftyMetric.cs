@@ -8,8 +8,8 @@ namespace ML.Core.Metric
   /// </summary>
   public sealed class LInftyMetric : MetricBase<double[]>
   {
-    public override string ID { get { return "LINFTY"; } }
-    public override string Name { get { return "L infinity"; } }
+    public override string Name { get { return "LINFTY"; } }
+
 
     /// <summary>
     /// Distance between two points

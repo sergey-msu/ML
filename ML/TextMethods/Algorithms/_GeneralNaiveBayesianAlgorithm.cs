@@ -18,8 +18,7 @@ namespace ML.TextMethods.Algorithms
 
     #region Properties
 
-    public override string ID   { get { return "TWCNB"; } }
-    public override string Name { get { return "Transformed Weignt-normalized Complement Naive Bayes Algorithm"; } }
+    public override string Name   { get { return "TWCNB"; } }
 
     #endregion
 

@@ -32,8 +32,8 @@ namespace ML.BayesianMethods.Algorithms
     {
     }
 
-    public override string ID   { get { return "NBAYES"; } }
-    public override string Name { get { return "Naive Bayesian non-parametric classification"; } }
+    public override string Name   { get { return "NBAYES"; } }
+
 
 
     /// <summary>
@@ -75,8 +75,9 @@ namespace ML.BayesianMethods.Algorithms
       var result = Class.Unknown;
       foreach (var cls in classes)
       {
-        var ly = (ClassLosses == null) ? 1.0D : ClassLosses[cls];
-        var p = yHist[cls] + Math.Log(PriorProbs[cls]*ly);
+        double penalty;
+        if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
+        var p = yHist[cls] + Math.Log(PriorProbs[cls]*penalty);
         if (p > max)
         {
           max = p;
@@ -112,8 +113,8 @@ namespace ML.BayesianMethods.Algorithms
       }
 
       double penalty;
-      if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
-        y += Math.Log(penalty*PriorProbs[cls]);
+      if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
+      y += Math.Log(penalty*PriorProbs[cls]);
 
       return y;
     }

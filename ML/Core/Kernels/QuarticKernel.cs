@@ -9,8 +9,8 @@ namespace ML.Core.Kernels
   {
     public const double COEFF = 0.9375D;
 
-    public string ID { get { return "QRT"; } }
-    public string Name { get { return "Quartic"; } }
+    public string Name { get { return "QRT"; } }
+
 
     public double Value(double r)
     {

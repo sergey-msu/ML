@@ -8,8 +8,8 @@ namespace ML.Core.ActivationFunctions
   /// </summary>
   public class ArctanActivation : IActivationFunction
   {
-    public string ID { get { return "ATAN"; } }
-    public string Name { get { return "Arctangent"; } }
+    public string Name { get { return "ATAN"; } }
+
 
     public double Value(double r)
     {

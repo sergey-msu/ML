@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core;
-using ML.Core.Registry;
+using ML.Registry;
 using ML.NeuralMethods.Algorithms;
 using ML.DeepMethods;
 using ML.DeepMethods.Registry;

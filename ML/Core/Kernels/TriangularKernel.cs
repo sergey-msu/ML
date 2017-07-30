@@ -8,8 +8,8 @@ namespace ML.Core.Kernels
   /// </summary>
   public sealed class TriangularKernel : IKernel
   {
-    public string ID { get { return "TRN"; } }
-    public string Name { get { return "Triangular"; } }
+    public string Name { get { return "TRN"; } }
+
 
     public double Value(double r)
     {

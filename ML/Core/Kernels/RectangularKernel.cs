@@ -10,8 +10,8 @@ namespace ML.Core.Kernels
   {
     public const double COEFF = 0.5D;
 
-    public string ID { get { return "RECT"; } }
-    public string Name { get { return "Rectangular"; } }
+    public string Name { get { return "RECT"; } }
+
 
     public double Value(double r)
     {

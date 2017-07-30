@@ -8,9 +8,7 @@ namespace ML.Tests.UnitTests.NN
   {
     public class LinearActivation : IActivationFunction
     {
-      public string ID { get { return "LA"; } }
-
-      public string Name { get { return "LinearActivation"; } }
+      public string Name { get { return "LA"; } }
 
       public double Value(double r)
       {

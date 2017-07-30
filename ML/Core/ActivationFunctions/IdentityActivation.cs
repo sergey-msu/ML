@@ -8,8 +8,8 @@ namespace ML.Core.ActivationFunctions
   /// </summary>
   public sealed class IdentityActivation : IActivationFunction
   {
-    public string ID { get { return "IDT"; } }
-    public string Name { get { return "Identity"; } }
+    public string Name { get { return "IDT"; } }
+
 
     public double Value(double r)
     {

@@ -8,8 +8,8 @@ namespace ML.Core.Metric
   /// </summary>
   public sealed class LpMetric : MetricBase<double[]>
   {
-    public override string ID { get { return "LP"; } }
-    public override string Name { get { return "L p"; } }
+    public override string Name { get { return "LP"; } }
+
 
     public LpMetric(double p)
     {

@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core;
 using ML.DeepMethods.Models;
-using ML.Core.Registry;
+using ML.Registry;
 using ML.Contracts;
 
 namespace ML.Tests.UnitTests.CNN

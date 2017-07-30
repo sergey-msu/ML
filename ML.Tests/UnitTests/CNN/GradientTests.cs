@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML.Core;
 using ML.DeepMethods.Algorithms;
 using ML.DeepMethods.Registry;
-using ML.Core.Registry;
+using ML.Registry;
 using ML.DeepMethods.Models;
 
 namespace ML.Tests.UnitTests.CNN

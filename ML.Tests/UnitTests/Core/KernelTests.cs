@@ -18,17 +18,17 @@ namespace ML.Tests.UnitTests.Core
     {
       var kernel = new GaussianKernel();
 
-      Assert.AreEqual(0.00193045413F, kernel.Value(-2.5F), EPS);
-      Assert.AreEqual(0.01831563888F, kernel.Value(-2.0F), EPS);
-      Assert.AreEqual(0.10539922456F, kernel.Value(-1.5F), EPS);
-      Assert.AreEqual(0.36787944117F, kernel.Value(-1.0F), EPS);
-      Assert.AreEqual(0.77880078307F, kernel.Value(-0.5F), EPS);
-      Assert.AreEqual(1.0F,           kernel.Value( 0.0F), EPS);
-      Assert.AreEqual(0.77880078307F, kernel.Value( 0.5F), EPS);
-      Assert.AreEqual(0.36787944117F, kernel.Value( 1.0F), EPS);
-      Assert.AreEqual(0.10539922456F, kernel.Value( 1.5F), EPS);
-      Assert.AreEqual(0.01831563888F, kernel.Value( 2.0F), EPS);
-      Assert.AreEqual(0.00193045413F, kernel.Value( 2.5F), EPS);
+      Assert.AreEqual(0.01752830049F, kernel.Value(-2.5F), EPS);
+      Assert.AreEqual(0.05399096651F, kernel.Value(-2.0F), EPS);
+      Assert.AreEqual(0.12951759566F, kernel.Value(-1.5F), EPS);
+      Assert.AreEqual(0.24197072451F, kernel.Value(-1.0F), EPS);
+      Assert.AreEqual(0.35206532676F, kernel.Value(-0.5F), EPS);
+      Assert.AreEqual( 0.3989422804F,  kernel.Value( 0.0F), EPS);
+      Assert.AreEqual(0.35206532676F, kernel.Value( 0.5F), EPS);
+      Assert.AreEqual(0.24197072451F, kernel.Value( 1.0F), EPS);
+      Assert.AreEqual(0.12951759566F, kernel.Value( 1.5F), EPS);
+      Assert.AreEqual(0.05399096651F, kernel.Value( 2.0F), EPS);
+      Assert.AreEqual(0.01752830049F, kernel.Value( 2.5F), EPS);
     }
 
     [TestMethod]
@@ -39,13 +39,13 @@ namespace ML.Tests.UnitTests.Core
       Assert.AreEqual(0,       kernel.Value(-1.5F),  EPS);
       Assert.AreEqual(0,       kernel.Value(-1.01F), EPS);
       Assert.AreEqual(0,       kernel.Value(-1.0F),  EPS);
-      Assert.AreEqual(0.0199F, kernel.Value(-0.99F), EPS);
-      Assert.AreEqual(0.75F,   kernel.Value(-0.5F),  EPS);
-      Assert.AreEqual(0.96F,   kernel.Value(-0.2F),  EPS);
-      Assert.AreEqual(1.0F,    kernel.Value( 0.0F),  EPS);
-      Assert.AreEqual(0.96F,   kernel.Value( 0.2F),  EPS);
-      Assert.AreEqual(0.75F,   kernel.Value( 0.5F),  EPS);
-      Assert.AreEqual(0.0199F, kernel.Value( 0.99F), EPS);
+      Assert.AreEqual(QuadraticKernel.COEFF*0.0199F, kernel.Value(-0.99F), EPS);
+      Assert.AreEqual(QuadraticKernel.COEFF*0.75F,   kernel.Value(-0.5F),  EPS);
+      Assert.AreEqual(QuadraticKernel.COEFF*0.96F,   kernel.Value(-0.2F),  EPS);
+      Assert.AreEqual(QuadraticKernel.COEFF*1.0F,    kernel.Value( 0.0F),  EPS);
+      Assert.AreEqual(QuadraticKernel.COEFF*0.96F,   kernel.Value( 0.2F),  EPS);
+      Assert.AreEqual(QuadraticKernel.COEFF*0.75F,   kernel.Value( 0.5F),  EPS);
+      Assert.AreEqual(QuadraticKernel.COEFF*0.0199F, kernel.Value( 0.99F), EPS);
       Assert.AreEqual(0,       kernel.Value( 1.0F),  EPS);
       Assert.AreEqual(0,       kernel.Value( 1.01F), EPS);
       Assert.AreEqual(0,       kernel.Value( 1.5F),  EPS);
@@ -99,13 +99,13 @@ namespace ML.Tests.UnitTests.Core
       Assert.AreEqual(0,    kernel.Value(-1.5F),  EPS);
       Assert.AreEqual(0,    kernel.Value(-1.01F), EPS);
       Assert.AreEqual(0,    kernel.Value(-1.0F),  EPS);
-      Assert.AreEqual(1.0F, kernel.Value(-0.99F), EPS);
-      Assert.AreEqual(1.0F, kernel.Value(-0.5F),  EPS);
-      Assert.AreEqual(1.0F, kernel.Value(-0.2F),  EPS);
-      Assert.AreEqual(1.0F, kernel.Value( 0.0F),  EPS);
-      Assert.AreEqual(1.0F, kernel.Value( 0.2F),  EPS);
-      Assert.AreEqual(1.0F, kernel.Value( 0.5F),  EPS);
-      Assert.AreEqual(1.0F, kernel.Value( 0.99F), EPS);
+      Assert.AreEqual(0.5F, kernel.Value(-0.99F), EPS);
+      Assert.AreEqual(0.5F, kernel.Value(-0.5F),  EPS);
+      Assert.AreEqual(0.5F, kernel.Value(-0.2F),  EPS);
+      Assert.AreEqual(0.5F, kernel.Value( 0.0F),  EPS);
+      Assert.AreEqual(0.5F, kernel.Value( 0.2F),  EPS);
+      Assert.AreEqual(0.5F, kernel.Value( 0.5F),  EPS);
+      Assert.AreEqual(0.5F, kernel.Value( 0.99F), EPS);
       Assert.AreEqual(0,    kernel.Value( 1.0F),  EPS);
       Assert.AreEqual(0,    kernel.Value( 1.01F), EPS);
       Assert.AreEqual(0,    kernel.Value( 1.5F),  EPS);

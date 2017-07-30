@@ -21,13 +21,9 @@ namespace ML.Core
     {
     }
 
-    /// <summary>
-    /// Algorithm mnemonic ID
-    /// </summary>
-    public abstract string ID { get; }
 
     /// <summary>
-    /// Algorithm name
+    /// Algorithm mnemonic ID
     /// </summary>
     public abstract string Name { get; }
 

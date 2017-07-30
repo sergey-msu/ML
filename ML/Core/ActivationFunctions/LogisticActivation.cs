@@ -18,8 +18,8 @@ namespace ML.Core.ActivationFunctions
       m_Alpha = alpha;
     }
 
-    public string ID { get { return "LGS"; } }
-    public string Name { get { return "Logistic"; } }
+    public string Name { get { return "LGS"; } }
+
     public double Alpha { get { return m_Alpha; } }
 
     public double Value(double r)

@@ -9,8 +9,8 @@ namespace ML.Core.Logical
   /// </summary>
   public class DonskoyIndex<TObj> : IndexBase<TObj>
   {
-    public override string ID { get {  return "DON"; } }
-    public override string Name { get { return "Donskoy Index"; } }
+    public override string Name { get {  return "DON"; } }
+
 
     public override double Calculate(Predicate<TObj> pattern, ClassifiedSample<TObj> sample)
     {

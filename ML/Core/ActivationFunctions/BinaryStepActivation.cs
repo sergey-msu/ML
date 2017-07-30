@@ -8,8 +8,8 @@ namespace ML.Core.ActivationFunctions
   /// </summary>
   public sealed class StepActivation : IFunction
   {
-    public string ID { get { return "STEP"; } }
-    public string Name { get { return "Binary Step"; } }
+    public string Name { get { return "STEP"; } }
+
 
     public double Value(double r)
     {
@@ -39,8 +39,8 @@ namespace ML.Core.ActivationFunctions
       m_Threshold = threshold;
     }
 
-    public string ID { get { return "SSTEP"; } }
-    public string Name { get { return "Shifted Binary Step"; } }
+    public string Name { get { return "SSTEP"; } }
+
     public double Threshold { get { return m_Threshold; } }
 
     public double Value(double r)

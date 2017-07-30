@@ -7,21 +7,51 @@ using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
-  public class MultinomialNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
+  public class TFIDFNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
     private Dictionary<ClassFeatureKey, double> m_Frequencies;
+    private List<double>        m_IDFWeights;
+    private ITFWeightingScheme  m_TFWeightingScheme;
+    private IIDFWeightingScheme m_IDFWeightingScheme;
 
-    public MultinomialNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
+
+    public TFIDFNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
       : base(preprocessor)
     {
+      TFWeightingScheme  = Registry.TFWeightingScheme.RawCount;
+      IDFWeightingScheme = Registry.IDFWeightingScheme.Standart;
     }
 
     #region Properties
 
-    public override string Name   { get { return "MNOMNB"; } }
-
+    public override string Name { get { return "TFIDFNB"; } }
 
     public Dictionary<ClassFeatureKey, double> Frequencies { get { return m_Frequencies; } }
+
+    public ITFWeightingScheme TFWeightingScheme
+    {
+      get { return m_TFWeightingScheme; }
+      set
+      {
+        if (value==null)
+          throw new MLException("TF weighting scheme cannot be null");
+
+        m_TFWeightingScheme=value;
+      }
+    }
+
+    public IIDFWeightingScheme IDFWeightingScheme
+    {
+      get { return m_IDFWeightingScheme; }
+      set
+      {
+        if (value==null)
+          throw new MLException("IDF weighting scheme cannot be null");
+
+        m_IDFWeightingScheme=value;
+      }
+    }
+
 
     #endregion
 
@@ -57,6 +87,7 @@ namespace ML.TextMethods.Algorithms
       var dict   = Vocabulary;
       var dim    = dict.Count;
       var result = new double[dim];
+      var freqs  = new int[dim];
       var prep   = Preprocessor;
       var tokens = prep.Preprocess(doc);
 
@@ -64,7 +95,14 @@ namespace ML.TextMethods.Algorithms
       {
         var idx = dict.IndexOf(token);
         if (idx<0) continue;
-        result[idx] += 1;
+        freqs[idx] += 1;
+      }
+
+      m_TFWeightingScheme.Reset();
+      for (int i=0; i<dim; i++)
+      {
+        var freq = freqs[i];
+        result[i] = m_TFWeightingScheme.GetFrequency(freqs, i) * m_IDFWeights[i];
       }
 
       return result;
@@ -73,9 +111,11 @@ namespace ML.TextMethods.Algorithms
 
     protected override void TrainImpl()
     {
+      var cnt = DataCount;
       var N = Vocabulary.Count;
       var a = Alpha;
-      var cTotal = new Dictionary<Class, int>();
+      var cTotal    = new Dictionary<Class, int>();
+      var idfFreqs  = new List<int>(N);
       m_Frequencies = new Dictionary<ClassFeatureKey, double>();
 
       foreach (var doc in TrainingSample)
@@ -90,10 +130,12 @@ namespace ML.TextMethods.Algorithms
         {
           var key = new ClassFeatureKey(cls, i);
           var f = data[i];
+
           double freq;
           if (!m_Frequencies.TryGetValue(key, out freq)) m_Frequencies[key] = f;
           else m_Frequencies[key] = freq+f;
 
+          if (f>0) idfFreqs[i] += 1;
           cTotal[cls] += (int)f;
         }
       }
@@ -104,12 +146,14 @@ namespace ML.TextMethods.Algorithms
         var total = (double)cTotal[key.Class];
         if (UseSmoothing)
         {
-          freq += a;
+          freq  += a;
           total += (a*N);
         }
 
         m_Frequencies[key] = freq/total;
       }
+
+      m_IDFWeights = IDFWeightingScheme.GetWeights(cnt, idfFreqs);
     }
 
   }

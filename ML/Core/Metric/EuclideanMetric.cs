@@ -9,8 +9,8 @@ namespace ML.Core.Metric
   /// </summary>
   public sealed class EuclideanMetric : MetricBase<double[]>
   {
-    public override string ID { get { return "EUCL"; } }
-    public override string Name { get { return "Euclidean"; } }
+    public override string Name { get { return "EUCL"; } }
+
 
     /// <summary>
     /// Distance between two points

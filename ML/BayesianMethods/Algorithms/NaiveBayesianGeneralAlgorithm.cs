@@ -38,8 +38,7 @@ namespace ML.BayesianMethods.Algorithms
       m_Distribution = distribution;
     }
 
-    public override string ID   { get { return "NPBAYES"; } }
-    public override string Name { get { return "Naive Bayesian parametric classification"; } }
+    public override string Name   { get { return "NPBAYES"; } }
 
     public TDistr Distribution { get { return m_Distribution; } }
 
@@ -68,8 +67,9 @@ namespace ML.BayesianMethods.Algorithms
           p += value;
         }
 
-        var ly = (ClassLosses == null) ? 1.0D : ClassLosses[cls];
-        p += Math.Log(ly*PriorProbs[cls]);
+        double penalty;
+        if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
+        p += Math.Log(penalty*PriorProbs[cls]);
 
         if (p > max)
         {
@@ -104,8 +104,9 @@ namespace ML.BayesianMethods.Algorithms
         }
       }
 
-      var ly = (ClassLosses == null) ? 1.0D : ClassLosses[cls];
-      p += Math.Log(ly*PriorProbs[cls]);
+      double penalty;
+      if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
+      p += Math.Log(penalty*PriorProbs[cls]);
 
       return p;
     }

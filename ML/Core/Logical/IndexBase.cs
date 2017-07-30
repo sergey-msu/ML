@@ -7,15 +7,10 @@ namespace ML.Core.Logical
   /// <summary>
   /// Base class for Informativity functions
   /// </summary>
-  public abstract class IndexBase<TObj>: IInformativityIndex<TObj>, IMnemonicNamed
+  public abstract class IndexBase<TObj>: IInformativityIndex<TObj>, INamed
   {
     /// <summary>
     /// Index mnemonic ID
-    /// </summary>
-    public abstract string ID { get; }
-
-    /// <summary>
-    /// Index name
     /// </summary>
     public abstract string Name { get; }
 

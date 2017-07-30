@@ -14,8 +14,8 @@ namespace ML.Core.ActivationFunctions
     }
 
     public readonly double ZeroValue;
-    public string ID { get { return "SIGN"; } }
-    public string Name { get { return "Signum"; } }
+    public string Name { get { return "SIGN"; } }
+
 
     public double Value(double r)
     {

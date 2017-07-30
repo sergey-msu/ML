@@ -34,8 +34,7 @@ namespace ML.BayesianMethods.Algorithms
       m_Metric = metric;
     }
 
-    public override string ID { get { return "BAYES"; } }
-    public override string Name { get { return "Bayesian Parzen non-parametric classification with general multidimensional kernel"; } }
+    public override string Name { get { return "BAYES"; } }
 
     /// <summary>
     /// Space metric

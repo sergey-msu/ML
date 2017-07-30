@@ -19,8 +19,8 @@ namespace ML.Core.Logical
 
     #endregion
 
-    public override string ID   { get {  return "ENTR"; } }
-    public override string Name { get { return "Multiclass Entropy Index"; } }
+    public override string Name   { get {  return "ENTR"; } }
+
 
     public override double Calculate(Predicate<TObj> pattern, ClassifiedSample<TObj> sample)
     {
