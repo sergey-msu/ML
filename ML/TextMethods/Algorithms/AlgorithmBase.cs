@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Contracts;
+using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -17,7 +18,8 @@ namespace ML.TextMethods.Algorithms
     private int m_DataDim;
     private int m_DataCount;
     private double m_Alpha;
-    private bool m_UserSmoothing;
+    private bool m_UseSmoothing;
+    private bool m_UsePriors;
 
     #endregion
 
@@ -27,14 +29,15 @@ namespace ML.TextMethods.Algorithms
         throw new MLException("NaiveBayesianAlgorithmBase.ctor(preprocessor=null)");
 
       m_Preprocessor = preprocessor;
-      m_UserSmoothing = true;
+      m_UseSmoothing = true;
+      m_UsePriors = true;
       m_Alpha = 1;
     }
 
     #region Properties
 
     public ITextPreprocessor Preprocessor { get { return m_Preprocessor; } }
-    public List<string> Vocabulary { get { return m_Vocabulary; } }
+    public List<string>      Vocabulary { get { return m_Vocabulary; } }
 
     public Dictionary<Class, double> PriorProbs { get { return m_PriorProbs; } }
     public Dictionary<Class, int>    ClassHist  { get { return m_ClassHist; } }
@@ -59,7 +62,12 @@ namespace ML.TextMethods.Algorithms
     /// <summary>
     /// If true, uses Laplace/Lidstone smoothing
     /// </summary>
-    public bool UseSmoothing { get { return m_UserSmoothing; } set { m_UserSmoothing=value; } }
+    public bool UseSmoothing { get { return m_UseSmoothing; } set { m_UseSmoothing=value; } }
+
+    /// <summary>
+    /// If true, the algorithm takes prior class probabilities into account
+    /// </summary>
+    public bool UsePriors { get { return m_UsePriors; } set { m_UsePriors=value; } }
 
     #endregion
 
@@ -74,6 +82,25 @@ namespace ML.TextMethods.Algorithms
     public abstract ClassScore[] PredictTokens(string obj, int cnt);
 
     public abstract double[] ExtractFeatureVector(string doc);
+
+    public double[] ExtractFrequencies(string doc)
+    {
+      var dict   = Vocabulary;
+      var dim    = dict.Count;
+      var result = new double[dim];
+      var prep   = Preprocessor;
+      var tokens = prep.Preprocess(doc);
+
+      foreach (var token in tokens)
+      {
+        var idx = dict.IndexOf(token);
+        if (idx<0) continue;
+        result[idx] += 1;
+      }
+
+      return result;
+    }
+
 
     protected override void DoTrain()
     {
@@ -119,6 +146,63 @@ namespace ML.TextMethods.Algorithms
 
       return dict.ToList();
     }
+  }
 
+  public abstract class LinearNaiveBayesianAlgorithmBase : NaiveBayesianAlgorithmBase
+  {
+    private Dictionary<ClassFeatureKey, double> m_Weights;
+
+    protected LinearNaiveBayesianAlgorithmBase(ITextPreprocessor preprocessor)
+      : base(preprocessor)
+    {
+    }
+
+    #region Properties
+
+    public Dictionary<ClassFeatureKey, double> Weights { get { return m_Weights; } }
+
+    #endregion
+
+    public override ClassScore[] PredictTokens(string obj, int cnt)
+    {
+      var data      = ExtractFeatureVector(obj);
+      var classes   = TrainingSample.CachedClasses;
+      var priors    = PriorProbs;
+      var dim       = DataDim;
+      var usePriors = UsePriors;
+      var scores    = new List<ClassScore>();
+
+      foreach (var cls in classes)
+      {
+        var score = usePriors ? Math.Log(priors[cls]) : 0.0D;
+        for (int i=0; i<dim; i++)
+        {
+          var x = data[i];
+          if (x==0) continue;
+          var w = m_Weights[new ClassFeatureKey(cls, i)];
+          score += x*w;
+        }
+
+        scores.Add(new ClassScore(cls, score));
+      }
+
+      return scores.OrderByDescending(s => s.Score)
+                   .Take(cnt)
+                   .ToArray();
+    }
+
+    public override double[] ExtractFeatureVector(string doc)
+    {
+      return ExtractFrequencies(doc);
+    }
+
+
+
+    protected override void TrainImpl()
+    {
+      m_Weights = TrainWeights();
+    }
+
+    protected abstract Dictionary<ClassFeatureKey, double> TrainWeights();
   }
 }

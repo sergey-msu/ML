@@ -7,10 +7,24 @@ using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
-  public class TFIDFNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
+  public class TFIDFNaiveBayesianAlgorithm : LinearNaiveBayesianAlgorithmBase
   {
-    private Dictionary<ClassFeatureKey, double> m_Frequencies;
-    private List<double>        m_IDFWeights;
+    #region Inner
+
+    protected struct FreqData
+    {
+      public FreqData(double value, Class cls)
+      {
+        Value = value;
+        Class = cls;
+      }
+
+      public readonly double Value;
+      public readonly Class  Class;
+    }
+
+    #endregion
+
     private ITFWeightingScheme  m_TFWeightingScheme;
     private IIDFWeightingScheme m_IDFWeightingScheme;
 
@@ -25,8 +39,6 @@ namespace ML.TextMethods.Algorithms
     #region Properties
 
     public override string Name { get { return "TFIDFNB"; } }
-
-    public Dictionary<ClassFeatureKey, double> Frequencies { get { return m_Frequencies; } }
 
     public ITFWeightingScheme TFWeightingScheme
     {
@@ -52,108 +64,74 @@ namespace ML.TextMethods.Algorithms
       }
     }
 
-
     #endregion
 
-    public override ClassScore[] PredictTokens(string obj, int cnt)
+    protected override Dictionary<ClassFeatureKey, double> TrainWeights()
     {
-      var data    = ExtractFeatureVector(obj);
-      var classes = TrainingSample.CachedClasses;
-      var priors  = PriorProbs;
-      var dim     = DataDim;
-      var scores  = new List<ClassScore>();
+      var dim       = DataDim;
+      var cnt       = DataCount;
+      var alpha     = Alpha;
+      var weights   = new Dictionary<ClassFeatureKey, double>();
+      var clsTotals = new Dictionary<Class, double>();
+      var idfFreqs  = new int[dim];
+      var freqDatas = new FreqData[dim, cnt];
 
-      foreach (var cls in classes)
-      {
-        var score = Math.Log(priors[cls]);
-        for (int i=0; i<dim; i++)
-        {
-          var x = data[i];
-          if (x==0) continue;
-          var p = m_Frequencies[new ClassFeatureKey(cls, i)];
-          score += x*Math.Log(p);
-        }
-
-        scores.Add(new ClassScore(cls, score));
-      }
-
-      return scores.OrderByDescending(s => s.Score)
-                   .Take(cnt)
-                   .ToArray();
-    }
-
-    public override double[] ExtractFeatureVector(string doc)
-    {
-      var dict   = Vocabulary;
-      var dim    = dict.Count;
-      var result = new double[dim];
-      var freqs  = new int[dim];
-      var prep   = Preprocessor;
-      var tokens = prep.Preprocess(doc);
-
-      foreach (var token in tokens)
-      {
-        var idx = dict.IndexOf(token);
-        if (idx<0) continue;
-        freqs[idx] += 1;
-      }
-
-      m_TFWeightingScheme.Reset();
-      for (int i=0; i<dim; i++)
-      {
-        var freq = freqs[i];
-        result[i] = m_TFWeightingScheme.GetFrequency(freqs, i) * m_IDFWeights[i];
-      }
-
-      return result;
-    }
-
-
-    protected override void TrainImpl()
-    {
-      var cnt = DataCount;
-      var N = Vocabulary.Count;
-      var a = Alpha;
-      var cTotal    = new Dictionary<Class, int>();
-      var idfFreqs  = new List<int>(N);
-      m_Frequencies = new Dictionary<ClassFeatureKey, double>();
-
+      // TF transform
+      int idx = -1;
       foreach (var doc in TrainingSample)
       {
+        idx++;
         var text = doc.Key;
         var cls  = doc.Value;
-        var data = ExtractFeatureVector(text);
+        var data = ExtractFrequencies(text);
 
-        if (!cTotal.ContainsKey(cls)) cTotal[cls] = 0;
+        m_TFWeightingScheme.Reset();
 
-        for (int i=0; i<N; i++)
+        for (int i=0; i<dim; i++)
         {
-          var key = new ClassFeatureKey(cls, i);
           var f = data[i];
-
-          double freq;
-          if (!m_Frequencies.TryGetValue(key, out freq)) m_Frequencies[key] = f;
-          else m_Frequencies[key] = freq+f;
+          var tf = m_TFWeightingScheme.GetFrequency(data, i);
+          freqDatas[i, idx] = new FreqData(tf, cls);
 
           if (f>0) idfFreqs[i] += 1;
-          cTotal[cls] += (int)f;
         }
       }
 
-      foreach (var key in m_Frequencies.Keys.ToList())
+      // IDF transform
+      var idfWeights = IDFWeightingScheme.GetWeights(dim, idfFreqs);
+      for (var i=0; i<dim; i++)
       {
-        var freq = m_Frequencies[key];
-        var total = (double)cTotal[key.Class];
+        var idf = idfWeights[i];
+        for (var j=0; j<cnt; j++)
+        {
+          var fData  = freqDatas[i, j];
+          var fValue = fData.Value*idf;
+          var cls    = fData.Class;
+          var key = new ClassFeatureKey(cls, i);
+
+          double w = weights.TryGetValue(key, out w) ? (w+fValue) : fValue;
+          weights[key] = w;
+
+          double t = clsTotals.TryGetValue(cls, out t) ? (t+fValue) : fValue;
+          clsTotals[cls] = t;
+        }
+      }
+
+      // calculate weights
+      foreach (var key in weights.Keys.ToList())
+      {
+        var w = weights[key];
+        var t = clsTotals[key.Class];
         if (UseSmoothing)
         {
-          freq  += a;
-          total += (a*N);
+          w += alpha;
+          t += (alpha*dim);
         }
 
-        m_Frequencies[key] = freq/total;
+        weights[key] = Math.Log(w/t);
       }
 
-      m_IDFWeights = IDFWeightingScheme.GetWeights(cnt, idfFreqs);
+      return weights;
     }
 
   }

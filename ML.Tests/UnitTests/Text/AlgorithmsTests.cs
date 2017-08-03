@@ -169,7 +169,7 @@ namespace ML.Tests.UnitTests.Text
 
     #endregion
 
-    #region BinaryNaiveBayesianAlgorithm
+    #region MultinomialNaiveBayesianAlgorithm
 
     [TestMethod]
     public void MultinomialNaiveBayesianAlgorithm_Train()
@@ -207,24 +207,24 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual(4/6.0D, alg.PriorProbs[CLS1]);
       Assert.AreEqual(2/6.0D, alg.PriorProbs[CLS2]);
 
-      Assert.AreEqual(16, alg.Frequencies.Count);
-      Assert.AreEqual(7.0/21, alg.Frequencies[new ClassFeatureKey(CLS1, 0)]);
-      Assert.AreEqual(2.0/21, alg.Frequencies[new ClassFeatureKey(CLS1, 1)]);
-      Assert.AreEqual(2.0/21, alg.Frequencies[new ClassFeatureKey(CLS1, 2)]);
-      Assert.AreEqual(2.0/21, alg.Frequencies[new ClassFeatureKey(CLS1, 3)]);
-      Assert.AreEqual(2.0/21, alg.Frequencies[new ClassFeatureKey(CLS1, 4)]);
-      Assert.AreEqual(3.0/21, alg.Frequencies[new ClassFeatureKey(CLS1, 5)]);
-      Assert.AreEqual(2.0/21, alg.Frequencies[new ClassFeatureKey(CLS1, 6)]);
-      Assert.AreEqual(1.0/21, alg.Frequencies[new ClassFeatureKey(CLS1, 7)]);
+      Assert.AreEqual(16, alg.Weights.Count);
+      Assert.AreEqual(Math.Log(7.0/21), alg.Weights[new ClassFeatureKey(CLS1, 0)], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 1)], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 2)], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 3)], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 4)], EPS);
+      Assert.AreEqual(Math.Log(3.0/21), alg.Weights[new ClassFeatureKey(CLS1, 5)], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 6)], EPS);
+      Assert.AreEqual(Math.Log(1.0/21), alg.Weights[new ClassFeatureKey(CLS1, 7)], EPS);
 
-      Assert.AreEqual(1.0/14, alg.Frequencies[new ClassFeatureKey(CLS2, 0)]);
-      Assert.AreEqual(2.0/14, alg.Frequencies[new ClassFeatureKey(CLS2, 1)]);
-      Assert.AreEqual(1.0/14, alg.Frequencies[new ClassFeatureKey(CLS2, 2)]);
-      Assert.AreEqual(1.0/14, alg.Frequencies[new ClassFeatureKey(CLS2, 3)]);
-      Assert.AreEqual(4.0/14, alg.Frequencies[new ClassFeatureKey(CLS2, 4)]);
-      Assert.AreEqual(1.0/14, alg.Frequencies[new ClassFeatureKey(CLS2, 5)]);
-      Assert.AreEqual(2.0/14, alg.Frequencies[new ClassFeatureKey(CLS2, 6)]);
-      Assert.AreEqual(2.0/14, alg.Frequencies[new ClassFeatureKey(CLS2, 7)]);
+      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS2, 0)], EPS);
+      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS2, 1)], EPS);
+      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS2, 2)], EPS);
+      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS2, 3)], EPS);
+      Assert.AreEqual(Math.Log(4.0/14), alg.Weights[new ClassFeatureKey(CLS2, 4)], EPS);
+      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS2, 5)], EPS);
+      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS2, 6)], EPS);
+      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS2, 7)], EPS);
     }
 
     [TestMethod]
@@ -285,10 +285,10 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual(-3.85545265394D, result1[0].Score, EPS);
       Assert.AreEqual(CLS2, result1[1].Class);
       Assert.AreEqual(-6.3767269479D, result1[1].Score, EPS);
-      Assert.AreEqual(CLS1, result2[1].Class);
-      Assert.AreEqual(-18.6568513775D, result2[1].Score, EPS);
       Assert.AreEqual(CLS2, result2[0].Class);
       Assert.AreEqual(-16.6658934811D, result2[0].Score, EPS);
+      Assert.AreEqual(CLS1, result2[1].Class);
+      Assert.AreEqual(-18.6568513775D, result2[1].Score, EPS);
     }
 
     [TestMethod]
@@ -300,6 +300,682 @@ namespace ML.Tests.UnitTests.Text
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
       var alg = new MultinomialNaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.Predict(testDocs()[0]);
+      var result2 = alg.Predict(testDocs()[1]);
+      var result3 = alg.Predict(testDocs()[2]);
+
+      // assert
+      Assert.AreEqual(CLS1, result1);
+      Assert.AreEqual(CLS2, result2);
+      Assert.AreEqual(CLS2, result3);
+    }
+
+    #endregion
+
+    #region ComplementNaiveBayesianAlgorithm
+
+    [TestMethod]
+    public void ComplementNaiveBayesianAlgorithm_Train()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new ComplementNaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+
+      // assert
+      Assert.AreEqual(sample, alg.TrainingSample);
+      Assert.AreEqual(prep, alg.Preprocessor);
+      Assert.AreEqual(2, alg.ClassHist.Count);
+      Assert.AreEqual(4, alg.ClassHist[CLS1]);
+      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(6, alg.DataCount);
+      Assert.AreEqual(8, alg.DataDim);
+
+      Assert.AreEqual(8, alg.Vocabulary.Count);
+      Assert.AreEqual("cat",      alg.Vocabulary[0]);
+      Assert.AreEqual("like",     alg.Vocabulary[1]);
+      Assert.AreEqual("icecream", alg.Vocabulary[2]);
+      Assert.AreEqual("at",       alg.Vocabulary[3]);
+      Assert.AreEqual("dog",      alg.Vocabulary[4]);
+      Assert.AreEqual("meet",     alg.Vocabulary[5]);
+      Assert.AreEqual("world",    alg.Vocabulary[6]);
+      Assert.AreEqual("seven",    alg.Vocabulary[7]);
+
+      Assert.AreEqual(2, alg.PriorProbs.Count);
+      Assert.AreEqual(4/6.0D, alg.PriorProbs[CLS1]);
+      Assert.AreEqual(2/6.0D, alg.PriorProbs[CLS2]);
+
+      Assert.AreEqual(16, alg.Weights.Count);
+      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 0)], EPS);
+      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 1)], EPS);
+      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 2)], EPS);
+      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 3)], EPS);
+      Assert.AreEqual(-Math.Log(4.0/14), alg.Weights[new ClassFeatureKey(CLS1, 4)], EPS);
+      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 5)], EPS);
+      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 6)], EPS);
+      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 7)], EPS);
+
+      Assert.AreEqual(-Math.Log(7.0/21), alg.Weights[new ClassFeatureKey(CLS2, 0)], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 1)], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 2)], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 3)], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 4)], EPS);
+      Assert.AreEqual(-Math.Log(3.0/21), alg.Weights[new ClassFeatureKey(CLS2, 5)], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 6)], EPS);
+      Assert.AreEqual(-Math.Log(1.0/21), alg.Weights[new ClassFeatureKey(CLS2, 7)], EPS);
+    }
+
+    [TestMethod]
+    public void ComplementNaiveBayesianAlgorithm_ExtractFeatureVector()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new ComplementNaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+
+      // assert
+      Assert.AreEqual(8, result1.Length);
+      Assert.AreEqual(1, result1[0]);
+      Assert.AreEqual(0, result1[1]);
+      Assert.AreEqual(1, result1[2]);
+      Assert.AreEqual(0, result1[3]);
+      Assert.AreEqual(0, result1[4]);
+      Assert.AreEqual(0, result1[5]);
+      Assert.AreEqual(0, result1[6]);
+      Assert.AreEqual(0, result1[7]);
+
+      Assert.AreEqual(8, result2.Length);
+      Assert.AreEqual(1, result2[0]);
+      Assert.AreEqual(2, result2[1]);
+      Assert.AreEqual(1, result2[2]);
+      Assert.AreEqual(0, result2[3]);
+      Assert.AreEqual(2, result2[4]);
+      Assert.AreEqual(0, result2[5]);
+      Assert.AreEqual(1, result2[6]);
+      Assert.AreEqual(1, result2[7]);
+    }
+
+    [TestMethod]
+    public void ComplementNaiveBayesianAlgorithm_PredictTokens()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new ComplementNaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.PredictTokens(testDocs()[0], 2);
+      var result2 = alg.PredictTokens(testDocs()[1], 2);
+
+      // assert
+      Assert.AreEqual(2, result1.Length);
+      Assert.AreEqual(CLS1, result1[0].Class);
+      Assert.AreEqual(4.8726495511D, result1[0].Score, EPS);
+      Assert.AreEqual(CLS2, result1[1].Class);
+      Assert.AreEqual(2.3513752571D, result1[1].Score, EPS);
+      Assert.AreEqual(CLS2, result2[0].Class);
+      Assert.AreEqual(17.152773981D, result2[0].Score, EPS);
+      Assert.AreEqual(CLS1, result2[1].Class);
+      Assert.AreEqual(15.161816084D, result2[1].Score, EPS);
+    }
+
+    [TestMethod]
+    public void ComplementNaiveBayesianAlgorithm_Predict()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new ComplementNaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.Predict(testDocs()[0]);
+      var result2 = alg.Predict(testDocs()[1]);
+      var result3 = alg.Predict(testDocs()[2]);
+
+      // assert
+      Assert.AreEqual(CLS1, result1);
+      Assert.AreEqual(CLS2, result2);
+      Assert.AreEqual(CLS2, result3);
+    }
+
+    #endregion
+
+    #region ComplementOVANaiveBayesianAlgorithm
+
+    [TestMethod]
+    public void ComplementOVANaiveBayesianAlgorithm_Train()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+
+      // assert
+      Assert.AreEqual(sample, alg.TrainingSample);
+      Assert.AreEqual(prep, alg.Preprocessor);
+      Assert.AreEqual(2, alg.ClassHist.Count);
+      Assert.AreEqual(4, alg.ClassHist[CLS1]);
+      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(6, alg.DataCount);
+      Assert.AreEqual(8, alg.DataDim);
+
+      Assert.AreEqual(8, alg.Vocabulary.Count);
+      Assert.AreEqual("cat",      alg.Vocabulary[0]);
+      Assert.AreEqual("like",     alg.Vocabulary[1]);
+      Assert.AreEqual("icecream", alg.Vocabulary[2]);
+      Assert.AreEqual("at",       alg.Vocabulary[3]);
+      Assert.AreEqual("dog",      alg.Vocabulary[4]);
+      Assert.AreEqual("meet",     alg.Vocabulary[5]);
+      Assert.AreEqual("world",    alg.Vocabulary[6]);
+      Assert.AreEqual("seven",    alg.Vocabulary[7]);
+
+      Assert.AreEqual(2, alg.PriorProbs.Count);
+      Assert.AreEqual(4/6.0D, alg.PriorProbs[CLS1]);
+      Assert.AreEqual(2/6.0D, alg.PriorProbs[CLS2]);
+
+      Assert.AreEqual(16, alg.Weights.Count);
+      Assert.AreEqual(Math.Log(7.0/21)-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 0)]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 1)]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 2)]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 3)]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(4.0/14), alg.Weights[new ClassFeatureKey(CLS1, 4)]);
+      Assert.AreEqual(Math.Log(3.0/21)-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 5)]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 6)]);
+      Assert.AreEqual(Math.Log(1.0/21)-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 7)]);
+
+      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(7.0/21), alg.Weights[new ClassFeatureKey(CLS2, 0)]);
+      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 1)]);
+      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 2)]);
+      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 3)]);
+      Assert.AreEqual(Math.Log(4.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 4)]);
+      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(3.0/21), alg.Weights[new ClassFeatureKey(CLS2, 5)]);
+      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 6)]);
+      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(1.0/21), alg.Weights[new ClassFeatureKey(CLS2, 7)]);
+    }
+
+    [TestMethod]
+    public void ComplementOVANaiveBayesianAlgorithm_ExtractFeatureVector()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+
+      // assert
+      Assert.AreEqual(8, result1.Length);
+      Assert.AreEqual(1, result1[0]);
+      Assert.AreEqual(0, result1[1]);
+      Assert.AreEqual(1, result1[2]);
+      Assert.AreEqual(0, result1[3]);
+      Assert.AreEqual(0, result1[4]);
+      Assert.AreEqual(0, result1[5]);
+      Assert.AreEqual(0, result1[6]);
+      Assert.AreEqual(0, result1[7]);
+
+      Assert.AreEqual(8, result2.Length);
+      Assert.AreEqual(1, result2[0]);
+      Assert.AreEqual(2, result2[1]);
+      Assert.AreEqual(1, result2[2]);
+      Assert.AreEqual(0, result2[3]);
+      Assert.AreEqual(2, result2[4]);
+      Assert.AreEqual(0, result2[5]);
+      Assert.AreEqual(1, result2[6]);
+      Assert.AreEqual(1, result2[7]);
+    }
+
+    [TestMethod]
+    public void ComplementOVANaiveBayesianAlgorithm_PredictTokens()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.PredictTokens(testDocs()[0], 2);
+      var result2 = alg.PredictTokens(testDocs()[1], 2);
+
+      // assert
+      Assert.AreEqual(2, result1.Length);
+      Assert.AreEqual(CLS1, result1[0].Class);
+      Assert.AreEqual(1.42266200529D, result1[0].Score, EPS);
+      Assert.AreEqual(CLS2, result1[1].Class);
+      Assert.AreEqual(-2.9267394021D, result1[1].Score, EPS);
+      Assert.AreEqual(CLS2, result2[0].Class);
+      Assert.AreEqual(1.58549278826D, result2[0].Score, EPS);
+      Assert.AreEqual(CLS1, result2[1].Class);
+      Assert.AreEqual(-3.0895701850D, result2[1].Score, EPS);
+    }
+
+    [TestMethod]
+    public void ComplementOVANaiveBayesianAlgorithm_Predict()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.Predict(testDocs()[0]);
+      var result2 = alg.Predict(testDocs()[1]);
+      var result3 = alg.Predict(testDocs()[2]);
+
+      // assert
+      Assert.AreEqual(CLS1, result1);
+      Assert.AreEqual(CLS2, result2);
+      Assert.AreEqual(CLS2, result3);
+    }
+
+    #endregion
+
+    #region TFIDFNaiveBayesianAlgorithm
+
+    [TestMethod]
+    public void TFIDFNaiveBayesianAlgorithm_Train()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new TFIDFNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+       };
+
+      // act
+      alg.Train(sample);
+
+      // assert
+      Assert.AreEqual(sample, alg.TrainingSample);
+      Assert.AreEqual(prep, alg.Preprocessor);
+      Assert.AreEqual(2, alg.ClassHist.Count);
+      Assert.AreEqual(4, alg.ClassHist[CLS1]);
+      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(6, alg.DataCount);
+      Assert.AreEqual(8, alg.DataDim);
+
+      Assert.AreEqual(8, alg.Vocabulary.Count);
+      Assert.AreEqual("cat",      alg.Vocabulary[0]);
+      Assert.AreEqual("like",     alg.Vocabulary[1]);
+      Assert.AreEqual("icecream", alg.Vocabulary[2]);
+      Assert.AreEqual("at",       alg.Vocabulary[3]);
+      Assert.AreEqual("dog",      alg.Vocabulary[4]);
+      Assert.AreEqual("meet",     alg.Vocabulary[5]);
+      Assert.AreEqual("world",    alg.Vocabulary[6]);
+      Assert.AreEqual("seven",    alg.Vocabulary[7]);
+
+      Assert.AreEqual(2, alg.PriorProbs.Count);
+      Assert.AreEqual(4/6.0D, alg.PriorProbs[CLS1]);
+      Assert.AreEqual(2/6.0D, alg.PriorProbs[CLS2]);
+
+      Assert.AreEqual(16, alg.Weights.Count);
+      Assert.AreEqual(-1.5552175827D, alg.Weights[new ClassFeatureKey(CLS1, 0)], EPS);
+      Assert.AreEqual(-2.2401396740D, alg.Weights[new ClassFeatureKey(CLS1, 1)], EPS);
+      Assert.AreEqual(-1.9851330973D, alg.Weights[new ClassFeatureKey(CLS1, 2)], EPS);
+      Assert.AreEqual(-1.9851330973D, alg.Weights[new ClassFeatureKey(CLS1, 3)], EPS);
+      Assert.AreEqual(-2.4263657885D, alg.Weights[new ClassFeatureKey(CLS1, 4)], EPS);
+      Assert.AreEqual(-1.7821199307D, alg.Weights[new ClassFeatureKey(CLS1, 5)], EPS);
+      Assert.AreEqual(-2.2401396740D, alg.Weights[new ClassFeatureKey(CLS1, 6)], EPS);
+      Assert.AreEqual(-3.1098813602D, alg.Weights[new ClassFeatureKey(CLS1, 7)], EPS);
+
+      Assert.AreEqual(-2.7404236664, alg.Weights[new ClassFeatureKey(CLS2, 0)], EPS);
+      Assert.AreEqual(-1.8706819802, alg.Weights[new ClassFeatureKey(CLS2, 1)], EPS);
+      Assert.AreEqual(-2.7404236664, alg.Weights[new ClassFeatureKey(CLS2, 2)], EPS);
+      Assert.AreEqual(-2.7404236664, alg.Weights[new ClassFeatureKey(CLS2, 3)], EPS);
+      Assert.AreEqual(-1.4480231657, alg.Weights[new ClassFeatureKey(CLS2, 4)], EPS);
+      Assert.AreEqual(-2.7404236664, alg.Weights[new ClassFeatureKey(CLS2, 5)], EPS);
+      Assert.AreEqual(-1.8706819802, alg.Weights[new ClassFeatureKey(CLS2, 6)], EPS);
+      Assert.AreEqual(-1.6156754035, alg.Weights[new ClassFeatureKey(CLS2, 7)], EPS);
+    }
+
+    [TestMethod]
+    public void TFIDFNaiveBayesianAlgorithm_ExtractFeatureVector()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new TFIDFNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+       };
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+
+      // assert
+      Assert.AreEqual(8, result1.Length);
+      Assert.AreEqual(1, result1[0]);
+      Assert.AreEqual(0, result1[1]);
+      Assert.AreEqual(1, result1[2]);
+      Assert.AreEqual(0, result1[3]);
+      Assert.AreEqual(0, result1[4]);
+      Assert.AreEqual(0, result1[5]);
+      Assert.AreEqual(0, result1[6]);
+      Assert.AreEqual(0, result1[7]);
+
+      Assert.AreEqual(8, result2.Length);
+      Assert.AreEqual(1, result2[0]);
+      Assert.AreEqual(2, result2[1]);
+      Assert.AreEqual(1, result2[2]);
+      Assert.AreEqual(0, result2[3]);
+      Assert.AreEqual(2, result2[4]);
+      Assert.AreEqual(0, result2[5]);
+      Assert.AreEqual(1, result2[6]);
+      Assert.AreEqual(1, result2[7]);
+    }
+
+    [TestMethod]
+    public void TFIDFNaiveBayesianAlgorithm_PredictTokens()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg  = new TFIDFNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+       };
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.PredictTokens(testDocs()[0], 2);
+      var result2 = alg.PredictTokens(testDocs()[1], 2);
+
+      // assert
+      Assert.AreEqual(2, result1.Length);
+      Assert.AreEqual(CLS1, result1[0].Class);
+      Assert.AreEqual(-3.9458157882D, result1[0].Score, EPS);
+      Assert.AreEqual(CLS2, result1[1].Class);
+      Assert.AreEqual(-6.5794596214D, result1[1].Score, EPS);
+      Assert.AreEqual(CLS2, result2[0].Class);
+      Assert.AreEqual(-16.7032272969D, result2[0].Score, EPS);
+      Assert.AreEqual(CLS1, result2[1].Class);
+      Assert.AreEqual(-18.6288477476D, result2[1].Score, EPS);
+    }
+
+    [TestMethod]
+    public void TFIDFNaiveBayesianAlgorithm_Predict()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new TFIDFNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+       };
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.Predict(testDocs()[0]);
+      var result2 = alg.Predict(testDocs()[1]);
+      var result3 = alg.Predict(testDocs()[2]);
+
+      // assert
+      Assert.AreEqual(CLS1, result1);
+      Assert.AreEqual(CLS2, result2);
+      Assert.AreEqual(CLS2, result3);
+    }
+
+    #endregion
+
+    #region TWCNaiveBayesianAlgorithm
+
+    [TestMethod]
+    public void TWCNaiveBayesianAlgorithm_Train()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new TWCNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+       };
+
+      // act
+      alg.Train(sample);
+
+      // assert
+      Assert.AreEqual(sample, alg.TrainingSample);
+      Assert.AreEqual(prep, alg.Preprocessor);
+      Assert.AreEqual(2, alg.ClassHist.Count);
+      Assert.AreEqual(4, alg.ClassHist[CLS1]);
+      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(6, alg.DataCount);
+      Assert.AreEqual(8, alg.DataDim);
+
+      Assert.AreEqual(8, alg.Vocabulary.Count);
+      Assert.AreEqual("cat",      alg.Vocabulary[0]);
+      Assert.AreEqual("like",     alg.Vocabulary[1]);
+      Assert.AreEqual("icecream", alg.Vocabulary[2]);
+      Assert.AreEqual("at",       alg.Vocabulary[3]);
+      Assert.AreEqual("dog",      alg.Vocabulary[4]);
+      Assert.AreEqual("meet",     alg.Vocabulary[5]);
+      Assert.AreEqual("world",    alg.Vocabulary[6]);
+      Assert.AreEqual("seven",    alg.Vocabulary[7]);
+
+      Assert.AreEqual(2, alg.PriorProbs.Count);
+      Assert.AreEqual(4/6.0D, alg.PriorProbs[CLS1]);
+      Assert.AreEqual(2/6.0D, alg.PriorProbs[CLS2]);
+
+      Assert.AreEqual(16, alg.Weights.Count);
+      Assert.AreEqual(0.1415017531D, alg.Weights[new ClassFeatureKey(CLS1, 0)], EPS);
+      Assert.AreEqual(0.1169948657D, alg.Weights[new ClassFeatureKey(CLS1, 1)], EPS);
+      Assert.AreEqual(0.1415017531D, alg.Weights[new ClassFeatureKey(CLS1, 2)], EPS);
+      Assert.AreEqual(0.1415017531D, alg.Weights[new ClassFeatureKey(CLS1, 3)], EPS);
+      Assert.AreEqual(0.0969081526D, alg.Weights[new ClassFeatureKey(CLS1, 4)], EPS);
+      Assert.AreEqual(0.1415017531D, alg.Weights[new ClassFeatureKey(CLS1, 5)], EPS);
+      Assert.AreEqual(0.1123506098D, alg.Weights[new ClassFeatureKey(CLS1, 6)], EPS);
+      Assert.AreEqual(0.1077393596D, alg.Weights[new ClassFeatureKey(CLS1, 7)], EPS);
+
+      Assert.AreEqual(0.0968271218, alg.Weights[new ClassFeatureKey(CLS2, 0)], EPS);
+      Assert.AreEqual(0.1314521840, alg.Weights[new ClassFeatureKey(CLS2, 1)], EPS);
+      Assert.AreEqual(0.1219882919, alg.Weights[new ClassFeatureKey(CLS2, 2)], EPS);
+      Assert.AreEqual(0.1250806983, alg.Weights[new ClassFeatureKey(CLS2, 3)], EPS);
+      Assert.AreEqual(0.1396735112, alg.Weights[new ClassFeatureKey(CLS2, 4)], EPS);
+      Assert.AreEqual(0.1092522527, alg.Weights[new ClassFeatureKey(CLS2, 5)], EPS);
+      Assert.AreEqual(0.1190328859, alg.Weights[new ClassFeatureKey(CLS2, 6)], EPS);
+      Assert.AreEqual(0.1566930542, alg.Weights[new ClassFeatureKey(CLS2, 7)], EPS);
+    }
+
+    [TestMethod]
+    public void TWCNaiveBayesianAlgorithm_ExtractFeatureVector()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new TWCNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+       };
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+
+      // assert
+      Assert.AreEqual(8, result1.Length);
+      Assert.AreEqual(1, result1[0]);
+      Assert.AreEqual(0, result1[1]);
+      Assert.AreEqual(1, result1[2]);
+      Assert.AreEqual(0, result1[3]);
+      Assert.AreEqual(0, result1[4]);
+      Assert.AreEqual(0, result1[5]);
+      Assert.AreEqual(0, result1[6]);
+      Assert.AreEqual(0, result1[7]);
+
+      Assert.AreEqual(8, result2.Length);
+      Assert.AreEqual(1, result2[0]);
+      Assert.AreEqual(2, result2[1]);
+      Assert.AreEqual(1, result2[2]);
+      Assert.AreEqual(0, result2[3]);
+      Assert.AreEqual(2, result2[4]);
+      Assert.AreEqual(0, result2[5]);
+      Assert.AreEqual(1, result2[6]);
+      Assert.AreEqual(1, result2[7]);
+    }
+
+    [TestMethod]
+    public void TWCNaiveBayesianAlgorithm_PredictTokens()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg  = new TWCNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        UsePriors = true
+       };
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.PredictTokens(testDocs()[0], 2);
+      var result2 = alg.PredictTokens(testDocs()[1], 2);
+
+      // assert
+      Assert.AreEqual(2, result1.Length);
+      Assert.AreEqual(CLS1, result1[0].Class);
+      Assert.AreEqual(-0.1224616D, result1[0].Score, EPS);
+      Assert.AreEqual(CLS2, result1[1].Class);
+      Assert.AreEqual(-0.8797969D, result1[1].Score, EPS);
+      Assert.AreEqual(CLS1, result2[0].Class);
+      Assert.AreEqual(0.5254344D, result2[0].Score, EPS);
+      Assert.AreEqual(CLS2, result2[1].Class);
+      Assert.AreEqual(-0.0618195D, result2[1].Score, EPS);
+    }
+
+    [TestMethod]
+    public void TWCNaiveBayesianAlgorithm_PredictTokens_NoPriors()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg  = new TWCNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        UsePriors = false // !!!
+       };
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.PredictTokens(testDocs()[0], 2);
+      var result2 = alg.PredictTokens(testDocs()[1], 2);
+
+      // assert
+      Assert.AreEqual(2, result1.Length);
+      Assert.AreEqual(CLS1, result1[0].Class);
+      Assert.AreEqual(0.2830035D, result1[0].Score, EPS);
+      Assert.AreEqual(CLS2, result1[1].Class);
+      Assert.AreEqual(0.2188154D, result1[1].Score, EPS);
+      Assert.AreEqual(CLS2, result2[0].Class);
+      Assert.AreEqual(1.0367927D, result2[0].Score, EPS);
+      Assert.AreEqual(CLS1, result2[1].Class);
+      Assert.AreEqual(0.9308995D, result2[1].Score, EPS);
+    }
+
+    [TestMethod]
+    public void TWCNaiveBayesianAlgorithm_Predict()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new TWCNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+       };
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.Predict(testDocs()[0]);
+      var result2 = alg.Predict(testDocs()[1]);
+      var result3 = alg.Predict(testDocs()[2]);
+
+      // assert
+      Assert.AreEqual(CLS1, result1);
+      Assert.AreEqual(CLS1, result2);
+      Assert.AreEqual(CLS1, result3);
+    }
+
+    [TestMethod]
+    public void TWCNaiveBayesianAlgorithm_Predict_NoPriors()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+      var alg = new TWCNaiveBayesianAlgorithm(prep)
+      {
+        TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        UsePriors = false // !!!
+       };
 
       // act
       alg.Train(sample);

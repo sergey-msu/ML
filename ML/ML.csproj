@@ -175,11 +175,13 @@
     <Compile Include="NeuralMethods\Models\NeuralNetwork.cs" />
     <Compile Include="NeuralMethods\Models\Neuron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextMethods\Algorithms\ComplementOVANaiveBayesianAlgorithm.cs" />
+    <Compile Include="TextMethods\Algorithms\ComplementNaiveBayesianAlgorithm.cs" />
     <Compile Include="TextMethods\Algorithms\_GeneralNaiveBayesianAlgorithm.cs" />
-    <Compile Include="TextMethods\Algorithms\_TWCNaiveBayesianAlgorithm.cs" />
+    <Compile Include="TextMethods\Algorithms\TWCNaiveBayesianAlgorithm.cs" />
     <Compile Include="TextMethods\Algorithms\TFIDFNaiveBayesianAlgorithm.cs" />
     <Compile Include="TextMethods\Algorithms\MultinomialNaiveBayesianAlgorithm.cs" />
-    <Compile Include="TextMethods\Algorithms\NaiveBayesianAlgorithmBase.cs" />
+    <Compile Include="TextMethods\Algorithms\AlgorithmBase.cs" />
     <Compile Include="TextMethods\Algorithms\BinaryNaiveBayesianAlgorithm.cs" />
     <Compile Include="TextMethods\Normalization\EnglishSimpleNormalizer.cs" />
     <Compile Include="TextMethods\Preprocessing\TextPreprocessor.cs" />

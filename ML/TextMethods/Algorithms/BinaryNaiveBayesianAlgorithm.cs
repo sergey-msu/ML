@@ -26,11 +26,11 @@ namespace ML.TextMethods.Algorithms
 
     public override ClassScore[] PredictTokens(string obj, int cnt)
     {
-      var data = ExtractFeatureVector(obj);
+      var data    = ExtractFeatureVector(obj);
       var classes = TrainingSample.CachedClasses;
-      var priors = PriorProbs;
-      var dim = DataDim;
-      var scores = new List<ClassScore>();
+      var priors  = PriorProbs;
+      var dim     = DataDim;
+      var scores  = new List<ClassScore>();
 
       foreach (var cls in classes)
       {
@@ -53,7 +53,7 @@ namespace ML.TextMethods.Algorithms
     public override double[] ExtractFeatureVector(string doc)
     {
       var dict   = Vocabulary;
-      var dim    = dict.Count;
+      var dim    = DataDim;
       var result = new double[dim];
       var prep   = Preprocessor;
       var tokens = prep.Preprocess(doc);
@@ -71,31 +71,30 @@ namespace ML.TextMethods.Algorithms
 
     protected override void TrainImpl()
     {
-      m_Frequencies = new Dictionary<ClassFeatureKey, double>();
       var cHist = ClassHist;
       var N = Vocabulary.Count;
       var a = Alpha;
+      var freqs = new Dictionary<ClassFeatureKey, double>();
 
       foreach (var doc in TrainingSample)
       {
         var text = doc.Key;
         var cls  = doc.Value;
         var data = ExtractFeatureVector(text);
-        var dim = data.Length;
 
-        for (int i=0; i<dim; i++)
+        for (int i=0; i<N; i++)
         {
           var key = new ClassFeatureKey(cls, i);
           var f = data[i];
           double freq;
-          if (!m_Frequencies.TryGetValue(key, out freq)) m_Frequencies[key] = f;
-          else m_Frequencies[key] = freq+f;
+          if (!freqs.TryGetValue(key, out freq)) freqs[key] = f;
+          else freqs[key] = freq+f;
         }
       }
 
-      foreach (var key in m_Frequencies.Keys.ToList())
+      foreach (var key in freqs.Keys.ToList())
       {
-        var freq = m_Frequencies[key];
+        var freq = freqs[key];
         var total = (double)cHist[key.Class];
         if (UseSmoothing)
         {
@@ -103,8 +102,10 @@ namespace ML.TextMethods.Algorithms
           total += (a*N);
         }
 
-        m_Frequencies[key] = freq/total;
+        freqs[key] = freq/total;
       }
+
+      m_Frequencies = freqs;
     }
 
 

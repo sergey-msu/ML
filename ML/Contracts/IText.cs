@@ -79,11 +79,11 @@ namespace ML.Contracts
   {
     void Reset();
 
-    double GetFrequency(int[] initFreqs, int idx);
+    double GetFrequency(double[] initFreqs, int idx);
   }
 
   public interface IIDFWeightingScheme : INamed
   {
-    List<double> GetWeights(int vocabularyCount, List<int> idfFreqs);
+    double[] GetWeights(int vocabularyCount, int[] idfFreqs);
   }
 }

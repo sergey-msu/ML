@@ -9,8 +9,6 @@ namespace ML.TextMethods.Algorithms
 {
   public class GeneralNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
-    private Dictionary<ClassFeatureKey, double> m_Frequencies;
-
     public GeneralNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
       : base(preprocessor)
     {
@@ -18,7 +16,7 @@ namespace ML.TextMethods.Algorithms
 
     #region Properties
 
-    public override string Name   { get { return "TWCNB"; } }
+    public override string Name   { get { return "GENNB"; } }
 
     #endregion
 

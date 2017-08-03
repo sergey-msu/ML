@@ -135,6 +135,7 @@ namespace ML.Registry
     public static readonly BinaryTFWeightingScheme Binary = new BinaryTFWeightingScheme();
     public static readonly RawCountTFWeightingScheme RawCount = new RawCountTFWeightingScheme();
     public static readonly LogNormalizationTFWeightingScheme LogNormalization = new LogNormalizationTFWeightingScheme();
+    public static readonly TermFrequencyTFWeightingScheme TermFrequency = new TermFrequencyTFWeightingScheme();
 
     public static DoubleNormalizationTFWeightingScheme DoubleNormalization(double k=0.5)
     {
@@ -143,9 +144,10 @@ namespace ML.Registry
 
     public static readonly Dictionary<string, ITFWeightingScheme> ByID = new Dictionary<string, ITFWeightingScheme>
     {
-      { Binary.Name,    Binary },
-      { RawCount.Name,   RawCount },
-      { LogNormalization.Name,     LogNormalization },
+      { Binary.Name,                Binary },
+      { RawCount.Name,              RawCount },
+      { LogNormalization.Name,      LogNormalization },
+      { TermFrequency.Name,         TermFrequency },
       { DoubleNormalization().Name, DoubleNormalization() }
     };
   }
