@@ -7,7 +7,7 @@ using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
-  public class MultinomialNaiveBayesianAlgorithm : LinearNaiveBayesianAlgorithmBase
+  public class MultinomialNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
     public MultinomialNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
       : base(preprocessor)

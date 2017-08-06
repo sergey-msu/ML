@@ -11,6 +11,8 @@ using ML.TextMethods.Stemming;
 using ML.Core;
 using ML.Core.Distributions;
 using ML.Contracts;
+using ML.Core.Kernels;
+using ML.BayesianMethods.Algorithms;
 
 namespace ML.Tests.UnitTests.Text
 {
@@ -61,24 +63,24 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual(4/6.0D, alg.PriorProbs[CLS1]);
       Assert.AreEqual(2/6.0D, alg.PriorProbs[CLS2]);
 
-      Assert.AreEqual(16, alg.Frequencies.Count);
-      Assert.AreEqual(5.0/12, alg.Frequencies[new ClassFeatureKey(CLS1, 0)]);
-      Assert.AreEqual(2.0/12, alg.Frequencies[new ClassFeatureKey(CLS1, 1)]);
-      Assert.AreEqual(2.0/12, alg.Frequencies[new ClassFeatureKey(CLS1, 2)]);
-      Assert.AreEqual(2.0/12, alg.Frequencies[new ClassFeatureKey(CLS1, 3)]);
-      Assert.AreEqual(2.0/12, alg.Frequencies[new ClassFeatureKey(CLS1, 4)]);
-      Assert.AreEqual(3.0/12, alg.Frequencies[new ClassFeatureKey(CLS1, 5)]);
-      Assert.AreEqual(2.0/12, alg.Frequencies[new ClassFeatureKey(CLS1, 6)]);
-      Assert.AreEqual(1.0/12, alg.Frequencies[new ClassFeatureKey(CLS1, 7)]);
+      Assert.AreEqual(16, alg.Weights.Count);
+      Assert.AreEqual(5.0/12, alg.Weights[new ClassFeatureKey(CLS1, 0)]);
+      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 1)]);
+      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 2)]);
+      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 3)]);
+      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 4)]);
+      Assert.AreEqual(3.0/12, alg.Weights[new ClassFeatureKey(CLS1, 5)]);
+      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 6)]);
+      Assert.AreEqual(1.0/12, alg.Weights[new ClassFeatureKey(CLS1, 7)]);
 
-      Assert.AreEqual(0.1, alg.Frequencies[new ClassFeatureKey(CLS2, 0)]);
-      Assert.AreEqual(0.2, alg.Frequencies[new ClassFeatureKey(CLS2, 1)]);
-      Assert.AreEqual(0.1, alg.Frequencies[new ClassFeatureKey(CLS2, 2)]);
-      Assert.AreEqual(0.1, alg.Frequencies[new ClassFeatureKey(CLS2, 3)]);
-      Assert.AreEqual(0.3, alg.Frequencies[new ClassFeatureKey(CLS2, 4)]);
-      Assert.AreEqual(0.1, alg.Frequencies[new ClassFeatureKey(CLS2, 5)]);
-      Assert.AreEqual(0.2, alg.Frequencies[new ClassFeatureKey(CLS2, 6)]);
-      Assert.AreEqual(0.2, alg.Frequencies[new ClassFeatureKey(CLS2, 7)]);
+      Assert.AreEqual(0.1, alg.Weights[new ClassFeatureKey(CLS2, 0)]);
+      Assert.AreEqual(0.2, alg.Weights[new ClassFeatureKey(CLS2, 1)]);
+      Assert.AreEqual(0.1, alg.Weights[new ClassFeatureKey(CLS2, 2)]);
+      Assert.AreEqual(0.1, alg.Weights[new ClassFeatureKey(CLS2, 3)]);
+      Assert.AreEqual(0.3, alg.Weights[new ClassFeatureKey(CLS2, 4)]);
+      Assert.AreEqual(0.1, alg.Weights[new ClassFeatureKey(CLS2, 5)]);
+      Assert.AreEqual(0.2, alg.Weights[new ClassFeatureKey(CLS2, 6)]);
+      Assert.AreEqual(0.2, alg.Weights[new ClassFeatureKey(CLS2, 7)]);
     }
 
     [TestMethod]
@@ -988,6 +990,147 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual(CLS2, result2);
       Assert.AreEqual(CLS2, result3);
     }
+
+    #endregion
+
+    #region GeneralTextAlgorithm
+
+    [TestMethod]
+    public void GeneralTextAlgorithm_Train()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+
+      var kernel = new TriangularKernel();
+      var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
+      var alg    = new GeneralTextAlgorithm(prep, subAlg);
+
+      // act
+      alg.Train(sample);
+
+      // assert
+      Assert.AreEqual(subAlg, alg.SubAlgorithm);
+      var ts = subAlg.TrainingSample.ToList();
+      Assert.AreEqual(1, ts[0].Key[0]);
+      Assert.AreEqual(1, ts[0].Key[1]);
+      Assert.AreEqual(1, ts[0].Key[2]);
+      Assert.AreEqual(0, ts[0].Key[7]);
+      Assert.AreEqual(CLS1, ts[0].Value);
+      Assert.AreEqual(0, ts[5].Key[3]);
+      Assert.AreEqual(2, ts[5].Key[4]);
+      Assert.AreEqual(0, ts[5].Key[5]);
+      Assert.AreEqual(1, ts[5].Key[6]);
+      Assert.AreEqual(CLS2, ts[5].Value);
+
+      Assert.AreEqual(2, subAlg.PriorProbs.Count);
+      Assert.AreEqual(4.0D/6, subAlg.PriorProbs[CLS1], EPS);
+      Assert.AreEqual(2.0D/6, subAlg.PriorProbs[CLS2], EPS);
+
+      Assert.AreEqual(8, subAlg.DataDim);
+      Assert.AreEqual(6, subAlg.DataCount);
+      Assert.AreEqual(2, subAlg.ClassHist.Count);
+      Assert.AreEqual(4, subAlg.ClassHist[CLS1]);
+      Assert.AreEqual(2, subAlg.ClassHist[CLS2]);
+    }
+
+    [TestMethod]
+    public void GeneralTextAlgorithm_ExtractFeatureVector()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+
+      var kernel = new TriangularKernel();
+      var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
+      var alg    = new GeneralTextAlgorithm(prep, subAlg);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+
+      // assert
+      Assert.AreEqual(8, result1.Length);
+      Assert.AreEqual(1, result1[0]);
+      Assert.AreEqual(0, result1[1]);
+      Assert.AreEqual(1, result1[2]);
+      Assert.AreEqual(0, result1[3]);
+      Assert.AreEqual(0, result1[4]);
+      Assert.AreEqual(0, result1[5]);
+      Assert.AreEqual(0, result1[6]);
+      Assert.AreEqual(0, result1[7]);
+
+      Assert.AreEqual(8, result2.Length);
+      Assert.AreEqual(1, result2[0]);
+      Assert.AreEqual(2, result2[1]);
+      Assert.AreEqual(1, result2[2]);
+      Assert.AreEqual(0, result2[3]);
+      Assert.AreEqual(2, result2[4]);
+      Assert.AreEqual(0, result2[5]);
+      Assert.AreEqual(1, result2[6]);
+      Assert.AreEqual(1, result2[7]);
+    }
+
+    [TestMethod]
+    public void GeneralTextAlgorithm_PredictTokens()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+
+      var kernel = new TriangularKernel();
+      var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
+      var alg    = new GeneralTextAlgorithm(prep, subAlg);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.PredictTokens(testDocs()[0], 2);
+      var result2 = alg.PredictTokens(testDocs()[1], 2);
+
+      // assert
+      Assert.AreEqual(2, result1.Length);
+      Assert.AreEqual(CLS1, result1[0].Class);
+      Assert.AreEqual(-0.1224616D, result1[0].Score, EPS);
+      Assert.AreEqual(CLS2, result1[1].Class);
+      Assert.AreEqual(-0.8797969D, result1[1].Score, EPS);
+      Assert.AreEqual(CLS1, result2[0].Class);
+      Assert.AreEqual(0.5254344D, result2[0].Score, EPS);
+      Assert.AreEqual(CLS2, result2[1].Class);
+      Assert.AreEqual(-0.0618195D, result2[1].Score, EPS);
+    }
+
+    [TestMethod]
+    public void GeneralTextAlgorithm_Predict()
+    {
+      // arrange
+      var sample = getSample();
+      var CLS1 = sample.CachedClasses.ElementAt(0);
+      var CLS2 = sample.CachedClasses.ElementAt(1);
+      var prep = getDefaultPreprocessor();
+
+      var kernel = new TriangularKernel();
+      var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
+      var alg    = new GeneralTextAlgorithm(prep, subAlg);
+
+      // act
+      alg.Train(sample);
+      var result1 = alg.Predict(testDocs()[0]);
+      var result2 = alg.Predict(testDocs()[1]);
+      var result3 = alg.Predict(testDocs()[2]);
+
+      // assert
+      Assert.AreEqual(CLS1, result1);
+      Assert.AreEqual(CLS2, result2);
+      Assert.AreEqual(CLS2, result3);
+    }
+
 
     #endregion
 

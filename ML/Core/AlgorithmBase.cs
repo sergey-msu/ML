@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ML.Contracts;
-using ML.Core.Mathematics;
 using ML.Utils;
 
 namespace ML.Core
@@ -99,6 +98,22 @@ namespace ML.Core
     protected ClassificationAlgorithmBase()
     {
     }
+
+    /// <summary>
+    /// Make a prediction
+    /// </summary>
+    public override Class Predict(TObj obj)
+    {
+      var tokens = PredictTokens(obj, 1);
+      if (tokens.Length <= 0) return Class.Unknown;
+
+      return tokens[0].Class;
+    }
+
+    /// <summary>
+    /// Returns set of marks (i.e. tags) for the specified object
+    /// </summary>
+    public abstract ClassScore[] PredictTokens(TObj obj, int cnt);
 
 
     protected override double CalculateProximity(Class mark1, Class mark2, double threshold)

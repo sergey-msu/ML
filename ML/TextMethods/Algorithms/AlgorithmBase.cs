@@ -7,31 +7,27 @@ using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
-  public abstract class NaiveBayesianAlgorithmBase : ClassificationAlgorithmBase<string>
+  public abstract class TextAlgorithmBase : ClassificationAlgorithmBase<string>
   {
     #region Fields
 
     private readonly ITextPreprocessor m_Preprocessor;
     private List<string> m_Vocabulary;
     private Dictionary<Class, double> m_PriorProbs;
-    private Dictionary<Class, int> m_ClassHist;
-    private int m_DataDim;
-    private int m_DataCount;
-    private double m_Alpha;
-    private bool m_UseSmoothing;
+    private Dictionary<Class, int>    m_ClassHist;
+    private int  m_DataDim;
+    private int  m_DataCount;
     private bool m_UsePriors;
 
     #endregion
 
-    protected NaiveBayesianAlgorithmBase(ITextPreprocessor preprocessor)
+    protected TextAlgorithmBase(ITextPreprocessor preprocessor)
     {
       if (preprocessor==null)
         throw new MLException("NaiveBayesianAlgorithmBase.ctor(preprocessor=null)");
 
       m_Preprocessor = preprocessor;
-      m_UseSmoothing = true;
       m_UsePriors = true;
-      m_Alpha = 1;
     }
 
     #region Properties
@@ -45,41 +41,11 @@ namespace ML.TextMethods.Algorithms
     public int DataCount           { get { return m_DataCount; } }
 
     /// <summary>
-    /// Smoothing coefficient
-    /// </summary>
-    public double Alpha
-    {
-      get { return m_Alpha; }
-      set
-      {
-        if (value<=0)
-          throw new MLException("Smoothing coefficient must be positive");
-
-        m_Alpha=value;
-      }
-    }
-
-    /// <summary>
-    /// If true, uses Laplace/Lidstone smoothing
-    /// </summary>
-    public bool UseSmoothing { get { return m_UseSmoothing; } set { m_UseSmoothing=value; } }
-
-    /// <summary>
     /// If true, the algorithm takes prior class probabilities into account
     /// </summary>
     public bool UsePriors { get { return m_UsePriors; } set { m_UsePriors=value; } }
 
     #endregion
-
-    public override Class Predict(string obj)
-    {
-      var tokens = PredictTokens(obj, 1);
-      if (tokens.Length <= 0) return Class.Unknown;
-
-      return tokens[0].Class;
-    }
-
-    public abstract ClassScore[] PredictTokens(string obj, int cnt);
 
     public abstract double[] ExtractFeatureVector(string doc);
 
@@ -148,18 +114,42 @@ namespace ML.TextMethods.Algorithms
     }
   }
 
-  public abstract class LinearNaiveBayesianAlgorithmBase : NaiveBayesianAlgorithmBase
+  public abstract class NaiveBayesianAlgorithmBase : TextAlgorithmBase
   {
+    private double m_Alpha;
+    private bool   m_UseSmoothing;
     private Dictionary<ClassFeatureKey, double> m_Weights;
 
-    protected LinearNaiveBayesianAlgorithmBase(ITextPreprocessor preprocessor)
+    protected NaiveBayesianAlgorithmBase(ITextPreprocessor preprocessor)
       : base(preprocessor)
     {
+      m_UseSmoothing = true;
+      m_Alpha = 1;
     }
 
     #region Properties
 
     public Dictionary<ClassFeatureKey, double> Weights { get { return m_Weights; } }
+
+    /// <summary>
+    /// Smoothing coefficient
+    /// </summary>
+    public double Alpha
+    {
+      get { return m_Alpha; }
+      set
+      {
+        if (value<=0)
+          throw new MLException("Smoothing coefficient must be positive");
+
+        m_Alpha=value;
+      }
+    }
+
+    /// <summary>
+    /// If true, uses Laplace/Lidstone smoothing
+    /// </summary>
+    public bool UseSmoothing { get { return m_UseSmoothing; } set { m_UseSmoothing=value; } }
 
     #endregion
 

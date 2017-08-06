@@ -46,12 +46,11 @@ namespace ML.BayesianMethods.Algorithms
     /// <summary>
     /// Classify point
     /// </summary>
-    public override Class Predict(double[] obj)
+    public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
       var classes = DataClasses;
       var dim     = DataDim;
-      var max     = double.MinValue;
-      var result  = Class.Unknown;
+      var scores  = new List<ClassScore>();
 
       foreach (var cls in classes)
       {
@@ -62,7 +61,6 @@ namespace ML.BayesianMethods.Algorithms
           var key = new ClassFeatureKey(cls, i);
           m_Distribution.Params = m_DistributionParameters[key];
           var value = m_Distribution.LogValue(obj[i]);
-          if (double.IsInfinity(value) || double.IsNaN(value)) return Class.Unknown;
 
           p += value;
         }
@@ -71,14 +69,12 @@ namespace ML.BayesianMethods.Algorithms
         if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
         p += Math.Log(penalty*PriorProbs[cls]);
 
-        if (p > max)
-        {
-          max = p;
-          result = cls;
-        }
+        scores.Add(new ClassScore(cls, p));
       }
 
-      return result;
+      return scores.OrderByDescending(s => s.Score)
+                   .Take(cnt)
+                   .ToArray();
     }
 
     /// <summary>

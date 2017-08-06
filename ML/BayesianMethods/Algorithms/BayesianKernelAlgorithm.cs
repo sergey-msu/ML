@@ -46,7 +46,7 @@ namespace ML.BayesianMethods.Algorithms
     /// <summary>
     /// Classify point
     /// </summary>
-    public override Class Predict(double[] obj)
+    public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
       var dim = DataDim;
       var classes = DataClasses;
@@ -69,8 +69,7 @@ namespace ML.BayesianMethods.Algorithms
         else pHist[cls] += p;
       }
 
-      var result = Class.Unknown;
-      var max = double.MinValue;
+      var scores = new List<ClassScore>();
       foreach (var cls in classes)
       {
         var p = pHist[cls];
@@ -78,14 +77,12 @@ namespace ML.BayesianMethods.Algorithms
         if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
           p = penalty*p;
 
-        if (p > max)
-        {
-          max = p;
-          result = cls;
-        }
+        scores.Add(new ClassScore(cls, p));
       }
 
-      return result;
+      return scores.OrderByDescending(s => s.Score)
+                   .Take(cnt)
+                   .ToArray();
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ML.Core;
 using ML.Core.Mathematics;
 
@@ -26,27 +27,23 @@ namespace ML.BayesianMethods.Algorithms
     public override string Name { get { return "QDISC"; } }
 
 
-
     /// <summary>
     /// Classify point
     /// </summary>
-    public override Class Predict(double[] obj)
+    public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
       var classes = DataClasses;
-      var result = Class.Unknown;
-      var max = double.MinValue;
+      var scores = new List<ClassScore>();
 
       foreach (var cls in classes)
       {
         var p = CalculateClassScore(obj, cls);
-        if (p > max)
-        {
-          max = p;
-          result = cls;
-        }
+        scores.Add(new ClassScore(cls, p));
       }
 
-      return result;
+      return scores.OrderByDescending(s => s.Score)
+                   .Take(cnt)
+                   .ToArray();
     }
 
     /// <summary>

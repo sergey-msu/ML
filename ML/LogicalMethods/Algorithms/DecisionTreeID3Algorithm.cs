@@ -38,12 +38,14 @@ namespace ML.LogicalMethods.Algorithms
 
 
 
-    public override Class Predict(TObj obj)
+    public override ClassScore[] PredictTokens(TObj obj, int cnt)
     {
       if (m_Result==null)
         throw new MLException("Decision tree is empty");
 
-      return m_Result.Decide(obj);
+      var cls = m_Result.Decide(obj);
+      var score = new ClassScore(cls, 1);
+      return new ClassScore[] { score };
     }
 
     /// <summary>

@@ -35,22 +35,19 @@ namespace ML.MetricMethods.Algorithms
     /// <summary>
     /// Classify point
     /// </summary>
-    public override Class Predict(TObj obj)
+    public override ClassScore[] PredictTokens(TObj obj, int cnt)
     {
-      var result = Class.Unknown;
-      var maxEst = double.MinValue;
+      var scores = new List<ClassScore>();
 
       foreach (var cls in TrainingSample.Classes)
       {
-        var est = CalculateClassScore(obj, cls);
-        if (est > maxEst)
-        {
-          maxEst = est;
-          result = cls;
-        }
+        var score = CalculateClassScore(obj, cls);
+        scores.Add(new ClassScore(cls, score));
       }
 
-      return result;
+      return scores.OrderByDescending(s => s.Score)
+                   .Take(cnt)
+                   .ToArray();
     }
 
 

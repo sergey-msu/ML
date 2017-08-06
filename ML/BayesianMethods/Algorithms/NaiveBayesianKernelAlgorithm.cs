@@ -32,20 +32,22 @@ namespace ML.BayesianMethods.Algorithms
     {
     }
 
-    public override string Name   { get { return "NBAYES"; } }
+
+    public override string Name { get { return "NBAYES"; } }
 
 
 
     /// <summary>
     /// Classify point
     /// </summary>
-    public override Class Predict(double[] obj)
+    public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
       var dim = DataDim;
-      var cnt = DataCount;
+      var dcnt = DataCount;
       var classes = DataClasses;
       var pHist = new Dictionary<Class, double>();
       var yHist = new Dictionary<Class, double>();
+      var scores = new List<ClassScore>();
 
       foreach (var cls in classes)
       {
@@ -71,21 +73,18 @@ namespace ML.BayesianMethods.Algorithms
         }
       }
 
-      var max = double.MinValue;
-      var result = Class.Unknown;
       foreach (var cls in classes)
       {
         double penalty;
         if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
         var p = yHist[cls] + Math.Log(PriorProbs[cls]*penalty);
-        if (p > max)
-        {
-          max = p;
-          result = cls;
-        }
+
+        scores.Add(new ClassScore(cls, p));
       }
 
-      return result;
+      return scores.OrderByDescending(s => s.Score)
+                   .Take(cnt)
+                   .ToArray();
     }
 
     /// <summary>

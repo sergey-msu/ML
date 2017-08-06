@@ -7,7 +7,7 @@ using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
-  public class TFIDFNaiveBayesianAlgorithm : LinearNaiveBayesianAlgorithmBase
+  public class TFIDFNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
     #region Inner
 

@@ -9,8 +9,6 @@ namespace ML.TextMethods.Algorithms
 {
   public class BinaryNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
-    private Dictionary<ClassFeatureKey, double> m_Frequencies;
-
     public BinaryNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
       : base(preprocessor)
     {
@@ -20,8 +18,6 @@ namespace ML.TextMethods.Algorithms
 
     public override string Name   { get { return "BINNB"; } }
 
-    public Dictionary<ClassFeatureKey, double> Frequencies { get { return m_Frequencies; } }
-
     #endregion
 
     public override ClassScore[] PredictTokens(string obj, int cnt)
@@ -30,6 +26,7 @@ namespace ML.TextMethods.Algorithms
       var classes = TrainingSample.CachedClasses;
       var priors  = PriorProbs;
       var dim     = DataDim;
+      var weights = Weights;
       var scores  = new List<ClassScore>();
 
       foreach (var cls in classes)
@@ -37,7 +34,7 @@ namespace ML.TextMethods.Algorithms
         var score = Math.Log(priors[cls]);
         for (int i=0; i<dim; i++)
         {
-          var p = m_Frequencies[new ClassFeatureKey(cls, i)];
+          var p = weights[new ClassFeatureKey(cls, i)];
           var x = data[i];
           score += x*Math.Log(p) + (1-x)*Math.Log(1-p);
         }
@@ -69,7 +66,7 @@ namespace ML.TextMethods.Algorithms
     }
 
 
-    protected override void TrainImpl()
+    protected override Dictionary<ClassFeatureKey, double> TrainWeights()
     {
       var cHist = ClassHist;
       var N = Vocabulary.Count;
@@ -86,9 +83,8 @@ namespace ML.TextMethods.Algorithms
         {
           var key = new ClassFeatureKey(cls, i);
           var f = data[i];
-          double freq;
-          if (!freqs.TryGetValue(key, out freq)) freqs[key] = f;
-          else freqs[key] = freq+f;
+          double freq = freqs.TryGetValue(key, out freq) ? freq+f : f;
+          freqs[key] = freq;
         }
       }
 
@@ -98,14 +94,14 @@ namespace ML.TextMethods.Algorithms
         var total = (double)cHist[key.Class];
         if (UseSmoothing)
         {
-          freq += a;
+          freq  += a;
           total += (a*N);
         }
 
         freqs[key] = freq/total;
       }
 
-      m_Frequencies = freqs;
+      return freqs;
     }
 
 

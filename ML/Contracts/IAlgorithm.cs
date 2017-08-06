@@ -43,6 +43,10 @@ namespace ML.Contracts
   /// </summary>
   public interface IClassificationAlgorithm<TObj> : ISupervisedAlgorithm<ClassifiedSample<TObj>, TObj, Class>
   {
+    /// <summary>
+    /// Returns set of marks (i.e. tags) for the specified object
+    /// </summary>
+    ClassScore[] PredictTokens(TObj obj, int cnt);
   }
 
   /// <summary>

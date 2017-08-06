@@ -14,9 +14,9 @@
     - move non-general thing from Core/ folder to ...Methods/ subfolders
   - inspect and refactor all "Inamed.Name" mnemonic IDs
   - revise exceptions text ("ClasName.Prop(value=null) vs. human-readable etc.")
-  - refactor all algorithms to
-    public abstract ClassScore[] PredictTokens(string obj, int cnt);
-    like NaiveBayesianAlgorithmBase
+  - [DONE] refactor all algorithms to
+           public abstract ClassScore[] PredictTokens(string obj, int cnt);
+           like NaiveBayesianAlgorithmBase
 
 - serialization
 - refactor CNN layers to use Inputs and Outputs

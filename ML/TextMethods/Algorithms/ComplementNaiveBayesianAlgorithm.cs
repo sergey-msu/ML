@@ -10,7 +10,7 @@ namespace ML.TextMethods.Algorithms
   /// <summary>
   /// http://machinelearning.wustl.edu/mlpapers/paper_files/icml2003_RennieSTK03.pdf
   /// </summary>
-  public class ComplementNaiveBayesianAlgorithm : LinearNaiveBayesianAlgorithmBase
+  public class ComplementNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
     public ComplementNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
       : base(preprocessor)
