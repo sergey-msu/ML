@@ -48,6 +48,7 @@ namespace ML.BayesianMethods.Algorithms
     public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
       var classes = DataClasses;
+      var priors  = PriorProbs;
       var pHist = new Dictionary<Class, double>();
 
       foreach (var pData in TrainingSample)
@@ -63,11 +64,7 @@ namespace ML.BayesianMethods.Algorithms
       var scores = new List<ClassScore>();
       foreach (var cls in classes)
       {
-        var p = pHist[cls];
-        double penalty;
-        if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
-          p = penalty*p;
-
+        var p = Math.Log(pHist[cls]) + priors[cls];
         scores.Add(new ClassScore(cls, p));
       }
 
@@ -88,9 +85,7 @@ namespace ML.BayesianMethods.Algorithms
         score += Kernel.Value(r);
       }
 
-      double penalty;
-      if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
-        score *= penalty;
+      score = Math.Log(score) + PriorProbs[cls];
 
       return score;
     }

@@ -75,10 +75,7 @@ namespace ML.BayesianMethods.Algorithms
 
       foreach (var cls in classes)
       {
-        double penalty;
-        if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
-        var p = yHist[cls] + Math.Log(PriorProbs[cls]*penalty);
-
+        var p = yHist[cls] + PriorProbs[cls];
         scores.Add(new ClassScore(cls, p));
       }
 
@@ -102,7 +99,6 @@ namespace ML.BayesianMethods.Algorithms
         foreach (var pData in TrainingSample.Where(d => d.Value.Equals(cls)))
         {
           var data = pData.Key;
-
           var r = (obj[i] - pData.Key[i])/H;
           p += Kernel.Value(r);
         }
@@ -111,9 +107,7 @@ namespace ML.BayesianMethods.Algorithms
         p = 0.0D;
       }
 
-      double penalty;
-      if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
-      y += Math.Log(penalty*PriorProbs[cls]);
+      y += PriorProbs[cls];
 
       return y;
     }

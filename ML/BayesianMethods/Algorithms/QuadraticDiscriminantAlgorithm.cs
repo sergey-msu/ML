@@ -61,12 +61,7 @@ namespace ML.BayesianMethods.Algorithms
       for (int j=0; j<dim; j++)
         p -= IS[i,j]*(obj[i] - mu[i])*(obj[j] - mu[j]);
       p /= 2;
-
-      p -= Math.Log(det)/2;
-
-      double penalty;
-      if (m_ClassLosses == null || m_ClassLosses.TryGetValue(cls, out penalty)) penalty = 1.0D;
-      p += Math.Log(penalty*PriorProbs[cls]);
+      p += PriorProbs[cls] - Math.Log(det)/2;
 
       return p;
     }

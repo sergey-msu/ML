@@ -21,7 +21,7 @@ namespace ML.ConsoleTest
       //generateFlower(100);
 
       //var file = "primitive.csv";
-      //var file = "iris.csv";
+      var file = "iris.csv";
       //var file = "iris.trunk.2d.csv";
       //var file = "normal.3classes.100.csv";
       //var file = "primitive.3classes.csv";
@@ -30,7 +30,7 @@ namespace ML.ConsoleTest
       //var file = "normal.2classes.200.csv";
       //var file = "normal.3classes.1000.csv";
       //var file = "normal.3classes.1000.all.csv";
-      var file = "flower.3classes.100.all.csv";
+      //var file = "flower.3classes.100.all.csv";
       //var file = "primitive3.csv";
       //var file = "ionosphere.csv";
       //var file = "sonar.csv";

@@ -36,6 +36,9 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public Dictionary<Class, double> ClassLosses { get { return m_ClassLosses; } }
 
+    /// <summary>
+    /// Prior class logarithm pobabilities
+    /// </summary>
     public Dictionary<Class, double> PriorProbs { get { return m_PriorProbs; } }
     public Dictionary<Class, int>    ClassHist  { get { return m_ClassHist; } }
     public int DataDim             { get { return m_DataDim; } }
@@ -64,7 +67,11 @@ namespace ML.BayesianMethods.Algorithms
       }
 
       foreach (var cls in m_DataClasses)
-        m_PriorProbs[cls] = m_ClassHist[cls]/(double)m_DataCount;
+      {
+        double penalty;
+        if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
+        m_PriorProbs[cls] = Math.Log(penalty*m_ClassHist[cls]/(double)m_DataCount);
+      }
 
       TrainImpl();
     }
@@ -82,7 +89,6 @@ namespace ML.BayesianMethods.Algorithms
   {
     private double m_H;
     private readonly IKernel m_Kernel;
-    private readonly Dictionary<Class, double> m_ClassLosses;
 
     protected BayesianKernelAlgorithmBase(IKernel kernel, double h, Dictionary<Class, double> classLosses=null)
       : base(classLosses)

@@ -49,12 +49,13 @@ namespace ML.BayesianMethods.Algorithms
     public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
       var classes = DataClasses;
+      var priors  = PriorProbs;
       var dim     = DataDim;
       var scores  = new List<ClassScore>();
 
       foreach (var cls in classes)
       {
-        var p = 0.0D;
+        var p = priors[cls];
 
         for (int i=0; i<dim; i++)
         {
@@ -64,10 +65,6 @@ namespace ML.BayesianMethods.Algorithms
 
           p += value;
         }
-
-        double penalty;
-        if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
-        p += Math.Log(penalty*PriorProbs[cls]);
 
         scores.Add(new ClassScore(cls, p));
       }
@@ -83,7 +80,7 @@ namespace ML.BayesianMethods.Algorithms
     public override double CalculateClassScore(double[] obj, Class cls)
     {
       var dim = TrainingSample.GetDimension();
-      var p   = 0.0D;
+      var p   = PriorProbs[cls];
 
       foreach (var pData in TrainingSample.Where(d => d.Value.Equals(cls)))
       {
@@ -94,15 +91,10 @@ namespace ML.BayesianMethods.Algorithms
           var key = new ClassFeatureKey(cls, i);
           m_Distribution.Params = m_DistributionParameters[key];
           var value = m_Distribution.LogValue(obj[i]);
-          if (double.IsInfinity(value) || double.IsNaN(value)) return double.NaN;
 
           p += value;
         }
       }
-
-      double penalty;
-      if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
-      p += Math.Log(penalty*PriorProbs[cls]);
 
       return p;
     }

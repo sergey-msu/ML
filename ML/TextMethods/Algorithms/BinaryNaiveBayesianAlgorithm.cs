@@ -31,7 +31,7 @@ namespace ML.TextMethods.Algorithms
 
       foreach (var cls in classes)
       {
-        var score = Math.Log(priors[cls]);
+        var score = priors[cls];
         for (int i=0; i<dim; i++)
         {
           var p = weights[new ClassFeatureKey(cls, i)];

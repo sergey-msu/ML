@@ -35,6 +35,9 @@ namespace ML.TextMethods.Algorithms
     public ITextPreprocessor Preprocessor { get { return m_Preprocessor; } }
     public List<string>      Vocabulary { get { return m_Vocabulary; } }
 
+    /// <summary>
+    /// Prior class logarithm probabilities
+    /// </summary>
     public Dictionary<Class, double> PriorProbs { get { return m_PriorProbs; } }
     public Dictionary<Class, int>    ClassHist  { get { return m_ClassHist; } }
     public int DataDim             { get { return m_DataDim; } }
@@ -93,7 +96,7 @@ namespace ML.TextMethods.Algorithms
       }
 
       foreach (var cls in classes)
-        m_PriorProbs[cls] = m_ClassHist[cls]/(double)m_DataCount;
+        m_PriorProbs[cls] = Math.Log(m_ClassHist[cls]/(double)m_DataCount);
 
       TrainImpl();
     }
@@ -164,7 +167,7 @@ namespace ML.TextMethods.Algorithms
 
       foreach (var cls in classes)
       {
-        var score = usePriors ? Math.Log(priors[cls]) : 0.0D;
+        var score = usePriors ? priors[cls] : 0.0D;
         for (int i=0; i<dim; i++)
         {
           var x = data[i];

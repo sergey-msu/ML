@@ -57,12 +57,12 @@ namespace ML.BayesianMethods.Algorithms
         var data = pData.Key;
         var cls  = pData.Value;
 
-        var p = 1.0D;
+        var p = 0.0D;
         for (int i=0; i<dim; i++)
         {
           var h = (m_Hs != null ) ? m_Hs[i] : H;
           var r = (obj[i] - data[i])/h;
-          p *= (Kernel.Value(r)/h);
+          p += Math.Log(Kernel.Value(r)/h);
         }
 
         if (!pHist.ContainsKey(cls)) pHist[cls] = p;
@@ -72,11 +72,7 @@ namespace ML.BayesianMethods.Algorithms
       var scores = new List<ClassScore>();
       foreach (var cls in classes)
       {
-        var p = pHist[cls];
-        double penalty;
-        if (ClassLosses != null && ClassLosses.TryGetValue(cls, out penalty))
-          p = penalty*p;
-
+        var p = pHist[cls] + PriorProbs[cls];
         scores.Add(new ClassScore(cls, p));
       }
 
@@ -97,20 +93,18 @@ namespace ML.BayesianMethods.Algorithms
       {
         var data = pData.Key;
 
-        var p = 1.0D;
+        var p = 0.0D;
         for (int i=0; i<dim; i++)
         {
           var h = (m_Hs != null ) ? m_Hs[i] : H;
           var r = (obj[i] - data[i])/h;
-          p *= (Kernel.Value(r)/h);
+          p += Math.Log(Kernel.Value(r)/h);
         }
 
         score += p;
       }
 
-      double penalty;
-      if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
-      score *= (penalty / DataCount);
+      score += PriorProbs[cls];
 
       return score;
     }
