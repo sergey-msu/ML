@@ -121,6 +121,10 @@ namespace ML.BayesianMethods.Algorithms
      }
     }
 
+    public bool UseKernelMinValue { get; set; }
+
+    public double KernelMinValue { get; set; }
+
 
     protected override void TrainImpl()
     {

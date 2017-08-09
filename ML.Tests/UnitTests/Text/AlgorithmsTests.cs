@@ -1086,7 +1086,7 @@ namespace ML.Tests.UnitTests.Text
       var prep = getDefaultPreprocessor();
 
       var kernel = new TriangularKernel();
-      var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
+      var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 0.5D) { UseKernelMinValue=true, KernelMinValue=EPS_ROUGH };
       var alg    = new GeneralTextAlgorithm(prep, subAlg);
 
       // act
@@ -1097,13 +1097,13 @@ namespace ML.Tests.UnitTests.Text
       // assert
       Assert.AreEqual(2, result1.Length);
       Assert.AreEqual(CLS1, result1[0].Class);
-      Assert.AreEqual(-0.1224616D, result1[0].Score, EPS);
+      Assert.AreEqual(Math.Log(27.0D/8), result1[0].Score, EPS);
       Assert.AreEqual(CLS2, result1[1].Class);
-      Assert.AreEqual(-0.8797969D, result1[1].Score, EPS);
-      Assert.AreEqual(CLS1, result2[0].Class);
-      Assert.AreEqual(0.5254344D, result2[0].Score, EPS);
-      Assert.AreEqual(CLS2, result2[1].Class);
-      Assert.AreEqual(-0.0618195D, result2[1].Score, EPS);
+      Assert.AreEqual(Math.Log(EPS_ROUGH*EPS_ROUGH*EPS_ROUGH*8.0D/6), result1[1].Score, EPS);
+      Assert.AreEqual(CLS2, result2[0].Class);
+      Assert.AreEqual(Math.Log(EPS_ROUGH*EPS_ROUGH*EPS_ROUGH*4.0/3), result2[0].Score, EPS);
+      Assert.AreEqual(CLS1, result2[1].Class);
+      Assert.AreEqual(Math.Log(EPS_ROUGH*EPS_ROUGH*EPS_ROUGH/4), result2[1].Score, EPS);
     }
 
     [TestMethod]

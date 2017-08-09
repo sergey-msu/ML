@@ -50,6 +50,8 @@ namespace ML.BayesianMethods.Algorithms
     {
       var dim = DataDim;
       var classes = DataClasses;
+      var useMin = UseKernelMinValue;
+      var min = KernelMinValue;
       var pHist = new Dictionary<Class, double>();
 
       foreach (var pData in TrainingSample)
@@ -62,7 +64,10 @@ namespace ML.BayesianMethods.Algorithms
         {
           var h = (m_Hs != null ) ? m_Hs[i] : H;
           var r = (obj[i] - data[i])/h;
-          p += Math.Log(Kernel.Value(r)/h);
+          var v = Kernel.Value(r);
+          if (Math.Abs(v)<min && useMin) v = min;
+
+          p += Math.Log(v);
         }
 
         if (!pHist.ContainsKey(cls)) pHist[cls] = p;
@@ -88,6 +93,8 @@ namespace ML.BayesianMethods.Algorithms
     {
       var score = 0.0D;
       var dim = DataDim;
+      var useMin = UseKernelMinValue;
+      var min = KernelMinValue;
 
       foreach (var pData in TrainingSample.Where(d => d.Value.Equals(cls)))
       {
@@ -98,7 +105,9 @@ namespace ML.BayesianMethods.Algorithms
         {
           var h = (m_Hs != null ) ? m_Hs[i] : H;
           var r = (obj[i] - data[i])/h;
-          p += Math.Log(Kernel.Value(r)/h);
+          var v = Kernel.Value(r)/h;
+          if (Math.Abs(v)<min && useMin) v = min;
+          p += Math.Log(v);
         }
 
         score += p;

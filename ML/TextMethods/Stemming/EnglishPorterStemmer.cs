@@ -10,10 +10,23 @@ namespace ML.TextMethods.Stemming
 	/// </summary>
 	public class EnglishPorterStemmer : IStemmer
   {
-		private StringBuilder m_Builder;
-		private int m_EndIndex;
-		private int m_StemIndex;
+    #region Inner
 
+    private class StemContext
+    {
+      public readonly StringBuilder Builder;
+      public int EndIndex;
+      public int StemIndex;
+
+      public StemContext(StringBuilder builder, int stemIdx, int endIdx)
+      {
+        Builder = builder;
+        EndIndex = endIdx;
+        StemIndex = stemIdx;
+      }
+    }
+
+    #endregion
 
     /// <summary>
     /// Returns stemmed token
@@ -22,20 +35,18 @@ namespace ML.TextMethods.Stemming
     {
       if (string.IsNullOrWhiteSpace(token) || token.Length <= 2) return token;
 
-      m_Builder   = new StringBuilder(token);
-			m_StemIndex = 0;
-			m_EndIndex  = token.Length-1;
+      var ctx = new StemContext(new StringBuilder(token), 0, token.Length-1);
 
-      step1();
-      step2();
-      step3();
-      step4();
-      step5();
-      step6();
+      step1(ctx);
+      step2(ctx);
+      step3(ctx);
+      step4(ctx);
+      step5(ctx);
+      step6(ctx);
 
-      m_Builder.Length = m_EndIndex+1;
+      ctx.Builder.Length = ctx.EndIndex+1;
 
-			return m_Builder.ToString();
+			return ctx.Builder.ToString();
     }
 
     #region .pvt
@@ -48,95 +59,95 @@ namespace ML.TextMethods.Stemming
     ///   matting   ->  mat
     ///   agreed    ->  agree
     /// </summary>
-    private void step1()
+    private void step1(StemContext ctx)
     {
-      if (m_Builder[m_EndIndex] == 's')
+      if (ctx.Builder[ctx.EndIndex] == 's')
       {
-             if (endsWith("sses")) m_EndIndex -= 2;
-        else if (endsWith("ies")) setEnd("i");
-        else if (m_Builder[m_EndIndex - 1] != 's')
-          m_EndIndex--;
+             if (endsWith(ctx, "sses")) ctx.EndIndex -= 2;
+        else if (endsWith(ctx, "ies")) setEnd(ctx, "i");
+        else if (ctx.Builder[ctx.EndIndex - 1] != 's')
+          ctx.EndIndex--;
       }
-      if (endsWith("eed"))
+      if (endsWith(ctx, "eed"))
       {
-        if (measureConsontantSequence() > 0)
-          m_EndIndex--;
+        if (measureConsontantSequence(ctx) > 0)
+          ctx.EndIndex--;
       }
-      else if ((endsWith("ed") || endsWith("ing")) && vowelInStem())
+      else if ((endsWith(ctx, "ed") || endsWith(ctx, "ing")) && vowelInStem(ctx))
       {
-        m_EndIndex = m_StemIndex;
-        if (endsWith("at"))
-          setEnd("ate");
-        else if (endsWith("bl"))
-          setEnd("ble");
-        else if (endsWith("iz"))
-          setEnd("ize");
-        else if (isDoubleConsontant(m_EndIndex))
+        ctx.EndIndex = ctx.StemIndex;
+        if (endsWith(ctx, "at"))
+          setEnd(ctx, "ate");
+        else if (endsWith(ctx, "bl"))
+          setEnd(ctx, "ble");
+        else if (endsWith(ctx, "iz"))
+          setEnd(ctx, "ize");
+        else if (isDoubleConsontant(ctx, ctx.EndIndex))
         {
-          m_EndIndex--;
-          int ch = m_Builder[m_EndIndex];
+          ctx.EndIndex--;
+          int ch = ctx.Builder[ctx.EndIndex];
           if (ch == 'l' || ch == 's' || ch == 'z')
-            m_EndIndex++;
+            ctx.EndIndex++;
         }
-        else if (measureConsontantSequence() == 1 && isCVC(m_EndIndex)) setEnd("e");
+        else if (measureConsontantSequence(ctx) == 1 && isCVC(ctx, ctx.EndIndex)) setEnd(ctx, "e");
       }
     }
 
     /// <summary>
     /// Change terminal y to i when there is another vowel in the stem
     /// </summary>
-    private void step2()
+    private void step2(StemContext ctx)
     {
-      if (endsWith("y") && vowelInStem())
-        m_Builder[m_EndIndex] = 'i';
+      if (endsWith(ctx, "y") && vowelInStem(ctx))
+        ctx.Builder[ctx.EndIndex] = 'i';
     }
 
     /// <summary>
     /// Maps double suffices to single ones. so -ization ( = -ize plus -ation) maps to -ize etc.
     /// Note that the string before the suffix must give m() > 0.
     /// </summary>
-    private void step3()
+    private void step3(StemContext ctx)
     {
-      if (m_EndIndex == 0) return;
+      if (ctx.EndIndex == 0) return;
 
-      switch (m_Builder[m_EndIndex-1])
+      switch (ctx.Builder[ctx.EndIndex-1])
       {
         case 'a':
-               if (endsWith("ational")) replaceEndIfConsonant("ate");
-          else if (endsWith("tional"))  replaceEndIfConsonant("tion");
+               if (endsWith(ctx, "ational")) replaceEndIfConsonant(ctx, "ate");
+          else if (endsWith(ctx, "tional"))  replaceEndIfConsonant(ctx, "tion");
           break;
         case 'c':
-               if (endsWith("enci")) replaceEndIfConsonant("ence");
-          else if (endsWith("anci")) replaceEndIfConsonant("ance");
+               if (endsWith(ctx, "enci")) replaceEndIfConsonant(ctx, "ence");
+          else if (endsWith(ctx, "anci")) replaceEndIfConsonant(ctx, "ance");
           break;
         case 'e':
-          if (endsWith("izer")) replaceEndIfConsonant("ize");
+          if (endsWith(ctx, "izer")) replaceEndIfConsonant(ctx, "ize");
           break;
         case 'l':
-               if (endsWith("bli"))   replaceEndIfConsonant("ble");
-          else if (endsWith("alli"))  replaceEndIfConsonant("al");
-          else if (endsWith("entli")) replaceEndIfConsonant("ent");
-          else if (endsWith("eli"))   replaceEndIfConsonant("e");
-          else if (endsWith("ousli")) replaceEndIfConsonant("ous");
+               if (endsWith(ctx, "bli"))   replaceEndIfConsonant(ctx, "ble");
+          else if (endsWith(ctx, "alli"))  replaceEndIfConsonant(ctx, "al");
+          else if (endsWith(ctx, "entli")) replaceEndIfConsonant(ctx, "ent");
+          else if (endsWith(ctx, "eli"))   replaceEndIfConsonant(ctx, "e");
+          else if (endsWith(ctx, "ousli")) replaceEndIfConsonant(ctx, "ous");
           break;
         case 'o':
-               if (endsWith("ization")) replaceEndIfConsonant("ize");
-          else if (endsWith("ation"))   replaceEndIfConsonant("ate");
-          else if (endsWith("ator"))    replaceEndIfConsonant("ate");
+               if (endsWith(ctx, "ization")) replaceEndIfConsonant(ctx, "ize");
+          else if (endsWith(ctx, "ation"))   replaceEndIfConsonant(ctx, "ate");
+          else if (endsWith(ctx, "ator"))    replaceEndIfConsonant(ctx, "ate");
           break;
         case 's':
-               if (endsWith("alism"))   replaceEndIfConsonant("al");
-          else if (endsWith("iveness")) replaceEndIfConsonant("ive");
-          else if (endsWith("fulness")) replaceEndIfConsonant("ful");
-          else if (endsWith("ousness")) replaceEndIfConsonant("ous");
+               if (endsWith(ctx, "alism"))   replaceEndIfConsonant(ctx, "al");
+          else if (endsWith(ctx, "iveness")) replaceEndIfConsonant(ctx, "ive");
+          else if (endsWith(ctx, "fulness")) replaceEndIfConsonant(ctx, "ful");
+          else if (endsWith(ctx, "ousness")) replaceEndIfConsonant(ctx, "ous");
           break;
         case 't':
-               if (endsWith("aliti"))  replaceEndIfConsonant("al");
-          else if (endsWith("iviti"))  replaceEndIfConsonant("ive");
-          else if (endsWith("biliti")) replaceEndIfConsonant("ble");
+               if (endsWith(ctx, "aliti"))  replaceEndIfConsonant(ctx, "al");
+          else if (endsWith(ctx, "iviti"))  replaceEndIfConsonant(ctx, "ive");
+          else if (endsWith(ctx, "biliti")) replaceEndIfConsonant(ctx, "ble");
           break;
         case 'g':
-          if (endsWith("logi")) replaceEndIfConsonant("log");
+          if (endsWith(ctx, "logi")) replaceEndIfConsonant(ctx, "log");
           break;
       }
     }
@@ -144,24 +155,24 @@ namespace ML.TextMethods.Stemming
     /// <summary>
     /// Deals with -ic-, -full, -ness etc. similar strategy to step3.
     /// </summary>
-    private void step4()
+    private void step4(StemContext ctx)
     {
-      switch (m_Builder[m_EndIndex])
+      switch (ctx.Builder[ctx.EndIndex])
       {
         case 'e':
-               if (endsWith("icate")) replaceEndIfConsonant("ic");
-          else if (endsWith("ative")) replaceEndIfConsonant("");
-          else if (endsWith("alize")) replaceEndIfConsonant("al");
+               if (endsWith(ctx, "icate")) replaceEndIfConsonant(ctx, "ic");
+          else if (endsWith(ctx, "ative")) replaceEndIfConsonant(ctx, string.Empty);
+          else if (endsWith(ctx, "alize")) replaceEndIfConsonant(ctx, "al");
           break;
         case 'i':
-          if (endsWith("iciti")) { replaceEndIfConsonant("ic"); }
+          if (endsWith(ctx, "iciti")) { replaceEndIfConsonant(ctx, "ic"); }
           break;
         case 'l':
-               if (endsWith("ical")) replaceEndIfConsonant("ic");
-          else if (endsWith("ful"))  replaceEndIfConsonant("");
+               if (endsWith(ctx, "ical")) replaceEndIfConsonant(ctx, "ic");
+          else if (endsWith(ctx, "ful"))  replaceEndIfConsonant(ctx, string.Empty);
           break;
         case 's':
-          if (endsWith("ness")) replaceEndIfConsonant("");
+          if (endsWith(ctx, "ness")) replaceEndIfConsonant(ctx, string.Empty);
           break;
       }
     }
@@ -169,66 +180,66 @@ namespace ML.TextMethods.Stemming
     /// <summary>
     /// Removes -ence, -ant etc., in context <c>vcvc<v>
     /// </summary>
-    private void step5()
+    private void step5(StemContext ctx)
     {
-      if (m_EndIndex == 0) return;
+      if (ctx.EndIndex == 0) return;
 
-      switch (m_Builder[m_EndIndex-1])
+      switch (ctx.Builder[ctx.EndIndex-1])
       {
         case 'a':
-          if (endsWith("al")) break; return;
+          if (endsWith(ctx, "al")) break; return;
         case 'c':
-          if (endsWith("ance")) break;
-          if (endsWith("ence")) break; return;
+          if (endsWith(ctx, "ance")) break;
+          if (endsWith(ctx, "ence")) break; return;
         case 'e':
-          if (endsWith("er")) break; return;
+          if (endsWith(ctx, "er")) break; return;
         case 'i':
-          if (endsWith("ic")) break; return;
+          if (endsWith(ctx, "ic")) break; return;
         case 'l':
-          if (endsWith("able")) break;
-          if (endsWith("ible")) break; return;
+          if (endsWith(ctx, "able")) break;
+          if (endsWith(ctx, "ible")) break; return;
         case 'n':
-          if (endsWith("ant")) break;
-          if (endsWith("ement")) break;
-          if (endsWith("ment")) break;
-          if (endsWith("ent")) break; return;
+          if (endsWith(ctx, "ant")) break;
+          if (endsWith(ctx, "ement")) break;
+          if (endsWith(ctx, "ment")) break;
+          if (endsWith(ctx, "ent")) break; return;
         case 'o':
-          if (endsWith("ion") && m_StemIndex >= 0 && (m_Builder[m_StemIndex] == 's' || m_Builder[m_StemIndex] == 't')) break;
-          if (endsWith("ou")) break; return;
+          if (endsWith(ctx, "ion") && ctx.StemIndex >= 0 && (ctx.Builder[ctx.StemIndex] == 's' || ctx.Builder[ctx.StemIndex] == 't')) break;
+          if (endsWith(ctx, "ou")) break; return;
         case 's':
-          if (endsWith("ism")) break; return;
+          if (endsWith(ctx, "ism")) break; return;
         case 't':
-          if (endsWith("ate")) break;
-          if (endsWith("iti")) break; return;
+          if (endsWith(ctx, "ate")) break;
+          if (endsWith(ctx, "iti")) break; return;
         case 'u':
-          if (endsWith("ous")) break; return;
+          if (endsWith(ctx, "ous")) break; return;
         case 'v':
-          if (endsWith("ive")) break; return;
+          if (endsWith(ctx, "ive")) break; return;
         case 'z':
-          if (endsWith("ize")) break; return;
+          if (endsWith(ctx, "ize")) break; return;
         default:
           return;
       }
 
-      if (measureConsontantSequence() > 1)
-        m_EndIndex = m_StemIndex;
+      if (measureConsontantSequence(ctx) > 1)
+        ctx.EndIndex = ctx.StemIndex;
     }
 
     /// <summary>
     /// Removes -e ending if m() > 1
     /// </summary>
-    private void step6()
+    private void step6(StemContext ctx)
     {
-      m_StemIndex = m_EndIndex;
+      ctx.StemIndex = ctx.EndIndex;
 
-      if (m_Builder[m_EndIndex] == 'e')
+      if (ctx.Builder[ctx.EndIndex] == 'e')
       {
-        var a = measureConsontantSequence();
-        if (a > 1 || a == 1 && !isCVC(m_EndIndex - 1))
-          m_EndIndex--;
+        var a = measureConsontantSequence(ctx);
+        if (a > 1 || a == 1 && !isCVC(ctx, ctx.EndIndex - 1))
+          ctx.EndIndex--;
       }
-      if (m_Builder[m_EndIndex] == 'l' && isDoubleConsontant(m_EndIndex) && measureConsontantSequence() > 1)
-        m_EndIndex--;
+      if (ctx.Builder[ctx.EndIndex] == 'l' && isDoubleConsontant(ctx, ctx.EndIndex) && measureConsontantSequence(ctx) > 1)
+        ctx.EndIndex--;
     }
 
 
@@ -236,11 +247,11 @@ namespace ML.TextMethods.Stemming
     /// Returns true if the character at the specified index is a consonant.
     /// With special handling for 'y'.
     /// </summary>
-    private bool isConsonant(int index)
+    private bool isConsonant(StemContext ctx, int index)
     {
-      var c = m_Builder[index];
+      var c = ctx.Builder[index];
       if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') return false;
-      return c != 'y' || (index == 0 || !isConsonant(index - 1));
+      return c != 'y' || (index == 0 || !isConsonant(ctx, index - 1));
     }
 
     /// <summary>
@@ -254,30 +265,30 @@ namespace ML.TextMethods.Stemming
 		///  <c>vcvcvc<v> gives 3
 		///  ....
     /// </summary>
-    private int measureConsontantSequence()
+    private int measureConsontantSequence(StemContext ctx)
     {
       var n = 0;
       var index = 0;
       while (true)
       {
-        if (index > m_StemIndex) return n;
-        if (!isConsonant(index)) break; index++;
+        if (index > ctx.StemIndex) return n;
+        if (!isConsonant(ctx, index)) break; index++;
       }
       index++;
       while (true)
       {
         while (true)
         {
-          if (index > m_StemIndex) return n;
-          if (isConsonant(index)) break;
+          if (index > ctx.StemIndex) return n;
+          if (isConsonant(ctx, index)) break;
           index++;
         }
         index++;
         n++;
         while (true)
         {
-          if (index > m_StemIndex) return n;
-          if (!isConsonant(index)) break;
+          if (index > ctx.StemIndex) return n;
+          if (!isConsonant(ctx, index)) break;
           index++;
         }
         index++;
@@ -287,12 +298,12 @@ namespace ML.TextMethods.Stemming
     /// <summary>
     /// Return true if there is a vowel in the current stem (0 ... stemIndex)
     /// </summary>
-    private bool vowelInStem()
+    private bool vowelInStem(StemContext ctx)
     {
       int i;
-      for (i = 0; i <= m_StemIndex; i++)
+      for (i = 0; i <= ctx.StemIndex; i++)
       {
-        if (!isConsonant(i)) return true;
+        if (!isConsonant(ctx, i)) return true;
       }
       return false;
     }
@@ -300,10 +311,10 @@ namespace ML.TextMethods.Stemming
     /// <summary>
     /// Returns true if the char at the specified index and the one preceeding it are the same consonants
     /// </summary>
-    private bool isDoubleConsontant(int index)
+    private bool isDoubleConsontant(StemContext ctx, int index)
     {
       if (index < 1) return false;
-      return m_Builder[index] == m_Builder[index - 1] && isConsonant(index);
+      return ctx.Builder[index] == ctx.Builder[index - 1] && isConsonant(ctx, index);
     }
 
     /// <summary>
@@ -315,26 +326,26 @@ namespace ML.TextMethods.Stemming
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    private bool isCVC(int index)
+    private bool isCVC(StemContext ctx, int index)
     {
-      if (index < 2 || !isConsonant(index) || isConsonant(index - 1) || !isConsonant(index - 2)) return false;
-      var c = m_Builder[index];
+      if (index < 2 || !isConsonant(ctx, index) || isConsonant(ctx, index - 1) || !isConsonant(ctx, index - 2)) return false;
+      var c = ctx.Builder[index];
       return c != 'w' && c != 'x' && c != 'y';
     }
 
     /// <summary>
     /// Does the current word array end with the specified string
     /// </summary>
-    private bool endsWith(string str)
+    private bool endsWith(StemContext ctx, string str)
     {
       var length = str.Length;
-      var index = m_EndIndex - length + 1;
+      var index = ctx.EndIndex - length + 1;
       if (index < 0) return false;
 
       for (var i=0; i<length; i++)
-        if (m_Builder[index+i] != str[i]) return false;
+        if (ctx.Builder[index+i] != str[i]) return false;
 
-      m_StemIndex = m_EndIndex - length;
+      ctx.StemIndex = ctx.EndIndex - length;
 
       return true;
     }
@@ -343,22 +354,22 @@ namespace ML.TextMethods.Stemming
     /// Set the end of the word to s.
 		/// Starting at the current stem pointer and readjusting the end pointer
     /// </summary>
-    private void setEnd(string str)
+    private void setEnd(StemContext ctx, string str)
     {
       var length = str.Length;
-      var index = m_StemIndex+1;
+      var index = ctx.StemIndex+1;
       for (var i=0; i<length; i++)
-        m_Builder[index+i] = str[i];
+        ctx.Builder[index+i] = str[i];
 
-      m_EndIndex = m_StemIndex + length;
+      ctx.EndIndex = ctx.StemIndex + length;
     }
 
     /// <summary>
     /// Conditionally replace the end of the word
     /// </summary>
-    private void replaceEndIfConsonant(string s)
+    private void replaceEndIfConsonant(StemContext ctx, string s)
     {
-      if (measureConsontantSequence() > 0) setEnd(s);
+      if (measureConsontantSequence(ctx) > 0) setEnd(ctx, s);
     }
 
     #endregion

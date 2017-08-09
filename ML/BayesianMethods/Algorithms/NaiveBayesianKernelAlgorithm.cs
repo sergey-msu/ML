@@ -36,7 +36,6 @@ namespace ML.BayesianMethods.Algorithms
     public override string Name { get { return "NBAYES"; } }
 
 
-
     /// <summary>
     /// Classify point
     /// </summary>
@@ -45,8 +44,10 @@ namespace ML.BayesianMethods.Algorithms
       var dim = DataDim;
       var dcnt = DataCount;
       var classes = DataClasses;
-      var pHist = new Dictionary<Class, double>();
-      var yHist = new Dictionary<Class, double>();
+      var useMin = UseKernelMinValue;
+      var min = KernelMinValue;
+      var pHist  = new Dictionary<Class, double>();
+      var yHist  = new Dictionary<Class, double>();
       var scores = new List<ClassScore>();
 
       foreach (var cls in classes)
@@ -61,14 +62,17 @@ namespace ML.BayesianMethods.Algorithms
         {
           var data = pData.Key;
           var cls  = pData.Value;
-
           var r = (obj[i] - data[i])/H;
+
           pHist[cls] += Kernel.Value(r);
         }
 
         foreach (var cls in classes)
         {
-          yHist[cls] += Math.Log(pHist[cls] / (H * ClassHist[cls]));
+          var p = pHist[cls] / (H * ClassHist[cls]);
+          if (Math.Abs(p)<min && useMin) p = min;
+
+          yHist[cls] += Math.Log(p);
           pHist[cls] = 0.0D;
         }
       }
@@ -93,6 +97,8 @@ namespace ML.BayesianMethods.Algorithms
       var p = 0.0D;
       var y = 0.0D;
       var my = ClassHist[cls];
+      var useMin = UseKernelMinValue;
+      var min = KernelMinValue;
 
       for (int i=0; i<dim; i++)
       {
@@ -102,8 +108,9 @@ namespace ML.BayesianMethods.Algorithms
           var r = (obj[i] - pData.Key[i])/H;
           p += Kernel.Value(r);
         }
-
-        y += Math.Log(p / (H * my));
+        p = p / (H * my);
+        if (Math.Abs(p)<min && useMin) p = min;
+        y += Math.Log(p);
         p = 0.0D;
       }
 

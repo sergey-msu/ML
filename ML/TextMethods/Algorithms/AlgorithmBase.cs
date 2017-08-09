@@ -33,15 +33,15 @@ namespace ML.TextMethods.Algorithms
     #region Properties
 
     public ITextPreprocessor Preprocessor { get { return m_Preprocessor; } }
-    public List<string>      Vocabulary { get { return m_Vocabulary; } }
+    public List<string>      Vocabulary   { get { return m_Vocabulary; } }
 
     /// <summary>
     /// Prior class logarithm probabilities
     /// </summary>
     public Dictionary<Class, double> PriorProbs { get { return m_PriorProbs; } }
     public Dictionary<Class, int>    ClassHist  { get { return m_ClassHist; } }
-    public int DataDim             { get { return m_DataDim; } }
-    public int DataCount           { get { return m_DataCount; } }
+    public int DataDim   { get { return m_DataDim; } }
+    public int DataCount { get { return m_DataCount; } }
 
     /// <summary>
     /// If true, the algorithm takes prior class probabilities into account
@@ -68,6 +68,19 @@ namespace ML.TextMethods.Algorithms
       }
 
       return result;
+    }
+
+    public virtual List<string> ExtractVocabulary(ClassifiedSample<string> corpus)
+    {
+      var dict = new HashSet<string>();
+      foreach (var doc in corpus)
+      {
+        var tokens = m_Preprocessor.Preprocess(doc.Key);
+        foreach (var token in tokens)
+          dict.Add(token);
+      }
+
+      return dict.ToList();
     }
 
 
@@ -103,18 +116,21 @@ namespace ML.TextMethods.Algorithms
 
     protected abstract void TrainImpl();
 
-    protected virtual List<string> ExtractVocabulary(ClassifiedSample<string> corpus)
-    {
-      var dict = new HashSet<string>();
-      foreach (var doc in corpus)
-      {
-        var tokens = m_Preprocessor.Preprocess(doc.Key);
-        foreach (var token in tokens)
-          dict.Add(token);
-      }
+    #region Serialization
 
-      return dict.ToList();
+    public void Serialize(System.IO.Stream stream)
+    {
+      var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
+      serializer.Serialize(stream, this);
     }
+
+    public static TextAlgorithmBase Deserialize(System.IO.Stream stream)
+    {
+      var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
+      return (TextAlgorithmBase)serializer.Deserialize(stream);
+    }
+
+    #endregion
   }
 
   public abstract class NaiveBayesianAlgorithmBase : TextAlgorithmBase

@@ -20,10 +20,10 @@ namespace ML.TextMethods.Preprocessing
 
     #endregion
 
-    public TextPreprocessor(ITokenizer tokenizer,
-                            IStopwords stopwords,
+    public TextPreprocessor(ITokenizer  tokenizer,
+                            IStopwords  stopwords,
                             INormalizer normalizer,
-                            IStemmer stemmer)
+                            IStemmer    stemmer)
     {
       if (tokenizer==null)  throw new MLException("TextPreprocessor.ctor(tokenizer=null)");
       if (stopwords==null)  throw new MLException("TextPreprocessor.ctor(stopwords=null)");
