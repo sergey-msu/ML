@@ -71,8 +71,19 @@ namespace ML.TextTests
 
     protected abstract void Load();
 
-    protected abstract void Train();
+    protected virtual void Train()
+    {
+      var now = DateTime.Now;
 
-    protected abstract void Test();
+      Console.WriteLine();
+      Console.WriteLine("Training started at {0}", now);
+      Alg.Train(m_TrainingSet);
+
+      Utils.HandleTrainEnded(Alg, m_TestingSet, OutputPath);
+
+      Console.WriteLine("\n--------- ELAPSED TRAIN ----------" + (int)(DateTime.Now-now).TotalSeconds + "s");
+    }
+
+    protected virtual void Test() {}
   }
 }

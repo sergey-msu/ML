@@ -92,11 +92,12 @@ namespace ML.Tests.UnitTests.Text
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
       var alg = new BinaryNaiveBayesianAlgorithm(prep);
+      bool isEmpty;
 
       // act
       alg.Train(sample);
-      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
-      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0], out isEmpty);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1], out isEmpty);
 
       // assert
       Assert.AreEqual(8, result1.Length);
@@ -238,11 +239,12 @@ namespace ML.Tests.UnitTests.Text
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
       var alg = new MultinomialNaiveBayesianAlgorithm(prep);
+      bool isEmpty;
 
       // act
       alg.Train(sample);
-      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
-      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0], out isEmpty);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1], out isEmpty);
 
       // assert
       Assert.AreEqual(8, result1.Length);
@@ -384,11 +386,12 @@ namespace ML.Tests.UnitTests.Text
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
       var alg = new ComplementNaiveBayesianAlgorithm(prep);
+      bool isEmpty;
 
       // act
       alg.Train(sample);
-      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
-      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0], out isEmpty);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1], out isEmpty);
 
       // assert
       Assert.AreEqual(8, result1.Length);
@@ -530,11 +533,12 @@ namespace ML.Tests.UnitTests.Text
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
       var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+      bool isEmpty;
 
       // act
       alg.Train(sample);
-      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
-      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0], out isEmpty);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1], out isEmpty);
 
       // assert
       Assert.AreEqual(8, result1.Length);
@@ -684,11 +688,12 @@ namespace ML.Tests.UnitTests.Text
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
         IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
        };
+       bool isEmpty;
 
       // act
       alg.Train(sample);
-      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
-      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0], out isEmpty);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1], out isEmpty);
 
       // assert
       Assert.AreEqual(8, result1.Length);
@@ -845,12 +850,13 @@ namespace ML.Tests.UnitTests.Text
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
         IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
-       };
+      };
+      bool isEmpty;
 
       // act
       alg.Train(sample);
-      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
-      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0], out isEmpty);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1], out isEmpty);
 
       // assert
       Assert.AreEqual(8, result1.Length);
@@ -1048,11 +1054,12 @@ namespace ML.Tests.UnitTests.Text
       var kernel = new TriangularKernel();
       var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
       var alg    = new GeneralTextAlgorithm(prep, subAlg);
+      bool isEmpty;
 
       // act
       alg.Train(sample);
-      var result1 = alg.ExtractFeatureVector(testDocs()[0]);
-      var result2 = alg.ExtractFeatureVector(testDocs()[1]);
+      var result1 = alg.ExtractFeatureVector(testDocs()[0], out isEmpty);
+      var result2 = alg.ExtractFeatureVector(testDocs()[1], out isEmpty);
 
       // assert
       Assert.AreEqual(8, result1.Length);

@@ -65,7 +65,10 @@
     <Compile Include="Examples.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Newsgroups20Runner.cs" />
+    <Compile Include="ReutersR52Runner.cs" />
     <Compile Include="Runner.cs" />
+    <Compile Include="ReutersR8Runner.cs" />
     <Compile Include="SpamRunner.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>

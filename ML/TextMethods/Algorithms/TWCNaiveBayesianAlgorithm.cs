@@ -15,6 +15,7 @@ namespace ML.TextMethods.Algorithms
     public TWCNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
       : base(preprocessor)
     {
+      UsePriors = false; // not to use prior probabilities is the default TWC behaviour
     }
 
     #region Properties
@@ -32,16 +33,20 @@ namespace ML.TextMethods.Algorithms
       var weights   = new Dictionary<ClassFeatureKey, double>();
       var cClsTotals = new Dictionary<Class, double>();
       var idfFreqs  = new int[dim];
-      var freqDatas = new FreqData[dim, cnt];
+      var freqDatas = new FreqData[dim][];
+      for (int i=0; i<dim; i++)
+        freqDatas[i] = new FreqData[cnt];
 
       // TF transform
       int idx = -1;
       foreach (var doc in TrainingSample)
       {
-        idx++;
         var text = doc.Key;
         var cls  = doc.Value;
-        var data = ExtractFrequencies(text);
+        bool isEmpty;
+        var data = ExtractFeatureVector(text, out isEmpty);
+        if (isEmpty) continue;
+        idx++;
 
         TFWeightingScheme.Reset();
 
@@ -49,21 +54,25 @@ namespace ML.TextMethods.Algorithms
         {
           var f = data[i];
           var tf = TFWeightingScheme.GetFrequency(data, i);
-          freqDatas[i, idx] = new FreqData(tf, cls);
+          freqDatas[i][idx] = new FreqData(tf, cls);
 
           if (f>0) idfFreqs[i] += 1;
         }
       }
+
+      cnt = idx;
 
       // IDF transform
       var idfWeights = IDFWeightingScheme.GetWeights(dim, idfFreqs);
       for (var i=0; i<dim; i++)
       {
         var idf = idfWeights[i];
+        var freqData = freqDatas[i];
+
         for (var j=0; j<cnt; j++)
         {
-          var fData  = freqDatas[i, j];
-          freqDatas[i, j] = new FreqData(fData.Value*idf, fData.Class);
+          var fData = freqData[j];
+          freqData[j] = new FreqData(fData.Value*idf, fData.Class);
         }
       }
 
@@ -73,15 +82,15 @@ namespace ML.TextMethods.Algorithms
         var norm = 0.0D;
         for (var i=0; i<dim; i++)
         {
-          var fData = freqDatas[i, j];
+          var fData = freqDatas[i][j];
           norm += (fData.Value * fData.Value);
         }
         norm = Math.Sqrt(norm);
 
         for (var i=0; i<dim; i++)
         {
-          var fData = freqDatas[i, j];
-          freqDatas[i, j] = new FreqData(fData.Value/norm, fData.Class);
+          var fData = freqDatas[i][j];
+          freqDatas[i][j] = new FreqData(fData.Value/norm, fData.Class);
         }
       }
 
@@ -92,7 +101,7 @@ namespace ML.TextMethods.Algorithms
         {
           for (var i=0; i<dim; i++)
           {
-            var fData = freqDatas[i, j];
+            var fData = freqDatas[i][j];
             var f     = fData.Value;
             var cls   = fData.Class;
 

@@ -37,7 +37,9 @@ namespace ML.TextMethods.Algorithms
       {
         var text = doc.Key;
         var cls  = doc.Value;
-        var data = ExtractFeatureVector(text);
+        bool isEmpty;
+        var data = ExtractFeatureVector(text, out isEmpty);
+        if (isEmpty) continue;
 
         foreach (var cCls in classes)
         {
@@ -68,9 +70,9 @@ namespace ML.TextMethods.Algorithms
 
         if (UseSmoothing)
         {
-          freq  += a;
-          cTotal += (a*dim);
-          cFreq  += a;
+          freq    += a;
+          cTotal  += (a*dim);
+          cFreq   += a;
           ccTotal += (a*dim);
         }
 

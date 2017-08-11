@@ -35,7 +35,9 @@ namespace ML.TextMethods.Algorithms
       {
         var text = doc.Key;
         var cls  = doc.Value;
-        var data = ExtractFeatureVector(text);
+        bool isEmpty;
+        var data = ExtractFeatureVector(text, out isEmpty);
+        if (isEmpty) continue;
 
         foreach (var cCls in classes)
         {

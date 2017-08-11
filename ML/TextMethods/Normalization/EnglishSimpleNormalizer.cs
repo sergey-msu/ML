@@ -14,12 +14,11 @@ namespace ML.TextMethods.Normalization
     {
       RemoveDashes = true;
       OnlyLettersAndDigits = true;
-
     }
 
     public bool RemoveDashes { get; set; }
     public bool OnlyLettersAndDigits { get; set; }
-
+    public int  MinShortWordLength { get; set; }
 
     public string Normalize(string token)
     {
@@ -38,7 +37,10 @@ namespace ML.TextMethods.Normalization
         builder.Append(c);
       }
 
-      return builder.ToString();
+      var result = builder.ToString();
+      if (result.Length < MinShortWordLength) return null;
+
+      return result;
     }
   }
 }

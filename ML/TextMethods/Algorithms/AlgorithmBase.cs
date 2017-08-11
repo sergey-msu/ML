@@ -50,21 +50,23 @@ namespace ML.TextMethods.Algorithms
 
     #endregion
 
-    public abstract double[] ExtractFeatureVector(string doc);
+    public abstract double[] ExtractFeatureVector(string doc, out bool isEmpty);
 
-    public double[] ExtractFrequencies(string doc)
+    public double[] ExtractFrequencies(string doc, out bool isEmpty)
     {
       var dict   = Vocabulary;
       var dim    = dict.Count;
       var result = new double[dim];
       var prep   = Preprocessor;
       var tokens = prep.Preprocess(doc);
+      isEmpty = true;
 
       foreach (var token in tokens)
       {
         var idx = dict.IndexOf(token);
         if (idx<0) continue;
         result[idx] += 1;
+        isEmpty = false;
       }
 
       return result;
@@ -174,7 +176,8 @@ namespace ML.TextMethods.Algorithms
 
     public override ClassScore[] PredictTokens(string obj, int cnt)
     {
-      var data      = ExtractFeatureVector(obj);
+      bool isEmpty;
+      var data      = ExtractFeatureVector(obj, out isEmpty);
       var classes   = TrainingSample.CachedClasses;
       var priors    = PriorProbs;
       var dim       = DataDim;
@@ -184,12 +187,16 @@ namespace ML.TextMethods.Algorithms
       foreach (var cls in classes)
       {
         var score = usePriors ? priors[cls] : 0.0D;
-        for (int i=0; i<dim; i++)
+
+        if (!isEmpty)
         {
-          var x = data[i];
-          if (x==0) continue;
-          var w = m_Weights[new ClassFeatureKey(cls, i)];
-          score += x*w;
+          for (int i=0; i<dim; i++)
+          {
+            var x = data[i];
+            if (x==0) continue;
+            var w = m_Weights[new ClassFeatureKey(cls, i)];
+            score += x*w;
+          }
         }
 
         scores.Add(new ClassScore(cls, score));
@@ -200,9 +207,9 @@ namespace ML.TextMethods.Algorithms
                    .ToArray();
     }
 
-    public override double[] ExtractFeatureVector(string doc)
+    public override double[] ExtractFeatureVector(string doc, out bool isEmpty)
     {
-      return ExtractFrequencies(doc);
+      return ExtractFrequencies(doc, out isEmpty);
     }
 
 

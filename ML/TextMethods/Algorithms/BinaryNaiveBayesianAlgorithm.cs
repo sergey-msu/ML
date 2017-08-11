@@ -16,13 +16,14 @@ namespace ML.TextMethods.Algorithms
 
     #region Properties
 
-    public override string Name   { get { return "BINNB"; } }
+    public override string Name { get { return "BINNB"; } }
 
     #endregion
 
     public override ClassScore[] PredictTokens(string obj, int cnt)
     {
-      var data    = ExtractFeatureVector(obj);
+      bool isEmpty;
+      var data    = ExtractFeatureVector(obj, out isEmpty);
       var classes = TrainingSample.CachedClasses;
       var priors  = PriorProbs;
       var dim     = DataDim;
@@ -47,19 +48,21 @@ namespace ML.TextMethods.Algorithms
                    .ToArray();
     }
 
-    public override double[] ExtractFeatureVector(string doc)
+    public override double[] ExtractFeatureVector(string doc, out bool isEmpty)
     {
       var dict   = Vocabulary;
       var dim    = DataDim;
       var result = new double[dim];
       var prep   = Preprocessor;
       var tokens = prep.Preprocess(doc);
+      isEmpty = true;
 
       foreach (var token in tokens)
       {
         var idx = dict.IndexOf(token);
         if (idx<0) continue;
         result[idx] = 1;
+        isEmpty = false;
       }
 
       return result;
@@ -77,7 +80,9 @@ namespace ML.TextMethods.Algorithms
       {
         var text = doc.Key;
         var cls  = doc.Value;
-        var data = ExtractFeatureVector(text);
+        bool isEmpty;
+        var data = ExtractFeatureVector(text, out isEmpty);
+        if (isEmpty) continue;
 
         for (int i=0; i<N; i++)
         {

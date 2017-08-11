@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using ML.Core;
 using ML.TextMethods.Algorithms;
-using System.Text;
 
 namespace ML.TextTests
 {
@@ -71,7 +71,9 @@ namespace ML.TextTests
         {
           var doc  = pData.Key;
           var cls  = pData.Value;
-          var data = Alg.ExtractFeatureVector(doc);
+          bool isEmpty;
+          var data = Alg.ExtractFeatureVector(doc, out isEmpty);
+          if (isEmpty) continue;
 
           builder.Clear();
           for (int i=0; i<dim; i++)
@@ -123,32 +125,6 @@ namespace ML.TextTests
 
       m_TrainingSet = sample.Subset(0, tcnt);
       m_TestingSet  = sample.Subset(tcnt, cnt-tcnt);
-    }
-
-    #endregion
-
-    #region Train
-
-    protected override void Train()
-    {
-      var now = DateTime.Now;
-
-      Console.WriteLine();
-      Console.WriteLine("Training started at {0}", now);
-      Alg.Train(m_TrainingSet);
-
-      Utils.HandleTrainEnded(Alg, m_TestingSet, OutputPath);
-
-      Console.WriteLine("\n--------- ELAPSED TRAIN ----------" + (int)(DateTime.Now-now).TotalSeconds + "s");
-    }
-
-    #endregion
-
-    #region Test
-
-    protected override void Test()
-    {
-      throw new NotSupportedException();
     }
 
     #endregion

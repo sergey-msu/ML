@@ -89,7 +89,7 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new TWCNaiveBayesianAlgorithm(proc) { UsePriors = false };
+      var alg = new TWCNaiveBayesianAlgorithm(proc);
 
       return alg;
     }

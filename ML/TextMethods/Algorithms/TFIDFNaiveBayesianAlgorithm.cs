@@ -74,16 +74,21 @@ namespace ML.TextMethods.Algorithms
       var weights   = new Dictionary<ClassFeatureKey, double>();
       var clsTotals = new Dictionary<Class, double>();
       var idfFreqs  = new int[dim];
-      var freqDatas = new FreqData[dim, cnt];
+      var freqDatas = new FreqData[dim][];
+      for (int i=0; i<dim; i++)
+        freqDatas[i] = new FreqData[cnt];
 
       // TF transform
       int idx = -1;
       foreach (var doc in TrainingSample)
       {
-        idx++;
         var text = doc.Key;
         var cls  = doc.Value;
-        var data = ExtractFrequencies(text);
+        bool isEmpty;
+        var data = ExtractFeatureVector(text, out isEmpty);
+        if (isEmpty) continue;
+
+        idx++;
 
         m_TFWeightingScheme.Reset();
 
@@ -91,20 +96,24 @@ namespace ML.TextMethods.Algorithms
         {
           var f = data[i];
           var tf = m_TFWeightingScheme.GetFrequency(data, i);
-          freqDatas[i, idx] = new FreqData(tf, cls);
+          freqDatas[i][idx] = new FreqData(tf, cls);
 
           if (f>0) idfFreqs[i] += 1;
         }
       }
+
+      cnt = idx;
 
       // IDF transform
       var idfWeights = IDFWeightingScheme.GetWeights(dim, idfFreqs);
       for (var i=0; i<dim; i++)
       {
         var idf = idfWeights[i];
+        var freqData = freqDatas[i];
+
         for (var j=0; j<cnt; j++)
         {
-          var fData  = freqDatas[i, j];
+          var fData  = freqData[j];
           var fValue = fData.Value*idf;
           var cls    = fData.Class;
           var key = new ClassFeatureKey(cls, i);

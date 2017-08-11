@@ -27,13 +27,14 @@ namespace ML.TextMethods.Algorithms
 
     public override ClassScore[] PredictTokens(string obj, int cnt)
     {
-      var data = ExtractFeatureVector(obj);
+      bool isEmpty;
+      var data = ExtractFeatureVector(obj, out isEmpty);
       return m_SubAlgorithm.PredictTokens(data, cnt);
     }
 
-    public override double[] ExtractFeatureVector(string doc)
+    public override double[] ExtractFeatureVector(string doc, out bool isEmpty)
     {
-      return ExtractFrequencies(doc);
+      return ExtractFrequencies(doc, out isEmpty);
     }
 
 
@@ -43,7 +44,10 @@ namespace ML.TextMethods.Algorithms
       foreach (var pData in TrainingSample)
       {
         var doc  = pData.Key;
-        var data = ExtractFeatureVector(doc);
+        bool isEmpty;
+        var data = ExtractFeatureVector(doc, out isEmpty);
+        if (isEmpty) continue;
+
         var cls  = pData.Value;
         featureSample[data] = cls;
       }
