@@ -126,7 +126,7 @@ namespace ML.TextTests
 
     protected override TextAlgorithmBase CreateAlgorithm()
     {
-      return Examples.Create_BinaryAlgorithm();
+      return Examples.Create_TWCAlgorithm();
     }
 
     #region Export

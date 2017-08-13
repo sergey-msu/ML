@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using ML.Core;
 using ML.TextMethods.Algorithms;
 
@@ -33,8 +32,8 @@ namespace ML.TextTests
     };
 
     public override string SrcMark    { get { return "original"; } }
-    public override string DataPath   { get { return RootPath+@"\data\reuters-r8"; }}
-    public override string OutputPath { get { return RootPath+@"\output\reuters-r8_original"; }}
+    public override string DataPath   { get { return RootPath+@"\data\reuters-r8"; } }
+    public override string OutputPath { get { return RootPath+@"\output\reuters-r8_original"; } }
 
     protected override TextAlgorithmBase CreateAlgorithm()
     {

@@ -44,7 +44,7 @@ namespace ML.Contracts
     /// Fills distrubution parameters from given classified sample (Maximum Likelihood estimation / frequency analysis etc)
     /// Ranges result with respect to classes and feature indices
     /// </summary>
-    Dictionary<ClassFeatureKey, TParam> FromSample(ClassifiedSample<double[]> sample);
+    TParam[][] FromSample(ClassifiedSample<double[]> sample);
   }
 
   /// <summary>

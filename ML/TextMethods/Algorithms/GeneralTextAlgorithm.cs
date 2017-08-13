@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using ML.Core;
 using ML.Contracts;
+using ML.Core.Serialization;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -41,6 +43,7 @@ namespace ML.TextMethods.Algorithms
     protected override void TrainImpl()
     {
       var featureSample = new ClassifiedSample<double[]>();
+
       foreach (var pData in TrainingSample)
       {
         var doc  = pData.Key;
@@ -54,5 +57,23 @@ namespace ML.TextMethods.Algorithms
 
       m_SubAlgorithm.Train(featureSample);
     }
+
+    #region Serialization
+
+    public override void Serialize(MLSerializer ser)
+    {
+      // TODO intelligent serialize inner algorithm
+
+      ser.Write("SUB_ALGORITHM", m_SubAlgorithm);
+    }
+
+    public override void Deserialize(MLSerializer ser)
+    {
+      // TODO intelligent deserialize inner algorithm
+
+
+    }
+
+    #endregion
   }
 }

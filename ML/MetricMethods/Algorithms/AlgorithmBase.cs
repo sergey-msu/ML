@@ -49,12 +49,6 @@ namespace ML.MetricMethods.Algorithms
                    .Take(cnt)
                    .ToArray();
     }
-
-
-    protected override void DoTrain()
-    {
-      // Metric methods are not trainable by default
-    }
   }
 
   /// <summary>

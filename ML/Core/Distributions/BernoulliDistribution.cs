@@ -62,18 +62,20 @@ namespace ML.Core.Distributions
       Params = new Parameters(mu);
     }
 
-    public override Dictionary<ClassFeatureKey, Parameters> FromSample(ClassifiedSample<double[]> sample)
+    public override Parameters[][] FromSample(ClassifiedSample<double[]> sample)
     {
-      var result  = new Dictionary<ClassFeatureKey, Parameters>();
       var dim     = sample.GetDimension();
       var classes = sample.CachedClasses;
-      var mus     = new Dictionary<Class, double>();
-      var mys     = new Dictionary<Class, double>();
+      var mus     = new double[classes.Count];
+      var mys     = new double[classes.Count];
+      var result  = new Parameters[classes.Count][];
+      foreach (var cls in classes)
+        result[cls.Value] = new Parameters[dim];
 
       foreach (var cls in classes)
       {
-        mus[cls] = 0.0D;
-        mys[cls] = 0;
+        mus[cls.Value] = 0.0D;
+        mys[cls.Value] = 0;
       }
 
       for (int i=0; i<dim; i++)
@@ -82,16 +84,16 @@ namespace ML.Core.Distributions
         {
           var data = pData.Key;
           var cls  = pData.Value;
-          mus[cls] += data[i];
+          mus[cls.Value] += data[i];
 
-          if (i==0) mys[cls]++;
+          if (i==0) mys[cls.Value]++;
         }
 
         foreach (var cls in classes)
         {
-          var mu = mus[cls]/mys[cls];
-          result[new ClassFeatureKey(cls, i)] = new Parameters(mu);
-          mus[cls] = 0.0D;
+          var mu = mus[cls.Value]/mys[cls.Value];
+          result[cls.Value][i] = new Parameters(mu);
+          mus[cls.Value] = 0.0D;
         }
       }
 

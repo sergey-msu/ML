@@ -83,20 +83,22 @@ namespace ML.Core.Distributions
       Params = new Parameters(mu, sigma);
     }
 
-    public override Dictionary<ClassFeatureKey, Parameters> FromSample(ClassifiedSample<double[]> sample)
+    public override Parameters[][] FromSample(ClassifiedSample<double[]> sample)
     {
-      var result  = new Dictionary<ClassFeatureKey, Parameters>();
       var dim     = sample.GetDimension();
       var classes = sample.CachedClasses;
+      var mus     = new double[classes.Count];
+      var sigmas  = new double[classes.Count];
+      var mys     = new double[classes.Count];
+      var result  = new Parameters[classes.Count][];
+      foreach (var cls in classes)
+        result[cls.Value] = new Parameters[dim];
 
-      var mus    = new Dictionary<Class, double>();
-      var sigmas = new Dictionary<Class, double>();
-      var mys    = new Dictionary<Class, double>();
       foreach (var cls in classes)
       {
-        mus[cls]    = 0.0D;
-        sigmas[cls] = 0.0D;
-        mys[cls]    = 0;
+        mus[cls.Value]    = 0.0D;
+        sigmas[cls.Value] = 0.0D;
+        mys[cls.Value]    = 0;
       }
 
       for (int i=0; i<dim; i++)
@@ -105,29 +107,29 @@ namespace ML.Core.Distributions
         {
           var data = pData.Key;
           var cls  = pData.Value;
-          mus[cls] += data[i];
+          mus[cls.Value] += data[i];
 
-          if (i==0) mys[cls]++;
+          if (i==0) mys[cls.Value]++;
         }
         foreach (var cls in classes)
-          mus[cls] /= mys[cls];
+          mus[cls.Value] /= mys[cls.Value];
 
         foreach (var pData in sample)
         {
           var data = pData.Key;
           var cls  = pData.Value;
-          var t = data[i] - mus[cls];
-          sigmas[cls] += t*t;
+          var t = data[i] - mus[cls.Value];
+          sigmas[cls.Value] += t*t;
         }
 
         foreach (var cls in classes)
         {
-          var sigma = Math.Sqrt(sigmas[cls] / mys[cls]);
+          var sigma = Math.Sqrt(sigmas[cls.Value] / mys[cls.Value]);
           if (UseSigmaMinThreshold && sigma<SigmaMinThreshold)
             sigma = SigmaMinThreshold;
-          result[new ClassFeatureKey(cls, i)] = new Parameters(mus[cls], sigma);
-          mus[cls] = 0.0D;
-          sigmas[cls] = 0.0D;
+          result[cls.Value][i] = new Parameters(mus[cls.Value], sigma);
+          mus[cls.Value] = 0.0D;
+          sigmas[cls.Value] = 0.0D;
         }
       }
 

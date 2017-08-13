@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ML.Core;
 using ML.Contracts;
-using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -20,19 +18,21 @@ namespace ML.TextMethods.Algorithms
 
     #region Properties
 
-    public override string Name   { get { return "TWCNB"; } }
+    public override string Name { get { return "TWCNB"; } }
 
     #endregion
 
-    protected override Dictionary<ClassFeatureKey, double> TrainWeights()
+    protected override double[][] TrainWeights()
     {
-      var dim       = DataDim;
-      var cnt       = DataCount;
-      var classes   = TrainingSample.Classes;
-      var alpha     = Alpha;
-      var weights   = new Dictionary<ClassFeatureKey, double>();
-      var cClsTotals = new Dictionary<Class, double>();
-      var idfFreqs  = new int[dim];
+      var dim = DataDim;
+      var cnt = DataCount;
+      var alp = Alpha;
+      var classes = Classes;
+      var idfFreqs = new int[dim];
+      var cTotals  = new double[classes.Length];
+      var weights  = new double[Classes.Length][];
+      foreach (var cls in Classes)
+        weights[cls.Value] = new double[dim];
       var freqDatas = new FreqData[dim][];
       for (int i=0; i<dim; i++)
         freqDatas[i] = new FreqData[cnt];
@@ -60,7 +60,7 @@ namespace ML.TextMethods.Algorithms
         }
       }
 
-      cnt = idx;
+      cnt = idx+1;
 
       // IDF transform
       var idfWeights = IDFWeightingScheme.GetWeights(dim, idfFreqs);
@@ -97,8 +97,10 @@ namespace ML.TextMethods.Algorithms
       // complements
       for (var j=0; j<cnt; j++)
       {
-        foreach (var cCls in classes)
+        foreach (var cCls in Classes)
         {
+          var ws = weights[cCls.Value];
+
           for (var i=0; i<dim; i++)
           {
             var fData = freqDatas[i][j];
@@ -107,50 +109,46 @@ namespace ML.TextMethods.Algorithms
 
             if (cCls.Equals(cls)) break;
 
-            var key = new ClassFeatureKey(cCls, i);
-
-            double w = weights.TryGetValue(key, out w) ? w += f : w = f;
-            weights[key] = w;
-
-            double t = cClsTotals.TryGetValue(cCls, out t) ? t += f : f;
-            cClsTotals[cCls] = t;
+            ws[i] += f;
+            cTotals[cCls.Value] += f;
           }
         }
       }
 
       // take logarithm
-      foreach (var key in weights.Keys.ToList())
+      foreach (var cls in Classes)
       {
-        var w = weights[key];
-        var t = cClsTotals[key.Class];
-        if (UseSmoothing)
-        {
-          w += alpha;
-          t += (alpha*dim);
-        }
+        var ws = weights[cls.Value];
+        var t  = cTotals[cls.Value];
+        if (UseSmoothing) t += alp*dim;
 
-        weights[key] = -Math.Log(w/t);
+        for (int i=0; i<dim; i++)
+        {
+          var w = ws[i];
+          if (UseSmoothing) w += alp;
+
+          ws[i] = -Math.Log(w/t);
+        }
       }
 
       // weight normalization
 
-      foreach (var cls in classes)
+      foreach (var cls in Classes)
       {
-        cClsTotals[cls] = 0;
+        cTotals[cls.Value] = 0;
+        var ws = weights[cls.Value];
 
         for (var i=0; i<dim; i++)
-          cClsTotals[cls] += Math.Abs(weights[new ClassFeatureKey(cls, i)]);
+          cTotals[cls.Value] += Math.Abs(ws[i]);
       }
 
-      foreach (var cls in classes)
+      foreach (var cls in Classes)
       {
-        var t = cClsTotals[cls];
+        var t = cTotals[cls.Value];
+        var ws = weights[cls.Value];
+
         for (var i=0; i<dim; i++)
-        {
-          var key = new ClassFeatureKey(cls, i);
-          var w = weights[key]/t;
-          weights[key] = w;
-        }
+          ws[i] = ws[i]/t;
       }
 
       return weights;

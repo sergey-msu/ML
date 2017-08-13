@@ -137,8 +137,8 @@ namespace ML.ConsoleTest
         var clsName = data[classesIndx];
         if (!Classes.TryGetValue(clsName, out cls))
         {
-          double val;
-          var value = (clsValIdx<0 || !double.TryParse(data[clsValIdx], out val)) ? (double?)null : val;
+          int val;
+          var value = (clsValIdx<0 || !int.TryParse(data[clsValIdx], out val)) ? (int?)null : val;
           cls = new Class(clsName, value);
           Classes[clsName] = cls;
         }

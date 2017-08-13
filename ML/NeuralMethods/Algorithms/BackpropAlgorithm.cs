@@ -4,6 +4,7 @@ using System.Linq;
 using ML.Core;
 using ML.NeuralMethods.Models;
 using ML.Contracts;
+using ML.Core.Serialization;
 
 namespace ML.NeuralMethods.Algorithms
 {
@@ -200,6 +201,20 @@ namespace ML.NeuralMethods.Algorithms
         if (checkStopCriteria()) break;
       }
     }
+
+    #region Serialization
+
+    public override void Serialize(MLSerializer ser)
+    {
+      throw new NotImplementedException();
+    }
+
+    public override void Deserialize(MLSerializer ser)
+    {
+      throw new NotImplementedException();
+    }
+
+    #endregion
 
     #region .pvt
 

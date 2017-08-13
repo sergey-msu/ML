@@ -97,9 +97,10 @@ namespace ML.Core.Distributions
       var len = sample.Length;
       for (int i=0; i<len; i++)
         a += sample[i];
+
       double b = m_TotalCount;
 
-      if (a==0 && UseSmoothing)
+      if (UseSmoothing)
       {
         a += m_Alpha;
         b += m_Alpha*m_N;
@@ -108,16 +109,18 @@ namespace ML.Core.Distributions
       Params = new Parameters(a/b);
     }
 
-    public override Dictionary<ClassFeatureKey, Parameters> FromSample(ClassifiedSample<double[]> sample)
+    public override Parameters[][] FromSample(ClassifiedSample<double[]> sample)
     {
-      var result  = new Dictionary<ClassFeatureKey, Parameters>();
-      var temp    = new Dictionary<ClassFeatureKey, double>();
       var dim     = sample.GetDimension();
       var classes = sample.CachedClasses;
-      var ts      = new Dictionary<Class, double>();
-
+      var ts      = new double[classes.Count];
+      var result  = new Parameters[classes.Count][];
+      var temp    = new double[classes.Count][];
       foreach (var cls in classes)
-        ts[cls] = 0;
+      {
+        result[cls.Value] = new Parameters[dim];
+        temp[cls.Value]   = new double[dim];
+      }
 
       for (int i=0; i<dim; i++)
       {
@@ -125,32 +128,27 @@ namespace ML.Core.Distributions
         {
           var data = pData.Key;
           var cls  = pData.Value;
-          var key = new ClassFeatureKey(cls, i);
 
           var p = data[i];
-          if (!temp.ContainsKey(key))
-            temp[key] = p;
-          else
-            temp[key] += p;
+          temp[cls.Value][i] += p;
 
-          ts[cls] += p;
+          ts[cls.Value] += p;
         }
       }
 
-      for (int i=0; i<dim; i++)
+      foreach (var cls in classes)
       {
-        foreach (var cls in classes)
-        {
-          var key = new ClassFeatureKey(cls, i);
-          var p = temp[key];
-          var b = ts[cls];
-          if (p==0 && UseSmoothing)
-          {
-            p += m_Alpha;
-            b += m_Alpha*m_N;
-          }
+        var tmps = temp[cls.Value];
+        var rs   = result[cls.Value];
+        var bs   = ts[cls.Value];
+        if (UseSmoothing) bs += m_Alpha*m_N;
 
-          result[key] = new Parameters(p/b);
+        for (int i=0; i<dim; i++)
+        {
+          var p = tmps[i];
+          if (UseSmoothing) p += m_Alpha;
+
+          rs[i] = new Parameters(p/bs);
         }
       }
 

@@ -14,7 +14,7 @@ namespace ML.Core
     public static readonly Class Unknown = new Class(-1);
 
     private readonly string m_Name;
-    private readonly double m_Value;
+    private readonly int    m_Value;
     private readonly bool m_IsUnknown;
 
     private Class(int value)
@@ -24,13 +24,13 @@ namespace ML.Core
       m_IsUnknown = true;
     }
 
-    public Class(string name, double? value = null)
+    public Class(string name, int? value = null)
     {
       if (string.IsNullOrWhiteSpace(name))
         throw new MLException("Class.ctor(name=null|empty)");
 
       m_Name = name;
-      m_Value = value ?? 0.0F;
+      m_Value = value ?? 0;
       m_IsUnknown = false;
     }
 
@@ -40,9 +40,9 @@ namespace ML.Core
     public string Name { get { return m_Name; } }
 
     /// <summary>
-    /// Some associated value (e.g. {-1, +1} for two-classes classification)
+    /// Some associated value (e.g. {0, 1} for two-classes classification)
     /// </summary>
-    public double Value { get { return m_Value; } }
+    public int Value { get { return m_Value; } }
 
     /// <summary>
     /// Determines whether the class is unknown class

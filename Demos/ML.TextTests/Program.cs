@@ -7,10 +7,10 @@ namespace ML.TextTests
     static void Main(string[] args)
     {
       var runner =
-        //new SpamRunner();
+        new SpamRunner();
         //new ReutersR8Runner();
         //new ReutersR52Runner();
-        new Newsgroups20Runner();
+        //new Newsgroups20Runner();
 
       try
       {

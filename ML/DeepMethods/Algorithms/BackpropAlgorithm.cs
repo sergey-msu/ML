@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ML.Core;
 using ML.DeepMethods.Models;
 using ML.Contracts;
+using ML.Core.Serialization;
 
 namespace ML.DeepMethods.Algorithms
 {
@@ -96,7 +97,6 @@ namespace ML.DeepMethods.Algorithms
     #region Properties
 
     public override string Name   { get { return "CNN_BP"; } }
-
 
     public int InputDepth  { get { return m_InputDepth; } }
     public int InputHeight { get { return m_InputHeight; } }
@@ -299,6 +299,21 @@ namespace ML.DeepMethods.Algorithms
     {
       doTrain(sample);
     }
+
+    #region Serialization
+
+    public override void Serialize(MLSerializer ser)
+    {
+      throw new NotImplementedException();
+    }
+
+    public override void Deserialize(MLSerializer ser)
+    {
+      throw new NotImplementedException();
+    }
+
+
+    #endregion
 
     #region .pvt
 

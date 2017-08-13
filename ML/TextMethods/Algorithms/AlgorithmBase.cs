@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.IO.Compression;
 using ML.Core;
 using ML.Contracts;
-using ML.Core.Distributions;
+using ML.Core.Serialization;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -13,8 +15,8 @@ namespace ML.TextMethods.Algorithms
 
     private readonly ITextPreprocessor m_Preprocessor;
     private List<string> m_Vocabulary;
-    private Dictionary<Class, double> m_PriorProbs;
-    private Dictionary<Class, int>    m_ClassHist;
+    private double[] m_PriorProbs;
+    private int[] m_ClassHist;
     private int  m_DataDim;
     private int  m_DataCount;
     private bool m_UsePriors;
@@ -38,10 +40,10 @@ namespace ML.TextMethods.Algorithms
     /// <summary>
     /// Prior class logarithm probabilities
     /// </summary>
-    public Dictionary<Class, double> PriorProbs { get { return m_PriorProbs; } }
-    public Dictionary<Class, int>    ClassHist  { get { return m_ClassHist; } }
-    public int DataDim   { get { return m_DataDim; } }
-    public int DataCount { get { return m_DataCount; } }
+    public double[] PriorProbs { get { return m_PriorProbs; } }
+    public int[]    ClassHist  { get { return m_ClassHist; } }
+    public int      DataDim    { get { return m_DataDim; } }
+    public int      DataCount  { get { return m_DataCount; } }
 
     /// <summary>
     /// If true, the algorithm takes prior class probabilities into account
@@ -55,10 +57,8 @@ namespace ML.TextMethods.Algorithms
     public double[] ExtractFrequencies(string doc, out bool isEmpty)
     {
       var dict   = Vocabulary;
-      var dim    = dict.Count;
-      var result = new double[dim];
-      var prep   = Preprocessor;
-      var tokens = prep.Preprocess(doc);
+      var result = new double[DataDim];
+      var tokens = Preprocessor.Preprocess(doc);
       isEmpty = true;
 
       foreach (var token in tokens)
@@ -75,6 +75,7 @@ namespace ML.TextMethods.Algorithms
     public virtual List<string> ExtractVocabulary(ClassifiedSample<string> corpus)
     {
       var dict = new HashSet<string>();
+
       foreach (var doc in corpus)
       {
         var tokens = m_Preprocessor.Preprocess(doc.Key);
@@ -88,6 +89,15 @@ namespace ML.TextMethods.Algorithms
 
     protected override void DoTrain()
     {
+      base.DoTrain();
+
+      var classes = Classes.ToList();
+      for (int i=0; i<classes.Count; i++)
+      {
+        var any = classes.Any(c => (int)c.Value==i);
+        if (!any)  throw new MLException(string.Format("Class values must be enumerated from 0 to {0}", classes.Count));
+      }
+
       var corpus = TrainingSample;
       if (corpus==null || !corpus.Any())
         throw new MLException("Training sample is null or empty");
@@ -96,22 +106,19 @@ namespace ML.TextMethods.Algorithms
       if (m_Vocabulary.Count<=0)
         throw new MLException("Vocabulary is empty");
 
-      m_ClassHist  = new Dictionary<Class, int>();
-      m_PriorProbs = new Dictionary<Class, double>();
+      m_ClassHist  = new int[classes.Count];
+      m_PriorProbs = new double[classes.Count];
       m_DataDim    = m_Vocabulary.Count;
       m_DataCount  = TrainingSample.Count;
-      var classes  = TrainingSample.Classes.ToList();
 
       foreach (var doc in TrainingSample)
       {
         var cls = doc.Value;
-        int freq;
-        if (!m_ClassHist.TryGetValue(cls, out freq)) m_ClassHist[cls] = 1;
-        else m_ClassHist[cls] = freq+1;
+        m_ClassHist[cls.Value] += 1;
       }
 
       foreach (var cls in classes)
-        m_PriorProbs[cls] = Math.Log(m_ClassHist[cls]/(double)m_DataCount);
+        m_PriorProbs[cls.Value] = Math.Log(m_ClassHist[cls.Value]/(double)m_DataCount);
 
       TrainImpl();
     }
@@ -120,16 +127,24 @@ namespace ML.TextMethods.Algorithms
 
     #region Serialization
 
-    public void Serialize(System.IO.Stream stream)
+    public override void Serialize(MLSerializer ser)
     {
-      var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
-      serializer.Serialize(stream, this);
+      base.Serialize(ser);
+
+      ser.Write("PREPROCESSOR", m_Preprocessor);
+      ser.Write("VOCABULARY", m_Vocabulary);
+      ser.Write("PRIORS", m_PriorProbs);
+      ser.Write("CLASS_HIST", m_ClassHist);
+      ser.Write("DATA_DIM", m_DataDim);
+      ser.Write("DATA_COUNT", m_DataCount);
+      ser.Write("USE_PRIORS", m_UsePriors);
     }
 
-    public static TextAlgorithmBase Deserialize(System.IO.Stream stream)
+    public override void Deserialize(MLSerializer ser)
     {
-      var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
-      return (TextAlgorithmBase)serializer.Deserialize(stream);
+      base.Deserialize(ser);
+
+      throw new NotImplementedException();
     }
 
     #endregion
@@ -137,9 +152,9 @@ namespace ML.TextMethods.Algorithms
 
   public abstract class NaiveBayesianAlgorithmBase : TextAlgorithmBase
   {
-    private double m_Alpha;
-    private bool   m_UseSmoothing;
-    private Dictionary<ClassFeatureKey, double> m_Weights;
+    private double[][] m_Weights;
+    private double     m_Alpha;
+    private bool       m_UseSmoothing;
 
     protected NaiveBayesianAlgorithmBase(ITextPreprocessor preprocessor)
       : base(preprocessor)
@@ -150,7 +165,7 @@ namespace ML.TextMethods.Algorithms
 
     #region Properties
 
-    public Dictionary<ClassFeatureKey, double> Weights { get { return m_Weights; } }
+    public double[][] Weights { get { return m_Weights; } }
 
     /// <summary>
     /// Smoothing coefficient
@@ -178,7 +193,7 @@ namespace ML.TextMethods.Algorithms
     {
       bool isEmpty;
       var data      = ExtractFeatureVector(obj, out isEmpty);
-      var classes   = TrainingSample.CachedClasses;
+      var classes   = Classes;
       var priors    = PriorProbs;
       var dim       = DataDim;
       var usePriors = UsePriors;
@@ -186,7 +201,8 @@ namespace ML.TextMethods.Algorithms
 
       foreach (var cls in classes)
       {
-        var score = usePriors ? priors[cls] : 0.0D;
+        var score = usePriors ? priors[cls.Value] : 0.0D;
+        var weights = m_Weights[cls.Value];
 
         if (!isEmpty)
         {
@@ -194,7 +210,7 @@ namespace ML.TextMethods.Algorithms
           {
             var x = data[i];
             if (x==0) continue;
-            var w = m_Weights[new ClassFeatureKey(cls, i)];
+            var w = weights[i];
             score += x*w;
           }
         }
@@ -219,6 +235,26 @@ namespace ML.TextMethods.Algorithms
       m_Weights = TrainWeights();
     }
 
-    protected abstract Dictionary<ClassFeatureKey, double> TrainWeights();
+    protected abstract double[][] TrainWeights();
+
+    #region Serialization
+
+    public override void Serialize(MLSerializer ser)
+    {
+      base.Serialize(ser);
+
+      ser.Write("USE_SMOOTHING", m_UseSmoothing);
+      ser.Write("ALPHA", m_Alpha);
+      ser.Write("WEIGHTS", m_Weights);
+    }
+
+    public override void Deserialize(MLSerializer ser)
+    {
+      base.Deserialize(ser);
+
+      throw new NotImplementedException();
+    }
+
+    #endregion
   }
 }

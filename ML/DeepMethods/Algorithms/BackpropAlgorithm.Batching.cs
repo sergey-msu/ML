@@ -1,5 +1,6 @@
 ﻿using System;
 using ML.Core;
+using ML.Core.Serialization;
 
 namespace ML.DeepMethods.Algorithms
 {

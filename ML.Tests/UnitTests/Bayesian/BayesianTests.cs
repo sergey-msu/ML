@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ML;
 using ML.Core;
@@ -19,11 +18,11 @@ namespace ML.Tests.UnitTests.Bayesian
       var alg = new NaiveBayesianKernelAlgorithm(kernel, 0.3D);
       var sample = new ClassifiedSample<double[]>
       {
-        { new[] { 0.2, 0.2 }, new Class("A", 1) },
-        { new[] { 0.4, 0.6 }, new Class("A", 1) },
-        { new[] { 0.6, 0.4 }, new Class("A", 1) },
-        { new[] { 0.8, 0.6 }, new Class("B", 2) },
-        { new[] { 0.8, 0.8 }, new Class("B", 2) }
+        { new[] { 0.2, 0.2 }, new Class("A", 0) },
+        { new[] { 0.4, 0.6 }, new Class("A", 0) },
+        { new[] { 0.6, 0.4 }, new Class("A", 0) },
+        { new[] { 0.8, 0.6 }, new Class("B", 1) },
+        { new[] { 0.8, 0.8 }, new Class("B", 1) }
       };
 
       // act
@@ -33,9 +32,9 @@ namespace ML.Tests.UnitTests.Bayesian
       var res3 = alg.Predict(new[] { 0.9, 0.7 });
 
       // assert
-      Assert.AreEqual(new Class("A", 1), res1);
-      Assert.AreEqual(new Class("A", 1), res2);
-      Assert.AreEqual(new Class("B", 2), res3);
+      Assert.AreEqual(new Class("A", 0), res1);
+      Assert.AreEqual(new Class("A", 0), res2);
+      Assert.AreEqual(new Class("B", 1), res3);
     }
 
     [TestMethod]
@@ -46,19 +45,19 @@ namespace ML.Tests.UnitTests.Bayesian
       var alg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
       var sample = new ClassifiedSample<double[]>
       {
-        { new[] { 2.0, 1.0 }, new Class("A", 1) },
-        { new[] { 0.0, 3.0 }, new Class("A", 1) },
-        { new[] { 4.0, 3.0 }, new Class("B", 2) }
+        { new[] { 2.0, 1.0 }, new Class("A", 0) },
+        { new[] { 0.0, 3.0 }, new Class("A", 0) },
+        { new[] { 4.0, 3.0 }, new Class("B", 1) }
       };
 
       // act
       alg.Train(sample);
-      var s11 = alg.CalculateClassScore(new[] { 1.0, 2.0 }, new Class("A", 1));
-      var s12 = alg.CalculateClassScore(new[] { 1.0, 2.0 }, new Class("B", 2));
-      var s21 = alg.CalculateClassScore(new[] { 2.0, 2.0 }, new Class("A", 1));
-      var s22 = alg.CalculateClassScore(new[] { 2.0, 2.0 }, new Class("B", 2));
-      var s31 = alg.CalculateClassScore(new[] { 3.0, 2.0 }, new Class("A", 1));
-      var s32 = alg.CalculateClassScore(new[] { 3.0, 2.0 }, new Class("B", 2));
+      var s11 = alg.CalculateClassScore(new[] { 1.0, 2.0 }, new Class("A", 0));
+      var s12 = alg.CalculateClassScore(new[] { 1.0, 2.0 }, new Class("B", 1));
+      var s21 = alg.CalculateClassScore(new[] { 2.0, 2.0 }, new Class("A", 0));
+      var s22 = alg.CalculateClassScore(new[] { 2.0, 2.0 }, new Class("B", 1));
+      var s31 = alg.CalculateClassScore(new[] { 3.0, 2.0 }, new Class("A", 0));
+      var s32 = alg.CalculateClassScore(new[] { 3.0, 2.0 }, new Class("B", 1));
 
       // assert
       Assert.AreEqual(Math.Log(1/24.0D), s11, EPS);

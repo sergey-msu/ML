@@ -43,9 +43,9 @@ namespace ML.Tests.UnitTests.Text
       // assert
       Assert.AreEqual(sample, alg.TrainingSample);
       Assert.AreEqual(prep, alg.Preprocessor);
-      Assert.AreEqual(2, alg.ClassHist.Count);
-      Assert.AreEqual(4, alg.ClassHist[CLS1]);
-      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(2, alg.ClassHist.Length);
+      Assert.AreEqual(4, alg.ClassHist[0]);
+      Assert.AreEqual(2, alg.ClassHist[1]);
       Assert.AreEqual(6, alg.DataCount);
       Assert.AreEqual(8, alg.DataDim);
 
@@ -59,28 +59,30 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual("world",    alg.Vocabulary[6]);
       Assert.AreEqual("seven",    alg.Vocabulary[7]);
 
-      Assert.AreEqual(2, alg.PriorProbs.Count);
-      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[CLS1], EPS);
-      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[CLS2], EPS);
+      Assert.AreEqual(2, alg.PriorProbs.Length);
+      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[0], EPS);
+      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[1], EPS);
 
-      Assert.AreEqual(16, alg.Weights.Count);
-      Assert.AreEqual(5.0/12, alg.Weights[new ClassFeatureKey(CLS1, 0)]);
-      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 1)]);
-      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 2)]);
-      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 3)]);
-      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 4)]);
-      Assert.AreEqual(3.0/12, alg.Weights[new ClassFeatureKey(CLS1, 5)]);
-      Assert.AreEqual(2.0/12, alg.Weights[new ClassFeatureKey(CLS1, 6)]);
-      Assert.AreEqual(1.0/12, alg.Weights[new ClassFeatureKey(CLS1, 7)]);
+      Assert.AreEqual(2, alg.Weights.Length);
+      Assert.AreEqual(8, alg.Weights[0].Length);
+      Assert.AreEqual(8, alg.Weights[1].Length);
+      Assert.AreEqual(5.0/12, alg.Weights[0][0]);
+      Assert.AreEqual(2.0/12, alg.Weights[0][1]);
+      Assert.AreEqual(2.0/12, alg.Weights[0][2]);
+      Assert.AreEqual(2.0/12, alg.Weights[0][3]);
+      Assert.AreEqual(2.0/12, alg.Weights[0][4]);
+      Assert.AreEqual(3.0/12, alg.Weights[0][5]);
+      Assert.AreEqual(2.0/12, alg.Weights[0][6]);
+      Assert.AreEqual(1.0/12, alg.Weights[0][7]);
 
-      Assert.AreEqual(0.1, alg.Weights[new ClassFeatureKey(CLS2, 0)]);
-      Assert.AreEqual(0.2, alg.Weights[new ClassFeatureKey(CLS2, 1)]);
-      Assert.AreEqual(0.1, alg.Weights[new ClassFeatureKey(CLS2, 2)]);
-      Assert.AreEqual(0.1, alg.Weights[new ClassFeatureKey(CLS2, 3)]);
-      Assert.AreEqual(0.3, alg.Weights[new ClassFeatureKey(CLS2, 4)]);
-      Assert.AreEqual(0.1, alg.Weights[new ClassFeatureKey(CLS2, 5)]);
-      Assert.AreEqual(0.2, alg.Weights[new ClassFeatureKey(CLS2, 6)]);
-      Assert.AreEqual(0.2, alg.Weights[new ClassFeatureKey(CLS2, 7)]);
+      Assert.AreEqual(0.1, alg.Weights[1][0]);
+      Assert.AreEqual(0.2, alg.Weights[1][1]);
+      Assert.AreEqual(0.1, alg.Weights[1][2]);
+      Assert.AreEqual(0.1, alg.Weights[1][3]);
+      Assert.AreEqual(0.3, alg.Weights[1][4]);
+      Assert.AreEqual(0.1, alg.Weights[1][5]);
+      Assert.AreEqual(0.2, alg.Weights[1][6]);
+      Assert.AreEqual(0.2, alg.Weights[1][7]);
     }
 
     [TestMethod]
@@ -190,9 +192,9 @@ namespace ML.Tests.UnitTests.Text
       // assert
       Assert.AreEqual(sample, alg.TrainingSample);
       Assert.AreEqual(prep, alg.Preprocessor);
-      Assert.AreEqual(2, alg.ClassHist.Count);
-      Assert.AreEqual(4, alg.ClassHist[CLS1]);
-      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(2, alg.ClassHist.Length);
+      Assert.AreEqual(4, alg.ClassHist[0]);
+      Assert.AreEqual(2, alg.ClassHist[1]);
       Assert.AreEqual(6, alg.DataCount);
       Assert.AreEqual(8, alg.DataDim);
 
@@ -206,28 +208,30 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual("world",    alg.Vocabulary[6]);
       Assert.AreEqual("seven",    alg.Vocabulary[7]);
 
-      Assert.AreEqual(2, alg.PriorProbs.Count);
-      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[CLS1], EPS);
-      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[CLS2], EPS);
+      Assert.AreEqual(2, alg.PriorProbs.Length);
+      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[0], EPS);
+      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[1], EPS);
 
-      Assert.AreEqual(16, alg.Weights.Count);
-      Assert.AreEqual(Math.Log(7.0/21), alg.Weights[new ClassFeatureKey(CLS1, 0)], EPS);
-      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 1)], EPS);
-      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 2)], EPS);
-      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 3)], EPS);
-      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 4)], EPS);
-      Assert.AreEqual(Math.Log(3.0/21), alg.Weights[new ClassFeatureKey(CLS1, 5)], EPS);
-      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS1, 6)], EPS);
-      Assert.AreEqual(Math.Log(1.0/21), alg.Weights[new ClassFeatureKey(CLS1, 7)], EPS);
+      Assert.AreEqual(2, alg.Weights.Length);
+      Assert.AreEqual(8, alg.Weights[0].Length);
+      Assert.AreEqual(8, alg.Weights[1].Length);
+      Assert.AreEqual(Math.Log(7.0/21), alg.Weights[0][0], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[0][1], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[0][2], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[0][3], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[0][4], EPS);
+      Assert.AreEqual(Math.Log(3.0/21), alg.Weights[0][5], EPS);
+      Assert.AreEqual(Math.Log(2.0/21), alg.Weights[0][6], EPS);
+      Assert.AreEqual(Math.Log(1.0/21), alg.Weights[0][7], EPS);
 
-      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS2, 0)], EPS);
-      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS2, 1)], EPS);
-      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS2, 2)], EPS);
-      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS2, 3)], EPS);
-      Assert.AreEqual(Math.Log(4.0/14), alg.Weights[new ClassFeatureKey(CLS2, 4)], EPS);
-      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS2, 5)], EPS);
-      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS2, 6)], EPS);
-      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS2, 7)], EPS);
+      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[1][0], EPS);
+      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[1][1], EPS);
+      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[1][2], EPS);
+      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[1][3], EPS);
+      Assert.AreEqual(Math.Log(4.0/14), alg.Weights[1][4], EPS);
+      Assert.AreEqual(Math.Log(1.0/14), alg.Weights[1][5], EPS);
+      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[1][6], EPS);
+      Assert.AreEqual(Math.Log(2.0/14), alg.Weights[1][7], EPS);
     }
 
     [TestMethod]
@@ -337,9 +341,9 @@ namespace ML.Tests.UnitTests.Text
       // assert
       Assert.AreEqual(sample, alg.TrainingSample);
       Assert.AreEqual(prep, alg.Preprocessor);
-      Assert.AreEqual(2, alg.ClassHist.Count);
-      Assert.AreEqual(4, alg.ClassHist[CLS1]);
-      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(2, alg.ClassHist.Length);
+      Assert.AreEqual(4, alg.ClassHist[0]);
+      Assert.AreEqual(2, alg.ClassHist[1]);
       Assert.AreEqual(6, alg.DataCount);
       Assert.AreEqual(8, alg.DataDim);
 
@@ -353,28 +357,30 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual("world",    alg.Vocabulary[6]);
       Assert.AreEqual("seven",    alg.Vocabulary[7]);
 
-      Assert.AreEqual(2, alg.PriorProbs.Count);
-      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[CLS1], EPS);
-      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[CLS2], EPS);
+      Assert.AreEqual(2, alg.PriorProbs.Length);
+      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[0], EPS);
+      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[1], EPS);
 
-      Assert.AreEqual(16, alg.Weights.Count);
-      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 0)], EPS);
-      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 1)], EPS);
-      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 2)], EPS);
-      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 3)], EPS);
-      Assert.AreEqual(-Math.Log(4.0/14), alg.Weights[new ClassFeatureKey(CLS1, 4)], EPS);
-      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 5)], EPS);
-      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 6)], EPS);
-      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 7)], EPS);
+      Assert.AreEqual(2, alg.Weights.Length);
+      Assert.AreEqual(8, alg.Weights[0].Length);
+      Assert.AreEqual(8, alg.Weights[1].Length);
+      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[0][0], EPS);
+      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[0][1], EPS);
+      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[0][2], EPS);
+      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[0][3], EPS);
+      Assert.AreEqual(-Math.Log(4.0/14), alg.Weights[0][4], EPS);
+      Assert.AreEqual(-Math.Log(1.0/14), alg.Weights[0][5], EPS);
+      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[0][6], EPS);
+      Assert.AreEqual(-Math.Log(2.0/14), alg.Weights[0][7], EPS);
 
-      Assert.AreEqual(-Math.Log(7.0/21), alg.Weights[new ClassFeatureKey(CLS2, 0)], EPS);
-      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 1)], EPS);
-      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 2)], EPS);
-      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 3)], EPS);
-      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 4)], EPS);
-      Assert.AreEqual(-Math.Log(3.0/21), alg.Weights[new ClassFeatureKey(CLS2, 5)], EPS);
-      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 6)], EPS);
-      Assert.AreEqual(-Math.Log(1.0/21), alg.Weights[new ClassFeatureKey(CLS2, 7)], EPS);
+      Assert.AreEqual(-Math.Log(7.0/21), alg.Weights[1][0], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[1][1], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[1][2], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[1][3], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[1][4], EPS);
+      Assert.AreEqual(-Math.Log(3.0/21), alg.Weights[1][5], EPS);
+      Assert.AreEqual(-Math.Log(2.0/21), alg.Weights[1][6], EPS);
+      Assert.AreEqual(-Math.Log(1.0/21), alg.Weights[1][7], EPS);
     }
 
     [TestMethod]
@@ -484,9 +490,9 @@ namespace ML.Tests.UnitTests.Text
       // assert
       Assert.AreEqual(sample, alg.TrainingSample);
       Assert.AreEqual(prep, alg.Preprocessor);
-      Assert.AreEqual(2, alg.ClassHist.Count);
-      Assert.AreEqual(4, alg.ClassHist[CLS1]);
-      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(2, alg.ClassHist.Length);
+      Assert.AreEqual(4, alg.ClassHist[0]);
+      Assert.AreEqual(2, alg.ClassHist[1]);
       Assert.AreEqual(6, alg.DataCount);
       Assert.AreEqual(8, alg.DataDim);
 
@@ -500,28 +506,30 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual("world",    alg.Vocabulary[6]);
       Assert.AreEqual("seven",    alg.Vocabulary[7]);
 
-      Assert.AreEqual(2, alg.PriorProbs.Count);
-      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[CLS1], EPS);
-      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[CLS2], EPS);
+      Assert.AreEqual(2, alg.PriorProbs.Length);
+      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[0], EPS);
+      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[1], EPS);
 
-      Assert.AreEqual(16, alg.Weights.Count);
-      Assert.AreEqual(Math.Log(7.0/21)-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 0)]);
-      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 1)]);
-      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 2)]);
-      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 3)]);
-      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(4.0/14), alg.Weights[new ClassFeatureKey(CLS1, 4)]);
-      Assert.AreEqual(Math.Log(3.0/21)-Math.Log(1.0/14), alg.Weights[new ClassFeatureKey(CLS1, 5)]);
-      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 6)]);
-      Assert.AreEqual(Math.Log(1.0/21)-Math.Log(2.0/14), alg.Weights[new ClassFeatureKey(CLS1, 7)]);
+      Assert.AreEqual(2, alg.Weights.Length);
+      Assert.AreEqual(8, alg.Weights[0].Length);
+      Assert.AreEqual(8, alg.Weights[1].Length);
+      Assert.AreEqual(Math.Log(7.0/21)-Math.Log(1.0/14), alg.Weights[0][0]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(2.0/14), alg.Weights[0][1]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(1.0/14), alg.Weights[0][2]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(1.0/14), alg.Weights[0][3]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(4.0/14), alg.Weights[0][4]);
+      Assert.AreEqual(Math.Log(3.0/21)-Math.Log(1.0/14), alg.Weights[0][5]);
+      Assert.AreEqual(Math.Log(2.0/21)-Math.Log(2.0/14), alg.Weights[0][6]);
+      Assert.AreEqual(Math.Log(1.0/21)-Math.Log(2.0/14), alg.Weights[0][7]);
 
-      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(7.0/21), alg.Weights[new ClassFeatureKey(CLS2, 0)]);
-      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 1)]);
-      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 2)]);
-      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 3)]);
-      Assert.AreEqual(Math.Log(4.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 4)]);
-      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(3.0/21), alg.Weights[new ClassFeatureKey(CLS2, 5)]);
-      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(2.0/21), alg.Weights[new ClassFeatureKey(CLS2, 6)]);
-      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(1.0/21), alg.Weights[new ClassFeatureKey(CLS2, 7)]);
+      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(7.0/21), alg.Weights[1][0]);
+      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(2.0/21), alg.Weights[1][1]);
+      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(2.0/21), alg.Weights[1][2]);
+      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(2.0/21), alg.Weights[1][3]);
+      Assert.AreEqual(Math.Log(4.0/14)-Math.Log(2.0/21), alg.Weights[1][4]);
+      Assert.AreEqual(Math.Log(1.0/14)-Math.Log(3.0/21), alg.Weights[1][5]);
+      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(2.0/21), alg.Weights[1][6]);
+      Assert.AreEqual(Math.Log(2.0/14)-Math.Log(1.0/21), alg.Weights[1][7]);
     }
 
     [TestMethod]
@@ -635,9 +643,9 @@ namespace ML.Tests.UnitTests.Text
       // assert
       Assert.AreEqual(sample, alg.TrainingSample);
       Assert.AreEqual(prep, alg.Preprocessor);
-      Assert.AreEqual(2, alg.ClassHist.Count);
-      Assert.AreEqual(4, alg.ClassHist[CLS1]);
-      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(2, alg.ClassHist.Length);
+      Assert.AreEqual(4, alg.ClassHist[0]);
+      Assert.AreEqual(2, alg.ClassHist[1]);
       Assert.AreEqual(6, alg.DataCount);
       Assert.AreEqual(8, alg.DataDim);
 
@@ -651,28 +659,30 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual("world",    alg.Vocabulary[6]);
       Assert.AreEqual("seven",    alg.Vocabulary[7]);
 
-      Assert.AreEqual(2, alg.PriorProbs.Count);
-      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[CLS1], EPS);
-      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[CLS2], EPS);
+      Assert.AreEqual(2, alg.PriorProbs.Length);
+      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[0], EPS);
+      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[1], EPS);
 
-      Assert.AreEqual(16, alg.Weights.Count);
-      Assert.AreEqual(-1.5552175827D, alg.Weights[new ClassFeatureKey(CLS1, 0)], EPS);
-      Assert.AreEqual(-2.2401396740D, alg.Weights[new ClassFeatureKey(CLS1, 1)], EPS);
-      Assert.AreEqual(-1.9851330973D, alg.Weights[new ClassFeatureKey(CLS1, 2)], EPS);
-      Assert.AreEqual(-1.9851330973D, alg.Weights[new ClassFeatureKey(CLS1, 3)], EPS);
-      Assert.AreEqual(-2.4263657885D, alg.Weights[new ClassFeatureKey(CLS1, 4)], EPS);
-      Assert.AreEqual(-1.7821199307D, alg.Weights[new ClassFeatureKey(CLS1, 5)], EPS);
-      Assert.AreEqual(-2.2401396740D, alg.Weights[new ClassFeatureKey(CLS1, 6)], EPS);
-      Assert.AreEqual(-3.1098813602D, alg.Weights[new ClassFeatureKey(CLS1, 7)], EPS);
+      Assert.AreEqual(2, alg.Weights.Length);
+      Assert.AreEqual(8, alg.Weights[0].Length);
+      Assert.AreEqual(8, alg.Weights[1].Length);
+      Assert.AreEqual(-1.5552175827D, alg.Weights[0][0], EPS);
+      Assert.AreEqual(-2.2401396740D, alg.Weights[0][1], EPS);
+      Assert.AreEqual(-1.9851330973D, alg.Weights[0][2], EPS);
+      Assert.AreEqual(-1.9851330973D, alg.Weights[0][3], EPS);
+      Assert.AreEqual(-2.4263657885D, alg.Weights[0][4], EPS);
+      Assert.AreEqual(-1.7821199307D, alg.Weights[0][5], EPS);
+      Assert.AreEqual(-2.2401396740D, alg.Weights[0][6], EPS);
+      Assert.AreEqual(-3.1098813602D, alg.Weights[0][7], EPS);
 
-      Assert.AreEqual(-2.7404236664, alg.Weights[new ClassFeatureKey(CLS2, 0)], EPS);
-      Assert.AreEqual(-1.8706819802, alg.Weights[new ClassFeatureKey(CLS2, 1)], EPS);
-      Assert.AreEqual(-2.7404236664, alg.Weights[new ClassFeatureKey(CLS2, 2)], EPS);
-      Assert.AreEqual(-2.7404236664, alg.Weights[new ClassFeatureKey(CLS2, 3)], EPS);
-      Assert.AreEqual(-1.4480231657, alg.Weights[new ClassFeatureKey(CLS2, 4)], EPS);
-      Assert.AreEqual(-2.7404236664, alg.Weights[new ClassFeatureKey(CLS2, 5)], EPS);
-      Assert.AreEqual(-1.8706819802, alg.Weights[new ClassFeatureKey(CLS2, 6)], EPS);
-      Assert.AreEqual(-1.6156754035, alg.Weights[new ClassFeatureKey(CLS2, 7)], EPS);
+      Assert.AreEqual(-2.7404236664, alg.Weights[1][0], EPS);
+      Assert.AreEqual(-1.8706819802, alg.Weights[1][1], EPS);
+      Assert.AreEqual(-2.7404236664, alg.Weights[1][2], EPS);
+      Assert.AreEqual(-2.7404236664, alg.Weights[1][3], EPS);
+      Assert.AreEqual(-1.4480231657, alg.Weights[1][4], EPS);
+      Assert.AreEqual(-2.7404236664, alg.Weights[1][5], EPS);
+      Assert.AreEqual(-1.8706819802, alg.Weights[1][6], EPS);
+      Assert.AreEqual(-1.6156754035, alg.Weights[1][7], EPS);
     }
 
     [TestMethod]
@@ -798,9 +808,9 @@ namespace ML.Tests.UnitTests.Text
       // assert
       Assert.AreEqual(sample, alg.TrainingSample);
       Assert.AreEqual(prep, alg.Preprocessor);
-      Assert.AreEqual(2, alg.ClassHist.Count);
-      Assert.AreEqual(4, alg.ClassHist[CLS1]);
-      Assert.AreEqual(2, alg.ClassHist[CLS2]);
+      Assert.AreEqual(2, alg.ClassHist.Length);
+      Assert.AreEqual(4, alg.ClassHist[0]);
+      Assert.AreEqual(2, alg.ClassHist[1]);
       Assert.AreEqual(6, alg.DataCount);
       Assert.AreEqual(8, alg.DataDim);
 
@@ -814,28 +824,30 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual("world",    alg.Vocabulary[6]);
       Assert.AreEqual("seven",    alg.Vocabulary[7]);
 
-      Assert.AreEqual(2, alg.PriorProbs.Count);
-      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[CLS1], EPS);
-      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[CLS2], EPS);
+      Assert.AreEqual(2, alg.PriorProbs.Length);
+      Assert.AreEqual(Math.Log(4/6.0D), alg.PriorProbs[0], EPS);
+      Assert.AreEqual(Math.Log(2/6.0D), alg.PriorProbs[1], EPS);
 
-      Assert.AreEqual(16, alg.Weights.Count);
-      Assert.AreEqual(0.1415017531D, alg.Weights[new ClassFeatureKey(CLS1, 0)], EPS);
-      Assert.AreEqual(0.1169948657D, alg.Weights[new ClassFeatureKey(CLS1, 1)], EPS);
-      Assert.AreEqual(0.1415017531D, alg.Weights[new ClassFeatureKey(CLS1, 2)], EPS);
-      Assert.AreEqual(0.1415017531D, alg.Weights[new ClassFeatureKey(CLS1, 3)], EPS);
-      Assert.AreEqual(0.0969081526D, alg.Weights[new ClassFeatureKey(CLS1, 4)], EPS);
-      Assert.AreEqual(0.1415017531D, alg.Weights[new ClassFeatureKey(CLS1, 5)], EPS);
-      Assert.AreEqual(0.1123506098D, alg.Weights[new ClassFeatureKey(CLS1, 6)], EPS);
-      Assert.AreEqual(0.1077393596D, alg.Weights[new ClassFeatureKey(CLS1, 7)], EPS);
+      Assert.AreEqual(2, alg.Weights.Length);
+      Assert.AreEqual(8, alg.Weights[0].Length);
+      Assert.AreEqual(8, alg.Weights[1].Length);
+      Assert.AreEqual(0.1415017531D, alg.Weights[0][0], EPS);
+      Assert.AreEqual(0.1169948657D, alg.Weights[0][1], EPS);
+      Assert.AreEqual(0.1415017531D, alg.Weights[0][2], EPS);
+      Assert.AreEqual(0.1415017531D, alg.Weights[0][3], EPS);
+      Assert.AreEqual(0.0969081526D, alg.Weights[0][4], EPS);
+      Assert.AreEqual(0.1415017531D, alg.Weights[0][5], EPS);
+      Assert.AreEqual(0.1123506098D, alg.Weights[0][6], EPS);
+      Assert.AreEqual(0.1077393596D, alg.Weights[0][7], EPS);
 
-      Assert.AreEqual(0.0968271218, alg.Weights[new ClassFeatureKey(CLS2, 0)], EPS);
-      Assert.AreEqual(0.1314521840, alg.Weights[new ClassFeatureKey(CLS2, 1)], EPS);
-      Assert.AreEqual(0.1219882919, alg.Weights[new ClassFeatureKey(CLS2, 2)], EPS);
-      Assert.AreEqual(0.1250806983, alg.Weights[new ClassFeatureKey(CLS2, 3)], EPS);
-      Assert.AreEqual(0.1396735112, alg.Weights[new ClassFeatureKey(CLS2, 4)], EPS);
-      Assert.AreEqual(0.1092522527, alg.Weights[new ClassFeatureKey(CLS2, 5)], EPS);
-      Assert.AreEqual(0.1190328859, alg.Weights[new ClassFeatureKey(CLS2, 6)], EPS);
-      Assert.AreEqual(0.1566930542, alg.Weights[new ClassFeatureKey(CLS2, 7)], EPS);
+      Assert.AreEqual(0.0968271218, alg.Weights[1][0], EPS);
+      Assert.AreEqual(0.1314521840, alg.Weights[1][1], EPS);
+      Assert.AreEqual(0.1219882919, alg.Weights[1][2], EPS);
+      Assert.AreEqual(0.1250806983, alg.Weights[1][3], EPS);
+      Assert.AreEqual(0.1396735112, alg.Weights[1][4], EPS);
+      Assert.AreEqual(0.1092522527, alg.Weights[1][5], EPS);
+      Assert.AreEqual(0.1190328859, alg.Weights[1][6], EPS);
+      Assert.AreEqual(0.1566930542, alg.Weights[1][7], EPS);
     }
 
     [TestMethod]
@@ -966,8 +978,8 @@ namespace ML.Tests.UnitTests.Text
 
       // assert
       Assert.AreEqual(CLS1, result1);
-      Assert.AreEqual(CLS1, result2);
-      Assert.AreEqual(CLS1, result3);
+      Assert.AreEqual(CLS2, result2);
+      Assert.AreEqual(CLS2, result3);
     }
 
     [TestMethod]
@@ -1031,15 +1043,15 @@ namespace ML.Tests.UnitTests.Text
       Assert.AreEqual(1, ts[5].Key[6]);
       Assert.AreEqual(CLS2, ts[5].Value);
 
-      Assert.AreEqual(2, subAlg.PriorProbs.Count);
-      Assert.AreEqual(Math.Log(4.0D/6), subAlg.PriorProbs[CLS1], EPS);
-      Assert.AreEqual(Math.Log(2.0D/6), subAlg.PriorProbs[CLS2], EPS);
+      Assert.AreEqual(2, subAlg.PriorProbs.Length);
+      Assert.AreEqual(Math.Log(4.0D/6), subAlg.PriorProbs[0], EPS);
+      Assert.AreEqual(Math.Log(2.0D/6), subAlg.PriorProbs[1], EPS);
 
       Assert.AreEqual(8, subAlg.DataDim);
       Assert.AreEqual(6, subAlg.DataCount);
-      Assert.AreEqual(2, subAlg.ClassHist.Count);
-      Assert.AreEqual(4, subAlg.ClassHist[CLS1]);
-      Assert.AreEqual(2, subAlg.ClassHist[CLS2]);
+      Assert.AreEqual(2, subAlg.ClassHist.Length);
+      Assert.AreEqual(4, subAlg.ClassHist[0]);
+      Assert.AreEqual(2, subAlg.ClassHist[1]);
     }
 
     [TestMethod]
@@ -1153,8 +1165,8 @@ namespace ML.Tests.UnitTests.Text
 
     private ClassifiedSample<string> getSample()
     {
-      var CLS1 = new Class("CAT", 1);
-      var CLS2 = new Class("DOG", 2);
+      var CLS1 = new Class("CAT", 0);
+      var CLS2 = new Class("DOG", 1);
       return new ClassifiedSample<string>
       {
         { "my cats like icecream",              CLS1 },

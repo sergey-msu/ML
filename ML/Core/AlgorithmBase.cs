@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using ML.Contracts;
 using ML.Utils;
+using ML.Core.Serialization;
+using System.IO.Compression;
 
 namespace ML.Core
 {
@@ -86,6 +89,51 @@ namespace ML.Core
     protected abstract double CalculateProximity(TMark mark1, TMark mark2, double threshold);
 
     protected abstract void DoTrain();
+
+    #region Serialization
+
+    public void Serialize(Stream stream)
+    {
+      using (var ims = new MemoryStream())
+      using (var writer = new StreamWriter(ims) { AutoFlush=true })
+      {
+        var ser = new MLSerializer(writer);
+
+        Serialize(ser);
+
+        ims.Position = 0;
+        using (var compr = new GZipStream(stream, CompressionMode.Compress))
+          ims.CopyTo(compr);
+      }
+    }
+
+    public void Deserialize(Stream stream)
+    {
+      using (var compr = new GZipStream(stream, CompressionMode.Decompress))
+      using (var ims = new MemoryStream())
+      {
+        compr.CopyTo(ims);
+        ims.Position = 0;
+
+        using (var reader = new StreamWriter(ims))
+        {
+          var ser = new MLSerializer(reader);
+          Deserialize(ser);
+        }
+      }
+    }
+
+    public virtual void Serialize(MLSerializer ser)
+    {
+      ser.Write("TYPE", GetType().FullName);
+    }
+
+    public virtual void Deserialize(MLSerializer ser)
+    {
+      ser.Read("TYPE", GetType().FullName);
+    }
+
+    #endregion
   }
 
   /// <summary>
@@ -98,6 +146,9 @@ namespace ML.Core
     protected ClassificationAlgorithmBase()
     {
     }
+
+
+    public Class[] Classes { get; private set; }
 
     /// <summary>
     /// Make a prediction
@@ -115,11 +166,33 @@ namespace ML.Core
     /// </summary>
     public abstract ClassScore[] PredictTokens(TObj obj, int cnt);
 
+    protected override void DoTrain()
+    {
+      Classes = TrainingSample.Classes.ToArray();
+    }
 
     protected override double CalculateProximity(Class mark1, Class mark2, double threshold)
     {
       return (mark1.Equals(mark2)) ? 0 : 1;
     }
+
+    #region Serialization
+
+    public override void Serialize(MLSerializer ser)
+    {
+      base.Serialize(ser);
+
+      ser.Write("CLASSES", Classes);
+    }
+
+    public override void Deserialize(MLSerializer ser)
+    {
+      base.Deserialize(ser);
+
+      throw new NotImplementedException();
+    }
+
+    #endregion
   }
 
   /// <summary>

@@ -26,10 +26,10 @@ namespace ML.BayesianMethods.Algorithms
     where TParam : IDistributionParameters
   {
     private readonly TDistr m_Distribution;
-    private Dictionary<ClassFeatureKey, TParam> m_DistributionParameters;
+    private TParam[][] m_DistributionParameters;
 
 
-    public NaiveBayesianGeneralAlgorithm(TDistr distribution, Dictionary<Class, double> classLosses=null)
+    public NaiveBayesianGeneralAlgorithm(TDistr distribution, double[] classLosses=null)
       : base(classLosses)
     {
       if (distribution == null)
@@ -48,19 +48,19 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
-      var classes = DataClasses;
+      var classes = Classes;
       var priors  = PriorProbs;
       var dim     = DataDim;
       var scores  = new List<ClassScore>();
 
       foreach (var cls in classes)
       {
-        var p = priors[cls];
+        var p = priors[cls.Value];
+        var ds = m_DistributionParameters[cls.Value];
 
         for (int i=0; i<dim; i++)
         {
-          var key = new ClassFeatureKey(cls, i);
-          m_Distribution.Params = m_DistributionParameters[key];
+          m_Distribution.Params = ds[i];
           var value = m_Distribution.LogValue(obj[i]);
 
           p += value;
@@ -80,7 +80,8 @@ namespace ML.BayesianMethods.Algorithms
     public override double CalculateClassScore(double[] obj, Class cls)
     {
       var dim = TrainingSample.GetDimension();
-      var p   = PriorProbs[cls];
+      var p   = PriorProbs[cls.Value];
+      var ds = m_DistributionParameters[cls.Value];
 
       foreach (var pData in TrainingSample.Where(d => d.Value.Equals(cls)))
       {
@@ -88,8 +89,7 @@ namespace ML.BayesianMethods.Algorithms
 
         for (int i=0; i<dim; i++)
         {
-          var key = new ClassFeatureKey(cls, i);
-          m_Distribution.Params = m_DistributionParameters[key];
+          m_Distribution.Params = ds[i];
           var value = m_Distribution.LogValue(obj[i]);
 
           p += value;

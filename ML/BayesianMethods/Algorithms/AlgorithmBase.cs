@@ -15,16 +15,15 @@ namespace ML.BayesianMethods.Algorithms
   /// </summary>
   public abstract class BayesianAlgorithmBase : ClassificationAlgorithmBase<double[]>, IGammaAlgorithm<double[]>
   {
-    private readonly Dictionary<Class, double> m_ClassLosses;
+    private readonly double[] m_ClassLosses;
 
-    private Dictionary<Class, double> m_PriorProbs;
-    private Dictionary<Class, int> m_ClassHist;
+    private double[] m_PriorProbs;
+    private int[] m_ClassHist;
     private int m_DataDim;
     private int m_DataCount;
-    private List<Class> m_DataClasses;
 
 
-    protected BayesianAlgorithmBase(Dictionary<Class, double> classLosses=null)
+    protected BayesianAlgorithmBase(double[] classLosses=null)
     {
       m_ClassLosses = classLosses;
     }
@@ -34,16 +33,15 @@ namespace ML.BayesianMethods.Algorithms
     /// Additional multiplicative penalty to wrong object classification.
     /// If null, all class penalties dafault to 1 (no special effect on classification - pure MAP classification)
     /// </summary>
-    public Dictionary<Class, double> ClassLosses { get { return m_ClassLosses; } }
+    public double[] ClassLosses { get { return m_ClassLosses; } }
 
     /// <summary>
     /// Prior class logarithm pobabilities
     /// </summary>
-    public Dictionary<Class, double> PriorProbs { get { return m_PriorProbs; } }
-    public Dictionary<Class, int>    ClassHist  { get { return m_ClassHist; } }
-    public int DataDim             { get { return m_DataDim; } }
-    public int DataCount           { get { return m_DataCount; } }
-    public List<Class> DataClasses { get { return m_DataClasses; } }
+    public double[] PriorProbs { get { return m_PriorProbs; } }
+    public int[]    ClassHist  { get { return m_ClassHist; } }
+    public int      DataDim    { get { return m_DataDim; } }
+    public int      DataCount  { get { return m_DataCount; } }
 
     /// <summary>
     /// Caclulates object proximity to some class
@@ -53,24 +51,30 @@ namespace ML.BayesianMethods.Algorithms
 
     protected override void DoTrain()
     {
-      m_ClassHist   = new Dictionary<Class, int>();
-      m_PriorProbs  = new Dictionary<Class, double>();
-      m_DataCount   = TrainingSample.Count;
-      m_DataDim     = TrainingSample.GetDimension();
-      m_DataClasses = TrainingSample.Classes.ToList();
+      base.DoTrain();
+
+      var classes = Classes.ToList();
+      for (int i=0; i<classes.Count; i++)
+      {
+        var any = classes.Any(c => (int)c.Value==i);
+        if (!any)  throw new MLException(string.Format("Class values must be enumerated from 0 to {0}", classes.Count));
+      }
+
+      m_ClassHist  = new int[classes.Count];
+      m_PriorProbs = new double[classes.Count];
+      m_DataCount  = TrainingSample.Count;
+      m_DataDim    = TrainingSample.GetDimension();
 
       foreach (var pData in TrainingSample)
       {
         var cls = pData.Value;
-        if (!m_ClassHist.ContainsKey(cls)) m_ClassHist[cls] = 1;
-        else m_ClassHist[cls] += 1;
+        m_ClassHist[cls.Value] += 1;
       }
 
-      foreach (var cls in m_DataClasses)
+      foreach (var cls in classes)
       {
-        double penalty;
-        if (ClassLosses == null || !ClassLosses.TryGetValue(cls, out penalty)) penalty = 1;
-        m_PriorProbs[cls] = Math.Log(penalty*m_ClassHist[cls]/(double)m_DataCount);
+        var penalty = (ClassLosses == null) ? 1 : ClassLosses[cls.Value];
+        m_PriorProbs[cls.Value] = Math.Log(penalty*m_ClassHist[cls.Value]/(double)m_DataCount);
       }
 
       TrainImpl();
@@ -90,7 +94,7 @@ namespace ML.BayesianMethods.Algorithms
     private double m_H;
     private readonly IKernel m_Kernel;
 
-    protected BayesianKernelAlgorithmBase(IKernel kernel, double h, Dictionary<Class, double> classLosses=null)
+    protected BayesianKernelAlgorithmBase(IKernel kernel, double h, double[] classLosses=null)
       : base(classLosses)
     {
       if (kernel == null)

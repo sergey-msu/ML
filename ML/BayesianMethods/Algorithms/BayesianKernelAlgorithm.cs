@@ -27,7 +27,7 @@ namespace ML.BayesianMethods.Algorithms
 
     public BayesianKernelAlgorithm(IKernel kernel,
                                    double h = 1,
-                                   Dictionary<Class, double> classLosses=null,
+                                   double[] classLosses=null,
                                    double[] hs = null)
       : base(kernel, h, classLosses)
     {
@@ -48,11 +48,11 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
-      var dim = DataDim;
-      var classes = DataClasses;
-      var useMin = UseKernelMinValue;
-      var min = KernelMinValue;
-      var pHist = new Dictionary<Class, double>();
+      var dim     = DataDim;
+      var classes = Classes;
+      var useMin  = UseKernelMinValue;
+      var min     = KernelMinValue;
+      var pHist   = new double[classes.Length];
 
       foreach (var pData in TrainingSample)
       {
@@ -70,14 +70,13 @@ namespace ML.BayesianMethods.Algorithms
           p += Math.Log(v);
         }
 
-        if (!pHist.ContainsKey(cls)) pHist[cls] = p;
-        else pHist[cls] += p;
+        pHist[cls.Value] += p;
       }
 
       var scores = new List<ClassScore>();
       foreach (var cls in classes)
       {
-        var p = pHist[cls] + PriorProbs[cls];
+        var p = pHist[cls.Value] + PriorProbs[cls.Value];
         scores.Add(new ClassScore(cls, p));
       }
 
@@ -113,7 +112,7 @@ namespace ML.BayesianMethods.Algorithms
         score += p;
       }
 
-      score += PriorProbs[cls];
+      score += PriorProbs[cls.Value];
 
       return score;
     }

@@ -53,6 +53,8 @@ namespace ML.LogicalMethods.Algorithms
     /// </summary>
     protected override void DoTrain()
     {
+      base.DoTrain();
+
       if (Patterns==null || !Patterns.Any())
         throw new MLException("Patterns are empty or null");
       if (Informativity==null)

@@ -95,5 +95,20 @@ namespace ML.TextTests
     }
 
     #endregion
+
+    #region Spam
+
+    public static TextAlgorithmBase Create_SpamAlgorithm()
+    {
+      var proc = new TextPreprocessor(new EnglishSimpleTokenizer(),
+                                      new EnglishStopwords(),
+                                      new EnglishSimpleNormalizer(),
+                                      new EnglishPorterStemmer());
+      var alg = new ComplementNaiveBayesianAlgorithm(proc);
+
+      return alg;
+    }
+
+    #endregion
   }
 }

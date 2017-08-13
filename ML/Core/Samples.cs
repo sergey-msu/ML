@@ -154,7 +154,7 @@ namespace ML.Core
 
     #endregion
 
-    public IEnumerable<Class> Classes
+    public IList<Class> Classes
     {
       get
       {
@@ -163,7 +163,7 @@ namespace ML.Core
       }
     }
 
-    public IEnumerable<Class> CachedClasses
+    public IList<Class> CachedClasses
     {
       get
       {

@@ -25,7 +25,7 @@ namespace ML.BayesianMethods.Algorithms
     public BayesianParzenAlgorithm(IMetric<double[]> metric,
                                    IKernel kernel,
                                    double h = 1,
-                                   Dictionary<Class, double> classLosses=null)
+                                   double[] classLosses=null)
       : base(kernel, h, classLosses)
     {
       if (metric == null)
@@ -47,7 +47,7 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
-      var classes = DataClasses;
+      var classes = Classes;
       var priors  = PriorProbs;
       var pHist = new Dictionary<Class, double>();
 
@@ -64,7 +64,7 @@ namespace ML.BayesianMethods.Algorithms
       var scores = new List<ClassScore>();
       foreach (var cls in classes)
       {
-        var p = Math.Log(pHist[cls]) + priors[cls];
+        var p = Math.Log(pHist[cls]) + priors[cls.Value];
         scores.Add(new ClassScore(cls, p));
       }
 
@@ -85,7 +85,7 @@ namespace ML.BayesianMethods.Algorithms
         score += Kernel.Value(r);
       }
 
-      score = Math.Log(score) + PriorProbs[cls];
+      score = Math.Log(score) + PriorProbs[cls.Value];
 
       return score;
     }

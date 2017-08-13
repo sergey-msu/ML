@@ -26,7 +26,7 @@ namespace ML.TextTests
 
     protected override TextAlgorithmBase CreateAlgorithm()
     {
-      return Examples.Create_TWCAlgorithm();
+      return Examples.Create_SpamAlgorithm();
     }
 
     #region Export

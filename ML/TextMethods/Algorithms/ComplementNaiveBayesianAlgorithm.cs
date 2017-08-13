@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ML.Core;
 using ML.Contracts;
-using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -19,17 +15,19 @@ namespace ML.TextMethods.Algorithms
 
     #region Properties
 
-    public override string Name   { get { return "COMPLNB"; } }
+    public override string Name { get { return "COMPLNB"; } }
 
     #endregion
 
-    protected override Dictionary<ClassFeatureKey, double> TrainWeights()
+    protected override double[][] TrainWeights()
     {
       var dim      = DataDim;
-      var a        = Alpha;
-      var ccTotals = new Dictionary<Class, int>();
-      var weights  = new Dictionary<ClassFeatureKey, double>();
-      var classes  = TrainingSample.Classes;
+      var alp      = Alpha;
+      var classes  = Classes;
+      var ccTotals = new int[classes.Length];
+      var weights  = new double[classes.Length][];
+      foreach (var cls in classes)
+        weights[cls.Value] = new double[dim];
 
       foreach (var doc in TrainingSample)
       {
@@ -42,32 +40,31 @@ namespace ML.TextMethods.Algorithms
         foreach (var cCls in classes)
         {
           if (cCls.Equals(cls)) continue;
-          if (!ccTotals.ContainsKey(cCls)) ccTotals[cCls] = 0;
+
+          var ws = weights[cCls.Value];
 
           for (int i=0; i<dim; i++)
           {
-            var key = new ClassFeatureKey(cCls, i);
-
-            var f = data[i];
-            double w = weights.TryGetValue(key, out w) ? (w+f) : f;
-            weights[key] = w;
-
-            ccTotals[cCls] += (int)f;
+            var f = (int)data[i];
+            ws[i] += f;
+            ccTotals[cCls.Value] += f;
           }
         }
       }
 
-      foreach (var key in weights.Keys.ToList())
+      foreach (var cls in classes)
       {
-        var w = weights[key];
-        var t = (double)ccTotals[key.Class];
-        if (UseSmoothing)
-        {
-          w += a;
-          t += (a*dim);
-        }
+        var ws = weights[cls.Value];
+        var t  = (double)ccTotals[cls.Value];
+        if (UseSmoothing) t += alp*dim;
 
-        weights[key] = -Math.Log(w/t);
+        for (int i=0; i<dim; i++)
+        {
+          var w = ws[i];
+          if (UseSmoothing) w += alp;
+
+          ws[i] = -Math.Log(w/t);
+        }
       }
 
       return weights;

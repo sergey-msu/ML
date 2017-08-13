@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ML.Core;
 using ML.Contracts;
-using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -23,15 +19,20 @@ namespace ML.TextMethods.Algorithms
 
     #endregion
 
-    protected override Dictionary<ClassFeatureKey, double> TrainWeights()
+    protected override double[][] TrainWeights()
     {
       var dim      = DataDim;
-      var a        = Alpha;
-      var ccTotals = new Dictionary<Class, int>();
-      var cTotals  = new Dictionary<Class, int>();
-      var freqs    = new Dictionary<ClassFeatureKey, double>();
-      var cFreqs   = new Dictionary<ClassFeatureKey, double>();
-      var classes  = TrainingSample.Classes;
+      var alp      = Alpha;
+      var classes  = Classes;
+      var ccTotals = new int[classes.Length];
+      var cTotals  = new int[classes.Length];
+      var freqs    = new double[classes.Length][];
+      var cFreqs   = new double[classes.Length][];
+      foreach (var cls in classes)
+      {
+        freqs[cls.Value]  = new double[dim];
+        cFreqs[cls.Value] = new double[dim];
+      }
 
       foreach (var doc in TrainingSample)
       {
@@ -46,37 +47,41 @@ namespace ML.TextMethods.Algorithms
           var sameClass = cCls.Equals(cls);
           var fr = sameClass ? freqs : cFreqs;
           var ct = sameClass ? cTotals : ccTotals;
-          if (!ct.ContainsKey(cCls)) ct[cCls] = 0;
+          var fs = fr[cCls.Value];
 
           for (int i=0; i<dim; i++)
           {
-            var key = new ClassFeatureKey(cCls, i);
-
-            var f = data[i];
-            double freq = fr.TryGetValue(key, out freq) ? (freq+f) : f;
-            fr[key] = freq;
-
-            ct[cCls] += (int)f;
+            var f = (int)data[i];
+            fs[i] += f;
+            ct[cCls.Value] += f;
           }
         }
       }
 
-      foreach (var key in cFreqs.Keys.ToList())
+      foreach (var cls in classes)
       {
-        var freq    = freqs[key];
-        var cFreq   = cFreqs[key];
-        var cTotal  = (double)cTotals[key.Class];
-        var ccTotal = (double)ccTotals[key.Class];
-
+        var fs  = freqs[cls.Value];
+        var cfs = cFreqs[cls.Value];
+        var ct  = (double)cTotals[cls.Value];
+        var cct = (double)ccTotals[cls.Value];
         if (UseSmoothing)
         {
-          freq    += a;
-          cTotal  += (a*dim);
-          cFreq   += a;
-          ccTotal += (a*dim);
+          ct  += alp*dim;
+          cct += alp*dim;
         }
 
-        cFreqs[key] = Math.Log(freq/cTotal) - Math.Log(cFreq/ccTotal);
+        for (int i=0; i<dim; i++)
+        {
+          var f  = fs[i];
+          var cf = cfs[i];
+          if (UseSmoothing)
+          {
+            f  += alp;
+            cf += alp;
+          }
+
+          cfs[i] = Math.Log(f/ct) - Math.Log(cf/cct);
+        }
       }
 
       return cFreqs;

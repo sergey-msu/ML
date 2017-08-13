@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Contracts;
-using ML.Core.Distributions;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -24,18 +23,19 @@ namespace ML.TextMethods.Algorithms
     {
       bool isEmpty;
       var data    = ExtractFeatureVector(obj, out isEmpty);
-      var classes = TrainingSample.CachedClasses;
+      var classes = Classes;
       var priors  = PriorProbs;
       var dim     = DataDim;
-      var weights = Weights;
       var scores  = new List<ClassScore>();
 
       foreach (var cls in classes)
       {
-        var score = priors[cls];
+        var score   = priors[cls.Value];
+        var weights = Weights[cls.Value];
+
         for (int i=0; i<dim; i++)
         {
-          var p = weights[new ClassFeatureKey(cls, i)];
+          var p = weights[i];
           var x = data[i];
           score += x*Math.Log(p) + (1-x)*Math.Log(1-p);
         }
@@ -69,46 +69,45 @@ namespace ML.TextMethods.Algorithms
     }
 
 
-    protected override Dictionary<ClassFeatureKey, double> TrainWeights()
+    protected override double[][] TrainWeights()
     {
       var cHist = ClassHist;
-      var N = Vocabulary.Count;
-      var a = Alpha;
-      var freqs = new Dictionary<ClassFeatureKey, double>();
+      var dim   = Vocabulary.Count;
+      var alp   = Alpha;
+      var classes = Classes;
+      var freqs = new double[Classes.Length][];
+      foreach (var cls in classes)
+        freqs[cls.Value] = new double[dim];
 
       foreach (var doc in TrainingSample)
       {
         var text = doc.Key;
-        var cls  = doc.Value;
         bool isEmpty;
         var data = ExtractFeatureVector(text, out isEmpty);
         if (isEmpty) continue;
 
-        for (int i=0; i<N; i++)
-        {
-          var key = new ClassFeatureKey(cls, i);
-          var f = data[i];
-          double freq = freqs.TryGetValue(key, out freq) ? freq+f : f;
-          freqs[key] = freq;
-        }
+        var cls = doc.Value;
+        var fs = freqs[cls.Value];
+        for (int i=0; i<dim; i++)
+          fs[i] += data[i];
       }
 
-      foreach (var key in freqs.Keys.ToList())
+      foreach (var cls in classes)
       {
-        var freq = freqs[key];
-        var total = (double)cHist[key.Class];
-        if (UseSmoothing)
-        {
-          freq  += a;
-          total += (a*N);
-        }
+        var fs = freqs[cls.Value];
+        var t = (double)cHist[cls.Value];
+        if (UseSmoothing) t += alp*dim;
 
-        freqs[key] = freq/total;
+        for (int i=0; i<dim; i++)
+        {
+          var f = fs[i];
+          if (UseSmoothing) f += alp;
+
+          fs[i] = f/t;
+        }
       }
 
       return freqs;
     }
-
-
   }
 }

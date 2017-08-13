@@ -27,7 +27,7 @@ namespace ML.BayesianMethods.Algorithms
   {
     public NaiveBayesianKernelAlgorithm(IKernel kernel,
                                         double h = 1,
-                                        Dictionary<Class, double> classLosses=null)
+                                        double[] classLosses=null)
       : base(kernel, h, classLosses)
     {
     }
@@ -41,20 +41,14 @@ namespace ML.BayesianMethods.Algorithms
     /// </summary>
     public override ClassScore[] PredictTokens(double[] obj, int cnt)
     {
-      var dim = DataDim;
+      var dim  = DataDim;
       var dcnt = DataCount;
-      var classes = DataClasses;
+      var classes = Classes;
       var useMin = UseKernelMinValue;
-      var min = KernelMinValue;
-      var pHist  = new Dictionary<Class, double>();
-      var yHist  = new Dictionary<Class, double>();
+      var min    = KernelMinValue;
+      var pHist  = new double[classes.Length];
+      var yHist  = new double[classes.Length];
       var scores = new List<ClassScore>();
-
-      foreach (var cls in classes)
-      {
-        pHist[cls] = 0.0D;
-        yHist[cls] = 0.0D;
-      }
 
       for (int i=0; i<dim; i++)
       {
@@ -64,22 +58,22 @@ namespace ML.BayesianMethods.Algorithms
           var cls  = pData.Value;
           var r = (obj[i] - data[i])/H;
 
-          pHist[cls] += Kernel.Value(r);
+          pHist[cls.Value] += Kernel.Value(r);
         }
 
         foreach (var cls in classes)
         {
-          var p = pHist[cls] / (H * ClassHist[cls]);
+          var p = pHist[cls.Value] / (H * ClassHist[cls.Value]);
           if (Math.Abs(p)<min && useMin) p = min;
 
-          yHist[cls] += Math.Log(p);
-          pHist[cls] = 0.0D;
+          yHist[cls.Value] += Math.Log(p);
+          pHist[cls.Value] = 0.0D;
         }
       }
 
       foreach (var cls in classes)
       {
-        var p = yHist[cls] + PriorProbs[cls];
+        var p = yHist[cls.Value] + PriorProbs[cls.Value];
         scores.Add(new ClassScore(cls, p));
       }
 
@@ -96,7 +90,7 @@ namespace ML.BayesianMethods.Algorithms
       var dim = DataDim;
       var p = 0.0D;
       var y = 0.0D;
-      var my = ClassHist[cls];
+      var my = ClassHist[cls.Value];
       var useMin = UseKernelMinValue;
       var min = KernelMinValue;
 
@@ -114,7 +108,7 @@ namespace ML.BayesianMethods.Algorithms
         p = 0.0D;
       }
 
-      y += PriorProbs[cls];
+      y += PriorProbs[cls.Value];
 
       return y;
     }

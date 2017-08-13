@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ML.Core;
 using ML.Contracts;
-using ML.Core.Distributions;
+using ML.Core.Serialization;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -66,14 +65,17 @@ namespace ML.TextMethods.Algorithms
 
     #endregion
 
-    protected override Dictionary<ClassFeatureKey, double> TrainWeights()
+    protected override double[][] TrainWeights()
     {
-      var dim       = DataDim;
-      var cnt       = DataCount;
-      var alpha     = Alpha;
-      var weights   = new Dictionary<ClassFeatureKey, double>();
-      var clsTotals = new Dictionary<Class, double>();
-      var idfFreqs  = new int[dim];
+      var dim = DataDim;
+      var cnt = DataCount;
+      var alp = Alpha;
+      var classes = Classes;
+      var cTotals  = new double[classes.Length];
+      var idfFreqs = new int[dim];
+      var weights  = new double[classes.Length][];
+      foreach (var cls in classes)
+        weights[cls.Value] = new double[dim];
       var freqDatas = new FreqData[dim][];
       for (int i=0; i<dim; i++)
         freqDatas[i] = new FreqData[cnt];
@@ -102,7 +104,7 @@ namespace ML.TextMethods.Algorithms
         }
       }
 
-      cnt = idx;
+      cnt = idx+1;
 
       // IDF transform
       var idfWeights = IDFWeightingScheme.GetWeights(dim, idfFreqs);
@@ -116,32 +118,49 @@ namespace ML.TextMethods.Algorithms
           var fData  = freqData[j];
           var fValue = fData.Value*idf;
           var cls    = fData.Class;
-          var key = new ClassFeatureKey(cls, i);
 
-          double w = weights.TryGetValue(key, out w) ? (w+fValue) : fValue;
-          weights[key] = w;
-
-          double t = clsTotals.TryGetValue(cls, out t) ? (t+fValue) : fValue;
-          clsTotals[cls] = t;
+          weights[cls.Value][i] += fValue;
+          cTotals[cls.Value] += fValue;
         }
       }
 
       // calculate weights
-      foreach (var key in weights.Keys.ToList())
+      foreach (var cls in classes)
       {
-        var w = weights[key];
-        var t = clsTotals[key.Class];
-        if (UseSmoothing)
-        {
-          w += alpha;
-          t += (alpha*dim);
-        }
+        var ws = weights[cls.Value];
+        var t  = cTotals[cls.Value];
+        if (UseSmoothing) t += alp*dim;
 
-        weights[key] = Math.Log(w/t);
+        for (int i=0; i<dim; i++)
+        {
+          var w = ws[i];
+          if (UseSmoothing) w += alp;
+
+          ws[i] = Math.Log(w/t);
+        }
       }
 
       return weights;
     }
 
+
+    #region Serialization
+
+    public override void Serialize(MLSerializer ser)
+    {
+      base.Serialize(ser);
+
+      ser.Write("TF_SCHEME", m_TFWeightingScheme);
+      ser.Write("IDF_SCHEME", m_IDFWeightingScheme);
+    }
+
+    public override void Deserialize(MLSerializer ser)
+    {
+      base.Deserialize(ser);
+
+      throw new NotImplementedException();
+    }
+
+    #endregion
   }
 }

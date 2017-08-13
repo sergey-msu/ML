@@ -57,20 +57,20 @@ namespace ML.Tests.UnitTests.Core
       var distr = new NormalDistribution();
       var sample = new ClassifiedSample<double[]>
       {
-        { new[] { -1.0D, 1.0D, 2.0D }, new Class("A", 1) },
-        { new[] {  2.0D, 2.0D, 2.5D }, new Class("A", 1) },
-        { new[] {  3.0D, 3.0D, 2.6D }, new Class("B", 2) },
-        { new[] {  3.5D, 4.0D, 2.8D }, new Class("B", 2) },
+        { new[] { -1.0D, 1.0D, 2.0D }, new Class("A", 0) },
+        { new[] {  2.0D, 2.0D, 2.5D }, new Class("A", 0) },
+        { new[] {  3.0D, 3.0D, 2.6D }, new Class("B", 1) },
+        { new[] {  3.5D, 4.0D, 2.8D }, new Class("B", 1) },
       };
 
       // act
       var res = distr.FromSample(sample);
-      var dA1 = res[new ClassFeatureKey(new Class("A", 1), 0)];
-      var dA2 = res[new ClassFeatureKey(new Class("A", 1), 1)];
-      var dA3 = res[new ClassFeatureKey(new Class("A", 1), 2)];
-      var dB1 = res[new ClassFeatureKey(new Class("B", 2), 0)];
-      var dB2 = res[new ClassFeatureKey(new Class("B", 2), 1)];
-      var dB3 = res[new ClassFeatureKey(new Class("B", 2), 2)];
+      var dA1 = res[0][0];
+      var dA2 = res[0][1];
+      var dA3 = res[0][2];
+      var dB1 = res[1][0];
+      var dB2 = res[1][1];
+      var dB3 = res[1][2];
 
       // assert
       Assert.AreEqual(0.5D,  dA1.Mu, EPS);
@@ -129,20 +129,20 @@ namespace ML.Tests.UnitTests.Core
       var distr = new BernoulliDistribution();
       var sample = new ClassifiedSample<double[]>
       {
-        { new[] { 1.0D, 1.0D, 0.0D }, new Class("A", 1) },
-        { new[] { 1.0D, 0.0D, 1.0D }, new Class("A", 1) },
-        { new[] { 0.0D, 0.0D, 1.0D }, new Class("B", 2) },
-        { new[] { 0.0D, 0.0D, 0.0D }, new Class("B", 2) },
+        { new[] { 1.0D, 1.0D, 0.0D }, new Class("A", 0) },
+        { new[] { 1.0D, 0.0D, 1.0D }, new Class("A", 0) },
+        { new[] { 0.0D, 0.0D, 1.0D }, new Class("B", 1) },
+        { new[] { 0.0D, 0.0D, 0.0D }, new Class("B", 1) },
       };
 
       // act
       var res = distr.FromSample(sample);
-      var dA1 = res[new ClassFeatureKey(new Class("A", 1), 0)];
-      var dA2 = res[new ClassFeatureKey(new Class("A", 1), 1)];
-      var dA3 = res[new ClassFeatureKey(new Class("A", 1), 2)];
-      var dB1 = res[new ClassFeatureKey(new Class("B", 2), 0)];
-      var dB2 = res[new ClassFeatureKey(new Class("B", 2), 1)];
-      var dB3 = res[new ClassFeatureKey(new Class("B", 2), 2)];
+      var dA1 = res[0][0];
+      var dA2 = res[0][1];
+      var dA3 = res[0][2];
+      var dB1 = res[1][0];
+      var dB2 = res[1][1];
+      var dB3 = res[1][2];
 
       // assert
       Assert.AreEqual(1.0D, dA1.P, EPS);
@@ -211,23 +211,23 @@ namespace ML.Tests.UnitTests.Core
       // arrange
       var sample = new ClassifiedSample<double[]>
       {
-        { new[] { 1.0D, 2.0D, 0.0D }, new Class("A", 1) },
-        { new[] { 3.0D, 0.0D, 2.0D }, new Class("A", 1) },
-        { new[] { 0.0D, 3.0D, 1.0D }, new Class("B", 2) },
-        { new[] { 0.0D, 2.0D, 0.0D }, new Class("B", 2) },
-        { new[] { 0.0D, 2.0D, 2.0D }, new Class("B", 2) },
+        { new[] { 1.0D, 2.0D, 0.0D }, new Class("A", 0) },
+        { new[] { 3.0D, 0.0D, 2.0D }, new Class("A", 0) },
+        { new[] { 0.0D, 3.0D, 1.0D }, new Class("B", 1) },
+        { new[] { 0.0D, 2.0D, 0.0D }, new Class("B", 1) },
+        { new[] { 0.0D, 2.0D, 2.0D }, new Class("B", 1) },
       };
       var n = 3; // sample[i].Key.Length - the length of the word dictionary
       var distr = new MultinomialPartDistribution { N = n };
 
       // act
       var res = distr.FromSample(sample);
-      var dA1 = res[new ClassFeatureKey(new Class("A", 1), 0)];
-      var dA2 = res[new ClassFeatureKey(new Class("A", 1), 1)];
-      var dA3 = res[new ClassFeatureKey(new Class("A", 1), 2)];
-      var dB1 = res[new ClassFeatureKey(new Class("B", 2), 0)];
-      var dB2 = res[new ClassFeatureKey(new Class("B", 2), 1)];
-      var dB3 = res[new ClassFeatureKey(new Class("B", 2), 2)];
+      var dA1 = res[0][0];
+      var dA2 = res[0][1];
+      var dA3 = res[0][2];
+      var dB1 = res[1][0];
+      var dB2 = res[1][1];
+      var dB3 = res[1][2];
 
       // assert
       Assert.AreEqual( 0.5D, dA1.P, EPS);
@@ -244,31 +244,31 @@ namespace ML.Tests.UnitTests.Core
       // arrange
       var sample = new ClassifiedSample<double[]>
       {
-        { new[] { 1.0D, 2.0D, 0.0D }, new Class("A", 1) },
-        { new[] { 3.0D, 0.0D, 2.0D }, new Class("A", 1) },
-        { new[] { 0.0D, 3.0D, 1.0D }, new Class("B", 2) },
-        { new[] { 0.0D, 2.0D, 0.0D }, new Class("B", 2) },
-        { new[] { 0.0D, 2.0D, 2.0D }, new Class("B", 2) },
+        { new[] { 1.0D, 2.0D, 0.0D }, new Class("A", 0) },
+        { new[] { 3.0D, 0.0D, 2.0D }, new Class("A", 0) },
+        { new[] { 0.0D, 3.0D, 1.0D }, new Class("B", 1) },
+        { new[] { 0.0D, 2.0D, 0.0D }, new Class("B", 1) },
+        { new[] { 0.0D, 2.0D, 2.0D }, new Class("B", 1) },
       };
       var n = 3; // sample[i].Key.Length - the length of the word dictionary
       var distr = new MultinomialPartDistribution { N = n, UseSmoothing=true, Alpha=2 };
 
       // act
       var res = distr.FromSample(sample);
-      var dA1 = res[new ClassFeatureKey(new Class("A", 1), 0)];
-      var dA2 = res[new ClassFeatureKey(new Class("A", 1), 1)];
-      var dA3 = res[new ClassFeatureKey(new Class("A", 1), 2)];
-      var dB1 = res[new ClassFeatureKey(new Class("B", 2), 0)];
-      var dB2 = res[new ClassFeatureKey(new Class("B", 2), 1)];
-      var dB3 = res[new ClassFeatureKey(new Class("B", 2), 2)];
+      var dA1 = res[0][0];
+      var dA2 = res[0][1];
+      var dA3 = res[0][2];
+      var dB1 = res[1][0];
+      var dB2 = res[1][1];
+      var dB3 = res[1][2];
 
       // assert
-      Assert.AreEqual(  0.5D, dA1.P, EPS);
-      Assert.AreEqual( 0.25D, dA2.P, EPS);
-      Assert.AreEqual( 0.25D, dA3.P, EPS);
-      Assert.AreEqual(0.125D, dB1.P, EPS);
-      Assert.AreEqual(  0.7D, dB2.P, EPS);
-      Assert.AreEqual(  0.3D, dB3.P, EPS);
+      Assert.AreEqual(6.0D/14, dA1.P, EPS);
+      Assert.AreEqual(4.0D/14, dA2.P, EPS);
+      Assert.AreEqual(4.0D/14, dA3.P, EPS);
+      Assert.AreEqual(2.0D/16, dB1.P, EPS);
+      Assert.AreEqual(9.0D/16, dB2.P, EPS);
+      Assert.AreEqual(5.0D/16, dB3.P, EPS);
     }
 
     #endregion

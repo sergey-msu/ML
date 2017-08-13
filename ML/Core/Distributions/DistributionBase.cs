@@ -43,7 +43,7 @@ namespace ML.Core.Distributions
     /// Fills distrubution parameters with Maximum Likelihood estimation from a given classified sample.
     /// Ranges result with respect to classes and feature indices
     /// </summary>
-    public abstract Dictionary<ClassFeatureKey, TParam> FromSample(ClassifiedSample<double[]> sample);
+    public abstract TParam[][] FromSample(ClassifiedSample<double[]> sample);
   }
 
   /// <summary>
@@ -82,6 +82,6 @@ namespace ML.Core.Distributions
     /// Fills distrubution parameters from given classified sample (Maximum Likelihood estimation / frequency analysis etc)
     /// Ranges result with respect to classes and feature indices
     /// </summary>
-    public abstract Dictionary<ClassFeatureKey, TParam> FromSample(ClassifiedSample<double[]> sample);
+    public abstract TParam[][] FromSample(ClassifiedSample<double[]> sample);
   }
 }
