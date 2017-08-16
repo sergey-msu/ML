@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace ML.Core.Serialization
 {
@@ -45,17 +46,67 @@ namespace ML.Core.Serialization
 
     #region Read
 
-    public string Read(string name, string dft)
+    public T ReadObject<T>(string name)
     {
-      var res = readBeginTag(name);
-      if (!res) throw new MLException(string.Format("Error while reading begin tag {0}", name ?? "NULL"));
+      var block = readBlock(name);
 
-      // TODO
+      using (var ms = new MemoryStream(Convert.FromBase64String(block)))
+      {
+        ms.Position = 0;
 
-      res = readEndTag(name);
-      if (!res) throw new MLException(string.Format("Error while reading end tag {0}", name ?? "NULL"));
+        var slim = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
+        return (T)slim.Deserialize(ms);
+      }
+    }
 
-      return null;
+    public string ReadString(string name)
+    {
+      return readBlock(name);
+    }
+
+    public IEnumerable<T> ReadEnumerable<T>(string name, Func<string, T> converter)
+    {
+      var list = readList(name);
+      foreach (var item in list)
+        yield return converter(item);
+    }
+
+    public IEnumerable<string> ReadStrings(string name)
+    {
+      return readList(name);
+    }
+
+    public IEnumerable<double> ReadDoubles(string name)
+    {
+      return ReadEnumerable(name, s => double.Parse(s));
+    }
+
+    public IEnumerable<int> ReadInts(string name)
+    {
+      return ReadEnumerable(name, s => int.Parse(s));
+    }
+
+    public int ReadInt(string name)
+    {
+      var val = readBlock(name);
+      return int.Parse(val);
+    }
+
+    public double ReadDouble(string name)
+    {
+      var val = readBlock(name);
+      return double.Parse(val);
+    }
+
+    public bool ReadBool(string name)
+    {
+      var val = readBlock(name);
+      return bool.Parse(val);
+    }
+
+    public IMLSerializable ReadMLSerializable(string name)
+    {
+      throw new NotImplementedException();
     }
 
     #endregion
@@ -75,32 +126,16 @@ namespace ML.Core.Serialization
       write(name, value, v =>
       {
         using (var ms = new MemoryStream())
-        using (var reader = new StreamReader(ms))
+        using (var reader = new BinaryReader(ms))
         {
-          var serializer = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
-          serializer.Serialize(ms, v);
+          var slim = new NFX.Serialization.Slim.SlimSerializer(NFX.IO.SlimFormat.Instance);
+          slim.Serialize(ms, v);
+          var len = ms.Position;
           ms.Position = 0;
+          var str = Convert.ToBase64String(reader.ReadBytes((int)len), Base64FormattingOptions.None);
 
-          m_Writer.WriteLine(reader.ReadToEnd());
+          m_Writer.WriteLine(str);
         }
-      });
-    }
-
-    public void Write(string name, IEnumerable<string> value)
-    {
-      write(name, value, v =>
-      {
-        foreach (var item in v)
-          m_Writer.WriteLine(item);
-      });
-    }
-
-    public void Write(string name, IEnumerable<Class> value)
-    {
-      write(name, value, v =>
-      {
-        foreach (var item in v)
-          m_Writer.WriteLine("{0}:{1}", item.Value, item.Name);
       });
     }
 
@@ -109,24 +144,6 @@ namespace ML.Core.Serialization
       write(name, value, v =>
       {
         m_Writer.WriteLine(v);
-      });
-    }
-
-    public void Write(string name, IDictionary<Class, double> value)
-    {
-      write(name, value, v =>
-      {
-        foreach (var kvp in v)
-          m_Writer.WriteLine("{0}:{1:0.000000}", kvp.Key.Value, kvp.Value);
-      });
-    }
-
-    public void Write(string name, IDictionary<Class, int> value)
-    {
-      write(name, value, v =>
-      {
-        foreach (var kvp in v)
-          m_Writer.WriteLine("{0}:{1}", kvp.Key.Value, kvp.Value);
       });
     }
 
@@ -151,6 +168,35 @@ namespace ML.Core.Serialization
       write(name, value, v =>
       {
         m_Writer.WriteLine(v);
+      });
+    }
+
+    public void Write(string name, double[] value)
+    {
+      write(name, value, v =>
+      {
+        var len = v.Length;
+        for (int i=0; i<len; i++)
+          m_Writer.WriteLine("{0:0.000000}", v[i]);
+      });
+    }
+
+    public void Write(string name, int[] value)
+    {
+      write(name, value, v =>
+      {
+        var len = v.Length;
+        for (int i=0; i<len; i++)
+          m_Writer.WriteLine("{0}", v[i]);
+      });
+    }
+
+    public void Write(string name, IEnumerable<string> value)
+    {
+      write(name, value, v =>
+      {
+        foreach (var item in v)
+          m_Writer.WriteLine(item);
       });
     }
 
@@ -197,16 +243,56 @@ namespace ML.Core.Serialization
       return true;
     }
 
-
-    private bool readEndTag(string name)
+    private string readBlock(string name)
     {
-      var footer = m_Reader.ReadLine();
-      if (string.IsNullOrWhiteSpace(name) ||
-          footer.Length<3 ||
-          !footer.StartsWith(DCHAR) ||
-          !footer.EndsWith(DCHAR)) return false;
+      var res = readBeginTag(name);
+      if (!res) throw new MLException(string.Format("Error while reading begin tag {0}", name ?? "NULL"));
 
-      var body = footer.Substring(1, footer.Length-2);
+      var builder = new StringBuilder();
+      var first = true;
+
+      while (true)
+      {
+        var line = m_Reader.ReadLine();
+        if (line==null)
+          throw new MLException(string.Format("End tag {0} not found", name ?? "NULL"));
+
+        if (isEndTag(line, name)) break;
+        else
+        {
+          if (!first) builder.AppendLine();
+          builder.Append(line);
+          first = false;
+        }
+      }
+
+      return builder.ToString();
+    }
+
+    private IEnumerable<string> readList(string name)
+    {
+      var res = readBeginTag(name);
+      if (!res) throw new MLException(string.Format("Error while reading begin tag {0}", name ?? "NULL"));
+
+      while (true)
+      {
+        var line = m_Reader.ReadLine();
+        if (line==null)
+          throw new MLException(string.Format("End tag {0} not found", name ?? "NULL"));
+
+        if (isEndTag(line, name)) yield break;
+        else yield return line;
+      }
+    }
+
+    private bool isEndTag(string line, string name)
+    {
+      if (string.IsNullOrWhiteSpace(name) ||
+          line.Length<3 ||
+          !line.StartsWith(DCHAR) ||
+          !line.EndsWith(DCHAR)) return false;
+
+      var body = line.Substring(1, line.Length-2);
       if (!string.Equals(body, name, StringComparison.InvariantCultureIgnoreCase)) return false;
 
       return true;

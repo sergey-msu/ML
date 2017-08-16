@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.IO.Compression;
 using ML.Core;
 using ML.Contracts;
 using ML.Core.Serialization;
@@ -13,7 +11,7 @@ namespace ML.TextMethods.Algorithms
   {
     #region Fields
 
-    private readonly ITextPreprocessor m_Preprocessor;
+    private ITextPreprocessor m_Preprocessor;
     private List<string> m_Vocabulary;
     private double[] m_PriorProbs;
     private int[] m_ClassHist;
@@ -60,6 +58,7 @@ namespace ML.TextMethods.Algorithms
       var result = new double[DataDim];
       var tokens = Preprocessor.Preprocess(doc);
       isEmpty = true;
+      if (tokens==null) return result;
 
       foreach (var token in tokens)
       {
@@ -133,9 +132,9 @@ namespace ML.TextMethods.Algorithms
 
       ser.Write("PREPROCESSOR", m_Preprocessor);
       ser.Write("VOCABULARY", m_Vocabulary);
-      ser.Write("PRIORS", m_PriorProbs);
+      ser.Write("PRIORS",     m_PriorProbs);
       ser.Write("CLASS_HIST", m_ClassHist);
-      ser.Write("DATA_DIM", m_DataDim);
+      ser.Write("DATA_DIM",   m_DataDim);
       ser.Write("DATA_COUNT", m_DataCount);
       ser.Write("USE_PRIORS", m_UsePriors);
     }
@@ -144,7 +143,13 @@ namespace ML.TextMethods.Algorithms
     {
       base.Deserialize(ser);
 
-      throw new NotImplementedException();
+      m_Preprocessor = ser.ReadObject<ITextPreprocessor>("PREPROCESSOR");
+      m_Vocabulary = ser.ReadStrings("VOCABULARY").ToList();
+      m_PriorProbs = ser.ReadDoubles("PRIORS").ToArray();
+      m_ClassHist  = ser.ReadInts("CLASS_HIST").ToArray();
+      m_DataDim    = ser.ReadInt("DATA_DIM");
+      m_DataCount  = ser.ReadInt("DATA_COUNT");
+      m_UsePriors  = ser.ReadBool("USE_PRIORS");
     }
 
     #endregion
@@ -252,7 +257,9 @@ namespace ML.TextMethods.Algorithms
     {
       base.Deserialize(ser);
 
-      throw new NotImplementedException();
+      m_UseSmoothing = ser.ReadBool("USE_SMOOTHING");
+      m_Alpha = ser.ReadDouble("ALPHA");
+      m_Weights = ser.ReadObject<double[][]>("WEIGHTS");
     }
 
     #endregion

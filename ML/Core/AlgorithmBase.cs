@@ -115,7 +115,7 @@ namespace ML.Core
         compr.CopyTo(ims);
         ims.Position = 0;
 
-        using (var reader = new StreamWriter(ims))
+        using (var reader = new StreamReader(ims))
         {
           var ser = new MLSerializer(reader);
           Deserialize(ser);
@@ -130,7 +130,9 @@ namespace ML.Core
 
     public virtual void Deserialize(MLSerializer ser)
     {
-      ser.Read("TYPE", GetType().FullName);
+      var type = ser.ReadString("TYPE");
+      if (!string.Equals(type, GetType().FullName, StringComparison.InvariantCultureIgnoreCase))
+        throw new MLException(string.Format("Wrong type: expected {0}, actual {1}", type ?? "NULL", GetType().FullName));
     }
 
     #endregion
@@ -182,14 +184,24 @@ namespace ML.Core
     {
       base.Serialize(ser);
 
-      ser.Write("CLASSES", Classes);
+      ser.Write("CLASSES", Classes.Select(c => c.Name));
     }
 
     public override void Deserialize(MLSerializer ser)
     {
       base.Deserialize(ser);
 
-      throw new NotImplementedException();
+      var classes = new List<Class>();
+      var names = ser.ReadStrings("CLASSES");
+      var idx = 0;
+
+      foreach (var name in names)
+      {
+        var cls = new Class(name, idx++);
+        classes.Add(cls);
+      }
+
+      Classes = classes.ToArray();
     }
 
     #endregion

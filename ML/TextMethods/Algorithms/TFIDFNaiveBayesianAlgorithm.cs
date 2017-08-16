@@ -158,7 +158,8 @@ namespace ML.TextMethods.Algorithms
     {
       base.Deserialize(ser);
 
-      throw new NotImplementedException();
+      m_TFWeightingScheme  = ser.ReadObject<ITFWeightingScheme>("TF_SCHEME");
+      m_IDFWeightingScheme = ser.ReadObject<IIDFWeightingScheme>("IDF_SCHEME");
     }
 
     #endregion

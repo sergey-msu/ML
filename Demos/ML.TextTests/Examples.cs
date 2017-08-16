@@ -110,5 +110,35 @@ namespace ML.TextTests
     }
 
     #endregion
+
+    #region Reuters R8
+
+    public static TextAlgorithmBase Create_ReutersR8()
+    {
+      var proc = new TextPreprocessor(new EnglishSimpleTokenizer(),
+                                      new EnglishStopwords(),
+                                      new EnglishSimpleNormalizer(),
+                                      new EnglishPorterStemmer());
+      var alg = new MultinomialNaiveBayesianAlgorithm(proc);
+
+      return alg;
+    }
+
+    #endregion
+
+    #region 20 Newsgroups
+
+    public static TextAlgorithmBase Create_Newsgroups20Algorithm()
+    {
+      var proc = new TextPreprocessor(new EnglishSimpleTokenizer(),
+                                      new EnglishStopwords(),
+                                      new EnglishSimpleNormalizer(),
+                                      new EnglishPorterStemmer());
+      var alg = new TFIDFNaiveBayesianAlgorithm(proc);
+
+      return alg;
+    }
+
+    #endregion
   }
 }

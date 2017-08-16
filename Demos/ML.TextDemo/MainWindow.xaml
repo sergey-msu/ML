@@ -21,9 +21,6 @@
             <RowDefinition Height="Auto"/>
           </Grid.RowDefinitions>
           <TextBlock Grid.Row="0" Padding="10" TextWrapping="WrapWithOverflow">
-            <Run>Naive Bayes spam filtering is a baseline technique for dealing with spam that can tailor itself to the email needs of individual users and give low false positive spam detection rates that are generally acceptable to users. It is one of the oldest ways of doing spam filtering, with roots in the 1990s.</Run>
-            <LineBreak/>
-            <LineBreak/>
             <Run FontWeight="Bold">Spam examples:</Run>
             <LineBreak/>
             <Run>* WINNER!! As a valued network customer you have been selected to receivea еЈ900 prize reward! To claim call 09061701461. Claim code KL341. Valid 12 hours only</Run>
@@ -38,14 +35,131 @@
 
           <Button Grid.Row="2" Height="23" Width="75" Margin="10" x:Name="m_SpamClassify" Click="m_SpamClassify_Click">Classify</Button>
 
-          <TextBlock Grid.Row="3" Padding="30" HorizontalAlignment="Center" FontSize="40" x:Name="m_SpamResult">SPAM!</TextBlock>
+          <TextBlock Grid.Row="3" Padding="30" HorizontalAlignment="Center" FontSize="40" x:Name="m_SpamResult"></TextBlock>
 
         </Grid>
       </TabItem>
 
-      <!-- 20 Newsgroup -->
-      <TabItem Header="20 Newsgroup">
+      <!-- Reuters R8 -->
+      <TabItem Header="Reuters R8">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <TextBlock Grid.Row="0" Padding="10" TextWrapping="WrapWithOverflow">
+            <Run FontWeight="Bold">Valid classes:</Run>
+            <LineBreak/>
+            <Run FontWeight="Bold">* Acquisition</Run><Run> - I.U. International Co said it reached a preliminary agreement to sell the Hawaiian Insurance Cos to Hawaiian Electric Industries Inc.</Run>
+            <LineBreak/>
+            <Run FontWeight="Bold">* Crude</Run><Run> - Oil Trades Near $49 a Barrel as Libyan Crude Supply Is Disrupted</Run>
+            <LineBreak/>
+            <Run FontWeight="Bold">* Earnings and Investments</Run><Run> - Today the company reported first quarter earnings of 20.6 mln dlrs on sales of 238.0 mln dlrs</Run>
+            <LineBreak/>
+            <Run FontWeight="Bold">* Grain</Run><Run> - Current prospects for this year's grain crop in Bulgaria and Romania appear less favorable than in 1986</Run>
+            <LineBreak/>
+            <Run FontWeight="Bold">* Interest Rates</Run><Run> - The Federal Reserve will promote lower interest rates this year to sustain world economic growth</Run>
+            <LineBreak/>
+            <Run FontWeight="Bold">* Money</Run><Run> - Finance ministers from seven major industrialized nations agreed on the need to stabilize currencies at current levels</Run>
+            <LineBreak/>
+            <Run FontWeight="Bold">* Ship</Run><Run> - Any Iranian attack on Soviet ships in the Gulf will bring a forceful and violent response</Run>
+            <LineBreak/>
+            <Run FontWeight="Bold">* Trade</Run><Run> - Mounting trade friction between the U.S. And Japan has raised fears</Run>
+            <LineBreak/>
+            <LineBreak/>
+            <Run FontWeight="Bold">Enter text message:</Run>
+          </TextBlock>
 
+          <TextBox Margin="10,0" x:Name="m_RR8Input" Height="170" Grid.Row="1" VerticalAlignment="Top"/>
+
+          <Button Grid.Row="2" Height="23" Width="75" Margin="10" x:Name="m_RR8Classify" Click="m_RR8Classify_Click">Classify</Button>
+
+          <TextBlock Grid.Row="3" Padding="30" HorizontalAlignment="Center" FontSize="40" x:Name="m_RR8Result"></TextBlock>
+
+        </Grid>
+      </TabItem>
+
+      <!-- 20 Newsgroups -->
+      <TabItem Header="Newsgroups 20">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+
+          <TextBlock FontWeight="Bold" Grid.Row="0">Valid classes:</TextBlock>
+
+          <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition/>
+              <ColumnDefinition/>
+              <ColumnDefinition/>
+              <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock TextWrapping="WrapWithOverflow" Grid.Column="0">
+              <Run FontWeight="Bold">* Computers > Graphics</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Computers > MS Windows OS</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Computers > IBM Hardware</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Computers > Mac Hardware</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Computers > Windows X</Run><Run></Run>
+            </TextBlock>
+            <TextBlock TextWrapping="WrapWithOverflow" Grid.Column="1">
+              <Run FontWeight="Bold">* For Sale</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Autos</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Motorcycles</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Sport > Baseball</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Sport > Hockey</Run><Run></Run>
+              <LineBreak/>
+            </TextBlock>
+            <TextBlock TextWrapping="WrapWithOverflow" Grid.Column="2">
+              <Run FontWeight="Bold">* Science > Cryptography</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Science > Electronics</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Science > Medicine</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Science > Space</Run><Run></Run>
+              <LineBreak/>
+            </TextBlock>
+            <TextBlock TextWrapping="WrapWithOverflow" Grid.Column="3">
+              <Run FontWeight="Bold">* Politics > Guns</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Politics > Mideast</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Politics > Misc</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Religion > Atheism</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Religion > Christian</Run><Run></Run>
+              <LineBreak/>
+              <Run FontWeight="Bold">* Religion > Misc</Run><Run></Run>
+              <LineBreak/>
+            </TextBlock>
+          </Grid>
+
+          <TextBlock FontWeight="Bold" Grid.Row="2" Margin="10">Enter text message:</TextBlock>
+
+          <TextBox Margin="10,0" x:Name="m_N20Input" Height="170" Grid.Row="3" VerticalAlignment="Top"/>
+
+          <Button Grid.Row="4" Height="23" Width="75" Margin="10" x:Name="m_N20Classify" Click="m_N20Classify_Click">Classify</Button>
+
+          <TextBlock Grid.Row="5" Padding="30" HorizontalAlignment="Center" FontSize="40" x:Name="m_N20Result"></TextBlock>
+
+        </Grid>
       </TabItem>
 
     </TabControl>

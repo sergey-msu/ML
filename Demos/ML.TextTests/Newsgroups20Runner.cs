@@ -62,7 +62,7 @@ namespace ML.TextTests
 
     protected override TextAlgorithmBase CreateAlgorithm()
     {
-      return Examples.Create_TWCAlgorithm();
+      return Examples.Create_Newsgroups20Algorithm();
     }
 
     #region Export

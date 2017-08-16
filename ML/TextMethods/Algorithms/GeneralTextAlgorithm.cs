@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using ML.Core;
 using ML.Contracts;
 using ML.Core.Serialization;
@@ -9,7 +8,7 @@ namespace ML.TextMethods.Algorithms
 {
   public class GeneralTextAlgorithm : TextAlgorithmBase
   {
-    private readonly IClassificationAlgorithm<double[]> m_SubAlgorithm;
+    private IClassificationAlgorithm<double[]> m_SubAlgorithm;
 
     public GeneralTextAlgorithm(ITextPreprocessor preprocessor, IClassificationAlgorithm<double[]> alg)
       : base(preprocessor)
@@ -62,16 +61,12 @@ namespace ML.TextMethods.Algorithms
 
     public override void Serialize(MLSerializer ser)
     {
-      // TODO intelligent serialize inner algorithm
-
       ser.Write("SUB_ALGORITHM", m_SubAlgorithm);
     }
 
     public override void Deserialize(MLSerializer ser)
     {
-      // TODO intelligent deserialize inner algorithm
-
-
+      m_SubAlgorithm = ser.ReadMLSerializable("SUB_ALGORITHM") as IClassificationAlgorithm<double[]>;
     }
 
     #endregion
