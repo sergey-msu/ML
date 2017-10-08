@@ -35,7 +35,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new BinaryNaiveBayesianAlgorithm(prep);
+      var alg = new BinaryNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -93,7 +93,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new BinaryNaiveBayesianAlgorithm(prep);
+      var alg = new BinaryNaiveBayesianAlgorithm() { Preprocessor = prep };
       bool isEmpty;
 
       // act
@@ -131,7 +131,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new BinaryNaiveBayesianAlgorithm(prep);
+      var alg = new BinaryNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -158,7 +158,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new BinaryNaiveBayesianAlgorithm(prep);
+      var alg = new BinaryNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -184,7 +184,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new MultinomialNaiveBayesianAlgorithm(prep);
+      var alg = new MultinomialNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -242,7 +242,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new MultinomialNaiveBayesianAlgorithm(prep);
+      var alg = new MultinomialNaiveBayesianAlgorithm() { Preprocessor = prep };
       bool isEmpty;
 
       // act
@@ -280,7 +280,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new MultinomialNaiveBayesianAlgorithm(prep);
+      var alg = new MultinomialNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -307,7 +307,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new MultinomialNaiveBayesianAlgorithm(prep);
+      var alg = new MultinomialNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -333,7 +333,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new ComplementNaiveBayesianAlgorithm(prep);
+      var alg = new ComplementNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -391,7 +391,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new ComplementNaiveBayesianAlgorithm(prep);
+      var alg = new ComplementNaiveBayesianAlgorithm() { Preprocessor = prep };
       bool isEmpty;
 
       // act
@@ -429,7 +429,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new ComplementNaiveBayesianAlgorithm(prep);
+      var alg = new ComplementNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -456,7 +456,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new ComplementNaiveBayesianAlgorithm(prep);
+      var alg = new ComplementNaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -482,7 +482,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+      var alg = new ComplementOVANaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -540,7 +540,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+      var alg = new ComplementOVANaiveBayesianAlgorithm() { Preprocessor = prep };
       bool isEmpty;
 
       // act
@@ -578,7 +578,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+      var alg = new ComplementOVANaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -605,7 +605,7 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new ComplementOVANaiveBayesianAlgorithm(prep);
+      var alg = new ComplementOVANaiveBayesianAlgorithm() { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -631,10 +631,11 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new TFIDFNaiveBayesianAlgorithm(prep)
+      var alg = new TFIDFNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
-        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        Preprocessor = prep
        };
 
       // act
@@ -693,10 +694,11 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new TFIDFNaiveBayesianAlgorithm(prep)
+      var alg = new TFIDFNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
-        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        Preprocessor = prep
        };
        bool isEmpty;
 
@@ -735,10 +737,11 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg  = new TFIDFNaiveBayesianAlgorithm(prep)
+      var alg  = new TFIDFNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
-        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        Preprocessor = prep
        };
 
       // act
@@ -766,10 +769,11 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new TFIDFNaiveBayesianAlgorithm(prep)
+      var alg = new TFIDFNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
-        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        Preprocessor = prep
        };
 
       // act
@@ -796,10 +800,11 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new TWCNaiveBayesianAlgorithm(prep)
+      var alg = new TWCNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
-        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        Preprocessor = prep
        };
 
       // act
@@ -858,10 +863,11 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new TWCNaiveBayesianAlgorithm(prep)
+      var alg = new TWCNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
-        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        Preprocessor = prep
       };
       bool isEmpty;
 
@@ -900,11 +906,12 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg  = new TWCNaiveBayesianAlgorithm(prep)
+      var alg  = new TWCNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
         IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
-        UsePriors = true
+        UsePriors = true,
+        Preprocessor = prep
        };
 
       // act
@@ -932,11 +939,12 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg  = new TWCNaiveBayesianAlgorithm(prep)
+      var alg  = new TWCNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
         IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
-        UsePriors = false // !!!
+        UsePriors = false, // !!!
+        Preprocessor = prep
        };
 
       // act
@@ -964,10 +972,11 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new TWCNaiveBayesianAlgorithm(prep)
+      var alg = new TWCNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
-        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart
+        IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
+        Preprocessor = prep
        };
 
       // act
@@ -990,11 +999,12 @@ namespace ML.Tests.UnitTests.Text
       var CLS1 = sample.CachedClasses.ElementAt(0);
       var CLS2 = sample.CachedClasses.ElementAt(1);
       var prep = getDefaultPreprocessor();
-      var alg = new TWCNaiveBayesianAlgorithm(prep)
+      var alg = new TWCNaiveBayesianAlgorithm()
       {
         TFWeightingScheme  = Registry.TFWeightingScheme.LogNormalization,
         IDFWeightingScheme = Registry.IDFWeightingScheme.Standart,
-        UsePriors = false // !!!
+        UsePriors = false, // !!!
+        Preprocessor = prep
        };
 
       // act
@@ -1024,7 +1034,7 @@ namespace ML.Tests.UnitTests.Text
 
       var kernel = new TriangularKernel();
       var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
-      var alg    = new GeneralTextAlgorithm(prep, subAlg);
+      var alg    = new GeneralTextAlgorithm(subAlg) { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -1065,7 +1075,7 @@ namespace ML.Tests.UnitTests.Text
 
       var kernel = new TriangularKernel();
       var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
-      var alg    = new GeneralTextAlgorithm(prep, subAlg);
+      var alg    = new GeneralTextAlgorithm(subAlg) { Preprocessor = prep };
       bool isEmpty;
 
       // act
@@ -1106,7 +1116,7 @@ namespace ML.Tests.UnitTests.Text
 
       var kernel = new TriangularKernel();
       var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 0.5D) { UseKernelMinValue=true, KernelMinValue=EPS_ROUGH };
-      var alg    = new GeneralTextAlgorithm(prep, subAlg);
+      var alg    = new GeneralTextAlgorithm(subAlg) { Preprocessor = prep };
 
       // act
       alg.Train(sample);
@@ -1136,7 +1146,7 @@ namespace ML.Tests.UnitTests.Text
 
       var kernel = new TriangularKernel();
       var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 2.0D);
-      var alg    = new GeneralTextAlgorithm(prep, subAlg);
+      var alg    = new GeneralTextAlgorithm(subAlg){ Preprocessor = prep };
 
       // act
       alg.Train(sample);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
 using ML.Contracts;
-using ML.Utils;
 
 namespace ML.BayesianMethods.Algorithms
 {
@@ -44,31 +43,42 @@ namespace ML.BayesianMethods.Algorithms
       var dim  = DataDim;
       var dcnt = DataCount;
       var classes = Classes;
+      var cHist = ClassHist;
       var useMin = UseKernelMinValue;
       var min    = KernelMinValue;
-      var pHist  = new double[classes.Length];
       var yHist  = new double[classes.Length];
+      var pHist  = new double[classes.Length][];
+      for (int i=0; i<classes.Length; i++)
+        pHist[i] = new double[dim];
       var scores = new List<ClassScore>();
 
-      for (int i=0; i<dim; i++)
+      foreach (var pData in TrainingSample)
       {
-        foreach (var pData in TrainingSample)
+        var data = pData.Key;
+        var cls  = pData.Value;
+        var ph = pHist[cls.Value];
+
+        for (int i=0; i<dim; i++)
         {
-          var data = pData.Key;
-          var cls  = pData.Value;
           var r = (obj[i] - data[i])/H;
-
-          pHist[cls.Value] += Kernel.Value(r);
+          ph[i] += Kernel.Value(r);
         }
+      }
 
-        foreach (var cls in classes)
+      foreach (var cls in classes)
+      {
+        var ph = pHist[cls.Value];
+        var denom = H * cHist[cls.Value];
+        var y = 0.0D;
+
+        for (int i=0; i<dim; i++)
         {
-          var p = pHist[cls.Value] / (H * ClassHist[cls.Value]);
-          if (Math.Abs(p)<min && useMin) p = min;
-
-          yHist[cls.Value] += Math.Log(p);
-          pHist[cls.Value] = 0.0D;
+          var p = ph[i] / denom;
+          if (useMin && Math.Abs(p)<min) p = min;
+          y += Math.Log(p);
         }
+
+        yHist[cls.Value] = y;
       }
 
       foreach (var cls in classes)

@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using ML.Core;
-using ML.Contracts;
+using ML.TextMethods.FeatureExtractors;
 
 namespace ML.TextMethods.Algorithms
 {
   public class BinaryNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
-    public BinaryNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
-      : base(preprocessor)
+    public BinaryNaiveBayesianAlgorithm()
     {
+      FeatureExtractor = Registry.TextFeatureExtractor.Binary;
     }
 
     #region Properties
@@ -46,26 +46,6 @@ namespace ML.TextMethods.Algorithms
       return scores.OrderByDescending(s => s.Score)
                    .Take(cnt)
                    .ToArray();
-    }
-
-    public override double[] ExtractFeatureVector(string doc, out bool isEmpty)
-    {
-      var dict   = Vocabulary;
-      var dim    = DataDim;
-      var result = new double[dim];
-      var prep   = Preprocessor;
-      var tokens = prep.Preprocess(doc);
-      isEmpty = true;
-
-      foreach (var token in tokens)
-      {
-        var idx = dict.IndexOf(token);
-        if (idx<0) continue;
-        result[idx] = 1;
-        isEmpty = false;
-      }
-
-      return result;
     }
 
 

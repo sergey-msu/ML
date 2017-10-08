@@ -117,16 +117,13 @@ namespace ML.Utils
       return result;
     }
 
-    public const double ENTROPY_COEFF = 1.44269504089F; // 1/ln(2)
-    public const double DOUBLE_PI = 2*Math.PI;
-
     /// <summary>
     /// Calculates h(z) = -z*log2(z)
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double EntropyH(double z)
     {
-      return (0.0D <= z && z < double.Epsilon) ? 0.0D : -z*Math.Log(z)*ENTROPY_COEFF;
+      return (0.0D <= z && z < double.Epsilon) ? 0.0D : -z*Math.Log(z)*MathConsts.ENTROPY_COEFF;
     }
 
     /// <summary>

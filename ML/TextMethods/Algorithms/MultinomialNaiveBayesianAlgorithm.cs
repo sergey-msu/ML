@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using ML.Core;
-using ML.Contracts;
 
 namespace ML.TextMethods.Algorithms
 {
   public class MultinomialNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
-    public MultinomialNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
-      : base(preprocessor)
+    public MultinomialNaiveBayesianAlgorithm()
     {
     }
 

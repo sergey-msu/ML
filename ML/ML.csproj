@@ -184,6 +184,11 @@
     <Compile Include="TextMethods\Algorithms\MultinomialNaiveBayesianAlgorithm.cs" />
     <Compile Include="TextMethods\Algorithms\AlgorithmBase.cs" />
     <Compile Include="TextMethods\Algorithms\BinaryNaiveBayesianAlgorithm.cs" />
+    <Compile Include="TextMethods\FeatureExtractors\FeatureExtractorBase.cs" />
+    <Compile Include="TextMethods\FeatureExtractors\ExtendedFourierFeatureExtractor.cs" />
+    <Compile Include="TextMethods\FeatureExtractors\FourierFeatureExtractor.cs" />
+    <Compile Include="TextMethods\FeatureExtractors\MultinomialFeatureExtractor.cs" />
+    <Compile Include="TextMethods\FeatureExtractors\BinaryFeatureExtractor.cs" />
     <Compile Include="TextMethods\Normalization\EnglishSimpleNormalizer.cs" />
     <Compile Include="TextMethods\Preprocessing\TextPreprocessor.cs" />
     <Compile Include="TextMethods\Stemming\EnglishPorterStemmer.cs" />
@@ -192,6 +197,7 @@
     <Compile Include="TextMethods\WeightingSchemes\TFWeightingSchemes.cs" />
     <Compile Include="TextMethods\Tokenization\EnglishSimpleTokenizer.cs" />
     <Compile Include="Utils\GeneralUtils.cs" />
+    <Compile Include="Utils\MathConsts.cs" />
     <Compile Include="Utils\NetworkFactory.cs" />
     <Compile Include="Utils\StatUtils.cs" />
   </ItemGroup>

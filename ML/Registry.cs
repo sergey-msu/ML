@@ -7,6 +7,7 @@ using ML.Contracts;
 using ML.Utils;
 using ML.Core.Distributions;
 using ML.TextMethods.WeightingSchemes;
+using ML.TextMethods.FeatureExtractors;
 
 namespace ML.Registry
 {
@@ -168,6 +169,25 @@ namespace ML.Registry
       { Smooth.Name,        Smooth },
       { Probabilistic.Name, Probabilistic },
     };
+  }
+
+  public static class TextFeatureExtractor
+  {
+    private static readonly Dictionary<double, FourierFeatureExtractor> s_Fouriers = new Dictionary<double, FourierFeatureExtractor>();
+    private static readonly Dictionary<double, ExtendedFourierFeatureExtractor> s_ExtendedFouriers = new Dictionary<double, ExtendedFourierFeatureExtractor>();
+
+    public static readonly BinaryFeatureExtractor Binary = new BinaryFeatureExtractor();
+    public static readonly MultinomialFeatureExtractor Multinomial = new MultinomialFeatureExtractor();
+
+    public static FourierFeatureExtractor Fourier(double t)
+    {
+      return GeneralUtils.GetThroughMap(t, s_Fouriers);
+    }
+
+    public static ExtendedFourierFeatureExtractor ExtendedFourier(double t)
+    {
+      return GeneralUtils.GetThroughMap(t, s_ExtendedFouriers);
+    }
   }
 }
 

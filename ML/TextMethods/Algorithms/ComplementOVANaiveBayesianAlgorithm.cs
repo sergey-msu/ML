@@ -8,8 +8,7 @@ namespace ML.TextMethods.Algorithms
   /// </summary>
   public class ComplementOVANaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
-    public ComplementOVANaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
-      : base(preprocessor)
+    public ComplementOVANaiveBayesianAlgorithm()
     {
     }
 

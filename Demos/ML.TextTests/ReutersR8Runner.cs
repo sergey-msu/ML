@@ -37,8 +37,16 @@ namespace ML.TextTests
 
     protected override TextAlgorithmBase CreateAlgorithm()
     {
-      return Examples.Create_ReutersR8();
+      return //Examples.Create_GeneralTextAlgorithm();
+             Examples.Create_FourierGeneralTextAlgorithm(0.0);
+             //Examples.Create_ReutersR8();
     }
+
+    //protected override IEnumerable<TextAlgorithmBase> CreateAlgorithms()
+    //{
+    //  for (double t=0; t<6; t += 0.1)
+    //    yield return Examples.Create_FourierTFIDFAlgorithm(t);
+    //}
 
     #region Export
 

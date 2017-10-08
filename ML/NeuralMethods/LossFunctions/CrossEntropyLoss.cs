@@ -15,12 +15,12 @@ namespace ML.DeepMethods.LossFunctions
         res += expected[i] * Math.Log(actual[i]);
       }
 
-      return -res * GeneralUtils.ENTROPY_COEFF;
+      return -res * MathConsts.ENTROPY_COEFF;
     }
 
     public double Derivative(int idx, double[] actual, double[] expected)
     {
-      return -GeneralUtils.ENTROPY_COEFF * expected[idx] / actual[idx];
+      return -MathConsts.ENTROPY_COEFF * expected[idx] / actual[idx];
     }
   }
 }

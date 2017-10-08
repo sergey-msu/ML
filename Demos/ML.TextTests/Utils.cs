@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ML.Contracts;
 using ML.TextMethods.Algorithms;
 using ML.Core;
 

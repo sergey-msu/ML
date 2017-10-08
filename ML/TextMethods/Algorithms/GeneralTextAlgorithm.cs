@@ -10,8 +10,7 @@ namespace ML.TextMethods.Algorithms
   {
     private IClassificationAlgorithm<double[]> m_SubAlgorithm;
 
-    public GeneralTextAlgorithm(ITextPreprocessor preprocessor, IClassificationAlgorithm<double[]> alg)
-      : base(preprocessor)
+    public GeneralTextAlgorithm(IClassificationAlgorithm<double[]> alg)
     {
       if (alg==null) throw new MLException("GeneralNaiveBayesianAlgorithm.ctor(alg=null)");
 
@@ -31,11 +30,6 @@ namespace ML.TextMethods.Algorithms
       bool isEmpty;
       var data = ExtractFeatureVector(obj, out isEmpty);
       return m_SubAlgorithm.PredictTokens(data, cnt);
-    }
-
-    public override double[] ExtractFeatureVector(string doc, out bool isEmpty)
-    {
-      return ExtractFrequencies(doc, out isEmpty);
     }
 
 

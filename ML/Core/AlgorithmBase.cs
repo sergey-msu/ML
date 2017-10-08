@@ -80,7 +80,7 @@ namespace ML.Core
         Parallel.ForEach(testSample, body);
       else
         foreach (var pdata in testSample)
-          body(pdata);
+        body(pdata);
 
       return errors;
     }

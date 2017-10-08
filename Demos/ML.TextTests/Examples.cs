@@ -8,6 +8,7 @@ using ML.TextMethods.Tokenization;
 using ML.TextMethods.Stopwords;
 using ML.TextMethods.Normalization;
 using ML.TextMethods.Stemming;
+using ML.TextMethods.FeatureExtractors;
 
 namespace ML.TextTests
 {
@@ -23,7 +24,20 @@ namespace ML.TextTests
                                       new EnglishPorterStemmer());
       var kernel = new TriangularKernel();
       var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 0.5D) { UseKernelMinValue=true, KernelMinValue=0.000001D };
-      var alg    = new GeneralTextAlgorithm(proc, subAlg);
+      var alg    = new GeneralTextAlgorithm(subAlg) { Preprocessor = proc };
+
+      return alg;
+    }
+
+    public static TextAlgorithmBase Create_FourierGeneralTextAlgorithm(double t)
+    {
+      var proc = new TextPreprocessor(new EnglishSimpleTokenizer(),
+                                      new EnglishStopwords(),
+                                      new EnglishSimpleNormalizer(),
+                                      new EnglishPorterStemmer());
+      var kernel = new TriangularKernel();
+      var subAlg = new NaiveBayesianKernelAlgorithm(kernel, 0.5D) { UseKernelMinValue=true, KernelMinValue=0.000001D };
+      var alg    = new GeneralTextAlgorithm(subAlg) { Preprocessor = proc, FeatureExtractor=new ExtendedFourierFeatureExtractor { T=t } };
 
       return alg;
     }
@@ -34,7 +48,18 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new MultinomialNaiveBayesianAlgorithm(proc);
+      var alg = new MultinomialNaiveBayesianAlgorithm() { Preprocessor = proc };
+
+      return alg;
+    }
+
+    public static TextAlgorithmBase Create_FourierMultinomialAlgorithm(double t)
+    {
+      var proc = new TextPreprocessor(new EnglishSimpleTokenizer(),
+                                      new EnglishStopwords(),
+                                      new EnglishSimpleNormalizer(),
+                                      new EnglishPorterStemmer());
+      var alg = new MultinomialNaiveBayesianAlgorithm() { Preprocessor = proc, FeatureExtractor=new FourierFeatureExtractor { T=t } };
 
       return alg;
     }
@@ -45,7 +70,18 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new TFIDFNaiveBayesianAlgorithm(proc);
+      var alg = new TFIDFNaiveBayesianAlgorithm() { Preprocessor = proc };
+
+      return alg;
+    }
+
+    public static TextAlgorithmBase Create_FourierTFIDFAlgorithm(double t)
+    {
+      var proc = new TextPreprocessor(new EnglishSimpleTokenizer(),
+                                      new EnglishStopwords(),
+                                      new EnglishSimpleNormalizer(),
+                                      new EnglishPorterStemmer());
+      var alg = new TFIDFNaiveBayesianAlgorithm() { Preprocessor = proc, FeatureExtractor=new FourierFeatureExtractor { T=t } };
 
       return alg;
     }
@@ -56,7 +92,7 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new BinaryNaiveBayesianAlgorithm(proc);
+      var alg = new BinaryNaiveBayesianAlgorithm() { Preprocessor = proc };
 
       return alg;
     }
@@ -67,7 +103,7 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new ComplementNaiveBayesianAlgorithm(proc);
+      var alg = new ComplementNaiveBayesianAlgorithm() { Preprocessor = proc };
 
       return alg;
     }
@@ -78,7 +114,7 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new ComplementOVANaiveBayesianAlgorithm(proc);
+      var alg = new ComplementOVANaiveBayesianAlgorithm() { Preprocessor = proc };
 
       return alg;
     }
@@ -89,7 +125,7 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new TWCNaiveBayesianAlgorithm(proc);
+      var alg = new TWCNaiveBayesianAlgorithm() { Preprocessor = proc };
 
       return alg;
     }
@@ -104,7 +140,7 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new ComplementNaiveBayesianAlgorithm(proc);
+      var alg = new ComplementNaiveBayesianAlgorithm() { Preprocessor = proc };
 
       return alg;
     }
@@ -119,7 +155,7 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new MultinomialNaiveBayesianAlgorithm(proc);
+      var alg = new MultinomialNaiveBayesianAlgorithm() { Preprocessor = proc };
 
       return alg;
     }
@@ -134,7 +170,7 @@ namespace ML.TextTests
                                       new EnglishStopwords(),
                                       new EnglishSimpleNormalizer(),
                                       new EnglishPorterStemmer());
-      var alg = new TFIDFNaiveBayesianAlgorithm(proc);
+      var alg = new TFIDFNaiveBayesianAlgorithm() { Preprocessor = proc };
 
       return alg;
     }

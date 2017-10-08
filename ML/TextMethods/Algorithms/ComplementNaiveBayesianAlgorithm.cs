@@ -1,5 +1,4 @@
 ﻿using System;
-using ML.Contracts;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -8,8 +7,7 @@ namespace ML.TextMethods.Algorithms
   /// </summary>
   public class ComplementNaiveBayesianAlgorithm : NaiveBayesianAlgorithmBase
   {
-    public ComplementNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
-      : base(preprocessor)
+    public ComplementNaiveBayesianAlgorithm()
     {
     }
 

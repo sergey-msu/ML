@@ -4,6 +4,7 @@ using System.Linq;
 using ML.Core;
 using ML.Contracts;
 using ML.Core.Serialization;
+using ML.TextMethods.FeatureExtractors;
 
 namespace ML.TextMethods.Algorithms
 {
@@ -15,25 +16,47 @@ namespace ML.TextMethods.Algorithms
     private List<string> m_Vocabulary;
     private double[] m_PriorProbs;
     private int[] m_ClassHist;
-    private int  m_DataDim;
-    private int  m_DataCount;
-    private bool m_UsePriors;
+    private int   m_DataDim;
+    private int   m_DataCount;
+    private bool  m_UsePriors;
+
+    protected ITextFeatureExtractor m_FeatureExtractor;
 
     #endregion
 
-    protected TextAlgorithmBase(ITextPreprocessor preprocessor)
+    protected TextAlgorithmBase()
     {
-      if (preprocessor==null)
-        throw new MLException("NaiveBayesianAlgorithmBase.ctor(preprocessor=null)");
-
-      m_Preprocessor = preprocessor;
       m_UsePriors = true;
+      FeatureExtractor = Registry.TextFeatureExtractor.Multinomial;
     }
 
     #region Properties
 
-    public ITextPreprocessor Preprocessor { get { return m_Preprocessor; } }
-    public List<string>      Vocabulary   { get { return m_Vocabulary; } }
+    public List<string> Vocabulary { get { return m_Vocabulary; } }
+
+    public ITextFeatureExtractor FeatureExtractor
+    {
+      get { return m_FeatureExtractor; }
+      set
+      {
+        if (value==null)
+          throw new MLException("FeatureExtractor can not be null");
+
+        m_FeatureExtractor = value;
+      }
+    }
+
+    public ITextPreprocessor Preprocessor
+    {
+      get { return m_Preprocessor; }
+      set
+      {
+        if (value==null)
+          throw new MLException("Preprocessor can not be null");
+
+        m_Preprocessor = value;
+      }
+    }
 
     /// <summary>
     /// Prior class logarithm probabilities
@@ -50,25 +73,9 @@ namespace ML.TextMethods.Algorithms
 
     #endregion
 
-    public abstract double[] ExtractFeatureVector(string doc, out bool isEmpty);
-
-    public double[] ExtractFrequencies(string doc, out bool isEmpty)
+    public virtual double[] ExtractFeatureVector(string doc, out bool isEmpty)
     {
-      var dict   = Vocabulary;
-      var result = new double[DataDim];
-      var tokens = Preprocessor.Preprocess(doc);
-      isEmpty = true;
-      if (tokens==null) return result;
-
-      foreach (var token in tokens)
-      {
-        var idx = dict.IndexOf(token);
-        if (idx<0) continue;
-        result[idx] += 1;
-        isEmpty = false;
-      }
-
-      return result;
+      return FeatureExtractor.ExtractFeatureVector(doc, out isEmpty);
     }
 
     public virtual List<string> ExtractVocabulary(ClassifiedSample<string> corpus)
@@ -105,9 +112,11 @@ namespace ML.TextMethods.Algorithms
       if (m_Vocabulary.Count<=0)
         throw new MLException("Vocabulary is empty");
 
+      m_FeatureExtractor.Preprocessor = m_Preprocessor;
+      m_FeatureExtractor.Vocabulary = m_Vocabulary;
       m_ClassHist  = new int[classes.Count];
       m_PriorProbs = new double[classes.Count];
-      m_DataDim    = m_Vocabulary.Count;
+      m_DataDim    = FeatureExtractor.DataDim;
       m_DataCount  = TrainingSample.Count;
 
       foreach (var doc in TrainingSample)
@@ -130,13 +139,14 @@ namespace ML.TextMethods.Algorithms
     {
       base.Serialize(ser);
 
+      ser.Write("FEATURE_EXTRACTOR", m_FeatureExtractor);
       ser.Write("PREPROCESSOR", m_Preprocessor);
-      ser.Write("VOCABULARY", m_Vocabulary);
-      ser.Write("PRIORS",     m_PriorProbs);
-      ser.Write("CLASS_HIST", m_ClassHist);
-      ser.Write("DATA_DIM",   m_DataDim);
-      ser.Write("DATA_COUNT", m_DataCount);
-      ser.Write("USE_PRIORS", m_UsePriors);
+      ser.Write("VOCABULARY",   m_Vocabulary);
+      ser.Write("PRIORS",       m_PriorProbs);
+      ser.Write("CLASS_HIST",   m_ClassHist);
+      ser.Write("DATA_DIM",     m_DataDim);
+      ser.Write("DATA_COUNT",   m_DataCount);
+      ser.Write("USE_PRIORS",   m_UsePriors);
     }
 
     public override void Deserialize(MLSerializer ser)
@@ -144,7 +154,10 @@ namespace ML.TextMethods.Algorithms
       base.Deserialize(ser);
 
       m_Preprocessor = ser.ReadObject<ITextPreprocessor>("PREPROCESSOR");
-      m_Vocabulary = ser.ReadStrings("VOCABULARY").ToList();
+      m_Vocabulary   = ser.ReadStrings("VOCABULARY").ToList();
+      m_FeatureExtractor = ser.ReadObject<ITextFeatureExtractor>("FEATURE_EXTRACTOR");
+      m_FeatureExtractor.Preprocessor = m_Preprocessor;
+      m_FeatureExtractor.Vocabulary = m_Vocabulary;
       m_PriorProbs = ser.ReadDoubles("PRIORS").ToArray();
       m_ClassHist  = ser.ReadInts("CLASS_HIST").ToArray();
       m_DataDim    = ser.ReadInt("DATA_DIM");
@@ -161,8 +174,7 @@ namespace ML.TextMethods.Algorithms
     private double     m_Alpha;
     private bool       m_UseSmoothing;
 
-    protected NaiveBayesianAlgorithmBase(ITextPreprocessor preprocessor)
-      : base(preprocessor)
+    protected NaiveBayesianAlgorithmBase()
     {
       m_UseSmoothing = true;
       m_Alpha = 1;
@@ -227,12 +239,6 @@ namespace ML.TextMethods.Algorithms
                    .Take(cnt)
                    .ToArray();
     }
-
-    public override double[] ExtractFeatureVector(string doc, out bool isEmpty)
-    {
-      return ExtractFrequencies(doc, out isEmpty);
-    }
-
 
 
     protected override void TrainImpl()

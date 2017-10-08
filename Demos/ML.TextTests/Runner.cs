@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ML.Core;
@@ -12,7 +13,6 @@ namespace ML.TextTests
 
     protected ClassifiedSample<string> m_TrainingSet = new ClassifiedSample<string>();
     protected ClassifiedSample<string> m_TestingSet  = new ClassifiedSample<string>();
-    protected ClassifiedSample<string> m_ValidationSet; // part of a training set
 
     public string RootPath
     {
@@ -38,6 +38,10 @@ namespace ML.TextTests
           m_Alg = CreateAlgorithm();
         return m_Alg;
       }
+      set
+      {
+        m_Alg = value;
+      }
     }
 
 
@@ -48,13 +52,19 @@ namespace ML.TextTests
       //Export();
       Load();
 
-      var vcnt = m_TrainingSet.Count / 20;
-      m_ValidationSet = m_TrainingSet.Subset(0, vcnt);
-
-      Train();
+      var algs = CreateAlgorithms();
+      foreach (var alg in algs)
+      {
+        Alg = alg;
+        Train();
+      }
     }
 
     protected abstract TextAlgorithmBase CreateAlgorithm();
+    protected virtual IEnumerable<TextAlgorithmBase> CreateAlgorithms()
+    {
+      yield return CreateAlgorithm();
+    }
 
     protected virtual void Init()
     {

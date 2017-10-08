@@ -28,8 +28,7 @@ namespace ML.TextMethods.Algorithms
     private IIDFWeightingScheme m_IDFWeightingScheme;
 
 
-    public TFIDFNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
-      : base(preprocessor)
+    public TFIDFNaiveBayesianAlgorithm()
     {
       TFWeightingScheme  = Registry.TFWeightingScheme.RawCount;
       IDFWeightingScheme = Registry.IDFWeightingScheme.Standart;

@@ -10,8 +10,7 @@ namespace ML.TextMethods.Algorithms
   /// </summary>
   public class TWCNaiveBayesianAlgorithm : TFIDFNaiveBayesianAlgorithm
   {
-    public TWCNaiveBayesianAlgorithm(ITextPreprocessor preprocessor)
-      : base(preprocessor)
+    public TWCNaiveBayesianAlgorithm()
     {
       UsePriors = false; // not to use prior probabilities is the default TWC behaviour
     }

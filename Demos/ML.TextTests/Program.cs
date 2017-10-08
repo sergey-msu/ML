@@ -8,9 +8,9 @@ namespace ML.TextTests
     {
       var runner =
         //new SpamRunner();
-        //new ReutersR8Runner();
+        new ReutersR8Runner();
         //new ReutersR52Runner();
-        new Newsgroups20Runner();
+        //new Newsgroups20Runner();
 
       try
       {

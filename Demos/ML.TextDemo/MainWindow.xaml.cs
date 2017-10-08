@@ -43,7 +43,7 @@ namespace ML.TextDemo
                                         new EnglishStopwords(),
                                         new EnglishSimpleNormalizer(),
                                         new EnglishPorterStemmer());
-        m_SpamAlgorithm = new ComplementNaiveBayesianAlgorithm(proc);
+        m_SpamAlgorithm = new ComplementNaiveBayesianAlgorithm() { Preprocessor = proc };
         m_SpamAlgorithm.Deserialize(spam);
       }
 
@@ -53,7 +53,7 @@ namespace ML.TextDemo
                                         new EnglishStopwords(),
                                         new EnglishSimpleNormalizer(),
                                         new EnglishPorterStemmer());
-        m_ReutersR8Algorithm = new MultinomialNaiveBayesianAlgorithm(proc);
+        m_ReutersR8Algorithm = new MultinomialNaiveBayesianAlgorithm() { Preprocessor = proc };
         m_ReutersR8Algorithm.Deserialize(r8);
       }
 
@@ -63,7 +63,7 @@ namespace ML.TextDemo
                                         new EnglishStopwords(),
                                         new EnglishSimpleNormalizer(),
                                         new EnglishPorterStemmer());
-        m_Newsgroups20Algorithm = new TFIDFNaiveBayesianAlgorithm(proc);
+        m_Newsgroups20Algorithm = new TFIDFNaiveBayesianAlgorithm() { Preprocessor = proc };
         m_Newsgroups20Algorithm.Deserialize(n20);
       }
     }

@@ -86,4 +86,15 @@ namespace ML.Contracts
   {
     double[] GetWeights(int vocabularyCount, int[] idfFreqs);
   }
+
+  public interface ITextFeatureExtractor
+  {
+    ITextPreprocessor Preprocessor { get; set; }
+
+    List<string> Vocabulary { get; set; }
+
+    int DataDim { get; }
+
+    double[] ExtractFeatureVector(string doc, out bool isEmpty);
+  }
 }
